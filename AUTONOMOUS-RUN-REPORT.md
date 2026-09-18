@@ -1,96 +1,76 @@
-# 이동용 개발 체크포인트
-2026-09-18. 사용자 요청으로 기능 개발을 멈췄다. APP-05/06은 시작하지 않았다. 출시 완료 보고가 아니다.
+# Arucon 모바일 재구성 실행 보고서
 
-## 단계별 실제 상태
-전체 단계의 필수 기기 검증이 남아 있어 APP-01~04를 `in_progress`로 기록했다. 로컬 구현 완료와 전체 게이트 완료를 구분한다.
+기준일: 2026-09-19 KST. **전체 게이트: PARTIAL — 로컬 구현·검사 완료, 네이티브 검증과 제품 결정 대기.**
 
-| 단계 | 상태 | 완료한 범위 | 남은 범위 / 마지막 통과 |
-|---|---|---|---|
-| APP-01 | in_progress | Expo 셸, 원본 GLB, 이동·터치·safe area; 독립 검토 완료 | native 화면/모션/FPS; 당시 8/8 |
-| APP-02 | in_progress | 순수 도메인, SQLite 저장·ledger·rollback; 독립 검토 완료 | native SQLite, 운영 정책; 당시 36/36 |
-| APP-03 | in_progress | 방/생활/직접·자동 급식/일지, 기존 DB 시설 일치; 독립 검토 완료 | 실제 UI 검증; 당시 47/47 |
-| APP-04 | in_progress | 로컬 이름/동의 예시, 합성 활동 provider, 중복·역순 정산 | 독립 reviewer 검토 대기, 실기기/실제 건강 연동; 현재 55/55 |
-| APP-05 | not_started | 없음 | 이번 요청에서 진행 금지 |
-| APP-06 | not_started | 없음 | 이번 요청에서 진행 금지 |
+## Git 구조와 변경 범위
 
-마지막으로 마무리한 소규모 작업은 APP-04 저장본 사전 검사 회귀(스키마 v1에 game_state 행이 없는 경우 포함) 및 전체 테스트/Android 번들 검증이다. 제품 코드 추가 없이 체크포인트 문서와 제외 규칙을 정리했다.
+아래 미커밋/미push 표기는 재구성 검증 종료 시점의 기록이다. 이후 체크포인트 저장 승인은 이 문서 마지막 절에 별도로 기록한다.
 
-## 구현 및 기술 선택
-- Expo SDK 57 / React Native 0.86.3 / React 19.2.3 / TypeScript 6.0.3. Expo GL + Three로 네이티브 GL 방을 구성했다. WebView가 아니다. [렌더러 ADR](mobile/docs/ADR-APP-01-renderer.md).
-- 승인 GLB를 변경 없이 번들했다. SHA256: `6971E18721E03784A22033D5F73BCD90474862117F1CB7D694DC326D254E984F`. 캐릭터 형태/성격/모션을 재디자인하지 않았다.
-- 도메인·저장·표시·OS 경계를 분리했다. 실제 섭취만 EXP, 직접/opt-in 자동급식 같은 경제 규칙, 무료 교감·활동 자원 중립, 청결 기반 기운 없음, 동면 정지 규칙을 테스트했다. [도메인/저장 결정](mobile/docs/APP-02-domain-storage.md).
-- SQLite 트랜잭션, 명령/식사 ledger, pending 명령, 엄격한 저장본 검증으로 중복 보상/부분 저장을 방지한다. 손상 저장본은 새 펫으로 덮어쓰지 않는다.
-- 자동급식은 실제 배고픔 조건이 성립하는 시점에 정산하며 늦게 받은 활동 먹이를 과거에 소급 소비하지 않는다. [방/생활 통합](mobile/docs/APP-03-life-room-integration.md).
-- 온보딩·이름 규칙·나이/보호자 상태·활동 날짜는 DEV fixture다. 실제 법적 동의나 건강 연결을 구현했다고 주장하지 않는다. native health 기본 OFF, 운영 config는 DecisionRequired/NotConfigured로 격리했다. [APP-04 경계](mobile/docs/APP-04-onboarding-activity.md).
-- Windows 인코딩 오류를 고치기 위해 validation/check_workflow.py의 텍스트 입출력에 UTF-8을 명시했다. 기존 검증 조건/테스트 기대값은 유지했다. 운영 기술 DEC를 APPROVED로 바꾸지 않았다.
+`mobile/`을 현재 루트 Git 저장소의 일반 폴더로 구성했다. `mobile/.git`은 만들지 않았다. 루트 브랜치는 `feature/arucon-mobile-autonomous`, 기준 HEAD는 `83897aa`다. 사용자가 staged한 기존 gitlink 삭제와 `.gitignore` 변경을 보존했다. 새 mobile 파일은 루트에서 untracked 상태다. commit, push, merge, 공개 배포는 하지 않았다.
 
-## 테스트와 빌드
-환경: Windows, Node 24.19.0, npm 11.17, 프로젝트 로컬 Python 3.13.15. PowerShell에서는 npm.cmd/npx.cmd 사용.
+비어 있던 mobile과 루트의 Git 객체에서 이전 소스를 복구할 수 없어 요구 문서·승인 GLB를 기준으로 다시 구현했다. 이 보고서는 과거 별도 mobile Git/Windows 기록을 대체하며, 과거 55개 테스트 결과를 현재 코드의 근거로 사용하지 않는다.
 
-| 검사 | 결과 |
-|---|---|
-| mobile: npm.cmd test | PASS 55/55, fail 0, skip 0 |
-| mobile: npm.cmd run lint | PASS, exit 0 |
-| mobile: npm.cmd run typecheck | PASS, exit 0 |
-| mobile: npx.cmd expo export --platform android --output-dir evidence/app04-android-export | PASS, 664 modules, GLB + HBC 번들; APK 빌드 아님 |
-| Python workflow checker | PASS 38/38 |
-| 기존 test_current_workflow_validator_passes 직접 실행 | PASS |
-| 기존 참조 baseline | 104/105; site/sw.js 미생성으로 실패 |
-| 원본 보존 복사본 build.py 후 참조 재검사 | 111/112; 원본 assets/icons 누락으로 manifest icon 검사 실패 |
-| npm audit --json | exit 1; moderate 10, high/critical 0; Expo→xcode→uuid 체인, 강제 다운그레이드 안 함 |
+## 구현 결과
 
-원시 로그는 mobile/evidence/checkpoint-npm-test.log, app04-lint-final.log, app04-typecheck-final.log, app04-export-approved.log 및 evidence/autonomous/에 있다. 로그/대형 export는 Git 제외 대상이다. 이 문서와 JSON에 결과 요약을 남겼으며 다음 PC에서는 명령을 다시 실행한다.
-
-## 검증하지 못한 항목 / OPEN / Hard Stop
-- Android 기기는 adb unauthorized였다. Java/Android SDK/emulator를 찾지 못했고 Windows에서 iOS/Xcode 빌드는 확인할 수 없다. APK/IPA, 실제 렌더/영상/FPS, OS SQLite, background/native health는 NOT_RUN이다.
-- APP-04 독립 검토는 미실행이다. 이전 APP-01~03 reviewer 결과로 이를 대체하지 않는다.
-- DEC-05 수면 scorer, DEC-08 진화, DEC-09 가격/결제, DEC-11 실제 동의, DEC-12/31 운영 기술/지원환경, DEC-13/24 밸런스, DEC-17 보존/복구 및 DEC-01/02/15 등 PROPOSED/OPEN 정책은 승인 대기다.
-- HS-01 실제 건강정보, HS-02 실제 계정/외부 쓰기, HS-03 실결제, HS-04 운영 배포, HS-05 원격 Git/파괴적 작업, HS-06 제품 결정, HS-07 큰 아트 변경, HS-08 관리자/전역 도구 설치는 실행하지 않았다. 상세 경계는 [hard-stops](docs/hard-stops.md).
-- 현재 정지 사유는 사용자의 이동 체크포인트 요청이다. OPEN 때문에 모든 독립 개발이 불가능하다는 뜻은 아니다.
-
-## 모델/역할
-| 역할 | 요청 모델 | 실제 실행 확인 |
+| 단계 | 구현 | 게이트와 남은 검증 |
 |---|---|---|
-| root 통합/판단 | Astra | 런타임 모델 ID 미노출 |
-| arucon_builder 구현 | Sol | ROUTING_UNVERIFIED |
-| arucon_explorer 읽기 조사 | Terra | ROUTING_UNVERIFIED |
-| arucon_reviewer 독립 검토 | Terra | ROUTING_UNVERIFIED |
-| arucon_luna_worker 좁은 반복 수정 | Luna | ROUTING_UNVERIFIED |
-| arucon_spark_worker | Codex-Spark | HTTP 400, 계정 미지원; 재시도 안 함 |
+| APP-01 | Expo 개발 셸, Three GLB 방·이동·터치·성격 모션 | PARTIAL; 실제 렌더·기기 모션/FPS 확인 불가 |
+| APP-02 | 순수 도메인, 원자적 SQLite 저장·식사/명령 원장·손상 보호 | PARTIAL; Node SQLite 검증, Expo SQLite 네이티브 미실행 |
+| APP-03 | 직접/자동 식사·시간 경계·전경 복귀·일지·재시도·방 입력 연결 | PARTIAL; 실제 AppState/앱 종료/화면 미실행 |
+| APP-04 | DEV 명명·합성 연령/보호자 상태·활동 공급자 계약 | PARTIAL; 실제 건강/인증/동의 OFF |
+| APP-05 | 합성 수면 정책·코인 전용 상점 견적·읽기 전용 위젯 미리보기 | PARTIAL; 실제 scorer/회복·구매 트랜잭션·OS 위젯 미구현 |
+| APP-06 | 통합 검사, SRS14 매핑, 증거·재개 기록 | PARTIAL; 로컬 증거 기록 완료, 설치형 앱 수용 게이트 잔여 |
 
-역할별 probe는 실행했으나 설정/자기 식별을 실제 모델 증거로 취급하지 않았다. Astra 상속을 입증한 증거도 없어 ROUTING_MISMATCH로 단정하지 않는다. evidence/autonomous/routing.*에 세부 기록이 있다.
+운영 밸런스·수면·진화·동의·가격 OPEN/PROPOSED는 승인으로 바꾸지 않았다. 이름 카탈로그는 아루콘/말루/모노/피코/몽글을 유지하며 실제 외형 resolver는 DecisionRequired다. 승인 GLB는 원본과 바이트가 같다.
 
-## Git와 이관 범위
-- 루트는 Git 저장소가 아니다. mobile만 별도 저장소이며 branch `main`, HEAD `800090441b5e9e0ae351d2cb02a16fa85d7a10c0` (Initial commit)이다.
-- 변경된 tracked 파일: mobile/.gitignore, App.tsx, app.json, package.json, package-lock.json.
-- 새 커밋 후보: mobile/README.md, assets/arucon-tsundere-motion.glb, docs/, eslint.config.js, metro.config.js, src/, tests/.
-- 루트 체크포인트 변경: .gitignore, AUTONOMOUS-STATUS.json, AUTONOMOUS-RUN-REPORT.md, NEXT-RESUME.md. 이전 작업의 docs/adr/README.md와 validation/check_workflow.py도 이관해야 한다. 루트에는 비교할 Git 기준선이 없어 전체 변경 여부를 Git diff로 확정할 수 없다.
-- mobile만 업로드하면 루트 문서·tasks·references·검증/라우팅 지침은 포함되지 않는다. 전체 개발 맥락은 프로젝트 루트도 함께 이관해야 한다. 저장소 초기화/중첩 .git 삭제/이력 변경은 하지 않았다.
-- 양쪽 .gitignore를 보강했다. .env*, 키/인증 파일, 의존성/캐시, SQLite, 로그, 빌드, evidence, 영상/ZIP을 제외한다. 필수 GLB·이미지·lockfile·소스는 보존한다. 원본 참조 assets도 유지한다.
-- 비밀정보 검사: mobile 커밋 후보 텍스트 및 루트 docs/tasks/validation/.codex/.agents/figma/references 텍스트 116개에서 private-key header, 알려진 키 형식, API key/token/password 할당과 URL을 검사했다. 실제 자격증명/내부 URL 후보는 발견되지 않았다. 바이너리 내부·ignored 생성물·Git 과거 이력은 검사 범위 밖이며 완전한 비밀 부재 보장은 아니다. 값은 출력하지 않았다.
-- commit/push/merge/배포/외부 데이터 쓰기는 하지 않았다.
-- 추가 비밀 패턴 검사: mobile 기존 tracked 텍스트 9개와 루트 최상위 텍스트 7개도 후보 0건. Git 과거 이력/바이너리는 제외했다.
+## 검토에서 수정한 문제
 
-### 체크포인트 자체 검증
-- arucon_reviewer의 독립 체크포인트 검토: BLOCKER 없음. 문서/ignore/검증 증거만 검토했으며 APP-04 구현 리뷰는 여전히 pending이다.
-- 상태 JSON 파싱 및 각 단계 상태 enum 검사 PASS.
-- root ignore 규칙을 npm ignore matcher로 검사: 제외 17경로/보존 6경로 모두 예상 일치. root 자체의 Git 추적 검사는 저장소 부재로 불가하다.
-- mobile git check-ignore 대표 패턴 검사 PASS; GLB/필수 PNG/소스/lockfile 유지, tracked 민감/대형 생성물 후보 없음.
-- mobile git diff --check PASS. 변경된 tracked 파일은 5개이며 새 소스는 아래 ?? 항목에 별도로 표시된다.
+- 저장 스냅샷 누락을 신규 펫으로 오인하지 않도록 생성 marker와 원장 잔존 검사를 추가했다.
+- 활동 공급자·revision·연결 이후 구간을 저장 트랜잭션 안에서 다시 검사한다.
+- 불확실한 재시도는 같은 명령과 합성 걸음 aggregate를 재사용한다. 예상 급식 거절은 다음 입력을 막지 않는다.
+- 과거 시간은 기존 재고로 먼저 정산한다. 전경 종료·보류된 lifecycle·동면 동시 경계도 검사했다.
+- 표시용 식사 신호는 확정 EXP와 일지 이벤트에서만 만든다. 일지/위젯 조회는 경제 명령을 실행하지 않는다.
+- 비동기 모델 로딩 후 자원 해제와 RAF 단일 예약을 검사했다. 동작 줄이기의 터치·식사·공은 짧은 정지 포즈로 바꾸고 mixer 시간이 전진하지 않는 것을 검사했다.
 
-최종 mobile Git 상태(로컬 명령 한정 safe.directory 지정, 전역 설정 변경 없음):
-```text
-## main
- M .gitignore
- M App.tsx
- M app.json
- M package-lock.json
- M package.json
-?? README.md
-?? assets/arucon-tsundere-motion.glb
-?? docs/
-?? eslint.config.js
-?? metro.config.js
-?? src/
-?? tests/
-```
+## 실행 기록
+
+아래 결과는 마지막 reduced-motion 수정까지 반영한 소스에서 실행했다. 관련 source SHA-256 목록은 `mobile/evidence/rebuild-2026-09-19/source-sha256.json`에 보존했다.
+
+| 명령 / cwd | 결과 | 로컬 증거 |
+|---|---|---|
+| `npm test` / mobile | exit 0, **72/72 PASS**, 실패·skip 0 | `tests.log` |
+| `npm run lint` / mobile | exit 0, 오류·lint 경고 0 | `lint.log` |
+| `npm run typecheck` / mobile | exit 0 | `typecheck.log` |
+| `EXPO_OFFLINE=1 CI=1 ./node_modules/.bin/expo export --platform all --max-workers 2 --output-dir evidence/rebuild-2026-09-19/metro` / mobile | exit 0, Android/iOS Hermes 번들·GLB 자산 생성 | `metro-export.log`, `metro/metadata.json` |
+| Python 3.12.14 `validation/check_workflow.py` / root | exit 0, **38/38 PASS** | `workflow.log` |
+| Python 3.12.14 `test_workflow_validator.py`의 회귀 assertion / root | exit 0 | `workflow-regression.log` |
+| Git 구조·GLB 동일성·문서 링크 | PASS | `repository-check.log` |
+
+장면 검사 11개를 포함한 합계이며 운영 수용 사례 218개 전체 실행 수가 아니다. 단위/SQLite 통합 검사이고 실제 UI E2E는 미실행이다. Expo의 NO_COLOR/FORCE_COLOR 런타임 경고는 번들 실패가 아니며 lint 경고와 구분한다.
+
+환경: macOS, Node 26.7.0, npm 11.19.0, Python 3.12.14(번들), Java 21.0.12.1. Expo57/RN0.86.3/React19.2.3.
+
+로컬 증거 폴더: `mobile/evidence/rebuild-2026-09-19/` (Git 제외). 원본 GLB SHA-256: `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`.
+
+실제 온라인 `npm audit --json`은 exit 1, moderate 10, high/critical 0이었다. Expo→xcode→uuid 경로 GHSA-w5hq-g745-h8pq가 남아 있다. 제안된 Expo46 강제 다운그레이드는 적용하지 않았다. 오프라인 감사 0건은 결과로 채택하지 않았다. `EXPO_OFFLINE=1 CI=1 expo install --check`는 exit 0이나 오프라인 호환성 검사가 불완전하다는 경고가 있으므로 전체 호환성 승인으로 해석하지 않는다.
+
+## 미실행·결정 대기
+
+Xcode/Simulator·Android SDK/adb가 없어 APK/IPA, 실제 앱 화면·영상·FPS·Expo SQLite·OS 생명주기는 **미실행 / 확인 불가**다. Metro export는 JavaScript와 자산 번들이며 설치형 빌드가 아니다. 실제 건강정보/계정/결제/서버·공개 배포도 수행하지 않았다.
+
+[APP-06 QA](mobile/docs/APP-06-validation.md)에 SRS14 전 항목, 네이티브 수용 판정, Hard Stop별 막힌 기능/선택지/재개 검사를 기록했다. [NEXT-RESUME.md](NEXT-RESUME.md)는 준비된 SDK 환경에서 이어갈 정확한 순서를 안내한다. 현재 결과로 MVP 완료나 AUTO-DEVELOPMENT: PASS를 선언하지 않는다.
+
+## 역할 및 외부 반영
+
+루트는 통합·최종 판단, arucon_builder는 장면/도메인/앱 통합, arucon_explorer는 요구·참조 탐색, arucon_reviewer는 독립 검토를 담당했다. APP-05 위임 중 모델 용량 오류가 발생해 루트가 기존 파일의 타입/config 수정과 통합을 이어갔다. 실제 backend model ID를 검증할 메타데이터가 없어 **ROUTING_UNVERIFIED**다.
+
+로컬 소스·lockfile·문서와 합성 테스트 산출물만 작성했다. npm 의존성 다운로드와 공식 문서 조회 외에 외부 서비스에 제품 데이터를 쓰지 않았다. 건강 원본·비밀 접근, 계정 생성, 원격 Git 반영, 공유권한 변경, 시스템 SDK 설치, 승인 아트 재디자인은 수행하지 않았다.
+
+
+## 체크포인트 저장 승인 — 커밋 전 기록
+
+2026-09-19 사용자가 현재 재구성 소스의 commit과 `origin/feature/arucon-mobile-autonomous` push를 명시적으로 승인했다. 커밋 메시지는 `APP: rebuild mobile checkpoint through APP-04`다. 기존 APP-05/06 개발 경계와 검증 문서도 현재 소스의 일부로 보존하며, 메시지를 이유로 해당 구현 상태를 바꾸지 않는다.
+
+사전 확인: 요청 브랜치 일치, `mobile/.git` 없음, package/lockfile 존재, 루트 Git 일반 파일 대상, 커밋 후보 제외 경로·비밀 패턴 발견 없음, 기존 검증 소스 해시 일치. stage 후에는 두 package 파일의 mode 100644 및 잔여 gitlink 부재를 확인한다. 실제 commit/push 성공은 이 커밋 전 문장에서 선행 선언하지 않으며 작업 종료 시 HEAD·원격 추적 ref·실제 원격 ref를 대조한다. main push, merge/PR merge, 배포는 승인 범위에 없다.
+
+검증 기록은 **72/72, lint/typecheck PASS, Android/iOS bundle PASS**를 유지한다. 실제 기기 검증은 SDK 부재로 **미실행**이며 번들 통과를 실기기 통과로 표시하지 않는다.

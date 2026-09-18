@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "아루콘 개발 셸",
+    "slug": "arucon-mobile",
+    "scheme": "arucondev",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": ["expo-dev-client", ["expo-asset", { "assets": ["./assets/arucon-tsundere-motion.glb"] }]],
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.arucon.dev" },
+    "android": { "package": "com.arucon.dev" }
+  }
+}

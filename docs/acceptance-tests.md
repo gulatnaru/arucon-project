@@ -5,6 +5,8 @@
 
 > **이 파일은 테스트 설계서이지 실행 결과가 아니다. 운영 MVP 사례는 미실행이다. 별도 PROTO 실행 증거는 해당 시제품 패키지의 QA 보고서에서만 보고한다. 이 묶음의 prototype-spec.md에 역사적 실행 범위를 구분했다.** 원문 기준과 이번 제안의 기대값을 구분했다. 미승인 DEC에 의존하는 기대값은 승인 후에만 운영 수용 기준으로 사용한다. 자동 테스트 코드는 각 D단계에서 작성·실행하고 증거를 남긴다.
 
+2026-09-19 모바일 재구성의 **개발 fixture 실행 이력**은 아래 별도 절과 [APP-06 QA](../mobile/docs/APP-06-validation.md)에 기록한다. 이 기록이 본문 설계 사례 전체나 운영 MVP의 미실행 상태를 통과로 바꾸지는 않는다.
+
 > **v1.7 변경**: 기존 214개 사례를 유지하고 진화형 명명/표시 분리 4개(AT-APPEARANCE-04~07)를 추가해 **총 218개 설계 사례**가 된다. 실행 통과 수가 아니다. 매 변경마다 218개를 전부 실행하라는 뜻은 아니며 영향 기반 검증을 따른다. 스킬 발동 검증은 별도이며 게임 AT 수에 합산하지 않는다.
 > **v1.6 운영 변경**: 당시 214개 사례의 입력·기대값·승인 의존·미실행 상태를 보존했다.
 
@@ -505,3 +507,24 @@ QA 판정:
 | AT-SURFACE-02 | 동작 줄이기·무음·절전 설정 | 필수 상태/메뉴 유지, 장식 움직임 제한. 성장 조건/보상 변화 없음 | FR-10.1/FR-NF.6 |
 | AT-SURFACE-03 | 모든 접점의 표정과 서식 정보 비교 | 같은 정체성/성격은 유지하되 포즈/픽셀위치 실시간 일치를 요구하지 않음 | FR-23/4-5 |
 | AT-SURFACE-04 | 신규 확장 미구현 상태의 문서/QA 검토 | MVP와 확장 게이트를 분리. 과거 브라우저/Figma 결과를 네이티브 기능 완료에 재사용하지 않음 | 3-6/14-3 |
+
+
+## 실행 이력 — 2026-09-19 루트 Git 모바일 재구성
+
+대상은 새 `mobile/` 소스의 DEV fixture다. 이전 별도 저장소의 55개 테스트/Windows 결과를 재사용하지 않는다. 최종 실행 명령·exit·개수는 [루트 실행 보고서](../AUTONOMOUS-RUN-REPORT.md), SRS14 전 항목 판정은 [APP-06 QA](../mobile/docs/APP-06-validation.md), 원시 로컬 로그는 `mobile/evidence/rebuild-2026-09-19/`에서 확인한다.
+
+최종 개발 검사: `npm test` **72/72 PASS**(실패/skip 0), lint/typecheck exit 0, Android/iOS Metro export exit 0. 장면 11개를 포함한다. 원시 로그와 소스 해시는 위 evidence 폴더에 남겼다.
+
+환경: macOS, Node 26.7.0, npm 11.19.0, Expo57/RN0.86.3/React19.2.3. 도메인/저장 검사는 Node 실제 SQLite와 합성 펫·활동을 사용한다. Python 문서 검사는 번들 3.12.14를 사용한다.
+
+| 검사 범위 | 명령 / cwd | 수용 범위 |
+|---|---|---|
+| 활동·급식·시간·동면·청결·무료 교감·저장·재시도 | `npm test` / mobile | 해당 AT의 개발 fixture 부분집합. AT-ACT/REWARD/FEED/AUTO/CLEAN/CONDITION/HIB/TXN/DATA 매핑은 APP-02 문서 참조 |
+| 생활 통합·확정 일지·DEV 시간·합성 활동·명명 | 같은 전체 test 명령 / mobile | 앱 서비스 통합과 계약 검증. OS UI E2E는 미실행 |
+| 수면·상점·위젯 | 같은 전체 test 명령 / mobile | 합성 배율·coin-only 견적·읽기 전용 projection만 검사. 실제 scorer/구매/OS 위젯 미실행 |
+| 장면 | 같은 전체 test 명령 / mobile | 수학/순수 상태 검증. 화면·모션·FPS 수용은 확인 불가 |
+| 정적 품질 | `npm run lint`, `npm run typecheck` / mobile | 최종 소스 검사; 네이티브 실행을 입증하지 않음 |
+| 번들 | `EXPO_OFFLINE=1 CI=1 ./node_modules/.bin/expo export --platform all --max-workers 2 --output-dir evidence/rebuild-2026-09-19/metro` / mobile | Android/iOS JavaScript와 GLB 자산. APK/IPA가 아님 |
+| 문서/역할 설정 | `python validation/check_workflow.py` / root | 38/38 PASS 및 `test_workflow_validator.py` 회귀 assertion PASS |
+
+실제 iOS/Android 권한·강제 종료·Expo SQLite·UI/모션·위젯 검증은 SDK/기기 부재로 미실행/확인 불가다. 실제 건강·계정·결제·출시 DEC는 승인 경계에 있다. 본문 218개 설계 사례 전체 실행 또는 운영 승인으로 집계하지 않는다.

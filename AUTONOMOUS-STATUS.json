@@ -1,139 +1,121 @@
 {
-  "schemaVersion": 2,
-  "runDate": "2026-09-18",
-  "status": "paused_at_checkpoint",
-  "reason": "User requested portable checkpoint and stop; no new APP stages.",
+  "schemaVersion": 3,
+  "runDate": "2026-09-19",
+  "timezone": "Asia/Seoul",
+  "status": "local_validation_complete_native_and_decisions_pending",
+  "overallGate": "PARTIAL",
+  "reason": "Mobile source reconstructed as an ordinary root repository directory; native SDK and product decisions remain outstanding.",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "stages": {
     "APP-01": {
-      "status": "in_progress",
-      "localImplementation": "done",
-      "independentReview": "done",
       "gate": "PARTIAL",
-      "note": "셸/GLB/입력 구현 및 독립 검토 완료; 실제 렌더·모션·FPS 미검증",
-      "lastPassedTests": {
-        "stageTestCount": 8,
-        "currentRegression": {
-          "command": "npm.cmd test",
-          "cwd": "mobile",
-          "passed": 55,
-          "failed": 0,
-          "date": "2026-09-18"
-        },
-        "lint": "pass",
-        "typecheck": "pass",
-        "androidMetroExport": "pass"
-      },
-      "remaining": [
-        "실기기 검증",
-        "OPEN 운영 정책"
-      ]
+      "localImplementation": "scene integration and reduced-motion held poses implemented",
+      "nativeValidation": "NOT_RUN",
+      "independentReview": "completed_for_local_scope"
     },
     "APP-02": {
-      "status": "in_progress",
-      "localImplementation": "done",
-      "independentReview": "done",
       "gate": "PARTIAL",
-      "note": "도메인/SQLite 구현 및 독립 검토 완료; 네이티브 SQLite 미검증",
-      "lastPassedTests": {
-        "stageTestCount": 36,
-        "currentRegression": {
-          "command": "npm.cmd test",
-          "cwd": "mobile",
-          "passed": 55,
-          "failed": 0,
-          "date": "2026-09-18"
-        },
-        "lint": "pass",
-        "typecheck": "pass",
-        "androidMetroExport": "pass"
-      },
-      "remaining": [
-        "실기기 검증",
-        "OPEN 운영 정책"
-      ]
+      "localImplementation": "domain and local SQLite implemented",
+      "nativeValidation": "NOT_RUN",
+      "independentReview": "completed_for_local_scope"
     },
     "APP-03": {
-      "status": "in_progress",
-      "localImplementation": "done",
-      "independentReview": "done",
       "gate": "PARTIAL",
-      "note": "생활/방/자동급식/일지 연결 및 독립 검토 완료; 실기기 UI 미검증",
-      "lastPassedTests": {
-        "stageTestCount": 47,
-        "currentRegression": {
-          "command": "npm.cmd test",
-          "cwd": "mobile",
-          "passed": 55,
-          "failed": 0,
-          "date": "2026-09-18"
-        },
-        "lint": "pass",
-        "typecheck": "pass",
-        "androidMetroExport": "pass"
-      },
-      "remaining": [
-        "실기기 검증",
-        "OPEN 운영 정책"
-      ]
+      "localImplementation": "life service, room actions and journal integrated",
+      "nativeValidation": "NOT_RUN",
+      "independentReview": "completed_for_local_scope"
     },
     "APP-04": {
-      "status": "in_progress",
-      "localImplementation": "done",
-      "independentReview": "pending",
       "gate": "PARTIAL",
-      "note": "온보딩/합성 활동 구현 및 테스트 완료; 독립 reviewer 검토 대기",
-      "lastPassedTests": {
-        "stageTestCount": 55,
-        "currentRegression": {
-          "command": "npm.cmd test",
-          "cwd": "mobile",
-          "passed": 55,
-          "failed": 0,
-          "date": "2026-09-18"
-        },
-        "lint": "pass",
-        "typecheck": "pass",
-        "androidMetroExport": "pass"
-      },
-      "remaining": [
-        "독립 검토와 필요한 수정/재검증",
-        "실기기 검증",
-        "OPEN 운영 정책"
-      ]
+      "localImplementation": "DEV onboarding and synthetic activity implemented",
+      "nativeValidation": "NOT_RUN",
+      "independentReview": "completed_for_local_scope"
     },
     "APP-05": {
-      "status": "not_started",
-      "lastPassedTests": null,
-      "note": "사용자 요청으로 체크포인트에서 중단; 새 단계 시작 안 함"
+      "gate": "PARTIAL",
+      "localImplementation": "sleep/shop/widget development boundaries implemented",
+      "nativeValidation": "NOT_RUN",
+      "independentReview": "completed_for_local_scope"
     },
     "APP-06": {
-      "status": "not_started",
-      "lastPassedTests": null,
-      "note": "사용자 요청으로 체크포인트에서 중단; 새 단계 시작 안 함"
+      "gate": "PARTIAL",
+      "localImplementation": "local validation, SRS14 matrix and evidence report complete",
+      "nativeValidation": "NOT_RUN",
+      "independentReview": "completed_for_local_scope"
     }
   },
   "git": {
-    "rootRepository": false,
-    "mobileRepository": true,
-    "branch": "main",
-    "head": "800090441b5e9e0ae351d2cb02a16fa85d7a10c0",
+    "rootRepository": true,
+    "mobileRepository": false,
+    "mobileLayout": "ordinary_directory",
+    "mobileDotGitExists": false,
+    "branch": "feature/arucon-mobile-autonomous",
+    "baselineHead": "83897aa",
+    "gitlinkDeletion": "already staged by user",
+    "newMobileFiles": "untracked under root; not staged by agent",
     "commitCreatedThisRun": false,
     "push": false,
     "merge": false,
-    "rootDocumentsIncludedInMobileRepository": false
+    "recordedAt": "end of reconstruction validation, before the subsequently authorized checkpoint commit/push"
   },
   "externalWrites": false,
-  "realDeviceValidation": "not_run",
+  "publicDeployment": false,
+  "realHealthDataRead": false,
+  "realPayment": false,
+  "realDeviceValidation": "NOT_RUN",
+  "nativeBuild": "NOT_RUN",
+  "screenshotsAndVideo": "NOT_RUN",
+  "environment": {
+    "node": "26.7.0",
+    "npm": "11.19.0",
+    "pythonValidation": "3.12.14",
+    "java": "21.0.12.1",
+    "xcode": false,
+    "androidSdk": false,
+    "adb": false
+  },
   "lastValidation": {
-    "mobileTests": "55/55 pass",
-    "lint": "pass",
-    "typecheck": "pass",
-    "androidMetroExport": "pass; 664 modules; not APK build",
-    "workflow": "38/38 pass",
-    "workflowRegression": "pass",
-    "referenceRebuilt": "111/112 pass; missing source manifest icons",
-    "dependencyAudit": "10 moderate; 0 high/critical"
+    "mobileTests": {
+      "command": "npm test",
+      "passed": 72,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0
+    },
+    "lint": "PASS; 0 lint warnings",
+    "typecheck": "PASS",
+    "androidMetroExport": "PASS; Hermes/asset bundle, not APK",
+    "iosMetroExport": "PASS; Hermes/asset bundle, not IPA",
+    "workflow": "38/38 PASS",
+    "workflowRegression": "PASS",
+    "dependencyAudit": {
+      "status": "FAIL_MODERATE",
+      "moderate": 10,
+      "high": 0,
+      "critical": 0,
+      "command": "npm audit --json",
+      "exit": 1
+    },
+    "sourceManifest": "mobile/evidence/rebuild-2026-09-19/source-sha256.json"
+  },
+  "evidenceDirectory": "mobile/evidence/rebuild-2026-09-19",
+  "remaining": [
+    "Native development build and actual device/simulator render, motion, FPS, SQLite and lifecycle verification",
+    "OPEN/PROPOSED product decisions; actual health/auth/sleep scorer/growth resolver remain disabled",
+    "Coin purchase transaction and native widget extension not implemented",
+    "Compatible dependency audit fix"
+  ],
+  "supersedes": "Prior separate-mobile-repository Windows checkpoint; its 55-test result is not evidence for reconstructed source.",
+  "checkpointPublication": {
+    "authorizedBy": "explicit user request on 2026-09-19",
+    "commitMessage": "APP: rebuild mobile checkpoint through APP-04",
+    "remote": "origin",
+    "branch": "feature/arucon-mobile-autonomous",
+    "scope": "current reconstructed source and related documentation; existing APP-05/06 scaffolds retained",
+    "verification": "This file is the pre-commit record. After push, compare HEAD, origin/feature/arucon-mobile-autonomous, and the live remote branch hash.",
+    "mergeAuthorized": false,
+    "mainPushAuthorized": false,
+    "deploymentAuthorized": false
   }
 }

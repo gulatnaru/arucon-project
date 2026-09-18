@@ -1,0 +1,41 @@
+export type SleepBalanceConfig = Readonly<{
+  mode: 'DEV_FIXTURE_ONLY';
+  version: string;
+  provenance: string;
+  noDataMultiplier: number;
+  curve: readonly Readonly<{ score: number; multiplier: number }>[];
+}>;
+
+/** SRS section 9 source curve; this does not configure the OPEN raw-data scorer. */
+export const DEV_SLEEP_CONFIG: SleepBalanceConfig = Object.freeze({
+  mode: 'DEV_FIXTURE_ONLY',
+  version: 'sleep-source-curve-v1',
+  provenance: 'arucon-SRS section 9; DEC-05 scorer remains OPEN',
+  noDataMultiplier: 1,
+  curve: Object.freeze([
+    Object.freeze({ score: 0, multiplier: 0.7 }),
+    Object.freeze({ score: 40, multiplier: 0.7 }),
+    Object.freeze({ score: 70, multiplier: 1 }),
+    Object.freeze({ score: 85, multiplier: 1.2 }),
+    Object.freeze({ score: 100, multiplier: 1.5 }),
+  ]),
+});
+
+export function validateSleepConfig(config: SleepBalanceConfig): void {
+  if (config.mode !== 'DEV_FIXTURE_ONLY' || !config.version || !config.provenance ||
+      config.curve.length < 2 || config.curve[0].score !== 0 || config.curve.at(-1)?.score !== 100) {
+    throw new Error('Invalid sleep curve configuration');
+  }
+  for (let i = 0; i < config.curve.length; i++) {
+    const point = config.curve[i];
+    const previous = config.curve[i - 1];
+    if (!Number.isFinite(point.score) || !Number.isFinite(point.multiplier) || point.multiplier <= 0 ||
+        (previous && (point.score <= previous.score || point.multiplier < previous.multiplier))) {
+      throw new Error('Sleep curve must have increasing scores and nondecreasing positive multipliers');
+    }
+  }
+  if (!Number.isFinite(config.noDataMultiplier) || config.noDataMultiplier < config.curve[0].multiplier ||
+      config.noDataMultiplier > config.curve[config.curve.length - 1].multiplier) {
+    throw new Error('Invalid no-data multiplier');
+  }
+}

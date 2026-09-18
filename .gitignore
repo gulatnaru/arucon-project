@@ -59,3 +59,6 @@ test-videos/
 # Re-generable native folders
 mobile/android/
 mobile/ios/
+
+# macOS
+.DS_Store

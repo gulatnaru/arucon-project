@@ -1,53 +1,53 @@
-# 다음 PC 재개 안내
-기준일: 2026-09-18. 현재는 사용자 요청으로 멈춘 이동 체크포인트다.
+# 다음 재개 안내
 
-## 브랜치 / 마지막 완료 작업
-루트는 Git 저장소가 아니다. mobile 저장소의 브랜치는 `main`, HEAD는 `800090441b5e9e0ae351d2cb02a16fa85d7a10c0`이다. 새 commit/push는 하지 않았다.
-APP-03까지 로컬 구현과 독립 검토를 완료했다. APP-04 로컬 구현 및 마지막 저장본 회귀 검사를 마쳤고 전체 55/55와 Android Metro export가 통과했다. 전체 APP 게이트는 기기 검증이 남아 in_progress다.
+기준일: 2026-09-19 KST. 루트 저장소의 `mobile/`에 개발 소스를 다시 구성했다. 이전 Windows/별도 mobile Git 체크포인트와 혼동하지 않는다.
 
-## 미완료와 다음 정확한 작업
-1. 프로젝트 루트 전체의 소스/문서/원본 assets를 이관한다. mobile Git만으로는 루트 AGENTS.md, .codex, .agents, docs, tasks, references, validation 및 이 체크포인트 문서가 전달되지 않는다. node_modules/.expo/.tools/빌드/DB/비밀/영상/ZIP은 이관 소스로 필요하지 않다.
-2. AGENTS.md → 이 문서 → AUTONOMOUS-STATUS.json → AUTONOMOUS-RUN-REPORT.md → docs/model-routing.md와 hard-stops.md를 읽는다. mobile 수정 전 mobile/AGENTS.md도 읽는다.
-3. Git 상태/Node/npm 및 필요한 개발 도구를 확인하고 lockfile로 npm ci 후 아래 검사를 재현한다.
-4. APP-04만 독립 arucon_reviewer에 읽기 검토를 위임한다. 대상: mobile/src/onboarding, activity, storage/gameStore.ts, application/lifeController.ts, App.tsx와 관련 tests/docs. DEC/실제 건강 OFF/손상 저장본/중복 정산 경계를 대조한다. 필요한 좁은 수정은 builder에 위임하고 영향 검사를 다시 실행한다.
-5. 승인된 기기와 이미 준비된 SDK가 있으면 native 개발 빌드 및 실제 화면/이동/터치/복귀/SQLite/모션 영상을 검증한다. 실제 건강정보 접근은 별도 Hard Stop이다.
-6. 새로운 APP-05/06은 이번 체크포인트 요청 범위가 아니다. 다음 사용자의 개발 재개 지시에 따라 시작한다.
+## Git과 소스
 
-## 개발 명령
-프로젝트 루트에서 시작한다. Node 24.19.0 / npm 11.17에서 마지막 검증했다.
-```powershell
-git -C mobile status --short --branch
-Set-Location mobile
-npm.cmd ci
-npm.cmd run lint
-npm.cmd run typecheck
-npm.cmd test
-npx.cmd expo export --platform android --output-dir evidence/resume-android-export
-npm.cmd run start
+- 루트: `/Users/heung/projects/arucon-project`, 브랜치 `feature/arucon-mobile-autonomous`, 기준 HEAD `83897aa`.
+- `mobile/`은 **일반 하위 디렉터리**다. `mobile/.git`을 만들거나 `git init`을 실행하지 않는다. 루트에서 Git 작업을 수행한다.
+- 기존 gitlink 삭제는 사용자가 staged했고, 이후 현재 재구성 체크포인트를 루트 Git에 commit하여 `origin/feature/arucon-mobile-autonomous`에 push하도록 명시적으로 승인했다. 지정 메시지는 `APP: rebuild mobile checkpoint through APP-04`다. 실제 저장 상태는 아래 Git 명령으로 HEAD와 원격 브랜치를 대조한다. main push·merge·배포는 이 승인에 포함되지 않는다.
+- 이전 gitlink 소스는 현재 로컬 객체/디렉터리에 없어 요구 문서와 승인 GLB로 다시 구현했다. 이전 55개 테스트 결과를 현재 소스의 결과로 사용하지 않는다.
+- `node_modules`, `.expo`, `evidence`, 생성 `ios/android`, 비밀과 DB는 이관 소스에서 제외한다. 합성 앱에 API 키는 필요 없다.
+
+## 현재 상태와 남은 일
+
+APP-01~05 로컬 구현과 통합 검사 결과는 [실행 보고서](AUTONOMOUS-RUN-REPORT.md), [상태](AUTONOMOUS-STATUS.json), [APP-06 QA](mobile/docs/APP-06-validation.md)에 기록했다. 전체 상태는 PARTIAL이다.
+
+1. 현재 Git/파일 상태와 최종 검사 기록을 확인한다. 문서·테스트 PASS를 네이티브 실행 PASS로 해석하지 않는다.
+2. 준비된 Xcode 또는 Android SDK 환경에서 로컬 개발 빌드를 실행한다. 현재 Mac에는 Xcode/Simulator/Android SDK/adb가 없으며 시스템 설치는 HS-08 승인 경계다.
+3. 실제 앱의 최초 온보딩→방→합성 걸음→직접/자동 식사→저장→종료/재실행을 검사한다. Expo SQLite와 AppState 실제 동작을 확인한다.
+4. 작은 휴대폰 레이아웃, 바닥 목적지 변경·가구 회피·펫 우선 터치, 두 성격, 식사/공/쓰다듬기 모션, 움직임 줄이기, 배경/복귀 RAF를 캡처·영상으로 검증한다. 기기 FPS를 별도로 측정한다.
+5. 제품 DEC 승인 후 수면 scorer/체력 회복·진화/성별·운영 밸런스·가격·동의 정책을 반영한다. 실제 건강/계정/결제/배포는 각각 Hard Stop을 먼저 확인한다. 상점은 견적만, 위젯은 읽기 전용 앱 내 미리보기만 구현되어 있다.
+6. 의존성 감사의 moderate 10건(Expo→xcode→uuid)을 호환 가능한 수정으로 해소한다. 현재 제안된 Expo 46 강제 다운그레이드를 적용하지 않는다.
+
+## 재현 명령
+
+Node 26.7.0 / npm 11.19.0에서 검사했다. `npm ci`는 lockfile 기준 설치다.
+
+```sh
+git status --short --branch
+git -C mobile rev-parse --show-toplevel
+cd mobile
+npm ci
+npm test
+npm run lint
+npm run typecheck
+CI=1 npx expo export --platform android --output-dir evidence/resume-android
+CI=1 npx expo export --platform ios --output-dir evidence/resume-ios
 ```
-native SDK/기기가 준비된 환경에서만 `npm.cmd run android`; iOS는 macOS/Xcode에서 `npm run ios`.
-루트의 Python 3.11 이상 환경:
-```powershell
-python -X utf8 validation/check_workflow.py
-python -X utf8 -c "import runpy; case=runpy.run_path('validation/test_workflow_validator.py'); case['test_current_workflow_validator_passes'](); print('PASS')"
+
+SDK가 준비된 환경에서 `npm run ios` 또는 `npm run android`, 이후 `npm start`를 사용한다. Metro export는 APK/IPA가 아니다.
+
+루트에서는 Python 3.11 이상 및 PyYAML을 사용한다.
+
+```sh
+python3 validation/check_workflow.py
+python3 -c "import runpy; runpy.run_path('validation/test_workflow_validator.py')['test_current_workflow_validator_passes']()"
 ```
-현재 PC에서는 python alias 대신 `.tools/python313/python.exe`를 사용했다. 이 로컬 바이너리는 Git에 넣지 않는다.
-소유권 오류가 나면 전역 safe.directory를 바꾸지 않고 해당 명령에만 현재 실제 mobile 절대 경로를 `git -c safe.directory=...`로 지정했다.
 
-## 마지막 결과 / 알려진 문제
-- 앱 test 55/55, lint/typecheck PASS. Android Metro export 664 modules PASS; APK/IPA 빌드 성공이 아니다.
-- workflow 38/38 및 기존 회귀 assertion PASS.
-- 참조 재빌드 111/112: 원본 assets/icons 누락으로 1개 실패. npm audit moderate 10건(Expo/xcode/uuid), high/critical 0. 테스트 삭제/강제 다운그레이드하지 않았다.
-- adb unauthorized, Java/Android SDK/emulator 미확인. 실제 기기 화면/모션/FPS/native SQLite/health/background는 미검증.
-- APP-04 reviewer 대기. 이름/보호자 상태/활동 날짜·인식 시작은 DEV fixture; 실제 동의/운영 정책이 아니다.
-- 운영 밸런스·수면 scorer·진화 resolver·가격·동의·보존/복구 DEC는 OPEN/PROPOSED. DecisionRequired/NotConfigured/native OFF를 유지한다.
-- routing은 ROUTING_UNVERIFIED. 모델 설정은 확인했지만 runtime ID는 없다. Spark는 계정 미지원이다.
+현재 Mac의 시스템 Python 3.9.6 대신 Codex 번들 Python 3.12.14로 실행했다. 검사기가 생성하는 `validation/v1.9-static-check.json`은 의미 없는 정렬 변경이 생길 수 있으므로 의도하지 않은 diff를 남기지 않는다.
 
-## 환경변수 이름
-현재 합성 앱 실행에 필요한 API 키/비밀 환경변수는 없다. Android 개발 도구 경로를 설정할 경우 필요한 이름만 나열한다.
-- ANDROID_HOME
-- ANDROID_SDK_ROOT
-- JAVA_HOME
+## 다음 세션 재개 프롬프트
 
-## 다음 Codex 세션 재개 프롬프트
-> 루트 AGENTS.md와 NEXT-RESUME.md, AUTONOMOUS-STATUS.json, AUTONOMOUS-RUN-REPORT.md를 먼저 읽어라. 이동 체크포인트에서 재개한다. mobile은 main의 별도 Git 저장소이고 루트는 Git 저장소가 아니므로 변경과 이관 범위를 먼저 확인해라. 루트는 통합을 담당하고 docs/model-routing.md에 따라 역할 위임해라. routing runtime ID를 확인할 수 없으면 ROUTING_UNVERIFIED로 기록하고 성공으로 주장하지 마라. APP-04 독립 reviewer 검토부터 진행하고 필요한 수정과 영향 범위 검증을 완료해라. 실제 기기 검증은 환경과 허용 범위를 확인한 뒤 수행해라. OPEN 제품 선택과 실제 건강정보/계정/결제/배포/원격 Git/파괴적 작업 Hard Stop을 지켜라. 기존 아트·불변식을 보존하고 APP-05/06은 아직 시작하지 마라. commit/push는 별도 지시 없이는 하지 마라.
+> 루트 AGENTS.md, NEXT-RESUME.md, AUTONOMOUS-STATUS.json과 AUTONOMOUS-RUN-REPORT.md부터 읽어라. mobile은 현재 루트 Git의 일반 하위 디렉터리이며 mobile/.git을 절대로 만들지 마라. 기존 gitlink의 staged 삭제와 사용자 변경을 보존해라. 현재 소스의 최종 검사만 근거로 삼고 과거 별도 저장소 결과를 재사용하지 마라. 역할 지침에 따라 위임하되 runtime model ID가 확인되지 않으면 ROUTING_UNVERIFIED로 남겨라. 준비된 로컬 SDK가 있는지 확인하고 설치형 개발 앱·SQLite·화면·모션 검증부터 이어가라. 실제 건강정보·계정·결제·운영 배포·원격 Git·시스템 설치·제품 결정 Hard Stop을 지켜라. 별도 허용 없이 commit/push/merge하지 마라.
