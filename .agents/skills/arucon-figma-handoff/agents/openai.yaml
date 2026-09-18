@@ -1,0 +1,6 @@
+interface:
+  display_name: "아루콘 Figma 반영"
+  short_description: "명시 승인된 Figma 원격 반영과 검증"
+  default_prompt: "$arucon-figma-handoff 스킬로 지정 Figma 파일의 승인된 변경만 반영하고 재조회·렌더를 검증하세요."
+policy:
+  allow_implicit_invocation: false

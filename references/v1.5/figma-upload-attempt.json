@@ -1,0 +1,9 @@
+{
+  "fileKey": "9Cbc00sJapliMarPRPJqLS",
+  "method": "supported upload_assets endpoint",
+  "asset": "arucon-v1.5-platform-board.svg",
+  "attemptedAt": "2026-09-17T06:08:47.934816+00:00",
+  "result": "NETWORK_ERROR",
+  "reason": "mcp.figma.com DNS name resolution failed; upload not completed",
+  "remoteCommitVerified": false
+}

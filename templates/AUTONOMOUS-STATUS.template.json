@@ -1,0 +1,43 @@
+{
+  "version": "1.8",
+  "run_mode": "autonomous",
+  "required_model": "gpt-6-astra",
+  "overall": "PENDING",
+  "gates": {
+    "APP-01": {
+      "status": "PENDING",
+      "evidence": [],
+      "hard_stops": []
+    },
+    "APP-02": {
+      "status": "PENDING",
+      "evidence": [],
+      "hard_stops": []
+    },
+    "APP-03": {
+      "status": "PENDING",
+      "evidence": [],
+      "hard_stops": []
+    },
+    "APP-04": {
+      "status": "PENDING",
+      "evidence": [],
+      "hard_stops": []
+    },
+    "APP-05": {
+      "status": "PENDING",
+      "evidence": [],
+      "hard_stops": []
+    },
+    "APP-06": {
+      "status": "PENDING",
+      "evidence": [],
+      "hard_stops": []
+    }
+  },
+  "hard_stops": [],
+  "external_writes": [],
+  "notes": [
+    "Template; AUTO-00 overwrites/updates this in the actual app repository."
+  ]
+}

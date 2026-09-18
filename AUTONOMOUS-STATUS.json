@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-09-18",
+  "status": "paused_at_checkpoint",
+  "reason": "User requested portable checkpoint and stop; no new APP stages.",
+  "routingStatus": "ROUTING_UNVERIFIED",
+  "effectiveModels": null,
+  "stages": {
+    "APP-01": {
+      "status": "in_progress",
+      "localImplementation": "done",
+      "independentReview": "done",
+      "gate": "PARTIAL",
+      "note": "셸/GLB/입력 구현 및 독립 검토 완료; 실제 렌더·모션·FPS 미검증",
+      "lastPassedTests": {
+        "stageTestCount": 8,
+        "currentRegression": {
+          "command": "npm.cmd test",
+          "cwd": "mobile",
+          "passed": 55,
+          "failed": 0,
+          "date": "2026-09-18"
+        },
+        "lint": "pass",
+        "typecheck": "pass",
+        "androidMetroExport": "pass"
+      },
+      "remaining": [
+        "실기기 검증",
+        "OPEN 운영 정책"
+      ]
+    },
+    "APP-02": {
+      "status": "in_progress",
+      "localImplementation": "done",
+      "independentReview": "done",
+      "gate": "PARTIAL",
+      "note": "도메인/SQLite 구현 및 독립 검토 완료; 네이티브 SQLite 미검증",
+      "lastPassedTests": {
+        "stageTestCount": 36,
+        "currentRegression": {
+          "command": "npm.cmd test",
+          "cwd": "mobile",
+          "passed": 55,
+          "failed": 0,
+          "date": "2026-09-18"
+        },
+        "lint": "pass",
+        "typecheck": "pass",
+        "androidMetroExport": "pass"
+      },
+      "remaining": [
+        "실기기 검증",
+        "OPEN 운영 정책"
+      ]
+    },
+    "APP-03": {
+      "status": "in_progress",
+      "localImplementation": "done",
+      "independentReview": "done",
+      "gate": "PARTIAL",
+      "note": "생활/방/자동급식/일지 연결 및 독립 검토 완료; 실기기 UI 미검증",
+      "lastPassedTests": {
+        "stageTestCount": 47,
+        "currentRegression": {
+          "command": "npm.cmd test",
+          "cwd": "mobile",
+          "passed": 55,
+          "failed": 0,
+          "date": "2026-09-18"
+        },
+        "lint": "pass",
+        "typecheck": "pass",
+        "androidMetroExport": "pass"
+      },
+      "remaining": [
+        "실기기 검증",
+        "OPEN 운영 정책"
+      ]
+    },
+    "APP-04": {
+      "status": "in_progress",
+      "localImplementation": "done",
+      "independentReview": "pending",
+      "gate": "PARTIAL",
+      "note": "온보딩/합성 활동 구현 및 테스트 완료; 독립 reviewer 검토 대기",
+      "lastPassedTests": {
+        "stageTestCount": 55,
+        "currentRegression": {
+          "command": "npm.cmd test",
+          "cwd": "mobile",
+          "passed": 55,
+          "failed": 0,
+          "date": "2026-09-18"
+        },
+        "lint": "pass",
+        "typecheck": "pass",
+        "androidMetroExport": "pass"
+      },
+      "remaining": [
+        "독립 검토와 필요한 수정/재검증",
+        "실기기 검증",
+        "OPEN 운영 정책"
+      ]
+    },
+    "APP-05": {
+      "status": "not_started",
+      "lastPassedTests": null,
+      "note": "사용자 요청으로 체크포인트에서 중단; 새 단계 시작 안 함"
+    },
+    "APP-06": {
+      "status": "not_started",
+      "lastPassedTests": null,
+      "note": "사용자 요청으로 체크포인트에서 중단; 새 단계 시작 안 함"
+    }
+  },
+  "git": {
+    "rootRepository": false,
+    "mobileRepository": true,
+    "branch": "main",
+    "head": "800090441b5e9e0ae351d2cb02a16fa85d7a10c0",
+    "commitCreatedThisRun": false,
+    "push": false,
+    "merge": false,
+    "rootDocumentsIncludedInMobileRepository": false
+  },
+  "externalWrites": false,
+  "realDeviceValidation": "not_run",
+  "lastValidation": {
+    "mobileTests": "55/55 pass",
+    "lint": "pass",
+    "typecheck": "pass",
+    "androidMetroExport": "pass; 664 modules; not APK build",
+    "workflow": "38/38 pass",
+    "workflowRegression": "pass",
+    "referenceRebuilt": "111/112 pass; missing source manifest icons",
+    "dependencyAudit": "10 moderate; 0 high/critical"
+  }
+}

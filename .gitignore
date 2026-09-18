@@ -1,0 +1,61 @@
+# Secrets and local authentication
+.env*
+*.pem
+*.key
+*.p12
+*.p8
+*.jks
+*.pfx
+*.keystore
+credentials*.json
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+.npmrc
+.netrc
+.aws/
+
+# Dependencies and tool caches
+node_modules/
+.expo/
+.tools/
+.npm-cache/
+
+# Build and generated output
+build/
+dist/
+dist-*/
+web-build/
+
+# Local databases and runtime files
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.db-wal
+*.db-shm
+*.wal
+*.shm
+*.log
+*.tmp
+temp/
+tmp/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.bak
+
+# Evidence and captured test media
+evidence/
+test-videos/
+*.mp4
+*.webm
+*.mov
+*.zip
+
+# Re-generable native folders
+mobile/android/
+mobile/ios/

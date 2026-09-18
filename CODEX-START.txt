@@ -1,0 +1,1 @@
+루트 AGENTS.md와 tasks/AUTO-00-orchestrate.md를 읽고 끝까지 실행해라. 루트 Astra가 모든 코드를 직접 작성하지 말고 docs/model-routing.md의 Sol/Terra/Luna/Spark 역할로 위임하라. APP 단계마다 사용자 검토를 기다리지 말고 구현→영향 검증→Terra reviewer→수정 후 다음 단계로 진행하라. docs/hard-stops.md에 해당하거나 가능한 모든 게이트를 끝냈을 때만 멈춰라. 시작할 때 하위 역할의 effective model을 확인할 수 있으면 probe하고, 확인 불가/불일치는 AUTONOMOUS-STATUS.json에 기록하라.

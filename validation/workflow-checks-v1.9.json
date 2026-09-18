@@ -1,0 +1,197 @@
+{
+  "version": "v1.9",
+  "passed": 38,
+  "total": 38,
+  "checks": [
+    {
+      "name": "AGENTS under 32KiB",
+      "ok": true,
+      "detail": "4296"
+    },
+    {
+      "name": "AGENTS says Astra not default worker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "root Astra",
+      "ok": true,
+      "detail": "gpt-6-astra"
+    },
+    {
+      "name": "arucon_builder.toml exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "arucon_builder.toml model",
+      "ok": true,
+      "detail": "gpt-5.6-sol"
+    },
+    {
+      "name": "arucon_builder.toml effort",
+      "ok": true,
+      "detail": "high"
+    },
+    {
+      "name": "arucon_builder.toml sandbox",
+      "ok": true,
+      "detail": "workspace-write"
+    },
+    {
+      "name": "arucon_explorer.toml exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "arucon_explorer.toml model",
+      "ok": true,
+      "detail": "gpt-5.6-terra"
+    },
+    {
+      "name": "arucon_explorer.toml effort",
+      "ok": true,
+      "detail": "medium"
+    },
+    {
+      "name": "arucon_explorer.toml sandbox",
+      "ok": true,
+      "detail": "read-only"
+    },
+    {
+      "name": "arucon_reviewer.toml exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "arucon_reviewer.toml model",
+      "ok": true,
+      "detail": "gpt-5.6-terra"
+    },
+    {
+      "name": "arucon_reviewer.toml effort",
+      "ok": true,
+      "detail": "high"
+    },
+    {
+      "name": "arucon_reviewer.toml sandbox",
+      "ok": true,
+      "detail": "read-only"
+    },
+    {
+      "name": "arucon_luna_worker.toml exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "arucon_luna_worker.toml model",
+      "ok": true,
+      "detail": "gpt-5.6-luna"
+    },
+    {
+      "name": "arucon_luna_worker.toml effort",
+      "ok": true,
+      "detail": "low"
+    },
+    {
+      "name": "arucon_luna_worker.toml sandbox",
+      "ok": true,
+      "detail": "workspace-write"
+    },
+    {
+      "name": "arucon_spark_worker.toml exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "arucon_spark_worker.toml model",
+      "ok": true,
+      "detail": "gpt-5.3-codex-spark"
+    },
+    {
+      "name": "arucon_spark_worker.toml sandbox",
+      "ok": true,
+      "detail": "workspace-write"
+    },
+    {
+      "name": "no v1.8 generic worker remains",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "routing doc exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "audit doc exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Figma implicit off",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "AUTO mentions arucon_builder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "AUTO mentions arucon_explorer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "AUTO mentions arucon_reviewer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "AUTO mentions arucon_luna_worker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "AUTO mentions arucon_spark_worker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-03-life-room-integration.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-04-onboarding-activity-adapter.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-02-domain-storage.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-06-integration-qa.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-05-sleep-shop-widget-scaffold.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-01-mobile-shell.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no inherit parent model",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

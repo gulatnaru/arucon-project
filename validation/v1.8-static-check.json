@@ -1,0 +1,147 @@
+{
+  "kind": "v1.8_autonomous_handoff_static_checks",
+  "passed": 28,
+  "total": 28,
+  "checks": [
+    {
+      "check": "SRS v1.8",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "product requirements preserved note",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ENG-02 autonomous approved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Astra pinned",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "network workspace enabled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "AUTO-00 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "APP-01 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "APP-02 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "APP-03 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "APP-04 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "APP-05 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "APP-06 exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "hard stops exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "autonomous continue wording",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "start points AUTO-00",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-32 naming preserved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "218 acceptance rows preserved",
+      "passed": true,
+      "detail": 218
+    },
+    {
+      "check": "DEC-08 still open",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-31 still open",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "current GLB included",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "approved art included",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no WebView shortcut",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no real health auto permission",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no real payment auto",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "status template",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "machine plan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "local markdown links resolve",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "no font files",
+      "passed": true,
+      "detail": []
+    }
+  ]
+}

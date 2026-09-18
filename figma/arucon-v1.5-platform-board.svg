@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1220" viewBox="0 0 1600 1220">
+<rect width="1600" height="1220" fill="#F7F5EF"/>
+<text x="60" y="56" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="16" font-weight="700" fill="#678073">ARUCON  /  PLATFORM EXPERIENCE</text>
+<text x="60" y="120" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="40" font-weight="700" fill="#263D33">밖에서는 함께 걷고, 집에서는 곁에 머무는 아루콘</text>
+<text x="60" y="164" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#6D7C73">SRS v1.5 · 플랫폼 확장 요건 보드 · 2026.09.17</text>
+<rect x="60" y="198" width="1480" height="70" rx="18" fill="#314E40"/>
+<text x="84" y="241" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#FFFFFF">같은 펫, 다른 접점. 화면을 더 켜두거나 기기를 늘려도 보상과 성장량은 늘어나지 않습니다.</text>
+<rect x="60" y="298" width="474" height="324" rx="24" fill="#EAF0E9"/>
+<text x="88" y="337" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="15" font-weight="700" fill="#668174">CORE · 모바일 MVP / FR-10, 16</text>
+<text x="88" y="382" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="28" font-weight="700" fill="#293F38">모바일은 본게임</text>
+<text x="88" y="424" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">휴대폰 화면 전체가 작은 방</text>
+<text x="88" y="459" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">작은 펫과 넓은 실제 이동 영역</text>
+<text x="88" y="494" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">먹이 · 꾸미기 · 기록, 최소한의 UI</text>
+<text x="88" y="529" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">건강 기록과 먹이 섭취로 성장</text>
+<text x="88" y="590" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="16" font-weight="400" fill="#65756D">정확한 비율·운영 수치·최종 아트는 미정</text>
+<rect x="554" y="298" width="474" height="324" rx="24" fill="#FFFFFF"/>
+<text x="582" y="337" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="15" font-weight="700" fill="#668174">EXT-PC · 후속 확장 / FR-21</text>
+<text x="582" y="382" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="28" font-weight="700" fill="#293F38">PC에서는 곁에 두기</text>
+<text x="582" y="424" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">작은 방 창 / 배경 없는 펫 모드</text>
+<text x="582" y="459" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">보기 · 무료 쓰다듬기 · 자리 이동</text>
+<text x="582" y="494" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">초기에는 먹이·구매 등 쓰기 제외</text>
+<text x="582" y="529" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">숨기기 · 종료 · 방해하지 않는 입력</text>
+<text x="582" y="590" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="16" font-weight="400" fill="#65756D">지원 OS·프레임워크·성능 목표는 미정</text>
+<rect x="1048" y="298" width="492" height="324" rx="24" fill="#FFFFFF"/>
+<text x="1076" y="337" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="15" font-weight="700" fill="#668174">HOME · FR-12 / FR-22</text>
+<text x="1076" y="382" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="28" font-weight="700" fill="#293F38">홈 화면은 작은 창구</text>
+<text x="1076" y="424" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">iOS·Android 위젯: 상태 스냅샷</text>
+<text x="1076" y="459" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">갱신 시각과 앱으로 들어가는 경로</text>
+<text x="1076" y="494" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">Android 라이브 배경화면: 선택 검토</text>
+<text x="1076" y="529" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">iOS 홈 전체 배회는 목표에서 제외</text>
+<text x="1076" y="590" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="16" font-weight="400" fill="#65756D">위젯을 상시 실행 게임으로 약속하지 않음</text>
+<rect x="60" y="650" width="720" height="262" rx="24" fill="#FFFFFF"/>
+<text x="88" y="692" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#293F38">같은 아이를 유지하는 동기화</text>
+<text x="88" y="736" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">펫 ID · 진화형 · 성격 · 가구를 게임 상태로 공유</text>
+<text x="88" y="770" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">PC / 위젯 / 배경화면은 별도 경제 엔진이 아님</text>
+<text x="88" y="804" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">조회·장면 재생·실행 시간으로 EXP 또는 코인 발행 금지</text>
+<text x="88" y="838" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">원시 수면 · 위치 · 오디오 등 건강 원본은 PC 미전송</text>
+<text x="88" y="872" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">오래된 정보는 시각을 표시하고, 새 상태로 추측하지 않음</text>
+<rect x="802" y="650" width="738" height="262" rx="24" fill="#EAF0E9"/>
+<text x="830" y="692" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#293F38">v3의 매력은 모든 접점에서 유지</text>
+<text x="830" y="736" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">조용한 아이: 반쯤 감긴 눈 · 작은 일자 입 · 절제된 애정</text>
+<text x="830" y="770" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">쓰다듬으면 말캉하게 눌리고 귀가 조금 늦게 따라옴</text>
+<text x="830" y="804" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">자율 행동과 휴식의 간격, 계속 출렁이는 표현은 지양</text>
+<text x="830" y="838" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">작게 보여도 눈매를 읽고 편하게 만질 수 있는 터치 영역</text>
+<text x="830" y="872" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#4A5D55">보이지 않을 때 렌더 정지 · 움직임 줄이기 제공</text>
+<rect x="60" y="940" width="1480" height="176" rx="22" fill="#EEEAE2"/>
+<text x="88" y="981" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="26" font-weight="700" fill="#293F38">승인된 방향과 추가 결정은 분리합니다</text>
+<text x="88" y="1021" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="21" font-weight="400" fill="#293F38">방향 반영: 모바일 중심 · PC 동반 펫 · 위젯 · Android 배경화면 검토 · 중복 성장 금지</text>
+<text x="88" y="1057" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="21" font-weight="400" fill="#596960">추가 결정: OS·SDK·배포 방식 / 연결·철회·만료 정책 / 갱신·성능 예산 / 출시 순서</text>
+<text x="60" y="1161" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="19" font-weight="400" fill="#63746A">설계 보드입니다. 설치형 앱, 실제 위젯·배경화면·기기 동기화의 구현 완료를 뜻하지 않습니다.</text>
+<text x="1540" y="1161" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif" font-size="18" font-weight="700" fill="#63746A">01</text>
+</svg>

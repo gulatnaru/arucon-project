@@ -1,0 +1,6 @@
+interface:
+  display_name: "아루콘 게임 검증"
+  short_description: "변경된 게임 규칙과 정합성 검증"
+  default_prompt: "$arucon-game-verification 스킬로 배정된 변경 범위와 완료 조건을 확인하세요."
+policy:
+  allow_implicit_invocation: true

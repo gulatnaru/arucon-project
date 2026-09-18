@@ -1,0 +1,143 @@
+{
+  "version": "1.5",
+  "kind": "requirements_revision",
+  "original_sources_modified": false,
+  "remote_figma_write_completed": false,
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 849,
+      "sha256": "f9bb51f553de459726f1eeeb00642b8512be8d641e394319eb3dbf756c65c763"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3371,
+      "sha256": "980ccc4a72df5c0fe83aca36c9a97a0d07176661b71938ad1fd6c95aa65a23e9"
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "bytes": 10800,
+      "sha256": "81ce006265b0a124893fa5691f293553788cedc316685fec590a8783dd60fd62"
+    },
+    {
+      "path": "docs/CHANGELOG.md",
+      "bytes": 6854,
+      "sha256": "96d9b9e1e3ac636efb6e643c03dd091824f9480849a533203be07f2a653fd30b"
+    },
+    {
+      "path": "docs/README.md",
+      "bytes": 1236,
+      "sha256": "1e509985df5e3dbde6f36b9fb958c5fe07b2d64f5f8b4518bc80e614d45802b9"
+    },
+    {
+      "path": "docs/TEAM-SUMMARY.md",
+      "bytes": 1743,
+      "sha256": "8baa3ab0cd73d4e8d1e6ee3364c7702854621779165b3e3bbc5e4cfa009c555c"
+    },
+    {
+      "path": "docs/acceptance-tests.md",
+      "bytes": 50149,
+      "sha256": "945bc37899539808da3e8d181a588e967a758c0f2e94672d97578de8e6acefed"
+    },
+    {
+      "path": "docs/arucon-SRS.md",
+      "bytes": 120874,
+      "sha256": "1bfd6f55d103e90146c72b5c1d08b1ac734893df3bbce7c2cc15261f5f8f6bda"
+    },
+    {
+      "path": "docs/arucon-agent-prompts.md",
+      "bytes": 34995,
+      "sha256": "5837b7f3e67a707506494d4d5b930fa7a0c0324f78f5135ff4d5df3a7ead6991"
+    },
+    {
+      "path": "docs/codex-handoff.md",
+      "bytes": 1958,
+      "sha256": "1adc5cff1bed0906c698776ce9f7346933b9ae7e5226dbc69daed5ca51d78c82"
+    },
+    {
+      "path": "docs/cross-device-design.md",
+      "bytes": 7443,
+      "sha256": "b9e607020c11d573df6d437a0c7dd06f4d49cfc791e40ebed75249c3d4eb53ff"
+    },
+    {
+      "path": "docs/decisions.md",
+      "bytes": 28434,
+      "sha256": "150ea1d2237c838d941a3ad09decc5abe812fd4ba3a6540e939d485d9f6f56f0"
+    },
+    {
+      "path": "docs/personality-life-design.md",
+      "bytes": 10604,
+      "sha256": "f44b29fb30638da95a3877485959cfcf6e155690627c514816722d63d7f7c6a1"
+    },
+    {
+      "path": "docs/platform-sources.md",
+      "bytes": 3733,
+      "sha256": "0b2af3f6f640d12641aebeef7c05164a03283c4fb8023ade3c8947d40b0b44d0"
+    },
+    {
+      "path": "docs/prototype-spec.md",
+      "bytes": 1739,
+      "sha256": "4418a7b841efe5b03999e5ae38822758b7ca99b5246f8f1d0d7ebff7b6a4017b"
+    },
+    {
+      "path": "docs/work-handoff.md",
+      "bytes": 1444,
+      "sha256": "0d0e0ccfd2efeaa7c40becaad25bf25805349887a9c5cb5310c7f689b224b963"
+    },
+    {
+      "path": "figma/FIGMA-STATUS.md",
+      "bytes": 2358,
+      "sha256": "46001f9747c75817fc477270c3d5fcb2c704ba9058b1a21c7c45f11bd2894f48"
+    },
+    {
+      "path": "figma/arucon-v1.5-platform-board-outlined.svg",
+      "bytes": 415493,
+      "sha256": "0303f5ab0e1578081cd6bfda727716801f8c549d235db256335b1427699819c8"
+    },
+    {
+      "path": "figma/arucon-v1.5-platform-board.png",
+      "bytes": 238287,
+      "sha256": "62da11c6e3aa6eab9567afaef20f3465d0aee44cd93f33f912fe6110d3cff400"
+    },
+    {
+      "path": "figma/arucon-v1.5-platform-board.svg",
+      "bytes": 10124,
+      "sha256": "cd23fa40ce657c15ec87df81b34ab90fe6bedb1e73bf858ba9d048faedb280c2"
+    },
+    {
+      "path": "references/v1.4-prototype-spec.md",
+      "bytes": 9888,
+      "sha256": "8dc3946018811f94cbb16208c900b6173ae9ce4a30b962374607b770ac7e3b20"
+    },
+    {
+      "path": "references/v3-QA-REPORT.md",
+      "bytes": 3543,
+      "sha256": "a3b0a10005e91697fcaf72e1e0496c9c29a127965774bf7e912d8759f537772e"
+    },
+    {
+      "path": "references/v3-UI-MOTION-DELTA.md",
+      "bytes": 3641,
+      "sha256": "fb935fa7dce6b76955d9b04351e57f56c6c526c87f1b2ef6bbfd764551c3aab2"
+    },
+    {
+      "path": "validation/DOCUMENT-QA.md",
+      "bytes": 2453,
+      "sha256": "50953957ee1f23837c11736f138d68248119d06dcc0e5d979184abc96ba4b131"
+    },
+    {
+      "path": "validation/check_documents.py",
+      "bytes": 5224,
+      "sha256": "35c2bed82b50239d6f6ddce75ce4832451008f87a8ada68b4a5c9d56d76731fd"
+    },
+    {
+      "path": "validation/document-checks.json",
+      "bytes": 3228,
+      "sha256": "8681dbf31f54fbb6347d19528bc5e497ce488921ea6c16aa40b7362707e02c3e"
+    },
+    {
+      "path": "validation/figma-upload-attempt.json",
+      "bytes": 327,
+      "sha256": "77de98fe45005ee1ee52701da070dd52492c1ae2a95ee495e37ed5f44b84e827"
+    }
+  ]
+}

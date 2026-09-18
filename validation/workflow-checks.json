@@ -1,0 +1,221 @@
+{
+  "kind": "document_config_static_checks",
+  "game_tests_run": false,
+  "codex_runtime_tested": false,
+  "skill_invocation_tested": false,
+  "figma_accessed": false,
+  "passed": 42,
+  "total": 42,
+  "checks": [
+    {
+      "check": "SRS identifies v1.6 operational revision",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Product chapters 1 onward byte-preserved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "214 acceptance rows byte-preserved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "214 unique acceptance IDs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Product DEC-01 through DEC-31 retained",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-30 remains proposed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-31 remains open",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Engineering decision separate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "All existing task stages retained",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Compact shared entry under delivery target",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Document instructions are scoped supplement",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Broad mandatory header removed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Project config parse and permission contract",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Optional delegation bounded to two child threads",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Exactly three namespaced roles",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Required role fields are nonempty",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Exploration/review read-only, implementation workspace-write",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "No assumed model IDs or reasoning settings",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Exactly three task-scoped skills",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill metadata: arucon-figma-handoff",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill outcome/procedure/boundary sections: arucon-figma-handoff",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill YAML UI metadata: arucon-figma-handoff",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill metadata: arucon-game-verification",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill outcome/procedure/boundary sections: arucon-game-verification",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill YAML UI metadata: arucon-game-verification",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill metadata: arucon-visual-verification",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill outcome/procedure/boundary sections: arucon-visual-verification",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Skill YAML UI metadata: arucon-visual-verification",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Implicit invocation only for game/visual; explicit Figma",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "18 unique evaluation designs, all not run",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Evaluation references known skills without live remote writes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Six concrete command entries",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Game command entries not misreported as executed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Kit command required files exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "External v3 command source paths exist (not executed)",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "Current Markdown local links resolve",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "No internal citation handles embedded in current docs",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "No font files included",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "Runtime and external work explicitly not claimed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "All baseline source files remain unchanged",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "Direct baseline product comparison",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Direct baseline AT comparison",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

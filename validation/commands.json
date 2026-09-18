@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "purpose": "명령 발견·검증 선택용 목록. 실행 성공 기록 아님.",
+  "commands": [
+    {
+      "id": "workflow-static",
+      "cwd_kind": "kit_root",
+      "argv": [
+        "python",
+        "validation/check_workflow.py"
+      ],
+      "requires_files": [
+        "validation/check_workflow.py"
+      ],
+      "requires_tools": [
+        "Python >=3.11",
+        "PyYAML >=6,<7"
+      ],
+      "writes": [
+        "stdout"
+      ],
+      "scope": "document_and_agent_config",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "v3-domain",
+      "cwd_kind": "prototype_root",
+      "argv": [
+        "node",
+        "--test",
+        "tests/engine.test.cjs"
+      ],
+      "requires_files": [
+        "tests/engine.test.cjs",
+        "src/engine.js",
+        "src/config.js"
+      ],
+      "requires_tools": [
+        "Node.js with node:test"
+      ],
+      "writes": [
+        "stdout"
+      ],
+      "scope": "game_rules",
+      "status": "SOURCE_VERIFIED_NOT_RUN_THIS_CHANGE"
+    },
+    {
+      "id": "v3-motion",
+      "cwd_kind": "prototype_root",
+      "argv": [
+        "node",
+        "--test",
+        "tests/motion.test.cjs"
+      ],
+      "requires_files": [
+        "tests/motion.test.cjs",
+        "src/room-gl.js",
+        "src/room-scene.js",
+        "src/actor.js"
+      ],
+      "requires_tools": [
+        "Node.js with node:test"
+      ],
+      "writes": [
+        "stdout"
+      ],
+      "scope": "actor_state_and_motion",
+      "status": "SOURCE_VERIFIED_NOT_RUN_THIS_CHANGE"
+    },
+    {
+      "id": "v3-bundle",
+      "cwd_kind": "prototype_root",
+      "argv": [
+        "python",
+        "build.py"
+      ],
+      "requires_files": [
+        "build.py",
+        "src/index.template.html",
+        "src/styles.css",
+        "src/app.js",
+        "src/engine.js",
+        "src/config.js",
+        "src/room-gl.js",
+        "src/room-scene.js",
+        "src/actor.js"
+      ],
+      "requires_tools": [
+        "Python3"
+      ],
+      "writes": [
+        "arucon-room-v3.html"
+      ],
+      "scope": "web_bundle",
+      "status": "SOURCE_VERIFIED_NOT_RUN_THIS_CHANGE"
+    },
+    {
+      "id": "v3-browser",
+      "cwd_kind": "prototype_root",
+      "argv": [
+        "python",
+        "tests/browser_test.py"
+      ],
+      "requires_files": [
+        "tests/browser_test.py",
+        "arucon-room-v3.html"
+      ],
+      "requires_tools": [
+        "Python3",
+        "Playwright",
+        "/usr/bin/chromium or approved port"
+      ],
+      "writes": [
+        "tests/browser-results.json",
+        "previews/*.png"
+      ],
+      "scope": "browser_and_layout",
+      "status": "ENVIRONMENT_PORT_REQUIRED",
+      "note": "기존 스크립트는 Linux 브라우저 경로와 환경별 플래그를 사용한다. 다른 OS·실기기 성능을 보장하지 않는다."
+    },
+    {
+      "id": "v3-video",
+      "cwd_kind": "prototype_root",
+      "argv": [
+        "python",
+        "tests/render_video.py"
+      ],
+      "requires_files": [
+        "tests/render_video.py",
+        "arucon-room-v3.html"
+      ],
+      "requires_tools": [
+        "Python3",
+        "Playwright",
+        "/usr/bin/chromium or approved port",
+        "ffmpeg"
+      ],
+      "writes": [
+        "previews/*.png",
+        "previews/*.mp4",
+        "previews/video-metadata.json"
+      ],
+      "scope": "visual_evidence",
+      "status": "ENVIRONMENT_PORT_REQUIRED",
+      "note": "Deterministic rendered video is not a device FPS measurement."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "아루콘 시각 검증"
+  short_description: "방·표정·모션의 실제 증거 검토"
+  default_prompt: "$arucon-visual-verification 스킬로 배정된 변경 범위와 완료 조건을 확인하세요."
+policy:
+  allow_implicit_invocation: true

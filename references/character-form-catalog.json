@@ -1,0 +1,72 @@
+{
+  "catalogVersion": "1.0",
+  "approvedAt": "2026-09-18",
+  "decision": "DEC-32",
+  "note": "Naming catalog only. AppearanceResolver remains not configured until DEC-08 is approved.",
+  "forms": [
+    {
+      "formId": "arucon",
+      "displayNameKo": "아루콘",
+      "romanization": "Arucon",
+      "stageRole": "common_baby",
+      "legacyLabel": null,
+      "personalityBinding": null,
+      "visualKeys": [
+        "small rounded horn",
+        "short floppy ears",
+        "low mochi body"
+      ]
+    },
+    {
+      "formId": "mallu",
+      "displayNameKo": "말루",
+      "romanization": "Mallu",
+      "stageRole": "first_evolution",
+      "legacyLabel": "말랑형",
+      "personalityBinding": null,
+      "visualKeys": [
+        "low wide body",
+        "side-floppy ears",
+        "horizontal silhouette"
+      ]
+    },
+    {
+      "formId": "mono",
+      "displayNameKo": "모노",
+      "romanization": "Mono",
+      "stageRole": "first_evolution",
+      "legacyLabel": "시크형",
+      "personalityBinding": null,
+      "visualKeys": [
+        "more upright body",
+        "asymmetric ear",
+        "clean vertical silhouette"
+      ]
+    },
+    {
+      "formId": "piko",
+      "displayNameKo": "피코",
+      "romanization": "Piko",
+      "stageRole": "first_evolution",
+      "legacyLabel": "쫑긋형",
+      "personalityBinding": null,
+      "visualKeys": [
+        "two upright ears",
+        "pointed silhouette"
+      ]
+    },
+    {
+      "formId": "mongle",
+      "displayNameKo": "몽글",
+      "romanization": "Mongle",
+      "stageRole": "first_evolution",
+      "legacyLabel": "몽실형",
+      "personalityBinding": null,
+      "visualKeys": [
+        "rounded ears",
+        "curled tail",
+        "cloud-like rounded silhouette"
+      ]
+    }
+  ]
+}

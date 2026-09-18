@@ -1,0 +1,9 @@
+# Arucon 문서 패키지 진입 지침
+
+현재 제품 기준은 `docs/arucon-SRS.md` **v1.5**다. 먼저 `docs/AGENTS.md`, `docs/decisions.md`, `docs/arucon-agent-prompts.md` 및 관련 `docs/acceptance-tests.md`를 읽는다.
+
+이 묶음은 문서 개정본이며 새 PC/모바일 네이티브 앱이나 브라우저 코드가 아니다. `references/`는 역사적 시제품 문서다. 과거 테스트를 신규 기능의 실행 근거로 사용하지 않는다.
+
+DEC-27~29는 명시된 방향만 승인, DEC-30은 제안, DEC-31은 OPEN이다. 모바일 MVP와 플랫폼 확장을 구분한다. 사용자 저장소의 기존 AGENTS나 코드를 무조건 덮어쓰지 말고 실제 기준 경로와 변경 사항을 먼저 확인한다.
+
+Figma 원격 상태는 `figma/FIGMA-STATUS.md`, 문서 검증은 `validation/DOCUMENT-QA.md`를 따른다.

@@ -1,0 +1,60 @@
+{
+  "version": "1.8",
+  "mode": "autonomous",
+  "model_required": "gpt-6-astra",
+  "gates": [
+    {
+      "id": "APP-01",
+      "task": "tasks/APP-01-mobile-shell.md",
+      "depends_on": []
+    },
+    {
+      "id": "APP-02",
+      "task": "tasks/APP-02-domain-storage.md",
+      "depends_on": [
+        "APP-01"
+      ]
+    },
+    {
+      "id": "APP-03",
+      "task": "tasks/APP-03-life-room-integration.md",
+      "depends_on": [
+        "APP-01",
+        "APP-02"
+      ]
+    },
+    {
+      "id": "APP-04",
+      "task": "tasks/APP-04-onboarding-activity-adapter.md",
+      "depends_on": [
+        "APP-02"
+      ]
+    },
+    {
+      "id": "APP-05",
+      "task": "tasks/APP-05-sleep-shop-widget-scaffold.md",
+      "depends_on": [
+        "APP-02"
+      ]
+    },
+    {
+      "id": "APP-06",
+      "task": "tasks/APP-06-integration-qa.md",
+      "depends_on": [
+        "APP-01",
+        "APP-02",
+        "APP-03",
+        "APP-04",
+        "APP-05"
+      ]
+    }
+  ],
+  "continue_without_user_review": true,
+  "max_fix_cycles_per_root_cause": 3,
+  "hard_stop_policy": "docs/hard-stops.md",
+  "final_outputs": [
+    "AUTONOMOUS-RUN-REPORT.md",
+    "AUTONOMOUS-STATUS.json",
+    "NEXT-RESUME.md"
+  ]
+}

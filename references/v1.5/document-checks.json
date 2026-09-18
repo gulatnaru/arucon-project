@@ -1,0 +1,145 @@
+{
+  "kind": "document_static_checks",
+  "game_tests_executed": false,
+  "figma_write_succeeded": false,
+  "passed": 27,
+  "total": 27,
+  "acceptance_spec_cases": 214,
+  "checks": [
+    {
+      "check": "Reference v1.4 available for this validation run",
+      "passed": true,
+      "detail": "Baseline is a runtime reference, not bundled in this delivery."
+    },
+    {
+      "check": "Preserve sections 0–14 and names",
+      "passed": true,
+      "detail": "15 chapters"
+    },
+    {
+      "check": "Preserve original FR IDs",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "Existing economy config block unchanged",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Preserve all 166 old acceptance IDs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Exactly 48 new acceptance IDs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "v1.4 extracted baseline content matches mounted original",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "214 unique acceptance cases",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Execution status explicitly unexecuted",
+      "passed": true,
+      "detail": "Document declarations only; this script is not a gameplay test."
+    },
+    {
+      "check": "New 48 scenarios explicitly unexecuted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-27 in SRS and decisions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-28 in SRS and decisions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-29 in SRS and decisions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-30 in SRS and decisions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-31 in SRS and decisions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-30 remains proposed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "DEC-31 remains open",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Separate mobile and extension DoD",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Independent extension task coverage",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Same pet and no PC economy writes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Figma failure not represented as success",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Prototype vs native evidence separated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Current document local links exist",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "SVG XML parses: arucon-v1.5-platform-board.svg",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "SVG XML parses: arucon-v1.5-platform-board-outlined.svg",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "No font files in deliverable",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "No internal citation handles in artifacts",
+      "passed": true,
+      "detail": "[]"
+    }
+  ]
+}
