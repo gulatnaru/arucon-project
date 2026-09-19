@@ -5,6 +5,7 @@ import {
   DevSleepBenefitPolicy, NotConfiguredSleepProvider, SYNTHETIC_SLEEP_FIXTURES,
   SyntheticSleepProvider, multiplierForScore,
 } from '../../src/sleep/index';
+import { prepareDevSleepFixture } from '../../src/application/devSleepFixture';
 
 test('AT-SLEEP-01/02: source curve distinguishes valid zero from no data', async () => {
   const provider = new SyntheticSleepProvider(SYNTHETIC_SLEEP_FIXTURES);
@@ -52,4 +53,23 @@ test('sleep mapping reads an injected, validated development curve', () => {
   assert.ok(Math.abs(multiplierForScore(50, config) - 1.1) < 1e-12);
   assert.throws(() => new DevSleepBenefitPolicy({ ...config, curve: [{ score: 0, multiplier: 1 }, { score: 100, multiplier: 0.7 }] }));
   assert.throws(() => new DevSleepBenefitPolicy({ ...config, curve: [{ score: 0, multiplier: 0.7 }, { score: 0, multiplier: 1.5 }] }));
+});
+
+test('DEV application resolves an explicit synthetic day once and never applies unavailable/error as neutral', async () => {
+  let reads = 0;
+  const changingProvider = { async getScore() { reads++; return reads === 1 ? { status: 'valid' as const, score: 100 } : { status: 'valid' as const, score: 0 }; } };
+  const prepared = await prepareDevSleepFixture(changingProvider, 'fixture-100');
+  assert.equal(reads, 1);
+  assert.equal(prepared.status, 'ready');
+  if (prepared.status === 'ready') assert.equal(prepared.growthMultiplier, 1.5);
+
+  const unavailable = await prepareDevSleepFixture(new SyntheticSleepProvider(SYNTHETIC_SLEEP_FIXTURES), 'missing-day');
+  assert.equal(unavailable.status, 'unavailable');
+  assert.match(unavailable.notice, /기존 배율을 유지/);
+  const error = await prepareDevSleepFixture({ async getScore() { throw new Error('synthetic failure'); } }, 'error-day');
+  assert.equal(error.status, 'error');
+  assert.match(error.notice, /기존 배율을 유지/);
+  const undecided = await prepareDevSleepFixture(new NotConfiguredSleepProvider(), 'fixture-100');
+  assert.equal(undecided.status, 'decision_required');
+  assert.match(undecided.notice, /DEC-05/);
 });

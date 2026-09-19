@@ -2,9 +2,9 @@
   "schemaVersion": 3,
   "runDate": "2026-09-19",
   "timezone": "Asia/Seoul",
-  "status": "local_validation_complete_native_and_decisions_pending",
+  "status": "app05_app06_local_complete_native_and_decisions_pending",
   "overallGate": "PARTIAL",
-  "reason": "Mobile source reconstructed as an ordinary root repository directory; native SDK and product decisions remain outstanding.",
+  "reason": "Resumed checkpoint 3b52a5b; APP-04 review closed, APP-05 local integrations completed/reviewed, APP-06 local validation and independent QA closed. Native environment and OPEN product decisions remain.",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "stages": {
@@ -30,19 +30,36 @@
       "gate": "PARTIAL",
       "localImplementation": "DEV onboarding and synthetic activity implemented",
       "nativeValidation": "NOT_RUN",
-      "independentReview": "completed_for_local_scope"
+      "independentReview": "LOCAL_PASS_CLOSED",
+      "resumeRegression": "13/13 PASS; activity/onboarding/devClock",
+      "reviewFix": "APP-04 document corrected to match existing DEV SQLite onboarding integration"
     },
     "APP-05": {
       "gate": "PARTIAL",
-      "localImplementation": "sleep/shop/widget development boundaries implemented",
+      "localImplementation": "synthetic sleep provider/policy and five-state widgetView preview integrated",
       "nativeValidation": "NOT_RUN",
-      "independentReview": "completed_for_local_scope"
+      "independentReview": "LOCAL_PASS_CLOSED",
+      "impactTests": {
+        "passed": 47,
+        "failed": 0,
+        "exit": 0,
+        "evidence": "mobile/evidence/resume-app05-06/app05-impact.log"
+      },
+      "reviewTests": {
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "exit": 0,
+        "evidence": "mobile/evidence/resume-app05-06/app05-review-tests.log"
+      }
     },
     "APP-06": {
       "gate": "PARTIAL",
-      "localImplementation": "local validation, SRS14 matrix and evidence report complete",
+      "localImplementation": "complete: final integration tests, Android/iOS JS asset bundles, evidence and reports",
       "nativeValidation": "NOT_RUN",
-      "independentReview": "completed_for_local_scope"
+      "independentReview": "LOCAL_PASS_CLOSED",
+      "nativeEnvironment": "BLOCKED_ENV",
+      "reviewFix": "corrected Git inventory to four untracked source/test files and unstaged tracked changes"
     }
   },
   "git": {
@@ -51,20 +68,27 @@
     "mobileLayout": "ordinary_directory",
     "mobileDotGitExists": false,
     "branch": "feature/arucon-mobile-autonomous",
-    "baselineHead": "83897aa",
-    "gitlinkDeletion": "already staged by user",
-    "newMobileFiles": "untracked under root; not staged by agent",
+    "baselineHead": "3b52a5b",
+    "gitlinkDeletion": "committed in checkpoint 3b52a5b; no remaining gitlinks",
+    "newMobileFiles": "four new ordinary root-repository source/test files remain untracked; existing tracked changes are unstaged",
     "commitCreatedThisRun": false,
     "push": false,
     "merge": false,
-    "recordedAt": "end of reconstruction validation, before the subsequently authorized checkpoint commit/push"
+    "recordedAt": "development completion before the subsequent checkpoint publication request; untracked/staged flags describe that snapshot",
+    "untrackedMobileFiles": [
+      "mobile/src/application/devSleepFixture.ts",
+      "mobile/src/application/devWidgetPreview.ts",
+      "mobile/src/presentation/devWidgetPreviewText.ts",
+      "mobile/tests/application/devSleepWidgetFlow.test.ts"
+    ],
+    "stagedChanges": false
   },
   "externalWrites": false,
   "publicDeployment": false,
   "realHealthDataRead": false,
   "realPayment": false,
   "realDeviceValidation": "NOT_RUN",
-  "nativeBuild": "NOT_RUN",
+  "nativeBuild": "BLOCKED_ENV",
   "screenshotsAndVideo": "NOT_RUN",
   "environment": {
     "node": "26.7.0",
@@ -73,20 +97,21 @@
     "java": "21.0.12.1",
     "xcode": false,
     "androidSdk": false,
-    "adb": false
+    "adb": false,
+    "verificationEvidence": "mobile/evidence/resume-app05-06/environment.json"
   },
   "lastValidation": {
     "mobileTests": {
       "command": "npm test",
-      "passed": 72,
+      "passed": 77,
       "failed": 0,
       "skipped": 0,
       "exit": 0
     },
     "lint": "PASS; 0 lint warnings",
     "typecheck": "PASS",
-    "androidMetroExport": "PASS; Hermes/asset bundle, not APK",
-    "iosMetroExport": "PASS; Hermes/asset bundle, not IPA",
+    "androidMetroExport": "PASS; current resume Hermes/asset bundle, not APK",
+    "iosMetroExport": "PASS; current resume Hermes/asset bundle, not IPA",
     "workflow": "38/38 PASS",
     "workflowRegression": "PASS",
     "dependencyAudit": {
@@ -95,25 +120,56 @@
       "high": 0,
       "critical": 0,
       "command": "npm audit --json",
-      "exit": 1
+      "exit": 1,
+      "executedThisResume": false
     },
-    "sourceManifest": "mobile/evidence/rebuild-2026-09-19/source-sha256.json"
+    "sourceManifest": "mobile/evidence/resume-app05-06/source-sha256.json",
+    "evidence": "mobile/evidence/resume-app05-06/results.json"
   },
-  "evidenceDirectory": "mobile/evidence/rebuild-2026-09-19",
+  "evidenceDirectory": "mobile/evidence/resume-app05-06",
   "remaining": [
-    "Native development build and actual device/simulator render, motion, FPS, SQLite and lifecycle verification",
-    "OPEN/PROPOSED product decisions; actual health/auth/sleep scorer/growth resolver remain disabled",
-    "Coin purchase transaction and native widget extension not implemented",
-    "Compatible dependency audit fix"
+    "Native SDK/device development build and actual UI/SQLite/lifecycle/motion/FPS validation (BLOCKED_ENV/NOT_RUN)",
+    "OPEN/PROPOSED scorer/date/recovery, evolution, operational price/payment/guardian-consent decisions; live paths stay disabled",
+    "Coin purchase transaction, native widget extension and actual open_app routing not implemented",
+    "Existing checkpoint dependency audit moderate 10; not re-audited in this resume"
   ],
   "supersedes": "Prior separate-mobile-repository Windows checkpoint; its 55-test result is not evidence for reconstructed source.",
   "checkpointPublication": {
+    "authorizedBy": "explicit subsequent user request on 2026-09-19",
+    "commitMessage": "APP: complete local implementation through APP-06",
+    "remote": "origin",
+    "branch": "feature/arucon-mobile-autonomous",
+    "scope": "reviewed 11 modified files and 4 new files only",
+    "recordTiming": "pre-commit snapshot; successful publication is verified after push using local HEAD, tracking ref and live origin branch",
+    "mergeAuthorized": false,
+    "mainPushAuthorized": false,
+    "deploymentAuthorized": false
+  },
+  "resumeCheckpoint": {
+    "head": "3b52a5b24685d113ebff34550cfa60be1e7b5cf7",
+    "branch": "feature/arucon-mobile-autonomous",
+    "initialWorktree": "clean",
+    "priorValidatedSourceManifest": "MATCH",
+    "commitPushAuthorizedThisRun": false
+  },
+  "completion": {
+    "localScope": "COMPLETE",
+    "independentReview": "APP-04/05/06 LOCAL_PASS_CLOSED",
+    "overallProductGate": "PARTIAL",
+    "nativeDevelopmentBuild": "BLOCKED_ENV",
+    "realDeviceExecution": "NOT_RUN",
+    "simulatorExecution": "NOT_RUN",
+    "openProductDecisions": "UNCHANGED",
+    "commitPushThisRun": false
+  },
+  "recordScope": "APP-04–06 development completion snapshot; later user-authorized publication recorded separately below",
+  "previousCheckpointPublication": {
     "authorizedBy": "explicit user request on 2026-09-19",
     "commitMessage": "APP: rebuild mobile checkpoint through APP-04",
     "remote": "origin",
     "branch": "feature/arucon-mobile-autonomous",
     "scope": "current reconstructed source and related documentation; existing APP-05/06 scaffolds retained",
-    "verification": "This file is the pre-commit record. After push, compare HEAD, origin/feature/arucon-mobile-autonomous, and the live remote branch hash.",
+    "verification": "Checkpoint 3b52a5b24685d113ebff34550cfa60be1e7b5cf7 was remotely verified in the prior authorized turn.",
     "mergeAuthorized": false,
     "mainPushAuthorized": false,
     "deploymentAuthorized": false

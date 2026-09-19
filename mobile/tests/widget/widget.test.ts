@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { initialPet } from '../../src/domain/model';
 import { DEV_GAME_CONFIG } from '../../src/domain/config';
 import { projectPetForWidget, widgetView, type WidgetSnapshotReader } from '../../src/widget/index';
+import { devWidgetSnapshotReader, readDevWidgetPreview } from '../../src/application/devWidgetPreview';
+import { devWidgetPreviewText } from '../../src/presentation/devWidgetPreviewText';
 
 test('AT-WIDGET-02/AT-HOME-03/06: projection allowlists display fields and emits only open-app action', async () => {
   const pet = initialPet('pet-1', '말루', 'profile-1', 100, DEV_GAME_CONFIG);
@@ -34,4 +36,28 @@ test('AT-WIDGET-01/AT-HOME-05: stale, absent and failed reads show checked time 
   assert.equal(failed.status, 'error');
   assert.equal(failed.lastUpdatedAtMs, 200);
   assert.match(failed.stateText, /마지막 확인/);
+});
+
+test('DEV widget reader and view show all five states with lastUpdated/open_app only', async () => {
+  const projection = projectPetForWidget(initialPet('pet-1', '말루', 'profile-1', 100, DEV_GAME_CONFIG), 100);
+  let reads = 0;
+  const service = { async readWidgetProjection() { reads++; return projection; } };
+  const expected = ['ready', 'stale', 'missing', 'error', 'unsupported'] as const;
+  for (const scenario of expected) {
+    const reader = devWidgetSnapshotReader(service, 200, scenario);
+    assert.deepEqual(Object.keys(reader), ['read']);
+    const view = await readDevWidgetPreview(reader, scenario, 200);
+    const text = devWidgetPreviewText(view);
+    assert.equal(view.status, scenario);
+    assert.deepEqual(view.action, { type: 'open_app' });
+    assert.match(text, /동작: open_app/);
+    if (scenario === 'ready' || scenario === 'stale') {
+      assert.equal(view.lastUpdatedAtMs, 100);
+      assert.match(text, /마지막 갱신: 1970-01-01T00:00:00.100Z/);
+    } else {
+      assert.equal(view.lastUpdatedAtMs, undefined);
+      assert.match(text, /마지막 갱신: 없음/);
+    }
+  }
+  assert.equal(reads, 2);
 });

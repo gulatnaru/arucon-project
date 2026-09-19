@@ -1,13 +1,13 @@
 # APP-06 — 통합 QA 기록
 
-기준일: 2026-09-19 KST. 현재 루트 저장소 아래 새로 구성한 모바일 개발 후보다. 과거 별도 `mobile` 저장소의 55개 테스트·Windows 빌드 기록은 이 소스의 증거로 재사용하지 않는다. 전체 판정은 **PARTIAL**이며 설치형 앱 실행과 MVP 출시 완료를 뜻하지 않는다.
+기준일: 2026-09-19 KST. 체크포인트 `3b52a5b`에서 기존 구현을 유지하여 APP-05/06을 재개한 모바일 개발 후보다. 과거 별도 `mobile` 저장소의 55개 테스트·Windows 빌드 기록은 이 소스의 증거로 재사용하지 않는다. 전체 판정은 **PARTIAL**이며 설치형 앱 실행과 MVP 출시 완료를 뜻하지 않는다.
 
 ## 실행 환경과 증거
 
 - macOS, Node 26.7.0, npm 11.19.0, Expo SDK 57, React Native 0.86.3, React 19.2.3.
 - Python 3.12.14 번들 런타임으로 저장소 문서 검사 38/38과 회귀 assertion을 실행했다. 시스템 Python 3.9.6은 `tomllib`이 없어 사용할 수 없었다.
-- 로컬 증거 폴더: `../evidence/rebuild-2026-09-19/`. 로그와 생성 번들은 Git에서 제외된다. 최종 명령·결과는 루트 [실행 보고서](../../AUTONOMOUS-RUN-REPORT.md)에 기록한다.
-- Xcode/Simulator와 Android SDK/adb가 없다. Java 21만 설치되어 있다. 실제 앱 캡처·영상·FPS·Expo SQLite 네이티브 실행·APK/IPA는 **미실행 / 확인 불가**다. Metro export는 JavaScript/자산 번들 검사다.
+- 로컬 증거 폴더: `../evidence/resume-app05-06/`. 로그와 생성 번들은 Git에서 제외된다. 최종 명령·결과는 루트 [실행 보고서](../../AUTONOMOUS-RUN-REPORT.md)에 기록한다.
+- Xcode/Simulator와 Android SDK/adb가 없다. Java 21만 설치되어 있다. 네이티브 개발 빌드·위젯 extension은 **BLOCKED_ENV**이며 실제 앱 캡처·영상·FPS·Expo SQLite 네이티브 실행·APK/IPA는 **NOT_RUN / 확인 불가**다. Metro export는 JavaScript/자산 번들 검사다.
 - GLB 사본 SHA-256은 `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`이며 원본과 동일하다. 승인 아트를 재디자인하지 않았다.
 - 앱 자체 코드의 `fetch`, URL, 콘솔 로그, 실제 건강 SDK·인증·결제 연결을 검색했다. 합성 활동/수면과 로컬 SQLite만 사용한다. 이는 의존성 전체에 대한 보안 감사나 실제 OS 권한 검증을 뜻하지 않는다.
 
@@ -24,14 +24,14 @@
 | 성격·무료 교감 | PARTIAL | 성격과 형태 분리·무료 교감 자원 중립 충족. 두 성격의 실제 반응 확인 불가 |
 | 가구·생활·일지 | PARTIAL | 설치 fixture·확정 outbox 일지·관계 손실 없는 자동급식 충족. 실제 화면 확인 불가 |
 | 레벨·진화·성별·외형 | BLOCKED | 이름 카탈로그와 DecisionRequired 경계만 구현. DEC-08 결정 대기 |
-| 수면 성장 배율·회복 | BLOCKED | 합성 배율·무기록 중립·주입 가능한 곡선 검사 충족. 실제 scorer·날짜 귀속·체력 회복 원장 미충족, DEC-04/05 결정 대기 |
+| 수면 성장 배율·회복 | BLOCKED | 합성 provider→policy→SQLite 배율→이후 실제 섭취 연결과 무기록 중립 검사 충족. 실제 scorer·날짜 귀속·체력 회복 원장 미충족, DEC-04/05 결정 대기 |
 | 체력 | PARTIAL | 시간/소화 감소·걷기/무료 교감 중립·0 체력 식사 검사 충족. 적극적 놀이 정책/실행 미충족 |
 | 청결·기분 | PARTIAL | 배설물·청소·성장 배율 로컬 검사 충족. 실제 화면 확인 불가 |
 | 기운 없음·자연 회복 | PARTIAL | 청결 방치 단일 원인·청소 후 약 없는 회복 검사 충족. 운영 수치 결정 대기 |
 | 배회·표정·터치 | PARTIAL | 장면과 입력·경로 구현. 실제 렌더·동작 확인 불가 |
 | FR-10.1 방·가독성·말캉함 | PARTIAL | 승인 GLB 재사용 및 로컬 표현 이식. 화면·영상·작은 기기 검증 확인 불가 |
 | 상점 | PARTIAL | 효율/약 코인 전용 견적·현금 결제 비활성 충족. 실제 코인 차감/지급·상품 가격 미충족/결정 대기 |
-| iOS/Android 홈 위젯 | PARTIAL | 허용 필드·오래됨/없음/오류·open_app 모델·자원 중립 검사 충족. OS extension·실제 갱신·앱 진입 확인 불가 |
+| iOS/Android 홈 위젯 | PARTIAL | 허용 필드·5개 DEV 표시 상태·갱신 시각·읽기 전용 원장 불변 검사 충족. open_app은 표시 descriptor만 구현. OS extension·실제 갱신·앱 진입 확인 불가 |
 | 동면 | PARTIAL | 부정 상태 정지·임계 동시 급식 차단·복귀 검사 충족. 운영 임계 결정 대기 |
 | 단일 밸런스 config | PARTIAL | 도메인/수면의 명시적 DEV config와 검증 구현. 운영 단일 config 승인·통합 미충족 |
 | 건강 원본 미전송 | PARTIAL | 합성 입력 경계·위젯 허용 필드 충족. 실제 건강 어댑터/플랫폼 점검 미실행 |
@@ -50,7 +50,7 @@
 | 오프라인·다중 기기·복구·migration | PARTIAL | 로컬 중복·손상/누락 보호·v1→v2 개발 migration 검사. 서버/다중 기기 미구현 |
 | 실제 결제 시나리오 | OUT_OF_SCOPE | 현재 실결제 OFF, 출시 검증으로 통과 처리하지 않음 |
 | 동의·정책·접근 통제 | BLOCKED / 결정 대기 | 실제 계정/동의/서버 경로 없음 |
-| 실행 환경·명령·증거 | PASS / 충족 | 최종 72/72 테스트·lint·typecheck·양 플랫폼 번들, 루트 보고서와 acceptance-tests 실행 이력, 로컬 원시 로그와 소스 해시 기록 완료 |
+| 실행 환경·명령·증거 | PASS / 충족 | 최종 77/77 테스트·lint·typecheck·양 플랫폼 번들, 루트 보고서와 acceptance-tests 실행 이력, 로컬 원시 로그와 소스 해시 기록 완료 |
 | 최종 사람의 머지·출시 판단 | BLOCKED / 미충족 | 네이티브 검증·제품 결정·감사 잔여. 머지/출시하지 않음 |
 
 SRS 14-2 판정은 기술 실행 결과와 요구사항 완료를 구분해 위에 기재했다. SRS 14-3의 PC, 공유 접점, 추가 위젯, Android 배경화면과 P2 소셜/P3 번식/2차 진화는 **OUT_OF_SCOPE / 해당 단계 범위 밖**이다.
@@ -65,3 +65,11 @@ SRS 14-2 판정은 기술 실행 결과와 요구사항 완료를 구분해 위�
 | HS-03/04/05 / 결제·배포·원격 Git | 별도 사용자 권한 경계 | 실결제·공개 배포·commit/push/merge | disabled port·로컬 산출물 | 로컬 후보 유지 또는 명시된 외부 작업 승인. 승인 후 대상별 게이트부터 재개 |
 
 승인 캐릭터 변경(HS-07)은 필요하지 않았다. 독립 검토에서 발견된 저장본 재생성, 활동 공급자 혼합, 예상 거절 후 UI 잠김, 합성 걸음 재시도 중복을 수정하고 관련 검사를 추가했다. 남은 네이티브/출시 게이트를 PASS로 표시하지 않는다.
+
+
+## 체크포인트 재개 검토 이력
+
+- APP04: 최소 회귀13/13, 온보딩 연결 설명 1줄 정정 후 reviewer LOCAL PASS/CLOSED.
+- APP05: 기존 baseline9/9 → 두 로컬 통합 경계 구현 → builder 영향47/47 → 독립 focused14/14, LOCAL PASS/CLOSED. 새 명세를 임의 승인하지 않았다.
+- APP06: 전체77/77·lint/typecheck·양 플랫폼 Metro PASS, workflow38/38 및 회귀 assertion PASS. 최종 독립 검토 LOCAL PASS/CLOSED. Git 상태 기록 P2를 정정하고 실제 untracked4/staged0과 재대조했다.
+- 실제 UI/모션/권한/OS widget 수용은 NOT_RUN/BLOCKED_ENV다. 이 판정을 위 자동 검사 결과로 대체하지 않는다. 이번 commit/push/merge/배포 없음.

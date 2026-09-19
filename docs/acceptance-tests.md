@@ -528,3 +528,10 @@ QA 판정:
 | 문서/역할 설정 | `python validation/check_workflow.py` / root | 38/38 PASS 및 `test_workflow_validator.py` 회귀 assertion PASS |
 
 실제 iOS/Android 권한·강제 종료·Expo SQLite·UI/모션·위젯 검증은 SDK/기기 부재로 미실행/확인 불가다. 실제 건강·계정·결제·출시 DEC는 승인 경계에 있다. 본문 218개 설계 사례 전체 실행 또는 운영 승인으로 집계하지 않는다.
+
+
+### 추가 실행 이력 — 체크포인트 3b52a5b에서 APP-05/06 재개
+
+2026-09-19 KST, 같은 Node26.7.0 환경. APP04 최소 회귀13/13 및 문서 정정 재검토 완료. APP05 영향47/47, 독립 focused14/14. APP06 최종 `npm test` **77/77 PASS**, lint/typecheck exit0, Android/iOS Metro export exit0. 이전72/72와 구분한다. 현재 명령/범위/exit/환경은 [실행 보고서](../AUTONOMOUS-RUN-REPORT.md), 원시 로그·소스 해시는 `mobile/evidence/resume-app05-06/`에 있다.
+
+추가 근거는 FR6 합성 null/0/70/100 provider→policy→SQLite 배율→이후 섭취, FR12 reader→5상태 widgetView→DEV 문자열 표시와 원장 불변이다. open_app 클릭/native route 검사는 아니다. 실제 SDK가 없어 native 개발 빌드·기기/시뮬레이터·UI E2E·영상/FPS·OS 위젯은 NOT_RUN/BLOCKED_ENV이며 운영 AT 전체 PASS로 집계하지 않는다.

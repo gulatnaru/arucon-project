@@ -13,12 +13,22 @@ import type { DomainEvent, PetState } from './src/domain/model';
 import { LocalPetStore, expoSqliteConnection, type SqlConnection } from './src/storage/sqlite';
 import { LifeRoomControls, type LifeRoomAction } from './src/presentation/LifeRoomControls';
 import { DevFixturePanel, type DevFixtureAction } from './src/presentation/DevFixturePanel';
+import { prepareDevSleepFixture } from './src/application/devSleepFixture';
+import { devWidgetSnapshotReader, readDevWidgetPreview, type DevWidgetScenario } from './src/application/devWidgetPreview';
+import { SYNTHETIC_SLEEP_FIXTURES, SyntheticSleepProvider } from './src/sleep';
+import { devWidgetPreviewText } from './src/presentation/devWidgetPreviewText';
 import { devShopRows } from './src/shop';
 import type { DevPetPreview } from './src/onboarding/devOnboarding';
 
 const PET_ID = 'dev-local-pet-1';
 const HOUR_MS = 3_600_000;
 type AppMealCuePolicy = { mode: MealCue['mode']; atMs?: () => number | null };
+const DEV_SLEEP_DAY: Record<'sleep_null' | 'sleep_0' | 'sleep_70' | 'sleep_100', string> = {
+  sleep_null: 'fixture-null', sleep_0: 'fixture-0', sleep_70: 'fixture-70', sleep_100: 'fixture-100',
+};
+const DEV_WIDGET_SCENARIO: Record<'widget_ready' | 'widget_stale' | 'widget_missing' | 'widget_error' | 'widget_unsupported', DevWidgetScenario> = {
+  widget_ready: 'ready', widget_stale: 'stale', widget_missing: 'missing', widget_error: 'error', widget_unsupported: 'unsupported',
+};
 
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -279,16 +289,35 @@ function AppContent() {
       }
       case 'install_table': void runTask(() => service.installFacilityFixture(now, id, 'table')); break;
       case 'install_toilet': void runTask(() => service.installFacilityFixture(now, id, 'toilet')); break;
-      case 'sleep_fixture': void runTask(() => service.setSleepMultiplierFixture(now, id, 1.2)); break;
+      case 'sleep_null':
+      case 'sleep_0':
+      case 'sleep_70':
+      case 'sleep_100': {
+        const prepared = prepareDevSleepFixture(new SyntheticSleepProvider(SYNTHETIC_SLEEP_FIXTURES), DEV_SLEEP_DAY[action]);
+        void runTask(async () => {
+          const fixture = await prepared;
+          if (fixture.status !== 'ready') { setNotice(fixture.notice); return; }
+          const updated = await service.setSleepMultiplierFixture(now, id, fixture.growthMultiplier);
+          setNotice(fixture.notice);
+          return updated;
+        });
+        break;
+      }
       case 'shop_preview':
         setJournal(null);
         setPreview(devShopRows().map(row => `${row.label}: ${row.priceLabel}`).join('\n'));
         break;
-      case 'widget_preview':
+      case 'widget_ready':
+      case 'widget_stale':
+      case 'widget_missing':
+      case 'widget_error':
+      case 'widget_unsupported':
         void runTask(async () => {
-          const projection = await service.readWidgetProjection(now);
+          const scenario = DEV_WIDGET_SCENARIO[action];
+          const reader = devWidgetSnapshotReader(service, now, scenario);
+          const view = await readDevWidgetPreview(reader, scenario, now);
           setJournal(null);
-          setPreview(`읽기 전용 위젯 · ${projection.formId} · ${projection.displayState}\n마지막 게임 시각 ${new Date(projection.updatedAtMs).toLocaleString()}`);
+          setPreview(devWidgetPreviewText(view));
         });
         break;
     }
