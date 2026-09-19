@@ -13,7 +13,7 @@ import type { FloorPoint, RoomProps } from './types';
 // It has embedded binary geometry, 15 animation clips, and no external images.
 // Metro requires a static require for non-code assets.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const PET_ASSET = require('../../assets/arucon-tsundere-motion.glb') as number;
+const PET_ASSET = require('../../assets/arucon_tsundere_motion.glb') as number;
 
 type HitName = 'pet' | 'table' | 'cushion' | 'toilet' | 'ball';
 export type ProjectedHits = Record<HitName, { x: number; y: number; visible: boolean }>;

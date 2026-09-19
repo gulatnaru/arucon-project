@@ -1,44 +1,29 @@
-# 다음 재개 안내
+# 다음 재개 — SRS MVP 전체 기준
 
-기준일: 2026-09-19 KST. 기준 체크포인트는 **3b52a5b24685d113ebff34550cfa60be1e7b5cf7**, 브랜치는 **feature/arucon-mobile-autonomous**다. 현재 재개 작업 결과는 [상태](AUTONOMOUS-STATUS.json)와 [실행 보고서](AUTONOMOUS-RUN-REPORT.md)를 우선 확인한다.
+2026-09-19. 상태 **WAITING_FOR_HUMAN_DECISIONS**. 독립 로컬 개발·검증·QA는 완료, MVP 제품 완료는 아니다. 현재 branch `feature/arucon-mobile-autonomous`; 시작 기준 `c99a4c0`, 최종 실제 hash는 `git rev-parse HEAD` 및 publication 증거/직전 종료 응답을 확인한다.
 
-## 저장소와 권한
+## 먼저 읽기
 
-- `mobile/`은 루트 Git의 일반 디렉터리다. `mobile/.git`·중첩 저장소·gitlink를 만들지 않는다.
-- 개발 기준 체크포인트 3b52a5b 이후 APP-04~06 로컬 구현·검증을 완료했다. 사용자가 후속 요청으로 `APP: complete local implementation through APP-06` 체크포인트의 stage/commit 및 현재 feature 브랜치 push를 승인했다. 이 저장 작업의 실제 결과는 HEAD·원격 ref로 확인한다. main push/merge·PR merge·배포는 승인되지 않았다.
-- 현재 소스는 체크포인트의 APP-01~04를 이어 쓰며 재구현하지 않았다. APP-04 reviewer의 문서 오류는 정정 후 LOCAL PASS/CLOSED다.
-- `node_modules`, `.expo`, `evidence`, 생성 native/번들, DB/비밀/영상/ZIP은 Git 제외 대상이다. 새 소스가 untracked이면 작업 디렉터리 이관 시 빠뜨리지 않는다.
+AGENTS.md → AUTONOMOUS-STATUS.json → AUTONOMOUS-RUN-REPORT.md → MVP-GAP-MATRIX.md → DECISION-QUEUE.md → docs/model-routing.md / hard-stops.md → SRS13~14.
 
-## 이어갈 순서
+- mobile은 루트 Git의 일반 디렉터리다. `mobile/.git`이나 gitlink를 만들지 않는다.
+- APP 단계별 완료를 최종 범위로 쓰지 않는다. SRS14의19개와14-1의11개가 기준이다.
+- 이번 최종 실행은 테스트147/147, lint/typecheck, 두 플랫폼 JS bundle, clean native project generation, workflow38/38 PASS, audit0. 이후 소스가 바뀌면 이 숫자를 현재 결과로 재사용하지 않는다.
+- SQLite DEV schema5와 source registry/progression/원자 구매/회복/outbox/privacy 계약을 이어 쓴다. 전체 운영 경로는 미정 DEC 때문에 활성화하지 않았다.
+- 환경은 Xcode/simctl/Android SDK/adb 없음. native compile BLOCKED_ENV, simulator와 physical device 모두 NOT_RUN. prebuild/export는 실제 native build가 아니다.
 
-1. Git 상태와 보고서의 실제 결과·남은 사항을 확인한다. APP-05/06 로컬 게이트가 완료된 항목은 다시 구현하지 않는다.
-2. 준비된 Xcode 또는 Android SDK 환경에서 네이티브 개발 빌드를 진행한다. 이번 호스트는 Xcode/simctl/Android SDK/adb/emulator가 없어 BLOCKED_ENV다. 시스템 도구 설치가 필요하면 HS-08 범위를 먼저 확인한다.
-3. 실제 앱의 온보딩→합성 활동→직접/자동 섭취→수면 fixture→이후 식사→저장/재실행과 native SQLite/AppState를 확인한다. 합성 null/0/70/100은 실제 건강 scorer가 아니다.
-4. 변경된 DEV 패널·수면 안내·위젯 ready/stale/missing/error/unsupported 미리보기를 실제 작은 화면에서 확인한다. 위젯 앱 내 미리보기는 OS widget extension이나 실제 앱 진입 검증을 대신하지 않는다.
-5. 기존 방의 이동·쓰다듬기·두 성격·식사·동작 줄이기·전경 복귀를 실제 캡처/영상으로 검증한다. FPS는 장치에서 측정하고 번들 통과/정지 화면으로 승인하지 않는다.
-6. 수면 scorer/날짜귀속/회복·진화·운영 가격·법정 동의는 OPEN/PROPOSED 결정 후 구현한다. 현재 실제 건강·계정·결제/클라우드 경로는 연결하지 않는다. 상점은 읽기 전용 견적이며 실제 코인 구매 트랜잭션도 아직 없다.
+## 재개 순서
 
-## 명령
+1. Git status와 `mobile/evidence/mvp-engineering/source-sha256.json`의 소스 일치, 최신 승인/장치 환경을 확인한다.
+2. DQ-01~10 중 새로 승인된 항목/준비된 환경을 식별한다. 아무것도 바뀌지 않았으면 완료된 scaffold를 다시 만들지 말고 남은 결정을 요약한다.
+3. DQ-09 환경 준비 후 `node scripts/check-native-environment.mjs`와 DEVICE-VALIDATION.md부터 진행한다. SDK/관리자 설치를 자동 실행하지 않는다.
+4. 승인된 config/정책/예시가 있을 때만 운영 resolver·sleep·shop·auth·sync·native widget 경로를 연결한다. 실제 Health 데이터 읽기, 실계정·서버/결제는 각각 별도 경계를 확인한다.
+5. 구현→영향 검사→독립 QA→수정→재검증. 최종 native/visual/FPS/권한 검증은 실제 명령·장치·원시 증거와 기록한다.
 
-현재 Node 26.7.0/npm 11.19.0이며 lockfile은 체크포인트 버전을 유지한다. 의존성이 이미 있으면 재설치하지 않는다.
+## 권한 / 산출물
 
-```sh
-git status -sb
-git log --oneline --decorate -3
-git -C mobile rev-parse --show-toplevel
-cd mobile
-npm test
-npm run lint
-npm run typecheck
-EXPO_OFFLINE=1 CI=1 ./node_modules/.bin/expo export --platform all --max-workers 2 --output-dir evidence/resume-app05-06/metro
-```
+이번 장기 작업에는 현재 feature의 local commit/일반 push 승인이 있다. 후속 세션은 최신 사용자 지시를 우선한다. main push/merge, PR merge, force/history rewrite, tag/release, 배포는 금지다. Git 저장 전에는 비밀·DB·의존성·.expo·생성 native·build·영상/ZIP 제외와 실제 테스트 상태를 확인한다.
 
-테스트는 영향 범위로 좁히되 APP-06 최종 통합 게이트에서는 전체 실행 기록을 남긴다. 준비된 SDK가 있을 때만 `npm run ios` 또는 `npm run android`를 실행한다. Metro는 JavaScript/자산 번들이며 APK/IPA가 아니다.
+로그/생성물은 ignored `mobile/evidence/mvp-engineering/`, `mobile/ios/`, `mobile/android/`다. 결정 대기열과 전체 gap/실행 보고서는 tracked Markdown/JSON에 있다. 전용 Luna/reviewer 할당은 thread limit으로 불가했으며 기존 Sol/Terra를 재사용했다. 실제 model ID는 미노출(ROUTING_UNVERIFIED).
 
-루트 문서 검사는 Python 3.11 이상+PyYAML이 필요하다. 이 호스트의 시스템 Python3.9.6 대신 Codex 번들 Python3.12.14를 사용한다. `validation/check_workflow.py`의 생성 JSON 정렬만 바뀌면 의미 없는 diff를 남기지 않는다.
-
-## 증거와 재개 프롬프트
-
-이번 로컬 증거는 `mobile/evidence/resume-app05-06/`에 있으며 Git에서 제외한다. 이전 72/72는 체크포인트 결과, 이번 최종 결과는 보고서의 해당 실행 표로 구분한다. 실제 backend model ID는 노출되지 않아 ROUTING_UNVERIFIED다.
-
-> AGENTS.md, AUTONOMOUS-STATUS.json, AUTONOMOUS-RUN-REPORT.md, NEXT-RESUME.md를 먼저 읽고 현재 HEAD와 로컬 변경을 보존해라. mobile은 루트 Git 일반 디렉터리다. 완료된 APP-01~05 로컬 구현을 다시 만들지 마라. 모델 역할을 유지하고 남은 native 환경/수용 검증 및 제품 결정부터 이어가라. 실제 건강·계정·클라우드·결제·운영 배포·시스템 설치 권한 경계를 지켜라. 현재 변경에 대한 별도 명시적 승인 없이는 stage/commit/push/merge하지 마라.
+재개 프롬프트는 AUTONOMOUS-RUN-REPORT.md 마지막 부분을 사용한다.

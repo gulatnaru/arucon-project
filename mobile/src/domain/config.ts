@@ -1,24 +1,29 @@
-/** Source values are traceable to SRS 9; proposed values never become production defaults. */
+import { BalanceDecisionRequired, MVP_BALANCE_REGISTRY } from '../config/balanceRegistry';
+
+const SOURCE = MVP_BALANCE_REGISTRY.source;
+const DEV = MVP_BALANCE_REGISTRY.devFixture.domain;
+
+/** Compatibility projection. Numeric ownership lives in CONFIG-01's versioned registry. */
 export const SOURCE_BALANCE = Object.freeze({
-  stepsPerFood: 500,
-  coinPer100Steps: 1,
-  runningMultiplier: 1.5,
-  foodCap: 20,
-  expPerFood: 15,
-  staminaMax: 100,
-  staminaDrainPerAwakeHour: 5,
-  staminaDrainPerFood: 1,
-  lowStaminaThreshold: 20,
-  lowStaminaMultiplier: 0.5,
-  sickPoopThreshold: 4,
-  sickTriggerHours: 24,
-  sickGrowthMultiplier: 0.5,
-  naturalRecoveryHours: 12,
-  moodCleanMultiplier: 1,
-  moodSomePoopMultiplier: 0.9,
-  moodDirtyMultiplier: 0.75,
-  moodSomePoopAt: 2,
-  moodDirtyAt: 4,
+  stepsPerFood: SOURCE.activity.stepsPerFood,
+  coinPer100Steps: SOURCE.activity.coinPer100Steps,
+  runningMultiplier: SOURCE.activity.runningMultiplier,
+  foodCap: SOURCE.activity.foodCap,
+  expPerFood: SOURCE.growth.expPerFood,
+  staminaMax: SOURCE.stamina.max,
+  staminaDrainPerAwakeHour: SOURCE.stamina.drainPerAwakeHour,
+  staminaDrainPerFood: SOURCE.stamina.drainPerFood,
+  lowStaminaThreshold: SOURCE.stamina.lowThreshold,
+  lowStaminaMultiplier: SOURCE.stamina.lowGrowthMultiplier,
+  sickPoopThreshold: SOURCE.hygiene.sickPoopThreshold,
+  sickTriggerHours: SOURCE.hygiene.sickTriggerHours,
+  sickGrowthMultiplier: SOURCE.hygiene.sickGrowthMultiplier,
+  naturalRecoveryHours: SOURCE.hygiene.naturalRecoveryHours,
+  moodCleanMultiplier: SOURCE.hygiene.moodCleanMultiplier,
+  moodSomePoopMultiplier: SOURCE.hygiene.moodSomePoopMultiplier,
+  moodDirtyMultiplier: SOURCE.hygiene.moodDirtyMultiplier,
+  moodSomePoopAt: SOURCE.hygiene.moodSomePoopAt,
+  moodDirtyAt: SOURCE.hygiene.moodDirtyAt,
 });
 
 export type SourceBalance = { readonly [K in keyof typeof SOURCE_BALANCE]: number };
@@ -45,27 +50,17 @@ export type GameConfig = {
 
 export const DEV_GAME_CONFIG: GameConfig = {
   status: 'DEV_FIXTURE_ONLY',
-  version: 'app02-dev-fixture-1',
+  version: MVP_BALANCE_REGISTRY.version,
   source: SOURCE_BALANCE,
   proposal: {
-    expScale: 1_000_000,
-    foodUnitsPerItem: 1_000,
-    coinUnitsPerCoin: 200,
-    poopIntervalMs: 6 * 60 * 60 * 1_000,
-    foodsPerPoop: 8,
-    hibernateAfterMs: 24 * 60 * 60 * 1_000,
-    hungerMax: 100,
-    initialHunger: 50,
-    mealHungerThreshold: 50,
-    hungerPerAwakeHour: 4,
-    hungerReductionPerMeal: 10,
+    ...DEV,
   },
 };
 
-export class DecisionRequired extends Error {
+export class DecisionRequired extends BalanceDecisionRequired {
   readonly decision: string;
   constructor(decision: string) {
-    super(`DecisionRequired: ${decision}`);
+    super([decision]);
     this.name = 'DecisionRequired';
     this.decision = decision;
   }

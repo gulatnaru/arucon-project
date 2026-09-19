@@ -1,3 +1,5 @@
+import { MVP_BALANCE_REGISTRY } from '../config/balanceRegistry';
+
 export type SleepBalanceConfig = Readonly<{
   mode: 'DEV_FIXTURE_ONLY';
   version: string;
@@ -9,16 +11,10 @@ export type SleepBalanceConfig = Readonly<{
 /** SRS section 9 source curve; this does not configure the OPEN raw-data scorer. */
 export const DEV_SLEEP_CONFIG: SleepBalanceConfig = Object.freeze({
   mode: 'DEV_FIXTURE_ONLY',
-  version: 'sleep-source-curve-v1',
-  provenance: 'arucon-SRS section 9; DEC-05 scorer remains OPEN',
-  noDataMultiplier: 1,
-  curve: Object.freeze([
-    Object.freeze({ score: 0, multiplier: 0.7 }),
-    Object.freeze({ score: 40, multiplier: 0.7 }),
-    Object.freeze({ score: 70, multiplier: 1 }),
-    Object.freeze({ score: 85, multiplier: 1.2 }),
-    Object.freeze({ score: 100, multiplier: 1.5 }),
-  ]),
+  version: MVP_BALANCE_REGISTRY.version,
+  provenance: `${MVP_BALANCE_REGISTRY.provenance.source}; DEC-05 scorer remains OPEN`,
+  noDataMultiplier: MVP_BALANCE_REGISTRY.source.sleep.noDataMultiplier,
+  curve: MVP_BALANCE_REGISTRY.source.sleep.curve,
 });
 
 export function validateSleepConfig(config: SleepBalanceConfig): void {

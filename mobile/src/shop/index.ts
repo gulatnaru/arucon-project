@@ -1,3 +1,5 @@
+import { MVP_BALANCE_REGISTRY } from '../config/balanceRegistry';
+
 /** DEC-09 OPEN: this catalog is a development fixture, never a live storefront. */
 export type UtilityKind = 'medicine' | 'toilet' | 'table' | 'furniture' | 'toy';
 
@@ -21,9 +23,9 @@ export type CosmeticItem = Readonly<{
 export type CatalogItem = UtilityItem | CosmeticItem;
 
 export const DEV_SHOP_CATALOG: readonly CatalogItem[] = Object.freeze([
-  { id: 'medicine', category: 'utility', kind: 'medicine', payment: 'coin', coinPrice: 50, priceStatus: 'source_value' },
-  { id: 'toilet-dev', category: 'utility', kind: 'toilet', payment: 'coin', coinPrice: 80, priceStatus: 'dev_fixture' },
-  { id: 'table-dev', category: 'utility', kind: 'table', payment: 'coin', coinPrice: 60, priceStatus: 'dev_fixture' },
+  { id: 'medicine', category: 'utility', kind: 'medicine', payment: 'coin', coinPrice: MVP_BALANCE_REGISTRY.source.shop.medicinePriceCoin, priceStatus: 'source_value' },
+  { id: 'toilet-dev', category: 'utility', kind: 'toilet', payment: 'coin', coinPrice: MVP_BALANCE_REGISTRY.devFixture.shop.toiletPriceCoin, priceStatus: 'dev_fixture' },
+  { id: 'table-dev', category: 'utility', kind: 'table', payment: 'coin', coinPrice: MVP_BALANCE_REGISTRY.devFixture.shop.tablePriceCoin, priceStatus: 'dev_fixture' },
   { id: 'furniture-pending', category: 'utility', kind: 'furniture', payment: 'coin', coinPrice: null, priceStatus: 'decision_required' },
   { id: 'cosmetic-placeholder', category: 'cosmetic', payment: 'cash_disabled', productId: null, effect: 'appearance_only' },
 ]);
@@ -40,7 +42,7 @@ export function validateCatalog(items: readonly CatalogItem[]): void {
       } else if (!Number.isSafeInteger(item.coinPrice) || item.coinPrice < 0 || item.priceStatus === 'decision_required') {
         throw new Error('Invalid utility price');
       }
-      if (item.kind === 'medicine' && (item.coinPrice !== 50 || item.priceStatus !== 'source_value')) {
+      if (item.kind === 'medicine' && (item.coinPrice !== MVP_BALANCE_REGISTRY.source.shop.medicinePriceCoin || item.priceStatus !== 'source_value')) {
         throw new Error('Medicine price must match source value');
       }
     } else if (item.category === 'cosmetic') {

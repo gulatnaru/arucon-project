@@ -1,177 +1,269 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "runDate": "2026-09-19",
   "timezone": "Asia/Seoul",
-  "status": "app05_app06_local_complete_native_and_decisions_pending",
-  "overallGate": "PARTIAL",
-  "reason": "Resumed checkpoint 3b52a5b; APP-04 review closed, APP-05 local integrations completed/reviewed, APP-06 local validation and independent QA closed. Native environment and OPEN product decisions remain.",
+  "status": "WAITING_FOR_HUMAN_DECISIONS",
+  "overallGate": "MVP_NOT_COMPLETE",
+  "definition": "SRS v1.8 sections 14 and 14-1, all 30 rows; not APP-stage completion",
+  "reason": "All independently implementable local pre-decision/pre-SDK work and independent QA are complete. Remaining production activation, native execution and external validation require documented human decisions, SDK preparation or sensitive/external authorization.",
+  "sourceBaseline": "c99a4c0ee9486193a7514983e29a778f361c9a84",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
-  "stages": {
-    "APP-01": {
-      "gate": "PARTIAL",
-      "localImplementation": "scene integration and reduced-motion held poses implemented",
-      "nativeValidation": "NOT_RUN",
-      "independentReview": "completed_for_local_scope"
-    },
-    "APP-02": {
-      "gate": "PARTIAL",
-      "localImplementation": "domain and local SQLite implemented",
-      "nativeValidation": "NOT_RUN",
-      "independentReview": "completed_for_local_scope"
-    },
-    "APP-03": {
-      "gate": "PARTIAL",
-      "localImplementation": "life service, room actions and journal integrated",
-      "nativeValidation": "NOT_RUN",
-      "independentReview": "completed_for_local_scope"
-    },
-    "APP-04": {
-      "gate": "PARTIAL",
-      "localImplementation": "DEV onboarding and synthetic activity implemented",
-      "nativeValidation": "NOT_RUN",
-      "independentReview": "LOCAL_PASS_CLOSED",
-      "resumeRegression": "13/13 PASS; activity/onboarding/devClock",
-      "reviewFix": "APP-04 document corrected to match existing DEV SQLite onboarding integration"
-    },
-    "APP-05": {
-      "gate": "PARTIAL",
-      "localImplementation": "synthetic sleep provider/policy and five-state widgetView preview integrated",
-      "nativeValidation": "NOT_RUN",
-      "independentReview": "LOCAL_PASS_CLOSED",
-      "impactTests": {
-        "passed": 47,
-        "failed": 0,
-        "exit": 0,
-        "evidence": "mobile/evidence/resume-app05-06/app05-impact.log"
-      },
-      "reviewTests": {
-        "passed": 14,
-        "failed": 0,
-        "skipped": 0,
-        "exit": 0,
-        "evidence": "mobile/evidence/resume-app05-06/app05-review-tests.log"
-      }
-    },
-    "APP-06": {
-      "gate": "PARTIAL",
-      "localImplementation": "complete: final integration tests, Android/iOS JS asset bundles, evidence and reports",
-      "nativeValidation": "NOT_RUN",
-      "independentReview": "LOCAL_PASS_CLOSED",
-      "nativeEnvironment": "BLOCKED_ENV",
-      "reviewFix": "corrected Git inventory to four untracked source/test files and unstaged tracked changes"
-    }
+  "routing": {
+    "root": "requested Astra orchestration/integration/Hard Stop decisions",
+    "builder": "arucon_builder / requested Sol, three existing/new agents",
+    "exploration": "arucon_explorer / requested Terra",
+    "independentReview": "existing Terra read-only explorer reused under reviewer instructions: dedicated reviewer allocation blocked by agent thread limit",
+    "luna": "allocation attempted; agent thread limit prevented use",
+    "spark": "not invoked; support not established",
+    "note": "Role requests do not prove backend model IDs; no metadata exposed."
   },
-  "git": {
-    "rootRepository": true,
-    "mobileRepository": false,
-    "mobileLayout": "ordinary_directory",
-    "mobileDotGitExists": false,
-    "branch": "feature/arucon-mobile-autonomous",
-    "baselineHead": "3b52a5b",
-    "gitlinkDeletion": "committed in checkpoint 3b52a5b; no remaining gitlinks",
-    "newMobileFiles": "four new ordinary root-repository source/test files remain untracked; existing tracked changes are unstaged",
-    "commitCreatedThisRun": false,
-    "push": false,
-    "merge": false,
-    "recordedAt": "development completion before the subsequent checkpoint publication request; untracked/staged flags describe that snapshot",
-    "untrackedMobileFiles": [
-      "mobile/src/application/devSleepFixture.ts",
-      "mobile/src/application/devWidgetPreview.ts",
-      "mobile/src/presentation/devWidgetPreviewText.ts",
-      "mobile/tests/application/devSleepWidgetFlow.test.ts"
-    ],
-    "stagedChanges": false
+  "completion": {
+    "independentLocalEngineering": "COMPLETE",
+    "independentReview": "LOCAL_PASS_CLOSED",
+    "remainingIndependentWork": [],
+    "productMvp": "NOT_COMPLETE",
+    "nativeDevelopmentBuild": "BLOCKED_ENV",
+    "simulatorExecution": "NOT_RUN",
+    "physicalDeviceExecution": "NOT_RUN",
+    "visualMotionFps": "NOT_RUN",
+    "productionPolicies": "OPEN_PROPOSED_UNCHANGED"
   },
-  "externalWrites": false,
-  "publicDeployment": false,
-  "realHealthDataRead": false,
-  "realPayment": false,
-  "realDeviceValidation": "NOT_RUN",
-  "nativeBuild": "BLOCKED_ENV",
-  "screenshotsAndVideo": "NOT_RUN",
-  "environment": {
-    "node": "26.7.0",
-    "npm": "11.19.0",
-    "pythonValidation": "3.12.14",
-    "java": "21.0.12.1",
-    "xcode": false,
-    "androidSdk": false,
-    "adb": false,
-    "verificationEvidence": "mobile/evidence/resume-app05-06/environment.json"
-  },
+  "implemented": [
+    "single versioned balance registry with unresolved decision gates",
+    "offline outbox replay/ack/conflict/privacy and recovery planner",
+    "SQLite v5 additive migration/failure recovery",
+    "DEV atomic coin purchase/ownership and injected sleep recovery ledgers",
+    "pure progression/RNG resolution and durable prepared-resolution ledger",
+    "default-OFF native health/widget contracts",
+    "synthetic account/device/consent revocation and outbound allowlist",
+    "disabled notification delivery and non-blaming copy contract",
+    "native environment inventory, clean prebuild readiness and dependency remediation"
+  ],
   "lastValidation": {
     "mobileTests": {
       "command": "npm test",
-      "passed": 77,
+      "passed": 147,
       "failed": 0,
       "skipped": 0,
       "exit": 0
     },
-    "lint": "PASS; 0 lint warnings",
+    "lint": "PASS",
     "typecheck": "PASS",
-    "androidMetroExport": "PASS; current resume Hermes/asset bundle, not APK",
-    "iosMetroExport": "PASS; current resume Hermes/asset bundle, not IPA",
-    "workflow": "38/38 PASS",
-    "workflowRegression": "PASS",
+    "androidJsBundle": "PASS_NOT_NATIVE_BUILD",
+    "iosJsBundle": "PASS_NOT_NATIVE_BUILD",
+    "cleanNativeProjectGeneration": "PASS_NOT_NATIVE_BUILD",
     "dependencyAudit": {
-      "status": "FAIL_MODERATE",
-      "moderate": 10,
-      "high": 0,
-      "critical": 0,
-      "command": "npm audit --json",
-      "exit": 1,
-      "executedThisResume": false
+      "exit": 0,
+      "total": 0
     },
-    "sourceManifest": "mobile/evidence/resume-app05-06/source-sha256.json",
-    "evidence": "mobile/evidence/resume-app05-06/results.json"
+    "workflow": {
+      "passed": 38,
+      "total": 38,
+      "exit": 0
+    },
+    "workflowRegression": "PASS",
+    "evidence": "mobile/evidence/mvp-engineering/results.json",
+    "sourceManifest": "mobile/evidence/mvp-engineering/source-sha256.json"
   },
-  "evidenceDirectory": "mobile/evidence/resume-app05-06",
-  "remaining": [
-    "Native SDK/device development build and actual UI/SQLite/lifecycle/motion/FPS validation (BLOCKED_ENV/NOT_RUN)",
-    "OPEN/PROPOSED scorer/date/recovery, evolution, operational price/payment/guardian-consent decisions; live paths stay disabled",
-    "Coin purchase transaction, native widget extension and actual open_app routing not implemented",
-    "Existing checkpoint dependency audit moderate 10; not re-audited in this resume"
+  "environment": {
+    "node": "26.7.0",
+    "npm": "11.19.0",
+    "xcode": false,
+    "androidSdk": false,
+    "adb": false,
+    "simctl": false,
+    "evidence": "mobile/evidence/mvp-engineering/native-environment.json"
+  },
+  "gapMatrix": [
+    {
+      "id": "M01",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "합성 명명/연령 및 계정·기기·철회 계약. DQ-06 실제 동의/가입"
+    },
+    {
+      "id": "M02",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "집계/상한/수정/날짜 테스트, 기본 OFF native bridge. DQ-05 실제 권한·소스 지원"
+    },
+    {
+      "id": "M03",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "공통 식사/부재 정산/SQLite 실패·재시도 검사. DQ-01 운영 순서, DQ-09 OS 종료 검증"
+    },
+    {
+      "id": "M04",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "무유지비 자동 화장실 engine + DEV 구매 원장. DQ-04 초기 설치/가격, DQ-09 화면"
+    },
+    {
+      "id": "M05",
+      "status": "NEEDS_DEVICE_VALIDATION",
+      "scopeAndResidual": "성격·형태 분리/무료 교감 검사. DQ-09 기기 준비 후 실제 반응/화면"
+    },
+    {
+      "id": "M06",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "생활 service/기록 일지/자동화 동등성. DQ-04 가구 카탈로그, DQ-09 실제 화면"
+    },
+    {
+      "id": "M07",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "순수 level/stage·RNG·확정 결과 영속 계약. DQ-03 승인 resolver 및 App 운영 연결"
+    },
+    {
+      "id": "M08",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "합성 score→섭취 배율·원자 회복 원장. DQ-02 scorer/날짜/회복 및 실제 기록"
+    },
+    {
+      "id": "M09",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "시간/소화·무료 교감·저체력 경계 검사. DQ-01/04 적극적 놀이 및 운영 config"
+    },
+    {
+      "id": "M10",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "배설/청소/기분·구간분할 검사. DQ-01 운영 타이머, DQ-09 실제 화면"
+    },
+    {
+      "id": "M11",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "청결 단일 원인·약 없는 회복 검사. DQ-01 운영 타이머, DQ-09 실제 화면"
+    },
+    {
+      "id": "M12",
+      "status": "NEEDS_DEVICE_VALIDATION",
+      "scopeAndResidual": "기존 controller/모션·입력 계약 유지. DQ-09 실제 GL/터치·배회"
+    },
+    {
+      "id": "M13",
+      "status": "BLOCKED_ENV",
+      "scopeAndResidual": "GLB 바이트 보존·빌드용 경로 정정. DQ-09 실제 가독성/영상/FPS"
+    },
+    {
+      "id": "M14",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "DEV coin/ownership 원자 원장·disabled cash. DQ-04 실제 상품/효과/UI·결제"
+    },
+    {
+      "id": "M15",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "위젯 projection/5상태·읽기 전용 native 계약. DQ-08 target/갱신, DQ-09 SDK/실제 앱 진입"
+    },
+    {
+      "id": "M16",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "동면 정지/복귀·경계 불변성. DQ-01 운영 threshold, DQ-09 lifecycle"
+    },
+    {
+      "id": "M17",
+      "status": "PASS",
+      "scopeAndResidual": "단일 versioned registry에서 domain/sleep/shop/progression 값 투영, OPEN 값 분리"
+    },
+    {
+      "id": "M18",
+      "status": "PASS",
+      "scopeAndResidual": "현재 구현 경로 raw/secret allowlist 및 전송 전 차단. 실제 bridge/server 연결 후 재검증 필수"
+    },
+    {
+      "id": "M19",
+      "status": "PASS",
+      "scopeAndResidual": "현재 문구/tone 계약 검사, 실제 알림 delivery disabled. DQ-08 발송 정책 별도"
+    },
+    {
+      "id": "V01",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "OPEN/PROPOSED 유지, DQ-01~08 승인 후 SRS/config/예시 동기화"
+    },
+    {
+      "id": "V02",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "합성 중복/cap/분수/자정/과거 수정 검사 완료. DQ-05 운영 날짜/소스 선택"
+    },
+    {
+      "id": "V03",
+      "status": "BLOCKED_ENV",
+      "scopeAndResidual": "Node SQLite failure/rollback/reload 검사 완료. DQ-09 실제 프로세스 강제 종료/재기동"
+    },
+    {
+      "id": "V04",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "clock/RNG·복합 상태·분할 불변성 및 영속 결과 재사용 계약. DQ-01/03 운영 정책"
+    },
+    {
+      "id": "V05",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "synthetic sleep 계약 완료. DQ-02 승인 예시와 HS-01 실제 기록 필요"
+    },
+    {
+      "id": "V06",
+      "status": "BLOCKED_ENV",
+      "scopeAndResidual": "fake 권한/철회/지연/재생성 계약. DQ-09 SDK와 DQ-05 실제 데이터 승인"
+    },
+    {
+      "id": "V07",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "local outbox/ack/conflict/복구 planner/migration 실패 검사. DQ-07 운영 복구/다기기 + HS-02"
+    },
+    {
+      "id": "V08",
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "현금 비활성. DQ-04 승인 상품/실제 purchase 검증·복원/환불"
+    },
+    {
+      "id": "V09",
+      "status": "HARD_STOP_DECISION",
+      "scopeAndResidual": "합성 scope/철회와 raw 차단 검사. DQ-06 법적 정책 및 실제 backend 접근 통제"
+    },
+    {
+      "id": "V10",
+      "status": "PASS",
+      "scopeAndResidual": "이번 실행 command/cwd/환경/결과/증거를 acceptance와 실행 보고서에 별도 기록"
+    },
+    {
+      "id": "V11",
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "독립 코드 QA 결과와 기기 미실행 분리. DQ-10 최종 인간 merge/release 판단"
+    }
   ],
-  "supersedes": "Prior separate-mobile-repository Windows checkpoint; its 55-test result is not evidence for reconstructed source.",
-  "checkpointPublication": {
-    "authorizedBy": "explicit subsequent user request on 2026-09-19",
-    "commitMessage": "APP: complete local implementation through APP-06",
-    "remote": "origin",
+  "decisionQueue": "DECISION-QUEUE.md",
+  "hardStops": [
+    "HS-01 real health records",
+    "HS-02 real accounts/cloud/server",
+    "HS-03 real payments",
+    "HS-04 release/deployment",
+    "HS-06 OPEN/PROPOSED product decisions",
+    "HS-07 new/unapproved art if needed",
+    "HS-08 SDK/admin environment setup"
+  ],
+  "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "scope": "reviewed 11 modified files and 4 new files only",
-    "recordTiming": "pre-commit snapshot; successful publication is verified after push using local HEAD, tracking ref and live origin branch",
-    "mergeAuthorized": false,
-    "mainPushAuthorized": false,
-    "deploymentAuthorized": false
+    "rootRepository": true,
+    "mobileLayout": "ordinary_directory",
+    "mobileDotGitExists": false,
+    "gitlinks": false,
+    "authorized": "local commits and normal push to origin/feature/arucon-mobile-autonomous for this long-running task",
+    "prohibited": [
+      "main push",
+      "merge",
+      "PR merge",
+      "force push",
+      "history rewrite",
+      "tag/release",
+      "deployment"
+    ],
+    "publicationRecordScope": "This tracked record is written before its own checkpoint commit; actual HEAD/tracking/live-origin hashes and clean status are recorded after publication.",
+    "verificationEvidence": "mobile/evidence/mvp-engineering/publication.json"
   },
-  "resumeCheckpoint": {
-    "head": "3b52a5b24685d113ebff34550cfa60be1e7b5cf7",
-    "branch": "feature/arucon-mobile-autonomous",
-    "initialWorktree": "clean",
-    "priorValidatedSourceManifest": "MATCH",
-    "commitPushAuthorizedThisRun": false
+  "realHealthDataRead": false,
+  "realAccountsOrCloudCreated": false,
+  "realPayment": false,
+  "publicDeployment": false,
+  "historicalBaseline": {
+    "checkpoint": "c99a4c0",
+    "priorApp04Regression": "13/13 historical; not reused as current execution evidence",
+    "priorApp06Tests": "77/77 historical; this run also executed a fresh 77-test baseline before changes"
   },
-  "completion": {
-    "localScope": "COMPLETE",
-    "independentReview": "APP-04/05/06 LOCAL_PASS_CLOSED",
-    "overallProductGate": "PARTIAL",
-    "nativeDevelopmentBuild": "BLOCKED_ENV",
-    "realDeviceExecution": "NOT_RUN",
-    "simulatorExecution": "NOT_RUN",
-    "openProductDecisions": "UNCHANGED",
-    "commitPushThisRun": false
-  },
-  "recordScope": "APP-04–06 development completion snapshot; later user-authorized publication recorded separately below",
-  "previousCheckpointPublication": {
-    "authorizedBy": "explicit user request on 2026-09-19",
-    "commitMessage": "APP: rebuild mobile checkpoint through APP-04",
-    "remote": "origin",
-    "branch": "feature/arucon-mobile-autonomous",
-    "scope": "current reconstructed source and related documentation; existing APP-05/06 scaffolds retained",
-    "verification": "Checkpoint 3b52a5b24685d113ebff34550cfa60be1e7b5cf7 was remotely verified in the prior authorized turn.",
-    "mergeAuthorized": false,
-    "mainPushAuthorized": false,
-    "deploymentAuthorized": false
-  }
+  "evidenceDirectory": "mobile/evidence/mvp-engineering"
 }

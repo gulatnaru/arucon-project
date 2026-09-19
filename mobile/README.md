@@ -23,7 +23,7 @@ npm start
 
 `src/scene/AruconRoom.tsx`의 `AruconRoom`을 `SafeAreaProvider` 아래 전체 화면 콘텐츠로 렌더합니다. `RoomProps`는 성격(`reserved`/`expressive`), 수면, 움직임 줄이기, 식탁/화장실 설치, 공 노출 상태를 입력받습니다. 빈 바닥, 펫, 가구의 Pressable은 분리되어 있습니다. `onPetTouch`, `onFurnitureHit`, `onMove`는 상위 앱으로 신호만 보냅니다. 장면 코드는 EXP/체력/재화/저장을 변경하지 않습니다.
 
-방 GLView는 [승인 GLB](../references/floor-navigation-03/assets/arucon-tsundere-motion.glb)를 바이트 동일한 사본 `assets/arucon-tsundere-motion.glb`에서 읽습니다. SHA-256: `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`. GLB의 기존 15개 클립은 수정하지 않았습니다. 화면의 이동 속도는 기존 presentation 기준 `reserved=1.55`, `expressive=1.72` 월드 단위/초, 방향 응답 12, 가속 응답 14, 도착 응답 6, 전환 0.14초를 사용합니다. 교감 눌림은 스프링 110/15를 1/120초 단계로 적분하고, 손을 뗀 뒤 2.1초 동안 복원합니다. 앱 복귀 시 RAF는 하나만 활성화합니다.
+방 GLView는 [승인 GLB](../references/floor-navigation-03/assets/arucon-tsundere-motion.glb)를 바이트 동일한 사본 `assets/arucon_tsundere_motion.glb`에서 읽습니다. SHA-256: `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`. GLB의 기존 15개 클립은 수정하지 않았습니다. 화면의 이동 속도는 기존 presentation 기준 `reserved=1.55`, `expressive=1.72` 월드 단위/초, 방향 응답 12, 가속 응답 14, 도착 응답 6, 전환 0.14초를 사용합니다. 교감 눌림은 스프링 110/15를 1/120초 단계로 적분하고, 손을 뗀 뒤 2.1초 동안 복원합니다. 앱 복귀 시 RAF는 하나만 활성화합니다.
 
 ## 대상 확인 순서
 

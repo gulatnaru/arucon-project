@@ -535,3 +535,10 @@ QA 판정:
 2026-09-19 KST, 같은 Node26.7.0 환경. APP04 최소 회귀13/13 및 문서 정정 재검토 완료. APP05 영향47/47, 독립 focused14/14. APP06 최종 `npm test` **77/77 PASS**, lint/typecheck exit0, Android/iOS Metro export exit0. 이전72/72와 구분한다. 현재 명령/범위/exit/환경은 [실행 보고서](../AUTONOMOUS-RUN-REPORT.md), 원시 로그·소스 해시는 `mobile/evidence/resume-app05-06/`에 있다.
 
 추가 근거는 FR6 합성 null/0/70/100 provider→policy→SQLite 배율→이후 섭취, FR12 reader→5상태 widgetView→DEV 문자열 표시와 원장 불변이다. open_app 클릭/native route 검사는 아니다. 실제 SDK가 없어 native 개발 빌드·기기/시뮬레이터·UI E2E·영상/FPS·OS 위젯은 NOT_RUN/BLOCKED_ENV이며 운영 AT 전체 PASS로 집계하지 않는다.
+
+
+## 2026-09-19 — SRS14/14-1 전체 MVP engineering 실행
+
+시작 c99a4c0, feature/arucon-mobile-autonomous. 현재 판정 WAITING_FOR_HUMAN_DECISIONS, MVP 제품 완료 아님. 이번 변경 후 실제 `npm test` 147/147(pass147/fail0/skip0), lint/typecheck exit0, Android/iOS Expo JS export exit0, clean prebuild(native project generation only) exit0/warning0, npm audit exit0/total0, workflow38/38 및 regression assertion PASS. 명령/cwd/환경·검증별 증거는 [실행 보고서](../AUTONOMOUS-RUN-REPORT.md), 전체30항목은 [gap matrix](../MVP-GAP-MATRIX.md), 사용자 개입은 [결정 대기열](../DECISION-QUEUE.md)에 있다.
+
+원시 증거 `mobile/evidence/mvp-engineering/results.json`, `source-sha256.json`, `final-*.log`, `native-prebuild-final.log`, `dependency-audit.json`, 독립 review 기록은 Git 제외다. Node26.7.0/npm11.19.0/Python3.12. native compile BLOCKED_ENV, simulator/physical device/실제 권한·Health/Widget/visual/FPS 모두 NOT_RUN. JS 번들·생성 프로젝트·Node SQLite 테스트를 실기기 PASS로 표기하지 않는다. OPEN/PROPOSED는 그대로이며 독립 로컬 계약만 검증했다.
