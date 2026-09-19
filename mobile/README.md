@@ -6,7 +6,7 @@ APP-01은 방/캐릭터 렌더링 기술 검증의 역사적 기록이며 현재
 
 ## 로컬 실행
 
-Node.js 22.13 이상, npm, 대상 플랫폼의 로컬 네이티브 도구가 필요합니다. 현재 의존성은 Expo SDK 57, React Native 0.86, React 19.2, `expo-gl`, Three.js와 `expo-dev-client`입니다. 계정과 클라우드 프로젝트는 필요하지 않습니다.
+Node.js 22.13 이상, npm, 대상 플랫폼의 로컬 네이티브 도구가 필요합니다. 현재 의존성은 Expo SDK 55.0.31, React Native 0.83.10, React 19.2.0, `expo-gl`, Three.js와 `expo-dev-client`입니다. 계정과 클라우드 프로젝트는 필요하지 않습니다.
 
 ```sh
 cd mobile
@@ -21,7 +21,7 @@ npm start
 
 `npm run ios`/`npm run android`는 로컬 개발 빌드를 만들고 실행합니다. Expo Go나 브라우저 캡처를 설치형 앱 검증으로 대신하지 않습니다. 장치 없이 JavaScript 자산 묶기만 확인하려면 `npx expo export --platform ios --output-dir dist`를 사용합니다. `ios/`, `android/`, `dist/`, `node_modules/`는 Git 대상이 아닙니다.
 
-2026-09-20 KST 재확인: Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0은 사용 가능하지만 Android SDK/adb/emulator는 없습니다. 위젯 소스의 Swift 컴파일·링크는 통과했으나 Expo SDK 57의 앱 네이티브 컴파일은 `JavaScriptRuntime.swift` Swift 동시성 오류로 exit 65였고, SDK 57 공식 요구 Xcode 26.4 이상에도 미달합니다. 따라서 앱 native compile은 `BLOCKED_ENV`, simulator 앱 실행과 physical device 실행은 `NOT_RUN`입니다. `expo prebuild`는 SDK 57에서 ios 프로젝트를 정리할 수 있으므로 재생성 시 `--no-clean`을 지원하는 현재 CLI인지 먼저 `npx expo prebuild --help`로 확인하고, 기존 native 산출물을 보존해야 할 때만 해당 옵션을 사용합니다. 이 기록은 npm ci 성공이나 JavaScript 번들 성공을 native build PASS로 해석하지 않습니다.
+2026-09-20 KST 재확인: Expo SDK 55.0.31, React Native 0.83.10, React 19.2.0으로 정렬했습니다. macOS 15.6 + Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0 조합에서 위젯 생성과 iOS native compile/install이 통과했습니다. 별도 `simctl launch` 프로세스 실행도 확인했습니다. `expo run:ios`의 마지막 GUI 활성화 단계는 System Events 권한 부족으로 exit 1이며 `BLOCKED_ENV_AUTOMATION_PERMISSION`으로 기록합니다. CUA 접근성·화면 기록 권한이 없어 실제 GLB 렌더, 터치·모션, WidgetKit 화면은 평가하지 않았습니다. Android SDK/adb/emulator는 없어 `BLOCKED_ENV`입니다. SDK 57 내부 패치와 postinstall은 제거했으며, SDK 55 prebuild 산출물은 `evidence/sdk55-migration/`에 기록했습니다. 이 기록은 JS bundle이나 프로세스 실행을 실기기 PASS로 해석하지 않습니다.
 
 로컬 MVP의 입력은 `SYNTHETIC_LOCAL` 합성 활동·수면 세션이며, 위젯은 마지막 갱신 시각을 보여 주는 read-only 앱 연결입니다.
 

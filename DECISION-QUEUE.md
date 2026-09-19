@@ -34,13 +34,13 @@
 - 선택지: 기기/법적 검증 뒤 별도 결제·출시 범위를 승인 / 로컬 MVP 개발만 유지. **추천: 각 gate의 실제 증거를 확인한 뒤 별도 승인.**
 - 이후 첫 검증: 승인된 상품의 테스트 검증/중복/복원/환불 → 실제 제출은 별도 명시 권한. feature push가 main merge/push·tag/release·배포 승인은 아니다.
 
-## EXT-ENV — 시스템 환경·기기
+## EXT-ENV — 시스템 환경·기기·UI 검증
 
-- 남은 사람 작업: Expo SDK 57의 [공식 최소 Xcode 26.4+](https://docs.expo.dev/versions/latest/#support-for-android-and-ios-versions)를 충족하는 개발 환경과 Android SDK/emulator/테스트 기기 준비. 시스템 설치는 사용자가 별도 수행/승인한다.
-- 2026-09-20 재조사: Xcode26.3/Swift6.2.4/CocoaPods1.17.0 및 iPhone16e iOS26.3 simulator는 사용 가능하다. Android SDK/adb/emulator는 없다. 최신 inventory는 `mobile/evidence/ios-widget-path-fix/native-environment.json`.
-- 실행/잔여: 위젯 Swift compile/link PASS. 전체 앱은 경로와 constructor annotation 수정 후에도 ExpoModulesJSI JavaScriptRuntime.swift의 pointer data-race 진단 7개로 xcodebuild exit65. iOS는 도구 부재가 아닌 공식 최소 미달/컴파일 호환성 BLOCKED_ENV다. simulator 앱 실행·OS 위젯 렌더·실기기 NOT_RUN. ADR-008의 재현 가능한 프로젝트 수정은 완료했고 동시성 검사는 완화하지 않았다.
-- 선택지: 이미 준비된 개발 호스트/기기 제공 / 관리자가 필요한 SDK 설치 / 로컬 계약 검사 상태 유지. **추천: 준비된 개발 환경 제공.**
-- 이후 첫 검증: environment inventory → 실제 건강 읽기 OFF native compile/simulator → lifecycle/저장/화면/위젯·모션/FPS → physical device 검증. simulator와 실기기는 별도 기록.
+- 현재: 사용자 요청으로 OS 업그레이드 없이 SDK55.0.31로 마이그레이션했다. 공식 최소 Xcode26.2를 현 Xcode26.3/macOS15.6이 충족하며 iOS native compile/install/process start PASS다. iOS26.3 Simulator runtime도 사용 가능하다. 기존 SDK57의 Xcode26.4+ 미달은 현재 차단 원인이 아니다.
+- 남은 사람 작업: 필요 시 macOS 자동화/System Events 및 CUA 접근성·화면 기록 권한을 허용하거나 Simulator 화면을 수동 검증. Android SDK/emulator/실기기 준비. 권한 변경·시스템 설치는 자동 수행하지 않았다.
+- 실행/잔여: 전체239개·doctor20개·CNG25개·독립 QA, xcodebuild exit0 및 simctl process start exit0. `expo run:ios`는 컴파일/설치 후 창 활성화에서 exit1(`BLOCKED_ENV_AUTOMATION_PERMISSION`). 화면/GLB/터치/모션/OS 위젯은 NOT_EVALUATED, physical device NOT_RUN. 근거 `mobile/evidence/sdk55-migration/`, ADR009.
+- 선택지: 필요한 UI 권한을 직접 허용하고 합성 검증 재개 / 사용자가 Simulator를 수동 조작해 검증 / 별도 준비된 Android·실기기 환경 제공. **추천: 현 iOS Simulator의 합성 UI·저장·위젯 검증부터 진행.**
+- 이후 첫 검증: Metro 실행→개발 앱 연결→합성 온보딩/GLB/식사/lifecycle/위젯→별도 physical device 검증. 실제 Health 접근은 계속 OFF다. 프로세스 시작을 실제 화면/모션 PASS로 사용하지 않는다.
 
 ## 재개 규칙
 

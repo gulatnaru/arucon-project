@@ -2,11 +2,11 @@
   "schemaVersion": 6,
   "runDate": "2026-09-20",
   "timezone": "Asia/Seoul",
-  "status": "WAITING_FOR_HUMAN_DECISIONS",
+  "status": "SDK55_MIGRATION_VALIDATED_WITH_UI_LIMITS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "iOS widget CNG path and reproducible ExpoModulesJSI constructor patch completed. Xcode26.3 is available but below Expo SDK57 documented26.4 minimum; whole app compile still fails with seven Swift pointer data-race diagnostics. External boundaries and environment remain.",
-  "sourceBaseline": "fce0bac7a0b240c3a396edc91f93d4e0c0d6b20c",
+  "reason": "Requested SDK55 migration validated on macOS15.6/Xcode26.3 without Expo-internal patches. Native compile/install and simulator process start passed. Expo CLI GUI activation lacks macOS automation permission; visual/interactive/physical and wider MVP gates are not claimed complete.",
+  "sourceBaseline": "0e795d94056f63d3192cbd9422a1c9823f3df401",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
@@ -18,25 +18,28 @@
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
     "currentRun": {
-      "builder": "ios_widget_path_fix / arucon_builder requested Sol",
-      "reviewer": "ios_widget_review / arucon_reviewer requested Terra High",
-      "explorer": "ios_docs_audit / arucon_explorer requested Terra",
-      "luna": "ios_environment_docs / arucon_luna_worker requested Luna",
-      "root": "Astra integration, native attempts and Git"
+      "root": "requested Astra integration/native verification",
+      "builder": "sdk55_migration / arucon_builder requested Sol",
+      "explorer": "sdk55_api_audit / arucon_explorer requested Terra",
+      "reviewer": "sdk55_review / arucon_reviewer requested Terra High",
+      "luna": "sdk55_docs / arucon_luna_worker requested Luna"
     }
   },
   "completion": {
     "independentLocalEngineering": "COMPLETE",
-    "independentReview": "SOURCE_PASS_NATIVE_APP_BUILD_FAILED",
-    "remainingIndependentWork": [],
+    "independentReview": "PASS_SOURCE_CNG_NATIVE_WITH_UI_LIMITS",
+    "remainingIndependentWork": [
+      "Simulator visual/GLB/touch/motion and widget OS interaction validation after UI automation permission or manual testing"
+    ],
     "productMvp": "NOT_COMPLETE",
-    "nativeDevelopmentBuild": "FAIL_IOS_COMPILER_INCOMPATIBILITY_BLOCKED_ENV_ANDROID_SDK_ABSENT",
-    "simulatorExecution": "NOT_RUN",
+    "nativeDevelopmentBuild": "PASS_IOS_ANDROID_NOT_RUN_BLOCKED_ENV",
+    "simulatorExecution": "PASS_INSTALL_AND_PROCESS_START_ONLY",
     "physicalDeviceExecution": "NOT_RUN",
-    "visualMotionFps": "NOT_RUN",
+    "visualMotionFps": "NOT_EVALUATED",
     "productionPolicies": "SIX_DEFAULTS_APPROVED_EXTERNAL_BOUNDARIES_OFF",
     "formRendering": "APPROVED_2D_REFERENCE_PRESENT_EXPLICIT_COMMON_GLB_FALLBACK_FOUR_RUNTIME_ASSETS_NOT_DELIVERED",
-    "iosWidgetCompileAndLink": "PASS_NOT_WIDGET_OS_EXECUTION"
+    "iosWidgetCompileAndLink": "PASS_INSTALLED_WITH_APP_NOT_WIDGET_OS_RENDER",
+    "migration": "COMPLETE"
   },
   "implemented": [
     "가입·연령·이름: 로컬 합성 온보딩/명명·scope·철회 계약. 실제 미성년 동의·가입은 EXT-LEGAL/ACCOUNT.",
@@ -60,27 +63,58 @@
     "비난 없는 안내: 앱 안 상태 안내 우선·중립 문구·합성 알림 중복/철회 검사. 실제 발송 비활성."
   ],
   "lastValidation": {
-    "scope": "iOS build troubleshooting; prior236 tests are historical",
-    "npmCiOffline": "PASS_POSTINSTALL_PATCH_REPRODUCED_NOT_FRESH_NETWORK_AUDIT",
+    "scope": "SDK55 migration plus generated widget executable repair",
+    "mobileTests": {
+      "command": "npm test",
+      "tests": 239,
+      "pass": 239,
+      "fail": 0,
+      "skipped": 0,
+      "exit": 0
+    },
+    "expoInstallFix": {
+      "status": "PASS",
+      "exit": 0
+    },
+    "expoDoctor": {
+      "passed": 20,
+      "total": 20,
+      "exit": 0
+    },
     "lint": "PASS",
     "typecheck": "PASS",
-    "iosWidgetCompileAndLink": "PASS",
-    "iosAppNativeBuild": {
-      "status": "FAIL",
-      "exit": 65,
-      "reason": "JavaScriptRuntime.swift pointer data-race diagnostics (7); Xcode26.3 below SDK57 minimum26.4"
+    "androidJsBundle": "PASS",
+    "iosJsBundle": "PASS",
+    "nativeGeneration": {
+      "passed": 25,
+      "total": 25,
+      "status": "PASS_NOT_RUNTIME"
     },
-    "simulatorAppExecution": "NOT_RUN",
+    "iosNativeCompile": {
+      "command": "xcodebuild -workspace ios/app.xcworkspace -scheme app -configuration Debug -sdk iphonesimulator -destination platform=iOS Simulator,id=<local-simulator> CODE_SIGNING_ALLOWED=NO build",
+      "status": "PASS",
+      "exit": 0
+    },
+    "expoRunIos": {
+      "command": "npx expo run:ios --device <local-simulator> --no-bundler",
+      "compile": "PASS",
+      "install": "PASS",
+      "exit": 1,
+      "remainingFailure": "Simulator window activation: osascript System Events permission",
+      "classification": "BLOCKED_ENV_AUTOMATION_PERMISSION"
+    },
+    "simulatorAppProcessStart": {
+      "command": "xcrun simctl launch --terminate-running-process <local-simulator> com.arucon.dev",
+      "status": "PASS",
+      "exit": 0
+    },
+    "simulatorRuntime": "AVAILABLE_iOS26.3_NOT_BLOCKED_ENV_SIM_RUNTIME",
+    "visualGlbTouchMotionWidgetOs": "NOT_EVALUATED",
     "physicalDeviceExecution": "NOT_RUN",
-    "evidence": "mobile/evidence/ios-widget-path-fix/",
-    "targetedNativeTests": {
-      "command": "node --import tsx --test tests/native/nativeIntegrationPlugin.test.ts tests/native/expoModulesJsiCompatibility.test.ts",
-      "tests": 9,
-      "pass": 9,
-      "fail": 0,
-      "exit": 0,
-      "independentReviewer": true
-    },
+    "androidNativeCompile": "NOT_RUN_BLOCKED_ENV",
+    "firstInstallFailure": "stale SDK57 npm peer graph ERESOLVE; clean SDK55 lock resolved without force",
+    "firstNativeInstallFailure": "CFBundleExecutable missing in generated widget plist; fixed in CNG plugin and regression tested",
+    "evidence": "mobile/evidence/sdk55-migration/",
     "workflow": {
       "version": "v1.9",
       "passed": 38,
@@ -99,12 +133,19 @@
     "adb": false,
     "emulator": false,
     "simctl": true,
-    "evidence": "mobile/evidence/ios-widget-path-fix/native-environment.json",
+    "evidence": "mobile/evidence/sdk55-migration/environment.json",
     "xcodeVersion": "26.3",
     "swiftVersion": "6.2.4",
     "cocoaPodsVersion": "1.17.0",
     "simulatorRuntime": "iOS26.3",
-    "expoSdkMinimumXcode": "26.4"
+    "expoSdkMinimumXcode": "26.2",
+    "expoSdk": "55.0.31",
+    "reactNative": "0.83.10",
+    "react": "19.2.0",
+    "macOS": "15.6",
+    "hostOfficiallyCompatible": true,
+    "automationPermission": "BLOCKED_ENV_AUTOMATION_PERMISSION",
+    "simulatorRuntimeAvailable": true
   },
   "gapMatrix": [
     {
@@ -180,7 +221,7 @@
     {
       "id": "M15",
       "status": "BLOCKED_ENV",
-      "scopeAndResidual": "iOS widget source path repaired; Swift compile/link PASS. Whole app compiler failure and Android SDK absence block app/widget OS execution."
+      "scopeAndResidual": "SDK55 CNG25 checks and iOS widget compile/install-with-app pass; standalone OS widget rendering and Android native remain unverified."
     },
     {
       "id": "M16",
@@ -250,7 +291,7 @@
     {
       "id": "V10",
       "status": "PASS",
-      "scopeAndResidual": "Historical236 tests preserved separately. Current targeted source/static checks and widget compilation distinguished from whole-app exit65 and NOT_RUN execution."
+      "scopeAndResidual": "Fresh239 tests, doctor20, lint/typecheck, both JS bundles, CNG25, xcodebuild exit0 and simulator install/process pass. Expo GUI activation exit1 and visual/physical NOT_RUN separated."
     },
     {
       "id": "V11",
@@ -264,7 +305,7 @@
     "EXT-HEALTH real health reads remain OFF",
     "EXT-ACCOUNT actual accounts/cloud/signing",
     "EXT-RELEASE actual payments/store/release/support declaration",
-    "EXT-ENV Xcode26.3 below ExpoSDK57 minimum26.4; iOS compiler failure, Android SDK absent; system install not performed"
+    "EXT-ENV Android SDK/device missing; macOS GUI automation permissions pending. iOS SDK55 compile/install/process start passed on current host; OS upgrade not required for this SDK."
   ],
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
@@ -272,7 +313,7 @@
     "mobileLayout": "ordinary_directory",
     "mobileDotGitExists": false,
     "gitlinks": false,
-    "authorized": "local commits and normal push to origin/feature/arucon-mobile-autonomous for this long-running task",
+    "authorized": "Stage, commit and normal push of this SDK55 checkpoint to origin/feature/arucon-mobile-autonomous are explicitly authorized.",
     "prohibited": [
       "main push",
       "merge",
@@ -282,8 +323,11 @@
       "tag/release",
       "deployment"
     ],
-    "publicationRecordScope": "This tracked record is written before its own checkpoint commit; actual HEAD/tracking/live-origin hashes and clean status are recorded after publication.",
-    "verificationEvidence": "mobile/evidence/ios-widget-path-fix/publication.json"
+    "publicationRecordScope": "This tracked record is written before its own checkpoint commit; final local/tracking/live-origin hashes and clean status are recorded in ignored evidence and the final response.",
+    "verificationEvidence": "mobile/evidence/sdk55-migration/final-git-audit.json",
+    "commitPerformed": true,
+    "pushPerformed": true,
+    "preCheckpointHead": "0e795d94056f63d3192cbd9422a1c9823f3df401"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -321,9 +365,37 @@
       "sourceManifest": "mobile/evidence/approved-mvp/staged-source-sha256.json",
       "nativeEvidence": "mobile/evidence/approved-mvp/native-final-validation.json"
     },
-    "approvedMvpValidationDate": "2026-09-19"
+    "approvedMvpValidationDate": "2026-09-19",
+    "iosWidgetFixValidation": {
+      "scope": "iOS build troubleshooting; prior236 tests are historical",
+      "npmCiOffline": "PASS_POSTINSTALL_PATCH_REPRODUCED_NOT_FRESH_NETWORK_AUDIT",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iosWidgetCompileAndLink": "PASS",
+      "iosAppNativeBuild": {
+        "status": "FAIL",
+        "exit": 65,
+        "reason": "JavaScriptRuntime.swift pointer data-race diagnostics (7); Xcode26.3 below SDK57 minimum26.4"
+      },
+      "simulatorAppExecution": "NOT_RUN",
+      "physicalDeviceExecution": "NOT_RUN",
+      "evidence": "mobile/evidence/ios-widget-path-fix/",
+      "targetedNativeTests": {
+        "command": "node --import tsx --test tests/native/nativeIntegrationPlugin.test.ts tests/native/expoModulesJsiCompatibility.test.ts",
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "exit": 0,
+        "independentReviewer": true
+      },
+      "workflow": {
+        "version": "v1.9",
+        "passed": 38,
+        "total": 38
+      }
+    }
   },
-  "evidenceDirectory": "mobile/evidence/ios-widget-path-fix",
+  "evidenceDirectory": "mobile/evidence/sdk55-migration",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [

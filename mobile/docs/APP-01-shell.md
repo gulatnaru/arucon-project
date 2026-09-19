@@ -1,5 +1,7 @@
 # APP-01 기술 검증 기록
 
+최신 SDK55 부록(2026-09-20): Expo 55.0.31/RN 0.83.10 정렬 후 iOS native compile/install 및 별도 Simulator process launch는 PASS. `expo run:ios` GUI 활성화는 `BLOCKED_ENV_AUTOMATION_PERMISSION`; CUA 권한 부재로 실제 GLB 렌더, 터치·모션은 `NOT_EVALUATED`; physical device는 `NOT_RUN`. 아래 APP-01 구현·역사 기록은 보존한다.
+
 ## 구현 경계
 
 - FR-10.1/16과 DEC-27의 승인 방향: 전체 화면 방, 작은 아루콘, 넓은 바닥, 분리된 터치, 원본 GLB 모션.
@@ -16,6 +18,6 @@
 - `npm run typecheck`, `npm run lint`, `npx expo export`와 네이티브 빌드는 실행 로그와 함께 최종 보고한다.
 - GLView/GLTFLoader가 실제 iOS/Android 기기에서 원본 GLB morph와 15개 애니메이션을 렌더하는지, 프레임/메모리, 펫 얼굴과 접촉/가구 회피를 실제 화면으로 확인해야 한다. 코드/번들만으로 APP-01 PASS를 선언하지 않는다.
 
-## 미리 확인된 환경 제약
+## SDK55 마이그레이션 전 환경 이력
 
-역사적 APP-01 기록 당시에는 Node.js 26.7.0과 Xcode Command Line Tools만 확인됐다. 2026-09-20 KST 재확인에서는 Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0이 사용 가능했지만 Android SDK/adb/emulator는 없었다. 위젯 Swift 컴파일·링크는 통과했으나 앱 native compile은 Swift 동시성 오류로 exit 65였고, 앱 실행·화면 캡처는 수행하지 않았다. 이 문서의 네이티브 수용 판정은 계속 `확인 불가`/`BLOCKED_ENV`이며 전역 SDK 설치나 계정 생성은 실행하지 않았다.
+역사적 APP-01 기록 당시에는 Node.js 26.7.0과 Xcode Command Line Tools만 확인됐다. SDK55 전환 전인 2026-09-20 KST SDK57 재확인에서는 Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0이 사용 가능했지만 Android SDK/adb/emulator는 없었다. 위젯 Swift 컴파일·링크는 통과했으나 앱 native compile은 Swift 동시성 오류로 exit 65였고, 앱 실행·화면 캡처는 수행하지 않았다. 당시 SDK57 네이티브 수용은 `확인 불가`/`BLOCKED_ENV`였다. 현재 SDK55 compile/install/process 결과는 맨 위 최신 부록을 따른다. 전역 SDK 설치나 계정 생성은 실행하지 않았다.

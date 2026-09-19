@@ -6,9 +6,9 @@ This checkpoint adds local contracts, build-discoverable Expo Modules, and gener
 
 The independent local scaffold is complete within its source/static scope. It does not satisfy the SRS 14-1 physical-device gate.
 
-## Latest host result (2026-09-20 KST)
+## Latest host result (2026-09-20 KST, SDK55 migration)
 
-Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0, and an iPhone 16e iOS 26.3 Simulator are available. Android SDK/adb/emulator are absent. The corrected widget source path compiled and linked in the native build, but the app build stopped at `JavaScriptRuntime.swift` with seven Swift concurrency errors (xcodebuild exit 65). Expo SDK 57 documents Xcode 26.4 or newer for this toolchain, so native app compilation remains `BLOCKED_ENV`; simulator app launch and physical-device/widget OS rendering remain `NOT_RUN`. This updates the older environment paragraph below without changing its historical evidence.
+Expo SDK 55.0.31, React Native 0.83.10, React 19.2.0, Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0, and an iPhone 16e iOS 26.3 Simulator are available. Android SDK/adb/emulator are absent. SDK55 prebuild generated the same widget target and the native iOS app compiled and installed successfully; separate `simctl launch` returned a process PID. The final Expo CLI GUI activation step exited 1 because System Events permission is unavailable, recorded as `BLOCKED_ENV_AUTOMATION_PERMISSION`. CUA accessibility/screen recording permission is pending, so GLB rendering, touch/motion, and WidgetKit OS rendering are `NOT_EVALUATED`; physical device remains `NOT_RUN`. Evidence is in `evidence/sdk55-migration/`. The prior SDK57 failure remains historical.
 
 ## Health boundary
 
@@ -38,20 +38,20 @@ Official references checked 2026-09-19:
 - Development identifiers are fixed in `native/arucon-widget-template/contract.json`. Clean prebuild now generates the iOS extension target/App Group entitlements and Android receiver/resources. Apple portal registration, signing, installation, and OS execution remain external or environment-blocked.
 - The tracked WidgetKit/AppWidget templates strictly decode the same six-field projection, model the existing four display states and five view statuses, read only shared storage, and expose only `arucondev://open/widget`. They perform no network, game command, reward, scheduled cadence, or health read.
 - The iOS template uses `.never` and the Android provider metadata uses `updatePeriodMillis=0`, so this checkpoint does not invent a refresh interval. Stale status is renderable but no native stale threshold is selected.
-- The plugin's DEV-only generation plan is enabled in `app.json`. It creates the Xcode extension target, copies Android/iOS sources and resources, registers the receiver, and declares the EAS extension metadata. App Group signing, compilation, install, and OS rendering remain `BLOCKED_ENV / NOT_RUN`.
+- The plugin's DEV-only generation plan is enabled in `app.json`. It creates the Xcode extension target, copies Android/iOS sources and resources, registers the receiver, and declares the EAS extension metadata. SDK55 iOS compilation and installation with the host app pass. Actual portal signing is an external gate; WidgetKit OS rendering remains `NOT_EVALUATED`, and Android native compilation remains `BLOCKED_ENV`.
 - `native/arucon-widget` is an autolinked app-side bridge. It validates and stores only the six-field JSON projection and requests an OS reload. The approved local App composition enables this read-only snapshot path and reports missing modules/errors explicitly; actual OS rendering remains unverified.
 
 ## Local contract verification
 
 The native contract tests cover default-OFF behavior, unsupported service, permission not requested, denial and revocation, HealthKit unknown authorization, delayed read, adapter recreation after restart, missing scorer decision, minimum read-only declarations, projection allowlisting, resource-neutral read/reload, native failure display behavior, local-module absence/malformed contracts, zero native calls while OFF, config declaration removal, the exact read-only opt-in declaration set, and widget template/generation-plan source contracts.
 
-Expo autolinking `search` and `resolve` both find `arucon-health` for Apple and Android, including the podspec/Swift module and Gradle/Kotlin module. Apple modules-provider generation with `--packages arucon-health` emits the `AruconHealth` import and `AruconHealthModule.self` registration. This verifies build-graph discovery and provider generation only. Swift/Kotlin compilation and runtime invocation remain `BLOCKED_ENV / NOT_RUN`.
+Expo autolinking `search` and `resolve` both find `arucon-health` for Apple and Android, including the podspec/Swift module and Gradle/Kotlin module. Apple modules-provider generation with `--packages arucon-health` emits the `AruconHealth` import and `AruconHealthModule.self` registration. This verifies build-graph discovery and provider generation only. The SDK55 iOS Swift modules now compile successfully. Kotlin compilation remains `BLOCKED_ENV`; actual native invocation remains `NOT_RUN`.
 
-After clean prebuild, run `node scripts/check-native-generation.mjs --output evidence/approved-mvp/native-generation.json`. It checks health declarations remain OFF, widget targets are generated, plugin markers are present, Health SDK imports and permission-request APIs are absent, and native runtime fields remain explicitly `NOT_RUN`.
+After clean prebuild, run `node scripts/check-native-generation.mjs --output evidence/sdk55-migration/native-generation-final.json`. It checks health declarations remain OFF, widget targets are generated, plugin markers are present, Health SDK imports and permission-request APIs are absent, and native runtime fields remain explicitly `NOT_RUN`.
 
 ## Remaining device gate
 
-Tracked widget targets and build generation are ready. Native compilation/runtime remains `BLOCKED_ENV / NOT_RUN` until a supported iOS toolchain and Android SDK are available. The required follow-up is:
+Tracked widget targets and build generation are ready. SDK55 iOS compilation, installation and process start pass on the current host. Interactive iOS runtime validation awaits UI permission or manual testing; Android native validation still needs its SDK. The required follow-up is:
 
 1. install or select the platform SDKs on an authorized host and perform the first build/launch with health reads OFF; approve only the product/legal details needed for later operational activation (technical structure is adopted under ADR-002/007);
 2. activate the existing config-plugin declaration gate with reviewed usage text and release scope;
@@ -74,17 +74,17 @@ Run `node scripts/check-native-environment.mjs --output evidence/approved-mvp/na
 - After registering the local plugin and autolinking directory, the same offline clean prebuild completed again. The iOS `AruconNativeIntegrationContractVersion` and Android `com.arucon.native.CONTRACT_VERSION` markers prove plugin execution; output is in ignored `evidence/decision-audit/final-prebuild.log`.
 - Generated native files contained no HealthKit entitlement, Health usage description, Health Connect steps/sleep permission, microphone permission, activity-recognition permission, or location permission. Health reads therefore remain OFF.
 - The DEV shell retains local-network/dev-launcher settings needed for the development client. The app config blocks legacy Android external-storage permissions because the bundled GLB and internal SQLite do not require them. Production network and development-client permissions still require a separate release manifest review.
-- The final clean prebuild used SDK 57's bundled `expo-system-ui@57.0.4` and completed without the earlier `userInterfaceStyle` warning. Canonical output is `evidence/decision-audit/final-prebuild.log`.
-- The bundled GLB uses the Android-safe `arucon_tsundere_motion.glb` basename. Its SHA-256 remains `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`, byte-identical to the approved reference. The generated iOS project contains only the underscore basename; the old copied-asset basename is absent.
+- SDK55 dependency alignment was completed with `npx expo install --fix`; `npx expo-doctor` reports 20/20 checks passing. The clean CNG regeneration and final native generation check are recorded in `evidence/sdk55-migration/`.
+- The bundled GLB uses the Android-safe `arucon_tsundere_motion.glb` basename. Its SHA-256 remains `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`, byte-identical to the approved reference. Both platform exports preserve the source hash. The direct-copy warning from the asset plugin is handled by Metro static require and `Asset`/`File.bytes`; no product asset was removed.
 - Android's generated source manifest represents both external-storage blocks as `tools:node="remove"`. These are removal directives, not granted runtime permissions. A merged release manifest still requires review on a build-capable Android host.
 
 ## Approved MVP native generation
 
 - `widgetTargetsEnabled` is true only for tracked development target generation; `healthDeclarationsEnabled` remains false.
 - Offline clean prebuild generates and embeds `AruconWidget`, applies the development App Group to both iOS targets, and generates the Android provider/receiver/resources.
-- `node scripts/check-native-generation.mjs --output evidence/approved-mvp/native-generation.json` parses the Xcode project and verifies target attributes, exact source copies, receiver metadata, last-confirmed timestamp, no automatic cadence, `open_app` only, and absence of health declarations.
+- `node scripts/check-native-generation.mjs --output evidence/sdk55-migration/native-generation-final.json` parses the Xcode project and verifies target attributes, exact source copies, receiver metadata, last-confirmed timestamp, no automatic cadence, `open_app` only, and absence of health declarations.
 - Apple and Android autolinking resolve both `arucon-health` and `arucon-widget`.
-- Historical host evidence above remains preserved. The latest iOS attempt reached and compiled/linked the widget target, then stopped in the app's ExpoModulesJSI/React Native Swift concurrency path (xcodebuild exit 65). Android SDK/adb/emulator remain absent. Module invocation, widget install/render, simulator app launch, and physical device remain `BLOCKED_ENV / NOT_RUN`.
+- Historical host evidence above remains preserved. The SDK55 iOS build compiled and installed the app and widget target, and a simulator process was launched. Module invocation, actual GLB/touch/motion, WidgetKit OS rendering, and physical device remain `NOT_EVALUATED / NOT_RUN`; Android SDK/adb/emulator remain `BLOCKED_ENV`.
 
 Official security references checked 2026-09-19:
 

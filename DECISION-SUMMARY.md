@@ -29,7 +29,7 @@
 | DQ-06 계정/동의 | fake scope·철회·오류·비전송 경계 | 법률·외부 계정/프로젝트 |
 | DQ-07 동기화/복구 | single writer·handoff·fence·복구 안내 구현 | 실제 backend/account와 법적 보존/삭제 |
 | DQ-08 위젯/알림 | timestamp/read-only·앱 안 안내, native 준비 | 실제 기기 검증·서명/플랫폼 계정 |
-| DQ-09 환경 | 2026-09-20 Xcode26.3/Simulator 확인, 위젯 compile/link·CNG 경로/JSI constructor 수정 | Xcode26.4+ 요구 충족 후 앱 재빌드; Android SDK/기기 준비 |
+| DQ-09 환경 | SDK55 공식 조합으로 migration; Xcode26.3 native compile/install/process start PASS | macOS UI 자동화 권한 또는 수동 검증; Android SDK/실기기 준비 |
 | DQ-10 보안/출시 | 중복/형식/순서 정합성 검사·비난 없는 오류 유지 | 법률/상표·실결제/출시. 행동 임계값으로 처벌하는 새 기능은 도입하지 않음 |
 
 ## 기술 결정 연결
@@ -44,7 +44,7 @@
 ## 권한과 완료 의미
 
 - 로컬 합성 입력은 실제 건강 접근을 포함하지 않는다. 법적 동의/실미성년 계정은 미활성이다.
-- 2026-09-20 Xcode26.3/Swift6.2.4/CocoaPods1.17.0/iOS26.3 Simulator를 확인했다. Expo SDK57의 공식 Xcode26.4+ 최소 요구에 미달하며 앱 빌드는 JSI pointer data-race 오류로 실패했다. Android SDK/emulator는 없다. 최신 증거는 `mobile/evidence/ios-widget-path-fix/`다.
+- 현재 SDK55.0.31/RN0.83.10/React19.2.0은 macOS15.6/Xcode26.3에서 공식 지원 조합이다. iOS native compile/install/process start PASS이며 runtime도 있다. Expo CLI 창 활성화는 macOS 권한으로 exit1, 화면/모션은 미검증이다. Android SDK/emulator 부재. 최신 증거 `mobile/evidence/sdk55-migration/`.
 - native project generation·parse·JS bundle과 실제 native compile·simulator·physical device를 분리한다.
 - 1차 외형 논리와 승인 아트/최종모션도 구분한다. 승인 2D 참고 시트는 존재한다. formId는 렌더러까지 전달되지만 전용 rigged/animated runtime asset이 없는 네 진화형은 명시적인 공통 GLB fallback을 사용한다. 이를 최종 진화 아트 렌더 통과로 표현하지 않는다.
 - SRS14/14-1 전체30행은 MVP-GAP-MATRIX.md에서 로컬 충족·외부·환경 잔여로 판정한다. 실기기/실서비스 미실행을 PASS로 바꾸지 않는다.
@@ -55,7 +55,11 @@ DECISION-QUEUE.md에는 **법률 / 실제 건강정보 / 외부 계정 / 실결�
 
 재개 프롬프트: “최신 DECISION-SUMMARY/QUEUE/MATRIX와 Git 상태를 읽고, 다음 외부 승인/환경 변경만 반영해 재개해라: [항목·범위]. 승인된 여섯 MVP 정책과 ADR config는 다시 묻지 말고 이어 써라. 실제 건강 읽기·법적 미성년 정책·실계정/결제/배포는 명시된 범위만 수행하고 native compile/simulator/physical device를 구분해 SRS14/14-1 전체를 검증해라.”
 
-## 2026-09-20 iOS 빌드 수정
+## 2026-09-20 SDK55 마이그레이션 (현재)
+
+ADR009가 임시 JSI 패치를 대체했고 패치와 postinstall을 제거했다. 전체239개/doctor20개/lint/typecheck/두 JS bundle/CNG25개 PASS. CFBundleExecutable 누락을 독립 리뷰로 발견해 CNG에서 수정했고 native compile/install/process 시작을 통과했다. `expo run:ios` 전체는 마지막 GUI 활성화 exit1이며 xcodebuild exit0와 분리한다. 제품 정책/DB7/3D asset/모션/위젯 계약은 유지했다. 실제 GLB·위젯 UI·모션·실기기는 미검증이며 feature 체크포인트 commit/push만 수행했다. main/merge/deploy는 하지 않았다.
+
+## 2026-09-20 SDK57 빌드 수정 이력 (현재 baseline 아님)
 
 ADR-008: 위젯 group-relative source 경로 수정 및 expo-modules-jsi57.1.0 constructor annotation의 버전/내용 검사 postinstall 패치. `npm ci --offline` 재설치에서 자동 적용을 확인했고 위젯 compile/link는 통과했다. 전체 앱은 Swift pointer data-race 7개로 exit65이며 simulator 앱/실기기 실행은 NOT_RUN이다. 승인 제품 정책 변경은 없다. 새 검사 결과는 최신 실행 보고서와 분리 기록한다.
 

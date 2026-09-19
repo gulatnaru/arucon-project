@@ -1,3 +1,52 @@
+# Expo SDK 55 호환성 마이그레이션 보고서
+
+2026-09-20 KST · baseline `0e795d9` · `feature/arucon-mobile-autonomous` · **SDK55 체크포인트 commit/push 수행**
+
+## 현재 결과
+
+**SDK 55 마이그레이션 검증 완료, GUI 검증 제한 잔여.** macOS15.6 + Xcode26.3을 그대로 사용했다. Expo55.0.31 / React Native0.83.10 / React19.2.0과 SDK55의 공식 Expo 패키지 조합으로 정렬했다. SDK55의 공식 최소 Xcode는26.2이며 현재 호스트가 충족한다. 제품 전체 MVP나 출시 검증 완료를 의미하지 않는다.
+
+## 변경 및 제품 보존
+
+- `expo install --fix`로 의존성 정렬을 확인하고 `expo-doctor`20/20을 통과했다. 기존 SDK57 peer graph를 사용한 첫 npm 설치는 ERESOLVE였으며, 강제 peer 무시 없이 SDK55 manifest에서 lock을 새로 생성했다.
+- SDK57의 JSI postinstall 내부 패치와 그 전용 테스트3개를 제거했다. 제품 테스트는 삭제·완화하지 않았다. ADR-009가 ADR-008의 임시 패치 결정을 대체하며, 위젯 source 경로 수리는 유지한다.
+- File/bytes, SQLite async, Asset, GLView, optional native module API는 SDK55에도 있어 제품 API 대체가 필요하지 않았다. 도메인·SQLite schema7·기존 자산/모션·위젯6필드·Health OFF를 유지했다.
+- `.glb`를 expo-asset plugin이 직접 native resource로 복사하는 기능은 SDK57에만 있다. SDK55에서는 경고가 나오지만 기존 Metro 정적 require→Asset→File.bytes 경로를 유지하며 Android/iOS export에 원본과 동일한 GLB가 포함됨을 확인했다. 실제 GLB 화면 렌더는 아래 권한 제한으로 미검증이다.
+- 실제 native compile 후 Simulator 설치에서 위젯 Info.plist의 CFBundleExecutable 누락을 발견했다. 프로젝트 CNG plugin에 `$(EXECUTABLE_NAME)` 선언과 회귀를 추가하고, PBX 검사를 parsed build settings 기준으로 보강했다. CNG 재생성·독립 리뷰·재빌드 후 설치 결함을 해결했다. Expo 내부 코드는 수정하지 않았다.
+
+## 실제 실행한 최종 검증
+
+| 검사 | 결과 |
+|---|---|
+| `npx expo install --fix` / `npm ls --all` | PASS / PASS |
+| `npx expo-doctor` | **20/20 PASS** |
+| `npm test` | **239/239 PASS**, fail0/skipped0; 위젯 수정 전238은 중간 실행 |
+| lint / typecheck | **PASS / PASS** |
+| Android / iOS JS bundle | **PASS / PASS**, GLB bytes 동일 |
+| Expo clean prebuild → 위젯 수정 후 non-clean prebuild | PASS, generated ios/android 재생성 |
+| generated widget/native boundary | **25/25 PASS** |
+| `npx expo run:ios` | 컴파일/설치 PASS. **전체 명령 exit1**: 마지막 Simulator 창 활성화용 System Events/osascript 권한 실패 |
+| 별도 `xcodebuild … build` | **BUILD SUCCEEDED, exit0** |
+| Simulator runtime | iOS26.3 / iPhone16e 사용 가능, `BLOCKED_ENV_SIM_RUNTIME` 아님 |
+| `simctl launch … com.arucon.dev` | **exit0, 프로세스 시작 확인** |
+| 실제 화면·GLB·터치·모션·OS 위젯 렌더 | **NOT_EVALUATED** — macOS 자동화/접근성·화면 기록 권한 대기 |
+| physical device | **NOT_RUN** |
+| Android native/emulator | **NOT_RUN / BLOCKED_ENV**, Android SDK 부재 |
+
+`expo run:ios` 전체를 PASS로 표현하지 않는다. 실패한 GUI 단계는 `BLOCKED_ENV_AUTOMATION_PERMISSION`이다. 기존 SDK57 Swift7개 오류는 현재 SDK55 네이티브 빌드에서 재현되지 않았다. 시스템 설치·OS 업그레이드·건강 읽기·외부 계정·실결제·배포는 수행하지 않았다. 이번 요청에서 승인된 feature 브랜치 체크포인트 commit/push만 수행하며 main/merge/deploy는 하지 않는다. 이번 Metro 서버는 검증 뒤 종료했다.
+
+## 독립 리뷰와 위임
+
+Sol builder: package/lock·CNG 설치 결함 수정·ADR. Terra explorer: API·DB·3D 호출 경로 조사. Terra reviewer: package matrix, DB/schema/asset/motion 보존, CNG 및 실제 native 로그 독립 대조; CFBundleExecutable 결함 발견→수정→재검증 PASS. Luna: 모바일 실행 문서 정정. 루트 Astra 역할: 환경·전체 검사·native 실행·권한 경계·최종 통합. 실제 backend model metadata는 미노출이므로 ROUTING_UNVERIFIED를 유지한다.
+
+증거: `mobile/evidence/sdk55-migration/`의 `results.json`, `api-audit.md`, `review.md`, `expo-doctor.log`, `tests-final.log`, `bundles.log`, `native-generation-final.json`, `expo-run-ios-final.log`, `xcodebuild-final.log`. 중간 설치/빌드 실패 로그도 보존했다. 생성 산출물·DB·증거는 ignored이며 index는 변경하지 않는다. 변경 목록과 HEAD 보존 확인은 `final-git-audit.json`을 따른다.
+
+다음은 UI 권한이 준비된 환경 또는 수동 조작으로 합성 온보딩→방 GLB/모션·위젯·저장 lifecycle 검증이다. 실제 HealthKit는 OFF다. 이전 실행 숫자는 아래 이력으로 보존하며 현재239개 검사와 혼합하지 않는다.
+
+---
+
+## 아래는 SDK57에서의 과거 실행 이력 (현재 환경/판정 아님)
+
 # iOS 로컬 빌드 오류 수정 실행 보고서
 
 2026-09-20 KST · 시작 `fce0bac7a0b240c3a396edc91f93d4e0c0d6b20c` · `feature/arucon-mobile-autonomous`

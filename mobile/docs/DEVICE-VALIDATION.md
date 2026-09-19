@@ -1,6 +1,8 @@
 # Native / simulator / physical-device 검증 재개표
 
-2026-09-20 KST 최신 환경: Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0 및 iPhone 16e iOS 26.3 Simulator는 사용 가능하고 Android SDK/adb/emulator는 없다. 위젯 Swift 컴파일·링크는 통과했지만 앱 native compile은 ExpoModulesJSI 이후 `JavaScriptRuntime.swift` 동시성 오류로 xcodebuild exit 65였으며, Expo SDK 57의 공식 Xcode 26.4 이상 요구에도 미달한다. 현재 native compile **BLOCKED_ENV**, simulator 앱 실행·physical device 실행 **NOT_RUN**. 최신 근거는 `evidence/ios-widget-path-fix/`이며, 2026-09-19의 환경 기록은 당시 시점의 역사적 증거로 보존한다.
+2026-09-20 KST SDK55 최신 부록: Expo 55.0.31/RN 0.83.10으로 정렬 후 iOS native compile/install은 PASS, 별도 `simctl launch`는 프로세스 실행 확인 PASS다. `expo run:ios` 전체 명령은 마지막 GUI 활성화 단계에서 System Events 권한 부족으로 exit 1이며 `BLOCKED_ENV_AUTOMATION_PERMISSION`이다. CUA Accessibility/Screen Recording 권한이 없어 실제 GLB 렌더·터치·모션·WidgetKit 화면은 `NOT_EVALUATED`; physical device는 `NOT_RUN`. Android SDK/adb/emulator는 `BLOCKED_ENV`다. 상세 증거는 `evidence/sdk55-migration/`에 있다.
+
+2026-09-20 KST 환경: macOS 15.6, Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0 및 iPhone 16e iOS 26.3 Simulator를 사용했다. SDK55 native compile/install과 별도 process launch는 PASS다. Expo CLI GUI 활성화는 `BLOCKED_ENV_AUTOMATION_PERMISSION`이다. Android SDK/adb/emulator는 없다. SDK57 실패 기록은 `evidence/ios-widget-path-fix/`에 역사적으로 보존한다.
 
 JS/asset bundle 성공, native project 생성, Node SQLite, synthetic bridge 테스트는 각각 다른 증거이며 이 문서의 실제 실행을 대신하지 않는다.
 
@@ -15,7 +17,7 @@ JS/asset bundle 성공, native project 생성, Node SQLite, synthetic bridge 테
 
 | 검증 | simulator/emulator | physical iOS | physical Android | 필요한 증거 |
 |---|---|---|---|---|
-| local development build/install/start | NOT_RUN | NOT_RUN | NOT_RUN | 명령/exit/SDK/build revision |
+| local development build/install/start | iOS PASS_INSTALL_AND_PROCESS_START_ONLY; Android NOT_RUN | NOT_RUN | NOT_RUN | SDK55 / xcodebuild exit0 / simctl process PID; GUI activation exit1 |
 | 합성 온보딩·이름·콘 표시 | NOT_RUN | NOT_RUN | NOT_RUN | 작은 화면 및 큰 글꼴/keyboard 캡처 |
 | 합성 활동→food/coin→직접/자동 식사 | NOT_RUN | NOT_RUN | NOT_RUN | 조작 순서와 자원/원장 전후 |
 | 식사 전·transaction 중·commit 직후 종료/relaunch | NOT_RUN | NOT_RUN | NOT_RUN | DB 보존/중복 EXP 없음, fault mode 구분 |

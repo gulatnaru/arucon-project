@@ -17,6 +17,7 @@ const {
   addIosWidgetTarget,
   createWidgetGenerationPlan,
   resolveIosWidgetSourceReference,
+  widgetInfoPlist,
 } = plugin._internal;
 
 function widgetTargets(project) {
@@ -131,6 +132,16 @@ test('widget generation adds only the development App Group and read-only Androi
   assert.deepEqual(names(applyAndroidWidgetReceiver(enabled, false).manifest.application[0].receiver), [
     'com.example.UnrelatedReceiver',
   ]);
+});
+
+test('iOS widget Info.plist names the generated extension executable', () => {
+  const info = widgetInfoPlist();
+  assert.equal(info.CFBundleExecutable, '$(EXECUTABLE_NAME)');
+  assert.equal(info.CFBundlePackageType, 'XPC!');
+  assert.equal(info.CFBundleIdentifier, '$(PRODUCT_BUNDLE_IDENTIFIER)');
+  assert.deepEqual(info.NSExtension, {
+    NSExtensionPointIdentifier: 'com.apple.widgetkit-extension',
+  });
 });
 
 test('fresh iOS widget target resolves its source once through the group path', () => {

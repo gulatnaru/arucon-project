@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const xcode = require('xcode');
+const plist = require('@expo/plist').default;
 const { resolveIosWidgetSourceReference } =
   require('../plugins/withAruconNativeIntegration')._internal;
 
@@ -52,6 +53,20 @@ function parseXcodeProject(relativePath) {
   });
 }
 
+function targetBuildSettings(project, targetEntry) {
+  if (!targetEntry) return [];
+  const configurationLists = project.hash.project.objects.XCConfigurationList ?? {};
+  const configurations = project.pbxXCBuildConfigurationSection();
+  const configurationList = configurationLists[targetEntry[1].buildConfigurationList];
+  return (configurationList?.buildConfigurations ?? [])
+    .map(reference => configurations[reference.value]?.buildSettings)
+    .filter(Boolean);
+}
+
+function unquoted(value) {
+  return typeof value === 'string' ? value.replace(/^"|"$/gu, '') : value;
+}
+
 const [appConfigText, iosInfo, iosEntitlements, iosProjectText, iosWidgetSource,
   iosWidgetTemplate, iosWidgetInfo, iosWidgetEntitlements, androidManifest,
   androidWidgetSource, androidWidgetTemplate, androidWidgetLayout, androidWidgetLayoutTemplate,
@@ -81,6 +96,7 @@ const [appConfigText, iosInfo, iosEntitlements, iosProjectText, iosWidgetSource,
   ]);
 
 const appConfig = JSON.parse(appConfigText);
+const iosWidgetInfoPlist = plist.parse(iosWidgetInfo);
 const pluginEntry = appConfig.expo?.plugins?.find(entry =>
   Array.isArray(entry) && entry[0] === './plugins/withAruconNativeIntegration');
 const pluginOptions = pluginEntry?.[1];
@@ -93,6 +109,7 @@ const widgetSourceReference = widgetTarget ? resolveIosWidgetSourceReference(par
   uuid: widgetTarget[0],
   pbxNativeTarget: widgetTarget[1],
 }) : null;
+const widgetBuildSettings = targetBuildSettings(parsedXcodeProject, widgetTarget);
 
 const checks = {
   pluginRegistered: Boolean(pluginEntry),
@@ -111,10 +128,14 @@ const checks = {
   iosWidgetTargetGenerated: Boolean(widgetTarget),
   iosWidgetSourceReferenceResolvesToGeneratedFile:
     widgetSourceReference?.relativePath === 'AruconWidget/AruconWidget.swift',
+  iosWidgetExecutableDeclared:
+    iosWidgetInfoPlist.CFBundleExecutable === '$(EXECUTABLE_NAME)',
   iosTargetAttributesHaveNoUndefinedKey: !iosProjectText.includes('\n\t\t\t\t\tundefined = {'),
   iosMainAndWidgetTargetsHaveAppGroupCapability: (iosProjectText.match(/com\.apple\.ApplicationGroups\.iOS/gu) ?? []).length === 2,
-  iosWidgetBundleAndEntitlementsGenerated: iosProjectText.includes('PRODUCT_BUNDLE_IDENTIFIER = "com.arucon.dev.widget"') &&
-    iosProjectText.includes('CODE_SIGN_ENTITLEMENTS = "AruconWidget/AruconWidget.entitlements"') &&
+  iosWidgetBundleAndEntitlementsGenerated: widgetBuildSettings.length > 0 &&
+    widgetBuildSettings.every(settings =>
+      unquoted(settings.PRODUCT_BUNDLE_IDENTIFIER) === 'com.arucon.dev.widget' &&
+      unquoted(settings.CODE_SIGN_ENTITLEMENTS) === 'AruconWidget/AruconWidget.entitlements') &&
     iosEntitlements.includes('group.com.arucon.dev.widget') && iosWidgetEntitlements.includes('group.com.arucon.dev.widget'),
   iosWidgetSourceMatchesTemplate: iosWidgetSource === iosWidgetTemplate,
   androidWidgetReceiverGenerated: androidManifest.includes('com.arucon.widget.AruconWidgetProvider') &&

@@ -1,5 +1,10 @@
 # ADR-008: iOS generated source paths and local ExpoModulesJSI compatibility
 
+> **Partial supersession (2026-09-20):** [ADR-009](ADR-009-expo-sdk-55-compatibility.md)
+> supersedes this ADR's Expo SDK 57 / ExpoModulesJSI lifecycle-patch decision. The widget
+> source-path decision and its CNG verification remain active. The historical failure and
+> investigation below are retained as build evidence.
+
 - Status: Accepted for local development
 - Date: 2026-09-20
 - Scope: Expo CNG iOS project generation and reproducible local dependency compatibility

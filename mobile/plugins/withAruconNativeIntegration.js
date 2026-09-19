@@ -167,6 +167,7 @@ function withAndroidWidgetSources(config, enabled) {
 function widgetInfoPlist() {
   return {
     CFBundleDisplayName: '아루콘',
+    CFBundleExecutable: '$(EXECUTABLE_NAME)',
     CFBundleIdentifier: '$(PRODUCT_BUNDLE_IDENTIFIER)',
     CFBundleInfoDictionaryVersion: '6.0',
     CFBundleName: '$(PRODUCT_NAME)',
@@ -384,6 +385,7 @@ module.exports._internal = {
   applyIosWidgetAppGroup,
   createWidgetGenerationPlan,
   resolveIosWidgetSourceReference,
+  widgetInfoPlist,
   applyAndroidHealthDeclarations,
   applyIosHealthDeclarations,
 };
