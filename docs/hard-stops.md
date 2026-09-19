@@ -8,6 +8,10 @@
 
 이 작업에는 현재 `feature/arucon-mobile-autonomous`의 로컬 commit과 origin 동일 브랜치 일반 push가 명시 승인되어 HS-05의 해당 행위만 해제됐다. main/merge/force/history rewrite/tag/release/배포는 승인되지 않았다.
 
+### 34ab069 이후 여섯 제품 방향 승인
+
+사용자는 비회수/수면bonus, 개인기준세션scorer, 케어결정표와성격독립, 기본화장실/작은coin목록, singlewriter/명시이전, readonly위젯/앱안내를 제품 기본으로 승인했다. 이 안의 가역 config/ADR 상세 선택은 다시 HS-06으로 반환하지 않는다. 실제 지원OS 출시선언·법적 미성년동의·실제 건강읽기·실계정/외부 프로젝트·실결제/출시·시스템 설치는 계속 경계다. 이미 설치된 SDK/시뮬레이터를 인증/관리자 없이 사용하는 개발 검증은 허용한다.
+
 ## HS-01 실제 건강정보
 
 멈춤 조건: 실제 사람의 HealthKit/Health Connect/센서/수면 기록을 읽거나 처리하려는 순간, 또는 실제 건강 원본을 로그/서버/분석 도구에 전달하려는 순간.

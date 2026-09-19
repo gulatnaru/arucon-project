@@ -3,7 +3,7 @@ import type { SyntheticOutboundEnvelope } from '../privacy/outbound';
 
 export type SyncStatus = 'synced' | 'pending' | 'conflict' | 'error';
 
-/** Injected identity only. The active-writer policy remains a DEC-10 decision. */
+/** Writer identity fenced by the approved single-writer authority contract. */
 export type WriterIdentity = Readonly<{
   deviceId: string;
   deviceEpoch: number;
@@ -23,6 +23,10 @@ export type SyncAction = Readonly<{
 /** DEV-only ledger events remain distinct from approved game domain events. */
 export type SyncPayloadEvent = DomainEvent |
   Readonly<{ type: 'DevCoinPurchaseCommitted'; purchaseId: string; itemId: string; ownershipKey: string; coinCost: number }> |
+  Readonly<{
+    type: 'ApprovedCoinPurchaseCommitted'; purchaseId: string; itemId: string;
+    ownershipKey: string | null; effect: 'medicine_recovery' | 'install_table' | 'grant_ownership'; coinCost: number;
+  }> |
   Readonly<{ type: 'DevSleepRecoveryCommitted'; commandId: string; gameDayId: string; appliedDelta: number }>;
 
 export type LocalSyncRecord = Readonly<{
@@ -35,7 +39,7 @@ export type LocalSyncRecord = Readonly<{
 }>;
 
 export interface SyncOutboundEnvelopeProjector {
-  project(record: LocalSyncRecord): SyntheticOutboundEnvelope;
+  project(record: LocalSyncRecord): SyntheticOutboundEnvelope | Promise<SyntheticOutboundEnvelope>;
 }
 
 export type SyncSummary = Readonly<{
@@ -64,6 +68,8 @@ export interface SyncQueue {
     retryPolicyVersion: string,
   ): Promise<void>;
   recordConflict(actionId: string, code: string): Promise<void>;
+  unconfirmedActionIds(petId: string): Promise<readonly string[]>;
+  preserveRecoveryConflicts(petId: string, actionIds: readonly string[]): Promise<void>;
   summary(petId: string): Promise<SyncSummary>;
 }
 
@@ -88,9 +94,10 @@ export type RecoveryPlan =
       emitRewardEvents: false;
     }>
   | Readonly<{
-      kind: 'decision_required';
-      decision: 'DEC-10';
-      reason: 'unconfirmed_local_actions';
+      kind: 'server_confirmed_only';
+      reason: 'unconfirmed_local_actions_preserved';
       preservedActionIds: readonly string[];
       checkpoint: ServerConfirmedCheckpoint;
+      mergeLocalActions: false;
+      emitRewardEvents: false;
     }>;

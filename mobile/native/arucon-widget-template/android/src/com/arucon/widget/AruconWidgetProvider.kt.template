@@ -6,9 +6,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.text.format.DateFormat
 import android.widget.RemoteViews
 import com.arucon.dev.R
 import org.json.JSONObject
+import java.util.Date
 
 private const val SNAPSHOT_KEY = "arucon.widget.snapshot.v1"
 private const val SNAPSHOT_PREFERENCES = "arucon.widget.snapshot.v1"
@@ -71,22 +73,35 @@ private object StrictProjectionDecoder {
   }.getOrNull()
 }
 
+private sealed interface SnapshotRead {
+  data class Ready(val projection: PetProjection) : SnapshotRead
+  data object Missing : SnapshotRead
+  data object Error : SnapshotRead
+}
+
 private object ReadOnlySnapshotStore {
-  fun read(context: Context): PetProjection? {
+  fun read(context: Context): SnapshotRead {
     val preferences = context.getSharedPreferences(SNAPSHOT_PREFERENCES, Context.MODE_PRIVATE)
-    val raw = preferences.getString(SNAPSHOT_KEY, null) ?: return null
-    return StrictProjectionDecoder.decode(raw)
+    val raw = preferences.getString(SNAPSHOT_KEY, null) ?: return SnapshotRead.Missing
+    val projection = StrictProjectionDecoder.decode(raw) ?: return SnapshotRead.Error
+    return SnapshotRead.Ready(projection)
   }
 }
 
 class AruconWidgetProvider : AppWidgetProvider() {
   override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
-    val projection = ReadOnlySnapshotStore.read(context)
-    val status = if (projection == null) WidgetViewStatus.MISSING else WidgetViewStatus.READY
+    val read = ReadOnlySnapshotStore.read(context)
+    val projection = (read as? SnapshotRead.Ready)?.projection
+    val status = when (read) {
+      is SnapshotRead.Ready -> WidgetViewStatus.READY
+      SnapshotRead.Missing -> WidgetViewStatus.MISSING
+      SnapshotRead.Error -> WidgetViewStatus.ERROR
+    }
     appWidgetIds.forEach { appWidgetId ->
       val views = RemoteViews(context.packageName, R.layout.arucon_widget)
       views.setTextViewText(R.id.arucon_widget_name, projection?.formId ?: "아루콘")
       views.setTextViewText(R.id.arucon_widget_state, statusText(status, projection))
+      views.setTextViewText(R.id.arucon_widget_updated_at, lastUpdatedText(context, projection))
       val openApp = Intent(Intent.ACTION_VIEW, Uri.parse(OPEN_APP_URL)).setPackage(context.packageName)
       val pendingIntent = PendingIntent.getActivity(
         context,
@@ -97,6 +112,13 @@ class AruconWidgetProvider : AppWidgetProvider() {
       views.setOnClickPendingIntent(R.id.arucon_widget_root, pendingIntent)
       manager.updateAppWidget(appWidgetId, views)
     }
+  }
+
+  private fun lastUpdatedText(context: Context, projection: PetProjection?): String {
+    val date = projection?.updatedAtMs?.let(::Date) ?: return ""
+    val formattedDate = DateFormat.getDateFormat(context).format(date)
+    val formattedTime = DateFormat.getTimeFormat(context).format(date)
+    return "마지막 확인: $formattedDate $formattedTime"
   }
 
   private fun statusText(status: WidgetViewStatus, projection: PetProjection?): String = when (status) {

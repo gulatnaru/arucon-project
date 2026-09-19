@@ -1,4 +1,5 @@
 import { BalanceDecisionRequired, MVP_BALANCE_REGISTRY } from '../config/balanceRegistry';
+import { APPROVED_MVP_POLICY } from '../config/approvedMvpPolicy';
 
 const SOURCE = MVP_BALANCE_REGISTRY.source;
 const DEV = MVP_BALANCE_REGISTRY.devFixture.domain;
@@ -29,10 +30,10 @@ export const SOURCE_BALANCE = Object.freeze({
 export type SourceBalance = { readonly [K in keyof typeof SOURCE_BALANCE]: number };
 
 export type GameConfig = {
-  status: 'DEV_FIXTURE_ONLY';
+  status: 'DEV_FIXTURE_ONLY' | 'APPROVED';
   version: string;
   source: SourceBalance;
-  /** All values below depend on PROPOSED/OPEN DEC-02/03/04/06/07/24/25. */
+  /** Compatibility field name: status/version state whether these runtime rules are DEV or approved. */
   proposal: {
     expScale: number;
     foodUnitsPerItem: number;
@@ -46,6 +47,8 @@ export type GameConfig = {
     hungerPerAwakeHour: number;
     hungerReductionPerMeal: number;
   };
+  initialFacilities: { toiletInstalled: boolean; tableInstalled: boolean };
+  sleepGrowthMultiplier: { minimum: number; maximum: number };
 };
 
 export const DEV_GAME_CONFIG: GameConfig = {
@@ -55,6 +58,21 @@ export const DEV_GAME_CONFIG: GameConfig = {
   proposal: {
     ...DEV,
   },
+  initialFacilities: { toiletInstalled: false, tableInstalled: false },
+  sleepGrowthMultiplier: {
+    minimum: MVP_BALANCE_REGISTRY.source.sleep.curve[0].multiplier,
+    maximum: MVP_BALANCE_REGISTRY.source.sleep.curve.at(-1)!.multiplier,
+  },
+};
+
+/** Approved local runtime. Historical CONFIG-01 DEV exports remain unchanged. */
+export const APPROVED_GAME_CONFIG: GameConfig = {
+  status: 'APPROVED',
+  version: APPROVED_MVP_POLICY.version,
+  source: APPROVED_MVP_POLICY.domain.source,
+  proposal: APPROVED_MVP_POLICY.domain.rules,
+  initialFacilities: APPROVED_MVP_POLICY.domain.initialFacilities,
+  sleepGrowthMultiplier: APPROVED_MVP_POLICY.domain.sleepGrowthMultiplier,
 };
 
 export class DecisionRequired extends BalanceDecisionRequired {
@@ -67,12 +85,23 @@ export class DecisionRequired extends BalanceDecisionRequired {
 }
 
 export function requireDevFixture(config: GameConfig): void {
-  if (config?.status !== 'DEV_FIXTURE_ONLY') throw new DecisionRequired('DEC-02/03/04/06/07/24/25');
+  if (config?.status !== 'DEV_FIXTURE_ONLY') throw new DecisionRequired('DEV fixture required');
+  validateGameConfig(config);
+}
+
+export function requireGameConfig(config: GameConfig): void {
+  if (config?.status !== 'DEV_FIXTURE_ONLY' && config?.status !== 'APPROVED') {
+    throw new DecisionRequired('approved or DEV game policy required');
+  }
+  validateGameConfig(config);
+}
+
+function validateGameConfig(config: GameConfig): void {
   const source = config.source;
   const proposal = config.proposal;
   const integer = (value: number, min: number, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(value) && value >= min && value <= max;
   const finite = (value: number, min: number, max = Number.MAX_VALUE) => Number.isFinite(value) && value >= min && value <= max;
-  if (!config.version || !source || !proposal ||
+  if (!config.version || !source || !proposal || !config.initialFacilities || !config.sleepGrowthMultiplier ||
       !integer(source.stepsPerFood, 1) || !integer(source.coinPer100Steps, 1) ||
       !finite(source.runningMultiplier, 1) || !integer(2 * source.runningMultiplier, 2) ||
       !integer(source.foodCap, 1) || !finite(source.expPerFood, Number.EPSILON) ||
@@ -97,5 +126,9 @@ export function requireDevFixture(config: GameConfig): void {
       !finite(proposal.initialHunger, 0, proposal.hungerMax) ||
       !finite(proposal.mealHungerThreshold, 0, proposal.hungerMax) ||
       !finite(proposal.hungerPerAwakeHour, 0) ||
-      !finite(proposal.hungerReductionPerMeal, Number.EPSILON, proposal.hungerMax)) throw new Error('Invalid game fixture');
+      !finite(proposal.hungerReductionPerMeal, Number.EPSILON, proposal.hungerMax) ||
+      typeof config.initialFacilities.toiletInstalled !== 'boolean' ||
+      typeof config.initialFacilities.tableInstalled !== 'boolean' ||
+      !finite(config.sleepGrowthMultiplier.minimum, Number.EPSILON) ||
+      !finite(config.sleepGrowthMultiplier.maximum, config.sleepGrowthMultiplier.minimum)) throw new Error('Invalid game fixture or approved configuration');
 }

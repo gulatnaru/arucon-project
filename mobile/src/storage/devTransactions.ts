@@ -20,6 +20,17 @@ export type DevPurchaseCommit = Readonly<{
   currentState: PetState;
 }>;
 
+export type ApprovedCoinPurchaseInput = Readonly<{
+  purchaseId: string;
+  petId: string;
+  itemId: string;
+  ownershipKey: string | null;
+  effect: 'medicine_recovery' | 'install_table' | 'grant_ownership';
+  coinCost: number;
+  catalogVersion: string;
+  committedAtMs: number;
+}>;
+
 export type DevSleepBenefitInput = Readonly<{
   commandId: string;
   petId: string;
@@ -55,7 +66,9 @@ type SleepRow = {
 };
 
 function requireId(value: string, name: string): void {
-  if (!value.trim() || value.length > 200) throw new Error(`Invalid ${name}`);
+  if (!value || value.trim() !== value || value.length > 200 || /[\u0000-\u001f\u007f]/u.test(value)) {
+    throw new Error(`Invalid ${name}`);
+  }
 }
 
 function requireWhole(value: number, name: string): void {
@@ -159,6 +172,101 @@ export class DevAtomicTransactionStore {
       await this.appendOutbox(tx, input.purchaseId, input.petId, [{
         type: 'DevCoinPurchaseCommitted', purchaseId: input.purchaseId, itemId: input.itemId,
         ownershipKey: input.ownershipKey, coinCost: input.coinCost,
+      }]);
+      return { replayed: false, committedState: state, currentState: state };
+    });
+  }
+
+  /**
+   * Approved local coin purchase boundary. The effect is an allowlisted value,
+   * so callers cannot mutate arbitrary snapshot fields inside this transaction.
+   */
+  async commitApprovedCoinItem(input: ApprovedCoinPurchaseInput): Promise<DevPurchaseCommit> {
+    requireId(input.purchaseId, 'purchase ID');
+    requireId(input.petId, 'pet ID');
+    requireId(input.itemId, 'item ID');
+    requireId(input.catalogVersion, 'catalog version');
+    requireWhole(input.coinCost, 'coin cost');
+    requireWhole(input.committedAtMs, 'purchase time');
+    if (input.coinCost === 0 || !['medicine_recovery', 'install_table', 'grant_ownership'].includes(input.effect)) {
+      throw new Error('Invalid approved coin purchase');
+    }
+    if (input.effect === 'medicine_recovery') {
+      if (input.ownershipKey !== null) throw new Error('Medicine must be consumable');
+    } else {
+      if (input.ownershipKey === null) throw new Error('Durable item ownership key required');
+      requireId(input.ownershipKey, 'ownership key');
+    }
+    const ledgerOwnershipKey = input.effect === 'medicine_recovery'
+      ? `approved:${input.effect}:consumable:${input.purchaseId}`
+      : `approved:${input.effect}:${input.ownershipKey}`;
+    requireId(ledgerOwnershipKey, 'approved ledger effect key');
+
+    return this.db.withExclusiveTransactionAsync(async tx => {
+      const previous = await tx.getFirstAsync<PurchaseRow>(`
+        SELECT pet_id, item_id, ownership_key, coin_cost, catalog_version, committed_at_ms, result_state_json
+        FROM dev_purchase_ledger WHERE purchase_id = ?
+      `, [input.purchaseId]);
+      if (previous) {
+        if (previous.pet_id !== input.petId || previous.item_id !== input.itemId ||
+            previous.ownership_key !== ledgerOwnershipKey || previous.coin_cost !== input.coinCost ||
+            previous.catalog_version !== input.catalogVersion || previous.committed_at_ms !== input.committedAtMs) {
+          throw new Error('purchaseId reused with different payload');
+        }
+        const currentState = await checkedSnapshot(tx, input.petId, this.config);
+        if (!currentState) throw new CorruptSnapshotError('Missing pet snapshot');
+        return { replayed: true, committedState: parseLedgerState(previous.result_state_json, this.config), currentState };
+      }
+
+      if (input.ownershipKey !== null) {
+        const owned = await tx.getFirstAsync<{ purchase_id: string }>(
+          'SELECT purchase_id FROM dev_item_ownership WHERE pet_id = ? AND ownership_key = ?',
+          [input.petId, input.ownershipKey],
+        );
+        if (owned) throw new Error(`Ownership already granted by ${owned.purchase_id}`);
+      }
+      const before = await checkedSnapshot(tx, input.petId, this.config);
+      if (!before) throw new Error('Pet not found');
+      if (before.coin < input.coinCost) throw new Error('Insufficient coin');
+      if (input.effect === 'install_table' && before.tableInstalled) throw new Error('Table already installed');
+      if (input.effect === 'medicine_recovery' && before.condition === 'well') {
+        throw new Error('Medicine requires a low or recovering condition');
+      }
+
+      const state = cloneState(before);
+      state.coin -= input.coinCost;
+      if (input.effect === 'install_table') state.tableInstalled = true;
+      if (input.effect === 'medicine_recovery') {
+        state.condition = 'well';
+        state.dirtyElapsedMs = 0;
+        state.recoveryElapsedMs = 0;
+      }
+      state.revision++;
+      validatePetState(state, this.config);
+      const updated = await tx.runAsync(
+        'UPDATE pet_snapshot SET revision = ?, state_json = ?, config_version = ? WHERE pet_id = ? AND revision = ?',
+        [state.revision, JSON.stringify(state), this.config.version, input.petId, before.revision],
+      );
+      if (updated && typeof updated === 'object' && 'changes' in updated && updated.changes !== 1) {
+        throw new Error('Concurrent snapshot update');
+      }
+      if (input.ownershipKey !== null) {
+        await tx.runAsync(
+          'INSERT INTO dev_item_ownership (pet_id, ownership_key, purchase_id) VALUES (?, ?, ?)',
+          [input.petId, input.ownershipKey, input.purchaseId],
+        );
+      }
+      await tx.runAsync(`
+        INSERT INTO dev_purchase_ledger
+          (purchase_id, pet_id, item_id, ownership_key, coin_cost, catalog_version, committed_at_ms, result_state_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        input.purchaseId, input.petId, input.itemId, ledgerOwnershipKey, input.coinCost,
+        input.catalogVersion, input.committedAtMs, JSON.stringify(state),
+      ]);
+      await this.appendOutbox(tx, input.purchaseId, input.petId, [{
+        type: 'ApprovedCoinPurchaseCommitted', purchaseId: input.purchaseId, itemId: input.itemId,
+        ownershipKey: input.ownershipKey, effect: input.effect, coinCost: input.coinCost,
       }]);
       return { replayed: false, committedState: state, currentState: state };
     });

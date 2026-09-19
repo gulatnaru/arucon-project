@@ -9,7 +9,9 @@ const {
   ANDROID_HEALTH_CONNECT_PACKAGE,
   ANDROID_HEALTH_READ_PERMISSIONS,
   applyAndroidHealthDeclarations,
+  applyAndroidWidgetReceiver,
   applyIosHealthDeclarations,
+  applyIosWidgetAppGroup,
   createWidgetGenerationPlan,
 } = plugin._internal;
 
@@ -66,7 +68,7 @@ test('explicit declaration mode emits read-only minimums and requires reviewed i
 
 test('widget generation plan fixes DEV-only identifiers, six fields, five states and open_app only', () => {
   assert.deepEqual(createWidgetGenerationPlan(), {
-    mode: 'template_only',
+    mode: 'cng_source_and_target',
     devOnlyIdentifiers: true,
     projectionKeys: ['petId', 'stateRevision', 'updatedAtMs', 'formId', 'personalityProfileId', 'displayState'],
     displayStates: ['awake', 'sleeping', 'hibernating', 'needs_care'],
@@ -82,13 +84,33 @@ test('widget generation plan fixes DEV-only identifiers, six fields, five states
       sharedPreferences: 'arucon.widget.snapshot.v1',
       sourceTemplate: 'native/arucon-widget-template/android/src/com/arucon/widget/AruconWidgetProvider.kt.template',
     },
-    targetActivation: 'default_off',
+    targetActivation: 'development_enabled',
   });
 });
 
-test('widget target activation fails closed while templates and provisioning are not wired', () => {
-  assert.throws(
-    () => plugin({}, { widgetTargetsEnabled: true }),
-    /TargetActivationBlocked: widget templates are ready but native targets and provisioning are not active/,
-  );
+test('widget generation adds only the development App Group and read-only Android receiver', () => {
+  const entitlements = applyIosWidgetAppGroup({
+    'com.apple.security.application-groups': ['group.example.unrelated'],
+  }, true);
+  assert.deepEqual(entitlements['com.apple.security.application-groups'], [
+    'group.example.unrelated', 'group.com.arucon.dev.widget',
+  ]);
+  assert.deepEqual(applyIosWidgetAppGroup(entitlements, false), {
+    'com.apple.security.application-groups': ['group.example.unrelated'],
+  });
+
+  const base = { manifest: { application: [{ receiver: [{
+    $: { 'android:name': 'com.example.UnrelatedReceiver', 'android:exported': 'false' },
+  }] }] } };
+  const enabled = applyAndroidWidgetReceiver(base, true);
+  assert.deepEqual(names(enabled.manifest.application[0].receiver), [
+    'com.example.UnrelatedReceiver', 'com.arucon.widget.AruconWidgetProvider',
+  ]);
+  const receiver = enabled.manifest.application[0].receiver[1];
+  assert.equal(receiver.$['android:exported'], 'true');
+  assert.equal(receiver['intent-filter'][0].action[0].$['android:name'], 'android.appwidget.action.APPWIDGET_UPDATE');
+  assert.equal(receiver['meta-data'][0].$['android:resource'], '@xml/arucon_widget_info');
+  assert.deepEqual(names(applyAndroidWidgetReceiver(enabled, false).manifest.application[0].receiver), [
+    'com.example.UnrelatedReceiver',
+  ]);
 });

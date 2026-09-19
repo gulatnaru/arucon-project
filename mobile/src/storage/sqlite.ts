@@ -3,6 +3,7 @@ import type { GameConfig } from '../domain/config';
 import type { Command, PetState, Transition } from '../domain/model';
 import type { WriterIdentity } from '../sync/contracts';
 import type { SQLiteDatabase } from 'expo-sqlite';
+import { validateLocalSyncRegistration } from './syncRegistration';
 
 /** Minimal async surface implemented by Expo SQLite and by the Node test adapter. */
 export interface SqlExecutor {
@@ -50,6 +51,14 @@ export class CorruptSnapshotError extends Error {
 type SnapshotRow = { state_json: string };
 type CommandRow = { pet_id: string; command_json: string; result_json: string };
 export type StoredTransition = Transition & { replayed: boolean; currentState: PetState };
+export type PetSyncRegistration = Readonly<{
+  accountId: string;
+  deviceId: string;
+  deviceEpoch: number;
+  access: 'active_writer' | 'read_only_fenced';
+  authorityEventId: string;
+  updatedAtMs: number;
+}>;
 
 function parseSnapshot(raw: string, config: GameConfig): PetState {
   try {
@@ -78,9 +87,11 @@ export async function checkedSnapshot(tx: SqlExecutor, petId: string, config: Ga
       EXISTS(SELECT 1 FROM dev_purchase_ledger WHERE pet_id = ?) OR
       EXISTS(SELECT 1 FROM dev_item_ownership WHERE pet_id = ?) OR
       EXISTS(SELECT 1 FROM dev_sleep_benefit_ledger WHERE pet_id = ?) OR
-      EXISTS(SELECT 1 FROM dev_resolution_ledger WHERE pet_id = ?)
+      EXISTS(SELECT 1 FROM dev_resolution_ledger WHERE pet_id = ?) OR
+      EXISTS(SELECT 1 FROM local_sync_registration WHERE pet_id = ?) OR
+      EXISTS(SELECT 1 FROM local_sync_checkpoint WHERE pet_id = ?)
     ) AS present
-  `, [petId, petId, petId, petId, petId, petId, petId, petId]);
+  `, [petId, petId, petId, petId, petId, petId, petId, petId, petId, petId]);
   if (marker || residue?.present) throw new CorruptSnapshotError('Creation history or dependent rows survive a missing snapshot');
   return null;
 }
@@ -102,8 +113,8 @@ export class LocalPetStore {
     await this.db.withExclusiveTransactionAsync(async tx => {
       const row = await tx.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
       const version = row?.user_version ?? 0;
-      if (version > 6) throw new Error(`Unsupported SQLite schema ${version}; original database preserved`);
-      if (version === 6) return;
+      if (version > 7) throw new Error(`Unsupported SQLite schema ${version}; original database preserved`);
+      if (version === 7) return;
       if (version === 0) await tx.execAsync(`
         CREATE TABLE IF NOT EXISTS pet_snapshot (
           pet_id TEXT PRIMARY KEY NOT NULL,
@@ -174,6 +185,24 @@ export class LocalPetStore {
           record_json TEXT NOT NULL,
           PRIMARY KEY (pet_id, slot)
         );
+        CREATE TABLE IF NOT EXISTS local_sync_registration (
+          pet_id TEXT PRIMARY KEY NOT NULL,
+          account_id TEXT NOT NULL,
+          device_id TEXT NOT NULL,
+          device_epoch INTEGER NOT NULL CHECK (device_epoch >= 0),
+          access_mode TEXT NOT NULL CHECK (access_mode IN ('active_writer', 'read_only_fenced')),
+          authority_event_id TEXT NOT NULL,
+          updated_at_ms INTEGER NOT NULL CHECK (updated_at_ms >= 0)
+        );
+        CREATE TABLE IF NOT EXISTS local_sync_checkpoint (
+          pet_id TEXT PRIMARY KEY NOT NULL,
+          authority_event_id TEXT NOT NULL UNIQUE,
+          confirmed_at_ms INTEGER NOT NULL CHECK (confirmed_at_ms >= 0),
+          server_revision INTEGER NOT NULL CHECK (server_revision >= 0),
+          config_version TEXT NOT NULL,
+          checkpoint_json TEXT NOT NULL,
+          preserved_action_ids_json TEXT NOT NULL
+        );
       `);
       // v1 was a never-released development schema. Preserve even orphaned v1/v2
       // ledger identities so a missing snapshot cannot be mistaken for a new pet.
@@ -190,7 +219,9 @@ export class LocalPetStore {
           UNION SELECT pet_id FROM dev_purchase_ledger
           UNION SELECT pet_id FROM dev_item_ownership
           UNION SELECT pet_id FROM dev_sleep_benefit_ledger
-          UNION SELECT pet_id FROM dev_resolution_ledger;
+          UNION SELECT pet_id FROM dev_resolution_ledger
+          UNION SELECT pet_id FROM local_sync_registration
+          UNION SELECT pet_id FROM local_sync_checkpoint;
       `);
       // Additive sync metadata does not delete acknowledged rows: retention and
       // permanent-drop policy remain DEC-17 decisions. Existing v2 rows become pending.
@@ -221,7 +252,7 @@ export class LocalPetStore {
             AND command_ledger.pet_id = local_outbox.pet_id
         )
         WHERE config_version IS NULL;
-        PRAGMA user_version = 6;
+        PRAGMA user_version = 7;
       `);
     });
   }
@@ -234,6 +265,37 @@ export class LocalPetStore {
       await tx.runAsync('INSERT INTO pet_registry (pet_id) VALUES (?)', [state.petId]);
       await tx.runAsync('INSERT INTO pet_snapshot (pet_id, revision, state_json, config_version) VALUES (?, ?, ?, ?)', [state.petId, state.revision, JSON.stringify(state), this.config.version]);
       return state;
+    });
+  }
+
+  /** Creates a pet and its first local writer registration atomically; also registers an unchanged legacy snapshot. */
+  async createPetWithSyncRegistration(state: PetState, registration: PetSyncRegistration): Promise<PetState> {
+    validatePetState(state, this.config);
+    validateLocalSyncRegistration({ ...registration, petId: state.petId });
+    return this.db.withExclusiveTransactionAsync(async tx => {
+      let current = await checkedSnapshot(tx, state.petId, this.config);
+      if (!current) {
+        await tx.runAsync('INSERT INTO pet_registry (pet_id) VALUES (?)', [state.petId]);
+        await tx.runAsync('INSERT INTO pet_snapshot (pet_id, revision, state_json, config_version) VALUES (?, ?, ?, ?)', [state.petId, state.revision, JSON.stringify(state), this.config.version]);
+        current = state;
+      }
+      const row = await tx.getFirstAsync<{
+        account_id: string; device_id: string; device_epoch: number; access_mode: string; authority_event_id: string; updated_at_ms: number;
+      }>('SELECT account_id, device_id, device_epoch, access_mode, authority_event_id, updated_at_ms FROM local_sync_registration WHERE pet_id = ?', [state.petId]);
+      if (row) {
+        if (row.account_id !== registration.accountId || row.device_id !== registration.deviceId ||
+            row.device_epoch !== registration.deviceEpoch || row.access_mode !== registration.access ||
+            row.authority_event_id !== registration.authorityEventId || row.updated_at_ms !== registration.updatedAtMs) {
+          throw new Error('Pet sync registration replay mismatch');
+        }
+        return current;
+      }
+      await tx.runAsync(`
+        INSERT INTO local_sync_registration
+          (account_id, pet_id, device_id, device_epoch, access_mode, authority_event_id, updated_at_ms)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, [registration.accountId, state.petId, registration.deviceId, registration.deviceEpoch, registration.access, registration.authorityEventId, registration.updatedAtMs]);
+      return current;
     });
   }
 

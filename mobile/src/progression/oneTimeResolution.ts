@@ -12,7 +12,7 @@ export type ResolutionContext = Readonly<{
 
 /** No sex ratio or appearance branch ships here; a DEV policy must be injected. */
 export type InjectedResolutionPolicy<T extends JsonValue> = Readonly<{
-  status: 'DEV_FIXTURE_ONLY';
+  status: 'DEV_FIXTURE_ONLY' | 'APPROVED';
   id: string;
   version: string;
   decision: ResolutionDecision;
@@ -43,7 +43,7 @@ function validateContext(context: ResolutionContext): void {
 }
 
 function validatePolicy<T extends JsonValue>(policy: InjectedResolutionPolicy<T>): void {
-  if (!policy || policy.status !== 'DEV_FIXTURE_ONLY' || !policy.id || !policy.version ||
+  if (!policy || !['DEV_FIXTURE_ONLY', 'APPROVED'].includes(policy.status) || !policy.id || !policy.version ||
       !['DEC-03', 'DEC-08'].includes(policy.decision) || typeof policy.isEligible !== 'function' ||
       typeof policy.resolve !== 'function' || typeof policy.validateResult !== 'function') {
     throw new Error('Invalid injected resolution policy');

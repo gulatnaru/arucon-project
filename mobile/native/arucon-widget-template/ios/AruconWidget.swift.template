@@ -77,13 +77,18 @@ private enum StrictProjectionDecoder {
   }
 }
 
+private enum SnapshotRead {
+  case ready(PetProjection)
+  case missing
+  case error
+}
+
 private enum ReadOnlySnapshotStore {
-  static func read() -> PetProjection? {
-    guard let defaults = UserDefaults(suiteName: developmentAppGroup),
-          let data = defaults.data(forKey: snapshotKey) else {
-      return nil
-    }
-    return StrictProjectionDecoder.decode(data)
+  static func read() -> SnapshotRead {
+    guard let defaults = UserDefaults(suiteName: developmentAppGroup) else { return .error }
+    guard let data = defaults.data(forKey: snapshotKey) else { return .missing }
+    guard let projection = StrictProjectionDecoder.decode(data) else { return .error }
+    return .ready(projection)
   }
 }
 
@@ -94,27 +99,27 @@ private struct AruconWidgetEntry: TimelineEntry {
 }
 
 private struct AruconWidgetProvider: TimelineProvider {
+  private func entry() -> AruconWidgetEntry {
+    switch ReadOnlySnapshotStore.read() {
+    case .ready(let projection):
+      return AruconWidgetEntry(date: Date(), status: .ready, projection: projection)
+    case .missing:
+      return AruconWidgetEntry(date: Date(), status: .missing, projection: nil)
+    case .error:
+      return AruconWidgetEntry(date: Date(), status: .error, projection: nil)
+    }
+  }
+
   func placeholder(in context: Context) -> AruconWidgetEntry {
     AruconWidgetEntry(date: Date(), status: .unsupported, projection: nil)
   }
 
   func getSnapshot(in context: Context, completion: @escaping (AruconWidgetEntry) -> Void) {
-    let projection = ReadOnlySnapshotStore.read()
-    completion(AruconWidgetEntry(
-      date: Date(),
-      status: projection == nil ? .missing : .ready,
-      projection: projection
-    ))
+    completion(entry())
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<AruconWidgetEntry>) -> Void) {
-    let projection = ReadOnlySnapshotStore.read()
-    let entry = AruconWidgetEntry(
-      date: Date(),
-      status: projection == nil ? .missing : .ready,
-      projection: projection
-    )
-    completion(Timeline(entries: [entry], policy: .never))
+    completion(Timeline(entries: [entry()], policy: .never))
   }
 }
 
@@ -136,10 +141,19 @@ private struct AruconWidgetView: View {
     }
   }
 
+  private var lastUpdatedText: String? {
+    guard let updatedAtMs = entry.projection?.updatedAtMs else { return nil }
+    let updatedAt = Date(timeIntervalSince1970: Double(updatedAtMs) / 1_000)
+    return "마지막 확인: \(updatedAt.formatted(date: .abbreviated, time: .shortened))"
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       Text(entry.projection?.formId ?? "아루콘")
       Text(stateText)
+      if let lastUpdatedText {
+        Text(lastUpdatedText).font(.caption2)
+      }
     }
     .widgetURL(openAppURL)
   }

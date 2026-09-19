@@ -82,7 +82,7 @@ function server(activeWriter = writer) {
   return new SyntheticIdempotentServer({
     activeWriter,
     supportedConfigVersions: [DEV_GAME_CONFIG.version],
-    sequencePolicy: { kind: 'strict', firstLocalSequence: 1 },
+    sequencePolicy: { kind: 'monotonic', minimumFirstLocalSequence: 1 },
     firstAckSequence: 40,
     firstConfirmedAtMs: 1_000,
   });
@@ -224,7 +224,7 @@ test('synthetic inactive writer epoch becomes a preserved conflict and is not au
   assert.equal(blocked.attempt_count, 0);
 });
 
-test('synthetic strict sequence policy rejects out-of-order actions and accepts them in configured order', async () => {
+test('synthetic monotonic sequence policy rejects duplicate/reverse actions and accepts global gaps', async () => {
   const synthetic = server();
   const projection = projector();
   const base = { petId: 'pet-1', writer, configVersion: DEV_GAME_CONFIG.version };
@@ -232,12 +232,17 @@ test('synthetic strict sequence policy rejects out-of-order actions and accepts 
     ...base, actionId: `sequence-${localSequence}`, localSequence,
     events: [{ type: 'InteractionObserved', kind: 'observe' }],
   });
-  const second = { ...base, actionId: 'sequence-2', localSequence: 2, attemptCount: 0, envelope: envelopeFor(2) };
-  assert.deepEqual(await synthetic.deliver(second), { kind: 'conflict', code: 'synthetic_local_sequence_out_of_order' });
+  const zeroth = { ...base, actionId: 'sequence-0', localSequence: 0, attemptCount: 0, envelope: envelopeFor(0) };
+  assert.deepEqual(await synthetic.deliver(zeroth), { kind: 'conflict', code: 'synthetic_local_sequence_out_of_order' });
   assert.equal(synthetic.committedActionCount(), 0);
   const first = { ...base, actionId: 'sequence-1', localSequence: 1, attemptCount: 0, envelope: envelopeFor(1) };
   assert.deepEqual(await synthetic.deliver(first), { kind: 'ack', actionId: 'sequence-1', ackSequence: 40, confirmedAtMs: 1_000 });
+  const second = { ...base, actionId: 'sequence-2', localSequence: 2, attemptCount: 0, envelope: envelopeFor(2) };
   assert.deepEqual(await synthetic.deliver(second), { kind: 'ack', actionId: 'sequence-2', ackSequence: 41, confirmedAtMs: 1_001 });
+  const fourth = { ...base, actionId: 'sequence-4', localSequence: 4, attemptCount: 0, envelope: envelopeFor(4) };
+  assert.deepEqual(await synthetic.deliver(fourth), { kind: 'ack', actionId: 'sequence-4', ackSequence: 42, confirmedAtMs: 1_002 });
+  const third = { ...base, actionId: 'sequence-3', localSequence: 3, attemptCount: 0, envelope: envelopeFor(3) };
+  assert.deepEqual(await synthetic.deliver(third), { kind: 'conflict', code: 'synthetic_local_sequence_out_of_order' });
 });
 
 test('sync transport rejects copied envelopes that bypass the outbound privacy builder', async () => {
@@ -289,7 +294,7 @@ test('outbox rows created before writer policy configuration are preserved and c
   assert.equal(row.device_epoch, null);
 });
 
-test('server-confirmed recovery emits no reward and requires DEC-10 when local actions are unconfirmed', async () => {
+test('server-confirmed recovery emits no reward and preserves unconfirmed actions without merging', async () => {
   const { store } = await setupMeal();
   const state = await store.loadPet('pet-1');
   const checkpoint = {
@@ -300,7 +305,29 @@ test('server-confirmed recovery emits no reward and requires DEC-10 when local a
     kind: 'ready', checkpoint, emitRewardEvents: false,
   });
   assert.deepEqual(planServerConfirmedRecovery(checkpoint, [{ actionId: 'offline-b' }, { actionId: 'offline-a' }, { actionId: 'offline-b' }]), {
-    kind: 'decision_required', decision: 'DEC-10', reason: 'unconfirmed_local_actions',
-    preservedActionIds: ['offline-a', 'offline-b'], checkpoint,
+    kind: 'server_confirmed_only', reason: 'unconfirmed_local_actions_preserved',
+    preservedActionIds: ['offline-a', 'offline-b'], checkpoint, mergeLocalActions: false, emitRewardEvents: false,
   });
+});
+
+test('server-confirmed recovery marks selected local rows as durable conflicts without changing attempts or state', async () => {
+  const { db, store } = await setupMeal();
+  await store.execute('pet-1', { type: 'interact', commandId: 'offline-2', kind: 'observe' });
+  const before = await store.loadPet('pet-1');
+  const queue = new SqliteSyncQueue(db, projector());
+  const ids = await queue.unconfirmedActionIds('pet-1');
+  assert.deepEqual(ids, ['meal-command', 'offline-2']);
+  await queue.preserveRecoveryConflicts('pet-1', ids);
+  await queue.preserveRecoveryConflicts('pet-1', ids);
+  assert.deepEqual(await store.loadPet('pet-1'), before);
+  assert.deepEqual(await queue.summary('pet-1'), {
+    status: 'conflict', pendingCount: 0, errorCount: 0, conflictCount: 2,
+    lastAcknowledgedAtMs: null, lastAckSequence: null,
+  });
+  const rows = await db.getAllAsync('SELECT sync_status, attempt_count, last_error_code FROM local_outbox ORDER BY sequence');
+  for (const row of rows) {
+    assert.equal(row.sync_status, 'conflict');
+    assert.equal(row.attempt_count, 0);
+    assert.equal(row.last_error_code, 'server_confirmed_recovery_unmerged');
+  }
 });

@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FLOOR, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
 import { disposeSceneObject, retainLoadedModel, RafGate } from './lifecycle';
+import { COMMON_PREVIEW_ASSET_KEY, selectFormPresentation, type FormPresentation } from './formPresentation';
 import { holdReducedPose } from './clipPresentation';
 import type { FloorPoint, RoomProps } from './types';
 
@@ -14,6 +15,9 @@ import type { FloorPoint, RoomProps } from './types';
 // Metro requires a static require for non-code assets.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const PET_ASSET = require('../../assets/arucon_tsundere_motion.glb') as number;
+const FORM_ASSETS: Record<FormPresentation['assetKey'], number> = {
+  [COMMON_PREVIEW_ASSET_KEY]: PET_ASSET,
+};
 
 type HitName = 'pet' | 'table' | 'cushion' | 'toilet' | 'ball';
 export type ProjectedHits = Record<HitName, { x: number; y: number; visible: boolean }>;
@@ -48,6 +52,7 @@ export class RoomController {
   private path: FloorPoint[] = [];
   private destination: FloorPoint | null = null;
   private profile: 'reserved' | 'expressive' = 'reserved';
+  private formPresentation = selectFormPresentation('arucon');
   private sleeping = false;
   private reducedMotion = false;
   private touchHolding = false;
@@ -112,6 +117,7 @@ export class RoomController {
   }
 
   setPresentation(props: RoomProps) {
+    this.formPresentation = selectFormPresentation(props.formId ?? 'arucon');
     const nextProfile = props.personality ?? 'reserved';
     const nextSleeping = !!props.sleeping;
     const wasReduced = this.reducedMotion;
@@ -135,6 +141,7 @@ export class RoomController {
     this.furniture.table!.visible = props.tableInstalled ?? true;
     this.furniture.toilet!.visible = props.toiletInstalled ?? false;
     this.furniture.ball!.visible = props.ballVisible ?? false;
+    this.furniture.cushion!.visible = props.cushionVisible ?? false;
     this.navigationOptions = { tableInstalled: props.tableInstalled ?? true, toiletInstalled: !!props.toiletInstalled };
     if (props.mealCue && props.mealCue.token !== this.lastMealToken) {
       if (!this.mixer) this.pendingMealToken = props.mealCue.token;
@@ -195,7 +202,7 @@ export class RoomController {
 
   async loadPet() {
     try {
-      const asset = Asset.fromModule(PET_ASSET);
+      const asset = Asset.fromModule(FORM_ASSETS[this.formPresentation.assetKey]);
       await asset.downloadAsync();
       if (!asset.localUri) throw new Error('GLB local URI is unavailable');
       const bytes = await new File(asset.localUri).bytes();

@@ -1,30 +1,26 @@
-# 다음 재개 — 결정 재감사 이후
+# 다음 재개 — 승인 MVP 기본 정책 구현 이후
 
-2026-09-19 · 시작 a8aa900 · feature/arucon-mobile-autonomous. 최신 checkpoint hash는 `git rev-parse HEAD`와 publication 증거에서 확인한다. 상태 WAITING_FOR_HUMAN_DECISIONS, 제품 MVP 미완이다.
+시작 baseline34ab069 이후 여섯 제품 정책을 승인·구현했다. 현재 feature checkpoint는 이 파일을 포함하는 Git HEAD/원격 브랜치로 확인한다. 현재 판정은 WAITING_FOR_HUMAN_DECISIONS / MVP_NOT_COMPLETE다.
 
 ## 먼저 확인
 
-AGENTS.md → AUTONOMOUS-STATUS.json → AUTONOMOUS-RUN-REPORT.md → DECISION-SUMMARY.md → DECISION-QUEUE.md → MVP-GAP-MATRIX.md → docs/model-routing.md / hard-stops.md / SRS13~14.
+1. AGENTS.md, AUTONOMOUS-STATUS.json, AUTONOMOUS-RUN-REPORT.md, DECISION-SUMMARY.md, DECISION-QUEUE.md, MVP-GAP-MATRIX.md와 SRS14/14-1 및 관련 DEC/ADR를 읽는다.
+2. feature/arucon-mobile-autonomous, root Git 일반 mobile 디렉터리, mobile/.git/gitlink 없음과 변경 상태를 확인한다. 기존 작업을 다시 구현하지 않는다.
+3. 이번 최종 자동 검사 236/236, lint/typecheck/두 OS JS bundle 및 CNG/static 검사는 실행됐으나 미래 작업의 fresh 증거로 재사용하지 않는다. native compile BLOCKED_ENV, simulator/physical device/visual runtime NOT_RUN이다.
 
-- `mobile/`은 루트 Git 일반 디렉터리. mobile/.git·gitlink 금지.
-- 원래10개 DQ의 기술 범위는 ADR-001~004로 AUTO_DECIDE 채택했다. SQLite/retry/SDK 구조/테스트 전략을 다시 사람에게 묻지 않는다.
-- 최신 로컬 구현: SQLite schema6 durable retry/HOL/single-flight/offline, default-OFF local Expo module/plugin/autolinking, read-only 위젯 템플릿, synthetic 알림·cancel/revoke, TEST_ONLY bonus curve 격리.
-- 제품값은 계속 OPEN/PROPOSED·DEV_FIXTURE_ONLY. 추천은 승인이 아니며 정확한 값/예시가 비어 있으면 운영 활성화하지 않는다.
-- 정확한 최신 test 수·명령·review 결과는 실행 보고서/results.json을 사용한다. 소스 변경 후 지난 숫자를 새 실행처럼 인용하지 않는다.
-- Xcode/simctl/Android SDK/adb 없음. native compile BLOCKED_ENV, simulator/emulator/physical device NOT_RUN. template parse/prebuild/export를 실기기 통과로 취급하지 않는다.
+## 진화형 runtime 아트 잔여
 
-## 자동 재개 순서
+승인 2D 진화 참고 시트와 외형 이름/실루엣은 이미 존재한다. formId→renderer 계약은 연결했지만 말루/모노/피코/몽글의 전용 rigged/animated runtime asset 네 개는 아직 없다. 현재는 명시적 공통 GLB 미리보기 fallback이며, 별도 asset 납품/출시 시각 수용과 실제 기기 검증이 필요하다. 이를 새로운 외형 제품 결정이나 4형 렌더 PASS로 바꾸지 않는다. `mobile/docs/MVP-form-render-readiness.md` 참조.
 
-1. worktree/branch/source hash와 승인·환경의 변경분을 확인한다. 완료한 scaffold를 재구현하지 않는다.
-2. 제품 결정: 승인된 DQ의 선택안·수치·예시만 DEC/SRS/config/tests에 반영한다. 미승인 추천 기본값은 OFF 유지.
-3. 환경 준비: `node scripts/check-native-environment.mjs` 후 DEVICE-VALIDATION 절차. 건강 읽기 OFF native build/launch·저장/lifecycle/렌더부터 진행한다. template를 실제 target에 연결한 후 native compile/기기 검증이 필요하다.
-4. 실제 건강정보·동의·외부 프로젝트·결제는 각각 별도 승인 범위가 있을 때만 실행한다. SDK 제공은 건강 읽기 승인이 아니다.
-5. 구현→영향 tests→독립 reviewer→수정→재검증. SRS14/14-1의30행을 계속 갱신한다.
+## 재개 가능한 가지
 
-## Git와 증거
+- EXT-ENV: 제공된 SDK/기기를 다시 조사하고 설치·계정 인증 없이 준비돼 있으면 건강 읽기 OFF native compile/simulator/기기·위젯·lifecycle·시각·모션을 검증한다.
+- EXT-LEGAL/ACCOUNT: 검토된 정책 및 별도 허용 테스트 계정/리소스 범위 안에서만 실제 연결을 진행한다.
+- EXT-HEALTH: 실제 건강정보 접근은 별도의 명시적 승인 전 OFF. 합성 scorer와 정책은 이미 승인됐다.
+- EXT-RELEASE: 실결제/상품/출시/지원 OS 최종 선언은 실제 gate와 별도 권한이 필요하다. main/merge/force/tag/release/배포 금지 경계 유지.
 
-이 결정 재감사 작업은 현 feature local commit/normal push가 승인됐다. 후속 세션은 최신 지시를 우선한다. main push/merge, PR merge, force/history rewrite, tag/release, 운영 배포 금지. 저장 전에 비밀/DB/의존성/.expo/생성물/영상ZIP 제외와 테스트 상태를 확인한다.
+합성 sync controller의 authority는 앱 재시작 후 실제 서버처럼 재구성하지 않는다. durable outbox/last-confirmed/fence는 보존되며 이전된 설치는 읽기 전용이다. 실제 backend가 준비되기 전 fake를 운영 복구 보증으로 사용하지 않는다.
 
-현재 로그는 ignored `mobile/evidence/decision-audit/`. `mobile/native/**`는 tracked 소스, 루트 `mobile/ios/`와 `mobile/android/`는 ignored 생성물이다. 미노출 모델 metadata는 ROUTING_UNVERIFIED. 기존 builder/explorer를 재사용했고 전용 Luna/reviewer 배정은 slot 제한이 있었다.
+## 재개 프롬프트
 
-재개 프롬프트는 DECISION-SUMMARY.md 또는 AUTONOMOUS-RUN-REPORT.md 마지막 절을 사용한다.
+“현재 feature checkpoint와 위 문서를 읽고, 다음 환경/외부 승인 변화만 반영해 재개해라: [항목·범위]. SRS14/14-1 전체를 완료 기준으로 삼고, 승인된 여섯 제품 정책 및 ADR config는 재승인을 묻지 말고 유지해라. docs/model-routing에 따라 구현→영향 테스트→독립 reviewer→수정→재검증을 계속해라. 실제 건강/법적 미성년 정책/실계정/결제·출시는 명시된 범위만 수행하고 simulator와 physical device를 구분해 기록해라. 현재 feature의 일반 commit/push만 허용하며 main/merge/force/tag/release/배포는 하지 마라.”

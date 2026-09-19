@@ -66,7 +66,7 @@ const setup = async (...petIds) => {
   const store = new LocalPetStore(db, DEV_GAME_CONFIG);
   await store.migrate();
   for (const petId of petIds) await store.createPet(initialPet(petId, `펫-${petId}`, 'reserved', 0, DEV_GAME_CONFIG));
-  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 7);
   return { db, ledger: new ResolutionLedger(db, DEV_GAME_CONFIG) };
 };
 

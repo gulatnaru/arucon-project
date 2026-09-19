@@ -100,3 +100,5 @@ export function multiplierForScore(score: number, config: SleepBalanceConfig = D
   }
   throw new Error('Sleep score outside configured curve');
 }
+
+export * from './approvedSessionScorer';

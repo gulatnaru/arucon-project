@@ -1,4 +1,5 @@
 import { BalanceDecisionRequired, MVP_BALANCE_REGISTRY } from '../config/balanceRegistry';
+import { APPROVED_MVP_POLICY } from '../config/approvedMvpPolicy';
 
 export type GrowthBand = Readonly<{
   stage: number;
@@ -12,7 +13,7 @@ export type GrowthBand = Readonly<{
  * Callers must explicitly inject a DEV fixture until the decision is approved.
  */
 export type GrowthProjectionPolicy = Readonly<{
-  status: 'DEV_FIXTURE_ONLY';
+  status: 'DEV_FIXTURE_ONLY' | 'APPROVED';
   version: string;
   initialLevel: number;
   finalLevel: number;
@@ -63,12 +64,21 @@ export const DEV_SOURCE_GROWTH_POLICY: GrowthProjectionPolicy = Object.freeze({
   }))),
 });
 
+export const APPROVED_GROWTH_POLICY: GrowthProjectionPolicy = Object.freeze({
+  status: 'APPROVED',
+  version: `${APPROVED_MVP_POLICY.version}:growth`,
+  initialLevel: APPROVED_MVP_POLICY.growth.initialLevel,
+  finalLevel: APPROVED_MVP_POLICY.growth.finalLevel,
+  expScale: APPROVED_MVP_POLICY.growth.expScale,
+  bands: APPROVED_MVP_POLICY.growth.bands,
+});
+
 function safePositiveInteger(value: number): boolean {
   return Number.isSafeInteger(value) && value > 0;
 }
 
 export function validateGrowthProjectionPolicy(policy: GrowthProjectionPolicy): void {
-  if (!policy || policy.status !== 'DEV_FIXTURE_ONLY' || !policy.version ||
+  if (!policy || !['DEV_FIXTURE_ONLY', 'APPROVED'].includes(policy.status) || !policy.version ||
       !safePositiveInteger(policy.initialLevel) || !safePositiveInteger(policy.finalLevel) ||
       policy.finalLevel <= policy.initialLevel || !safePositiveInteger(policy.expScale) ||
       !Array.isArray(policy.bands) || policy.bands.length === 0) {

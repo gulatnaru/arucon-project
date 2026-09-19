@@ -1,7 +1,8 @@
 import { MVP_BALANCE_REGISTRY } from '../config/balanceRegistry';
+import { APPROVED_MVP_POLICY } from '../config/approvedMvpPolicy';
 
 export type SleepBalanceConfig = Readonly<{
-  mode: 'DEV_FIXTURE_ONLY';
+  mode: 'DEV_FIXTURE_ONLY' | 'APPROVED';
   version: string;
   provenance: string;
   noDataMultiplier: number;
@@ -17,8 +18,16 @@ export const DEV_SLEEP_CONFIG: SleepBalanceConfig = Object.freeze({
   curve: MVP_BALANCE_REGISTRY.source.sleep.curve,
 });
 
+export const APPROVED_SLEEP_CONFIG: SleepBalanceConfig = Object.freeze({
+  mode: 'APPROVED',
+  version: `${APPROVED_MVP_POLICY.version}:sleep`,
+  provenance: 'conversation approval 34ab069; game reward baseline, not medical guidance',
+  noDataMultiplier: APPROVED_MVP_POLICY.sleep.noDataMultiplier,
+  curve: APPROVED_MVP_POLICY.sleep.curve,
+});
+
 export function validateSleepConfig(config: SleepBalanceConfig): void {
-  if (config.mode !== 'DEV_FIXTURE_ONLY' || !config.version || !config.provenance ||
+  if (!['DEV_FIXTURE_ONLY', 'APPROVED'].includes(config.mode) || !config.version || !config.provenance ||
       config.curve.length < 2 || config.curve[0].score !== 0 || config.curve.at(-1)?.score !== 100) {
     throw new Error('Invalid sleep curve configuration');
   }

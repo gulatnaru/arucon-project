@@ -41,7 +41,7 @@ export function AruconRoom(props: RoomProps) {
   useEffect(() => { latest.current = props; }, [props]);
   useEffect(() => {
     controller.current?.setPresentation({ ...latest.current, reducedMotion: systemReduced || latest.current.reducedMotion });
-  }, [props.personality, props.sleeping, props.reducedMotion, props.tableInstalled, props.toiletInstalled, props.ballVisible, props.mealCue, systemReduced]);
+  }, [props.formId, props.personality, props.sleeping, props.reducedMotion, props.tableInstalled, props.toiletInstalled, props.ballVisible, props.cushionVisible, props.mealCue, systemReduced]);
 
   useEffect(() => {
     let mounted = true;
@@ -88,7 +88,8 @@ export function AruconRoom(props: RoomProps) {
         onPress={(event) => onFloor(event.nativeEvent.locationX, event.nativeEvent.locationY + topLimit)}
       />
       {(['table', 'cushion', 'toilet', 'ball'] as const).map((name) => {
-        const installed = name === 'table' ? (props.tableInstalled ?? true) : name === 'toilet' ? !!props.toiletInstalled : name === 'ball' ? !!props.ballVisible : true;
+        const installed = name === 'table' ? (props.tableInstalled ?? true) : name === 'toilet' ? !!props.toiletInstalled
+          : name === 'ball' ? !!props.ballVisible : !!props.cushionVisible;
         if (!installed || !hitVisible(name)) return null;
         const point = hits![name];
         return (

@@ -1,4 +1,4 @@
-import { requireDevFixture } from './config';
+import { requireGameConfig } from './config';
 import type { GameConfig } from './config';
 import type { Command, Condition, DomainEvent, GameDayWindow, PetState, Transition } from './model';
 
@@ -186,7 +186,7 @@ function consumeMeal(state: PetState, command: Extract<Command, { type: 'consume
 }
 
 export function reducePet(input: PetState, command: Command, config: GameConfig): Transition {
-  requireDevFixture(config);
+  requireGameConfig(config);
   validatePetState(input, config);
   if (!command.commandId) throw new Error('Missing commandId');
   const state = clone(input);
@@ -194,7 +194,10 @@ export function reducePet(input: PetState, command: Command, config: GameConfig)
   switch (command.type) {
     case 'activity': applyActivity(state, command, config, events); break;
     case 'consumeMeal': consumeMeal(state, command, config, events); break;
-    case 'interact': events.push({ type: 'InteractionObserved', kind: command.kind }); break;
+    case 'interact':
+      if (command.gameDayId !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(command.gameDayId)) throw new Error('Invalid interaction game day');
+      events.push({ type: 'InteractionObserved', kind: command.kind, gameDayId: command.gameDayId });
+      break;
     case 'clean': {
       const removed = state.poopCount;
       state.poopCount = 0;
@@ -222,6 +225,7 @@ export function reducePet(input: PetState, command: Command, config: GameConfig)
       events.push({ type: 'AutoFeedChanged', enabled: command.enabled });
       break;
     case 'installFacilityFixture':
+      if (config.status !== 'DEV_FIXTURE_ONLY') throw new Error('DEV facility fixture is disabled by approved policy');
       if (command.facility === 'table') state.tableInstalled = true;
       else {
         state.toiletInstalled = true;
@@ -236,9 +240,45 @@ export function reducePet(input: PetState, command: Command, config: GameConfig)
       events.push({ type: 'FacilityInstalled', facility: command.facility });
       break;
     case 'setSleepMultiplierFixture':
+      if (config.status !== 'DEV_FIXTURE_ONLY') throw new Error('DEV sleep fixture is disabled by approved policy');
       if (!Number.isFinite(command.multiplier) || command.multiplier <= 0) throw new Error('Invalid fixture multiplier');
       state.sleepGrowthMultiplier = command.multiplier;
       events.push({ type: 'SleepMultiplierFixtureChanged', multiplier: command.multiplier });
+      break;
+    case 'applyApprovedPolicyUpgrade': {
+      if (config.status !== 'APPROVED' || command.policyVersion !== config.version) throw new Error('Invalid approved policy upgrade');
+      const sleepMultiplierRaised = state.sleepGrowthMultiplier < config.sleepGrowthMultiplier.minimum;
+      state.toiletInstalled = true;
+      if (sleepMultiplierRaised) state.sleepGrowthMultiplier = config.sleepGrowthMultiplier.minimum;
+      events.push({
+        type: 'ApprovedPolicyUpgraded', policyVersion: command.policyVersion,
+        toiletInstalled: true, sleepMultiplierRaised,
+      });
+      break;
+    }
+    case 'setSleepGrowthMultiplier':
+      if (config.status !== 'APPROVED' || command.policyVersion !== config.version ||
+          !validDay(command.gameDay) || !['neutral_reset', 'valid_score'].includes(command.confirmation) ||
+          !Number.isFinite(command.multiplier) ||
+          command.multiplier < config.sleepGrowthMultiplier.minimum ||
+          command.multiplier > config.sleepGrowthMultiplier.maximum ||
+          (command.confirmation === 'neutral_reset' &&
+            (command.multiplier !== config.sleepGrowthMultiplier.minimum || command.recordDayId !== null)) ||
+          (command.confirmation === 'valid_score' && !/^\d{4}-\d{2}-\d{2}$/.test(command.recordDayId ?? ''))) {
+        throw new Error('Invalid approved sleep growth multiplier');
+      }
+      state.sleepGrowthMultiplier = command.multiplier;
+      events.push({
+        type: 'SleepGrowthMultiplierChanged', gameDayId: command.gameDay.id,
+        recordDayId: command.recordDayId, policyVersion: command.policyVersion,
+        multiplier: command.multiplier, confirmation: command.confirmation,
+      });
+      break;
+    case 'applyEvolutionForm':
+      if (config.status !== 'APPROVED' || command.policyVersion !== config.version ||
+          !['mallu', 'mono', 'piko', 'mongle'].includes(command.formId)) throw new Error('Invalid approved evolution form');
+      state.formId = command.formId;
+      events.push({ type: 'EvolutionFormApplied', policyVersion: command.policyVersion, formId: command.formId });
       break;
     case 'advance': advance(state, command.toMs, config, events); break;
     case 'foregroundExit': {
@@ -266,7 +306,7 @@ export function reducePet(input: PetState, command: Command, config: GameConfig)
 
 /** Reject damaged snapshots before any transaction can replace their bytes. */
 export function validatePetState(value: PetState, config: GameConfig): void {
-  requireDevFixture(config);
+  requireGameConfig(config);
   if (!value || value.schemaVersion !== 1 || !value.petId || value.speciesFamily !== 'arucon' || !value.givenName || !value.personalityProfileId || !['arucon', 'mallu', 'mono', 'piko', 'mongle'].includes(value.formId)) throw new Error('Corrupt pet identity');
   for (const key of ['revision', 'food', 'coin', 'totalExpUnits', 'poopCount', 'poopElapsedMs', 'foodsSincePoop', 'dirtyElapsedMs', 'recoveryElapsedMs', 'lastSimulatedAtMs', 'lastForegroundAtMs', 'carryFoodUnits', 'carryCoinUnits'] as const) wholeNonnegative(value[key], key);
   if (!Number.isFinite(value.stamina) || value.stamina < 0 || value.stamina > config.source.staminaMax || !Number.isFinite(value.hunger) || value.hunger < 0 || value.hunger > config.proposal.hungerMax) throw new Error('Corrupt pet meters');

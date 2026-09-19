@@ -1,57 +1,65 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "runDate": "2026-09-19",
   "timezone": "Asia/Seoul",
   "status": "WAITING_FOR_HUMAN_DECISIONS",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "SRS v1.8 sections 14 and 14-1, all 30 rows; not APP-stage completion",
-  "reason": "Original ten DQ bundles re-audited. Reversible technical decisions adopted in ADR-001..004; independent local implementation and validation complete. Product choices, SDK/device preparation and sensitive/external approvals remain; recommendations are not activated.",
-  "sourceBaseline": "a8aa900aa148f7824305db458dc24250e0920802",
+  "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
+  "reason": "Six product defaults approved and independently implementable local code/integration/validation completed. Only legal, real-health, external-account, payments/release and system-environment gates remain.",
+  "sourceBaseline": "34ab069dc874947a0f71ff7b70c3be2b14065e00",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
     "root": "requested Astra orchestration/integration/Hard Stop decisions",
     "builder": "three existing arucon_builder roles reused for sync, native and notifications",
     "exploration": "arucon_explorer / requested Terra",
-    "independentReview": "existing read-only Terra explorer reused under reviewer instructions; dedicated reviewer slot unavailable; actual model/effort metadata not exposed",
-    "luna": "no free agent slot; narrow recommendation-isolation test delegated to existing builder, not root",
+    "independentReview": "arucon_reviewer / requested Terra High plus read-only explorer initial QA",
+    "luna": "arucon_luna_worker / requested Luna: narrow README update",
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed."
   },
   "completion": {
     "independentLocalEngineering": "COMPLETE",
-    "independentReview": "LOCAL_PASS_CLOSED_STATIC_NATIVE_SCOPE",
+    "independentReview": "LOCAL_PASS_NATIVE_SOURCE_CNG_ONLY",
     "remainingIndependentWork": [],
     "productMvp": "NOT_COMPLETE",
     "nativeDevelopmentBuild": "BLOCKED_ENV",
     "simulatorExecution": "NOT_RUN",
     "physicalDeviceExecution": "NOT_RUN",
     "visualMotionFps": "NOT_RUN",
-    "productionPolicies": "OPEN_PROPOSED_UNCHANGED"
+    "productionPolicies": "SIX_DEFAULTS_APPROVED_EXTERNAL_BOUNDARIES_OFF",
+    "formRendering": "APPROVED_2D_REFERENCE_PRESENT_EXPLICIT_COMMON_GLB_FALLBACK_FOUR_RUNTIME_ASSETS_NOT_DELIVERED"
   },
   "implemented": [
-    "single versioned balance registry with unresolved decision gates",
-    "offline outbox replay/ack/conflict/privacy and recovery planner",
-    "SQLite v6 additive migration/failure recovery",
-    "DEV atomic coin purchase/ownership and injected sleep recovery ledgers",
-    "pure progression/RNG resolution and durable prepared-resolution ledger",
-    "default-OFF native health/widget contracts",
-    "synthetic account/device/consent revocation and outbound allowlist",
-    "disabled notification delivery and non-blaming copy contract",
-    "native environment inventory, clean prebuild readiness and dependency remediation",
-    "AUTO_DECIDE ADR-001..004 and human-only DQ recommendations with original ten mapping",
-    "SQLite schema6 durable retry metadata and migration rollback; ordered stream dispatch, equal jitter, single-flight offline scheduler, no permanent drop",
-    "local Expo native module/autolinking/config plugin; health reads and permission requests absent, default OFF",
-    "read-only WidgetKit/AppWidget source templates and pure generation plan; target activation still disabled",
-    "synthetic notification planner and idempotent delivery/cancel/revoke contracts with injected policy",
-    "TEST_ONLY bonus-curve isolation proving source defaults and not_configured boundary remain unchanged"
+    "가입·연령·이름: 로컬 합성 온보딩/명명·scope·철회 계약. 실제 미성년 동의·가입은 EXT-LEGAL/ACCOUNT.",
+    "활동→먹이·코인·상한·폴백: 승인 config·중복/분수/상한/과거 수정·불완전 집계 보류·fake/오류 처리. 실제 건강 읽기 OFF, 지원 OS 최종 선언 전 EXT-HEALTH/ENV/RELEASE.",
+    "직접/자동 식사·부재 정산: 로컬 승인 서비스 공통 reducer·실제 섭취만 EXP·원자 원장/재시도. OS 강제 종료 검증은 V03으로 분리.",
+    "기본 화장실: 신규 시작 설치·레거시 비회수 이행·자동 처리·무유지비. 실제 렌더는 M13.",
+    "성격·무료 교감 독립: 성격/외형/경제 독립과 무료 교감 자동 검사. 실제 반응·표현은 EXT-ENV.",
+    "가구 생활·일지·자동화 동등: 코인 소유/설치·생활 UI·확정 일지와 직접/자동 동등 검사. 실제 화면/행동 검토는 EXT-ENV.",
+    "레벨·성별·외형: 승인 비용·Lv6 단회 성별·Lv16/확정7일 케어표·personality 독립·결과 영속/snapshot. 최종 아트/모션은 M13 및 출시 검토.",
+    "수면 배율·회복: 개인 기준 세션 scorer·bonus-only·날짜/무기록·wake 단회 로컬 검사. 실제 기록 연동은 EXT-HEALTH/ENV, V05.",
+    "체력 경계: 시간/소화·승인 행동 경계와 무료 교감·실제 걷기 비소모·저체력 허용 자동 검사.",
+    "청결·청소·기분: 승인 config·청결 상태/분할·기존 상태 보존 자동 검사. 실제 화면은 M13.",
+    "청결만 기운 없음·자연 회복: 청결 단일 원인·약 없는 회복·선택 약 코인50 원자 처리 검사.",
+    "배회·표정·터치: 기존 renderer/입력·reduced-motion 계약 유지. 실제 GL/터치/모션은 EXT-ENV.",
+    "방·가독성·말캉 실제 검토: GLB 보존·앱 소스/bundle 준비. 실제 렌더/영상/FPS 미실행; 최종 아트 승인을 주장하지 않음.",
+    "상점·현금 경계: 초기 코인 약/식탁/공/쿠션과 구매 원자성 구현. cash disabled. 실제 결제 gate는 EXT-RELEASE/V08.",
+    "두 OS 위젯: 6필드 timestamp/open_app bridge·native target/CNG 준비, 경제 명령 없음. 설치/OS 갱신·위젯 실행은 EXT-ENV/ACCOUNT.",
+    "동면 부정 진행 정지: 승인 로컬 config·경계/복귀·정지 자동 검사. OS lifecycle는 V03/V06.",
+    "단일 config: APPROVED_MVP_POLICY/APPROVED_GAME_CONFIG와 역사적 DEV fixture 분리, SRS9-4/ADR005 연결.",
+    "건강 원본 미전송: 현재 local/fake/nativeOFF 경로 allowlist·원본/비밀 차단 검사. 실제 연결 후 재검증 의무 유지.",
+    "비난 없는 안내: 앱 안 상태 안내 우선·중립 문구·합성 알림 중복/철회 검사. 실제 발송 비활성."
   ],
   "lastValidation": {
     "mobileTests": {
       "command": "npm test",
-      "passed": 179,
-      "failed": 0,
+      "tests": 236,
+      "pass": 236,
+      "fail": 0,
+      "cancelled": 0,
       "skipped": 0,
+      "todo": 0,
       "exit": 0
     },
     "lint": "PASS",
@@ -59,191 +67,190 @@
     "androidJsBundle": "PASS_NOT_NATIVE_BUILD",
     "iosJsBundle": "PASS_NOT_NATIVE_BUILD",
     "cleanNativeProjectGeneration": "PASS_NOT_NATIVE_BUILD",
-    "dependencyAudit": {
-      "exit": 0,
-      "total": 0
-    },
+    "nativeAutolinking": "PASS_STATIC_DISCOVERY_NOT_COMPILATION",
     "workflow": {
       "passed": 38,
       "total": 38,
       "exit": 0
     },
     "workflowRegression": "PASS",
-    "evidence": "mobile/evidence/decision-audit/results.json",
-    "sourceManifest": "mobile/evidence/decision-audit/source-sha256.json",
-    "nativeAutolinking": "PASS_STATIC_DISCOVERY_NOT_COMPILATION",
-    "widgetTemplates": "STATIC_CONTRACT_AND_SYNTAX_ONLY_NOT_NATIVE_EXECUTION"
+    "evidence": "mobile/evidence/approved-mvp/results.json",
+    "sourceManifest": "mobile/evidence/approved-mvp/staged-source-sha256.json",
+    "nativeEvidence": "mobile/evidence/approved-mvp/native-final-validation.json"
   },
   "environment": {
     "node": "26.7.0",
     "npm": "11.19.0",
-    "xcode": false,
+    "commandLineTools": true,
+    "swift": true,
+    "java": true,
+    "fullXcode": false,
+    "iosSimulatorSdk": false,
     "androidSdk": false,
     "adb": false,
+    "emulator": false,
     "simctl": false,
-    "evidence": "mobile/evidence/decision-audit/native-environment.json"
+    "evidence": "mobile/evidence/approved-mvp/native-environment.json"
   },
   "gapMatrix": [
     {
       "id": "M01",
       "status": "HARD_STOP_EXTERNAL",
-      "scopeAndResidual": "합성 명명/연령·계정/기기/철회 계약. DQ-06 법적 동의·실가입; DQ-01 초기값은 별도 제품 승인"
+      "scopeAndResidual": "로컬 합성 온보딩/명명·scope·철회 계약. 실제 미성년 동의·가입은 EXT-LEGAL/ACCOUNT."
     },
     {
       "id": "M02",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "집계·권한 계약과 기본 OFF local Expo module/plugin/autolinking 준비. DQ-05 공개 지원·소스, DQ-09 실제 기록/기기"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "승인 config·중복/분수/상한/과거 수정·불완전 집계 보류·fake/오류 처리. 실제 건강 읽기 OFF, 지원 OS 최종 선언 전 EXT-HEALTH/ENV/RELEASE."
     },
     {
       "id": "M03",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "공통 식사/부재 정산/SQLite 실패·재시도 검사. DQ-01 운영 순서, DQ-09 OS 종료 검증"
+      "status": "PASS",
+      "scopeAndResidual": "로컬 승인 서비스 공통 reducer·실제 섭취만 EXP·원자 원장/재시도. OS 강제 종료 검증은 V03으로 분리."
     },
     {
       "id": "M04",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "무유지비 자동 화장실 engine + DEV 구매 원장. DQ-04 초기 설치/가격, DQ-09 화면"
+      "status": "PASS",
+      "scopeAndResidual": "신규 시작 설치·레거시 비회수 이행·자동 처리·무유지비. 실제 렌더는 M13."
     },
     {
       "id": "M05",
       "status": "NEEDS_DEVICE_VALIDATION",
-      "scopeAndResidual": "성격·형태 분리/무료 교감 검사. DQ-09 기기 준비 후 실제 반응/화면"
+      "scopeAndResidual": "성격/외형/경제 독립과 무료 교감 자동 검사. 실제 반응·표현은 EXT-ENV."
     },
     {
       "id": "M06",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "생활 service/기록 일지/자동화 동등성. DQ-04 가구 카탈로그, DQ-09 실제 화면"
+      "status": "NEEDS_DEVICE_VALIDATION",
+      "scopeAndResidual": "코인 소유/설치·생활 UI·확정 일지와 직접/자동 동등 검사. 실제 화면/행동 검토는 EXT-ENV."
     },
     {
       "id": "M07",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "주입 progression/RNG·단회 결과 영속 계약. DQ-03 추천 결정표/비율/성격·기간 승인 후 운영 연결"
+      "status": "PASS",
+      "scopeAndResidual": "승인 비용·Lv6 단회 성별·Lv16/확정7일 케어표·personality 독립·결과 영속/snapshot. 최종 아트/모션은 M13 및 출시 검토."
     },
     {
       "id": "M08",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "점수→섭취·회복 원장 및 추천형 TEST_ONLY 커브 격리. DQ-02 실제 산식·혜택 승인/실제 기록"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "개인 기준 세션 scorer·bonus-only·날짜/무기록·wake 단회 로컬 검사. 실제 기록 연동은 EXT-HEALTH/ENV, V05."
     },
     {
       "id": "M09",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "시간/소화·무료 교감·저체력 경계 검사. DQ-01/04 적극적 놀이 및 운영 config"
+      "status": "PASS",
+      "scopeAndResidual": "시간/소화·승인 행동 경계와 무료 교감·실제 걷기 비소모·저체력 허용 자동 검사."
     },
     {
       "id": "M10",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "배설/청소/기분·구간분할 검사. DQ-01 운영 타이머, DQ-09 실제 화면"
+      "status": "PASS",
+      "scopeAndResidual": "승인 config·청결 상태/분할·기존 상태 보존 자동 검사. 실제 화면은 M13."
     },
     {
       "id": "M11",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "청결 단일 원인·약 없는 회복 검사. DQ-01 운영 타이머, DQ-09 실제 화면"
+      "status": "PASS",
+      "scopeAndResidual": "청결 단일 원인·약 없는 회복·선택 약 코인50 원자 처리 검사."
     },
     {
       "id": "M12",
       "status": "NEEDS_DEVICE_VALIDATION",
-      "scopeAndResidual": "기존 controller/모션·입력 계약 유지. DQ-09 실제 GL/터치·배회"
+      "scopeAndResidual": "기존 renderer/입력·reduced-motion 계약 유지. 실제 GL/터치/모션은 EXT-ENV."
     },
     {
       "id": "M13",
       "status": "BLOCKED_ENV",
-      "scopeAndResidual": "GLB 바이트 보존·빌드용 경로 정정. DQ-09 실제 가독성/영상/FPS"
+      "scopeAndResidual": "승인 2D 참고형 존재, form renderer 연결·명시적 공통 GLB fallback. 네 전용 rigged runtime asset 납품 및 실제 렌더/영상/FPS 수용은 미완료(EXT-RELEASE/ENV)."
     },
     {
       "id": "M14",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "DEV coin/ownership 원자 원장·disabled cash. DQ-04 실제 상품/효과/UI·결제"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "초기 코인 약/식탁/공/쿠션과 구매 원자성 구현. cash disabled. 실제 결제 gate는 EXT-RELEASE/V08."
     },
     {
       "id": "M15",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "read-only WidgetKit/AppWidget source template·6필드 decoder·generation plan 준비. DQ-08 최신성/알림 정책, DQ-09 target build/설치·기기 검증"
+      "status": "BLOCKED_ENV",
+      "scopeAndResidual": "6필드 timestamp/open_app bridge·native target/CNG 준비, 경제 명령 없음. 설치/OS 갱신·위젯 실행은 EXT-ENV/ACCOUNT."
     },
     {
       "id": "M16",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "동면 정지/복귀·경계 불변성. DQ-01 운영 threshold, DQ-09 lifecycle"
+      "status": "PASS",
+      "scopeAndResidual": "승인 로컬 config·경계/복귀·정지 자동 검사. OS lifecycle는 V03/V06."
     },
     {
       "id": "M17",
       "status": "PASS",
-      "scopeAndResidual": "단일 versioned registry에서 domain/sleep/shop/progression 값 투영, OPEN 값 분리"
+      "scopeAndResidual": "APPROVED_MVP_POLICY/APPROVED_GAME_CONFIG와 역사적 DEV fixture 분리, SRS9-4/ADR005 연결."
     },
     {
       "id": "M18",
       "status": "PASS",
-      "scopeAndResidual": "현재 구현 경로 raw/secret allowlist 및 전송 전 차단. 실제 bridge/server 연결 후 재검증 필수"
+      "scopeAndResidual": "현재 local/fake/nativeOFF 경로 allowlist·원본/비밀 차단 검사. 실제 연결 후 재검증 의무 유지."
     },
     {
       "id": "M19",
       "status": "PASS",
-      "scopeAndResidual": "현재 문구/tone 및 합성 알림 중복/취소/철회 검사; 기본 disabled. DQ-08 실제 발송 정책은 미승인"
+      "scopeAndResidual": "앱 안 상태 안내 우선·중립 문구·합성 알림 중복/철회 검사. 실제 발송 비활성."
     },
     {
       "id": "V01",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "기술 AUTO_DECIDE ADR1~4만 채택, 제품 OPEN/PROPOSED 유지. DQ-01~08 정확한 값/예시 승인 필요"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "여섯 제품 방향과 가역 config 승인 반영. 출시 전체에 필요한 법률·실서비스·지원 OS 승인은 잔여."
     },
     {
       "id": "V02",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "합성 중복/cap/분수/자정/과거 수정 검사 완료. DQ-05 운영 날짜/소스 선택"
+      "status": "PASS",
+      "scopeAndResidual": "승인 로컬 정책의 합성 경계/재시도/분할 검사. 실제 공급자 데이터는 V05/V06."
     },
     {
       "id": "V03",
       "status": "BLOCKED_ENV",
-      "scopeAndResidual": "Node SQLite failure/rollback/reload 검사 완료. DQ-09 실제 프로세스 강제 종료/재기동"
+      "scopeAndResidual": "SQLite 실패/rollback/reload·중복 방지 자동 검사. 실제 앱 프로세스 강제 종료는 미실행."
     },
     {
       "id": "V04",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "clock/RNG·복합 상태·분할 불변성 및 영속 결과 재사용 계약. DQ-01/03 운영 정책"
+      "status": "PASS",
+      "scopeAndResidual": "주입 시간/난수·단회 결과·시간 경계·복합 상태 자동 검사."
     },
     {
       "id": "V05",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "synthetic sleep 계약 완료. DQ-02 승인 예시와 HS-01 실제 기록 필요"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "승인 산식과 합성 예시/분할/무기록 검사 완료. 실제 플랫폼 기록은 EXT-HEALTH/ENV."
     },
     {
       "id": "V06",
       "status": "BLOCKED_ENV",
-      "scopeAndResidual": "fake 권한/철회/지연/재생성 계약. DQ-09 SDK와 DQ-05 실제 데이터 승인"
+      "scopeAndResidual": "fake 오류/철회·권한 OFF·native scaffold. SDK/기기와 실제 건강 접근 승인 필요."
     },
     {
       "id": "V07",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "schema6 보존 migration, durable retry/HOL/no-drop/single-flight/offline 및 fake ack 검증. DQ-07 다기기/분실복구 UX, 실서비스 HS-02"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "schema7 additive migration·재시도/HOL·단일 writer/fence·명시 이전·확인분 복구 한계 합성 검사. 실제 계정/서버는 EXT-ACCOUNT."
     },
     {
       "id": "V08",
       "status": "HARD_STOP_EXTERNAL",
-      "scopeAndResidual": "현금 비활성. DQ-04 승인 상품/실제 purchase 검증·복원/환불"
+      "scopeAndResidual": "현금 비활성 port/catalog 경계. 실결제 및 플랫폼 sandbox는 EXT-RELEASE/ACCOUNT."
     },
     {
       "id": "V09",
       "status": "HARD_STOP_EXTERNAL",
-      "scopeAndResidual": "합성 scope/철회·raw 차단 검사. DQ-06 법적 정책·실backend 접근 통제 승인/검증"
+      "scopeAndResidual": "fake scope/철회·privacy allowlist 검사. 법적 정책과 실제 backend 접근 검증 필요."
     },
     {
       "id": "V10",
       "status": "PASS",
-      "scopeAndResidual": "결정 재감사의 실제 명령·179 tests·환경·review·증거를 별도 기록; 과거147/77 결과 미재사용"
+      "scopeAndResidual": "이번 소스의 fresh 236개 검사·lint/typecheck·두 OS JS bundle·CNG·독립 QA, BLOCKED_ENV/NOT_RUN 분리."
     },
     {
       "id": "V11",
       "status": "HARD_STOP_EXTERNAL",
-      "scopeAndResidual": "독립 코드 QA 결과와 기기 미실행 분리. DQ-10 최종 인간 merge/release 판단"
+      "scopeAndResidual": "독립 로컬 코드 QA와 외부/실기기 미검증 구분. 최종 출시 판단은 EXT-RELEASE."
     }
   ],
   "decisionQueue": "DECISION-QUEUE.md",
   "hardStops": [
-    "HS-01 real health records",
-    "HS-02 real accounts/cloud/server",
-    "HS-03 real payments",
-    "HS-04 release/deployment",
-    "HS-06 OPEN/PROPOSED product decisions",
-    "HS-07 new/unapproved art if needed",
-    "HS-08 SDK/admin environment setup"
+    "EXT-LEGAL reviewed guardian/privacy/trademark policy",
+    "EXT-HEALTH real health reads remain OFF",
+    "EXT-ACCOUNT actual accounts/cloud/signing",
+    "EXT-RELEASE actual payments/store/release/support declaration",
+    "EXT-ENV missing SDK/simulator/device; no system installation"
   ],
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
@@ -262,30 +269,33 @@
       "deployment"
     ],
     "publicationRecordScope": "This tracked record is written before its own checkpoint commit; actual HEAD/tracking/live-origin hashes and clean status are recorded after publication.",
-    "verificationEvidence": "mobile/evidence/decision-audit/publication.json"
+    "verificationEvidence": "mobile/evidence/approved-mvp/publication.json"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
   "realPayment": false,
   "publicDeployment": false,
   "historicalBaseline": {
-    "checkpoint": "a8aa900",
-    "priorTests": "147/147 historical, not reused as current execution evidence",
+    "checkpoint": "34ab069",
+    "priorTests": "179/179 historical, not reused as current evidence",
     "earlierApp04": "13/13 historical",
     "earlierApp06": "77/77 historical"
   },
-  "evidenceDirectory": "mobile/evidence/decision-audit",
+  "evidenceDirectory": "mobile/evidence/approved-mvp",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
       "ADR-001",
       "ADR-002",
       "ADR-003",
-      "ADR-004"
+      "ADR-004",
+      "ADR-005",
+      "ADR-006",
+      "ADR-007"
     ],
-    "humanBundlesWithResidual": 10,
+    "humanBundlesWithResidual": 5,
     "summary": "DECISION-SUMMARY.md",
-    "recommendationsActivated": false,
-    "note": "Technical subdecisions removed; bundle titles not merged to imply fewer substantive decisions."
+    "recommendationsActivated": true,
+    "note": "Six product default bundles explicitly approved after 34ab069; external residuals grouped by authority, not claimed completed."
   }
 }

@@ -1,8 +1,8 @@
 import type { RecoveryPlan, ServerConfirmedCheckpoint, SyncAction } from './contracts';
 
 /**
- * Plans recovery without inventing DEC-10 conflict behavior. Unconfirmed local
- * actions are preserved and require a product decision instead of auto-merging.
+ * Applies the approved recovery boundary: restore only a server-confirmed
+ * checkpoint and preserve unconfirmed local action identities without merging.
  */
 export function planServerConfirmedRecovery(
   checkpoint: ServerConfirmedCheckpoint,
@@ -16,8 +16,8 @@ export function planServerConfirmedRecovery(
   const preservedActionIds = [...new Set(unconfirmedLocalActions.map(action => action.actionId))].sort();
   if (preservedActionIds.length > 0) {
     return {
-      kind: 'decision_required', decision: 'DEC-10', reason: 'unconfirmed_local_actions',
-      preservedActionIds, checkpoint,
+      kind: 'server_confirmed_only', reason: 'unconfirmed_local_actions_preserved',
+      preservedActionIds, checkpoint, mergeLocalActions: false, emitRewardEvents: false,
     };
   }
   return { kind: 'ready', checkpoint, emitRewardEvents: false };

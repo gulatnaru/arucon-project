@@ -25,7 +25,8 @@ export function DevOnboardingScreen({ onPreview }: { onPreview: (preview: DevPet
 
   return <View style={{ padding: 20, gap: 12 }}>
     <Text>로컬 개발용 합성 온보딩</Text>
-    <Text>실제 가입이나 보호자 동의 검증이 아닙니다.</Text>
+    <Text>SOURCE_SYNTHETIC · LOCAL_ONLY</Text>
+    <Text>실제 가입, 계정 생성, 연령 확인, 보호자 동의 검증이 아닙니다.</Text>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <TextInput accessibilityLabel="이름 본문" value={draft.givenNameInput} onChangeText={givenNameInput => setDraft({ ...draft, givenNameInput })} placeholder="이름 본문" style={{ flex: 1 }} />
       <Text>콘</Text>

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { DEV_GAME_CONFIG, DecisionRequired } from '../../src/domain/config';
 import { initialPet } from '../../src/domain/model';
+import { ApprovedCoinPurchaseService } from '../../src/shop/approvedCatalog';
 import { DevCoinPurchaseService } from '../../src/shop/devPurchase';
 import { DevAtomicTransactionStore } from '../../src/storage/devTransactions';
 import { LocalPetStore } from '../../src/storage/sqlite';
@@ -95,4 +96,64 @@ test('insufficient coin and reused purchase ID preserve the committed snapshot',
   await assert.rejects(service.purchase({ ...request, itemId: 'changed-item' }), /purchaseId reused with different payload/);
   assert.equal((await pets.loadPet('pet-1')).coin, 13);
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_purchase_ledger')).count, 1);
+});
+
+test('approved table purchase atomically debits coin, installs the table, grants ownership, and replays once', async () => {
+  const { db, pets, transactions } = await setup();
+  await db.runAsync('UPDATE pet_snapshot SET state_json = ? WHERE pet_id = ?', [
+    JSON.stringify({ ...(await pets.loadPet('pet-1')), coin: 100 }), 'pet-1',
+  ]);
+  const service = new ApprovedCoinPurchaseService(transactions);
+  const first = await service.purchase({ purchaseId: 'approved-table-1', petId: 'pet-1', itemId: 'table', committedAtMs: 200 });
+  assert.equal(first.replayed, false);
+  assert.equal(first.currentState.coin, 40);
+  assert.equal(first.currentState.tableInstalled, true);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_item_ownership WHERE ownership_key = ?', ['facility:table'])).count, 1);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM local_outbox WHERE command_id = ?', ['approved-table-1'])).count, 1);
+  const replay = await service.purchase({ purchaseId: 'approved-table-1', petId: 'pet-1', itemId: 'table', committedAtMs: 200 });
+  assert.equal(replay.replayed, true);
+  assert.equal(replay.currentState.coin, 40);
+  await assert.rejects(
+    service.purchase({ purchaseId: 'approved-table-2', petId: 'pet-1', itemId: 'table', committedAtMs: 201 }),
+    /Ownership already granted|Table already installed/,
+  );
+  assert.equal((await pets.loadPet('pet-1')).coin, 40);
+});
+
+test('approved medicine is repeatable only for low or recovering condition and resets condition timers atomically', async () => {
+  const { db, pets, transactions } = await setup();
+  const low = { ...(await pets.loadPet('pet-1')), coin: 100, condition: 'low', dirtyElapsedMs: 8_000, recoveryElapsedMs: 3_000 };
+  await db.runAsync('UPDATE pet_snapshot SET state_json = ? WHERE pet_id = ?', [JSON.stringify(low), 'pet-1']);
+  const service = new ApprovedCoinPurchaseService(transactions);
+  const result = await service.purchase({ purchaseId: 'approved-medicine-1', petId: 'pet-1', itemId: 'medicine', committedAtMs: 300 });
+  assert.deepEqual(
+    [result.currentState.coin, result.currentState.condition, result.currentState.dirtyElapsedMs, result.currentState.recoveryElapsedMs],
+    [50, 'well', 0, 0],
+  );
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_item_ownership')).count, 0);
+  await assert.rejects(
+    service.purchase({ purchaseId: 'approved-medicine-2', petId: 'pet-1', itemId: 'medicine', committedAtMs: 301 }),
+    /requires a low or recovering condition/,
+  );
+  assert.equal((await pets.loadPet('pet-1')).coin, 50);
+});
+
+test('approved item failure after snapshot mutation rolls back state, ownership, ledger, and outbox', async () => {
+  const { db, pets, transactions } = await setup();
+  await db.runAsync('UPDATE pet_snapshot SET state_json = ? WHERE pet_id = ?', [
+    JSON.stringify({ ...(await pets.loadPet('pet-1')), coin: 100 }), 'pet-1',
+  ]);
+  const service = new ApprovedCoinPurchaseService(transactions);
+  db.failOn = 'INSERT INTO dev_purchase_ledger';
+  await assert.rejects(
+    service.purchase({ purchaseId: 'approved-table-rollback', petId: 'pet-1', itemId: 'table', committedAtMs: 400 }),
+    /injected SQLite failure/,
+  );
+  db.failOn = null;
+  const unchanged = await pets.loadPet('pet-1');
+  assert.equal(unchanged.coin, 100);
+  assert.equal(unchanged.tableInstalled, false);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_item_ownership')).count, 0);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_purchase_ledger')).count, 0);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM local_outbox')).count, 0);
 });

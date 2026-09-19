@@ -5,6 +5,8 @@
 - Scope: development build integration only
 - Product decisions changed: none
 
+Widget target generation details are superseded by ADR-007. The local module/config-plugin selection and health default-OFF decision remain current.
+
 ## Context
 
 The TypeScript health and widget contracts already fail closed, but declarations alone do not prove that a native implementation can enter the Expo build graph. Generated `ios/` and `android/` directories are ignored and recreated by Continuous Native Generation, so editing them directly would not produce a durable implementation. The current host also lacks full Xcode, CocoaPods, the Android SDK, emulators, and physical devices.

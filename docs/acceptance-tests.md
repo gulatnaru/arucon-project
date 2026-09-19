@@ -559,3 +559,19 @@ QA 판정:
 - 실제 계정/프로젝트·건강정보·결제·배포 없음. 이전147/147은 이 실행 증거로 사용하지 않았다.
 
 정확한 명령/exit/로그: ignored `mobile/evidence/decision-audit/results.json`, `native-final-validation.json`, `review-native-widget.md`, `source-sha256.json`. tracked 보고: AUTONOMOUS-RUN-REPORT.md. Native templates와 synthetic port 검증이 실기기/실서버 완료를 뜻하지 않는다.
+
+## v1.9 승인 MVP 검증 매핑 — 34ab069 이후
+
+여섯 기본 정책은 SRS §0-4/§9-4 및 ADR-005~007을 따른다. 이 절은 이전 미승인 가격/커브/분기 사례의 해당 범위를 대체한다. 원문 0.7 커브와 DEV fixture의 과거 검사는 이력 호환성 검사이며 현재 앱 기본 정책이 아니다. 아래는 검사 요구와 코드 연결이며 실행 수치는 최신 `AUTONOMOUS-RUN-REPORT.md`를 따른다.
+
+| 범위 | 현재 기대값 / 코드 검사 |
+|---|---|
+| 정책 이행 | 기존 coin/food/EXP/컨디션 보존, 무료 기본 화장실, 중복 이행 무효; `tests/domain/approvedPolicy.test.ts`, `tests/application/approvedMvpService.test.ts` |
+| 개인 기준 scorer | baseline480분,240분→50점/1.125,480분→100점/1.25; 겹침 합집합·분할·날짜 경계·no_data·잘못된 입력; `tests/sleep/approvedSessionScorer.test.ts` |
+| 혜택 시점 | 기록 확정 전 식사 소급 금지, 무기록 중립, 게임 수면 자격·wake·일일 단회/재시작, 직접/자동 동등; `tests/application/approvedMvpService.test.ts` |
+| 1차 성장 | Lv6 단회 성별, Lv16+확정7일 외형 결정표, 형태/personality 독립, 결과 원장·snapshot 재사용; `tests/progression/approvedEvolution.test.ts` |
+| 코인 상품 | 약50/식탁60/공30/쿠션40, 원자 차감·효과, 부족/재시도/rollback, cash disabled; `tests/shop/approvedCatalog.test.ts` 및 storage 검사 |
+| 단일 쓰기 | 명시 이전 전 outbox 확인, 이전 epoch fence, restart guard, 충돌 보존·복구 범위·last-sync, fake임을 구분; `tests/sync/deviceHandoff.test.ts`, `tests/storage/syncRegistration.test.ts` |
+| 위젯 준비 | strict snapshot·시각·앱 진입·경제 명령 없음, 두 OS target 생성, 건강 읽기 OFF; `tests/native/`, `tests/widget/` |
+| 실제 기기 | 네이티브 compile/설치·lifecycle·시각·모션·위젯 실행은 해당 SDK/기기에서 별도 검증. 번들·CNG·Swift parse·Node SQLite를 실기기 PASS로 대체하지 않음 |
+| 외부 경계 | 법률·건강 읽기·실계정·결제/출시 미승인, `DECISION-QUEUE.md`의 외부 준비와 실행 권한 분리 |

@@ -2,7 +2,7 @@
 
 ## Scope and current result
 
-This checkpoint adds local contracts and a build-discoverable Expo Module/config-plugin seam for future HealthKit, Health Connect, and home-widget integration. All native reads are OFF by default. No health entitlement, health manifest permission, health SDK client, real health record, shared widget container, or OS widget extension is active in the application.
+This checkpoint adds local contracts, build-discoverable Expo Modules, and generated development widget targets for future HealthKit, Health Connect, and home-widget integration. All health reads are OFF. No health entitlement, health manifest permission, health SDK client, real health record, signed App Group, installed widget, or OS-verified widget execution is active.
 
 The independent local scaffold is complete within its source/static scope. It does not satisfy the SRS 14-1 physical-device gate.
 
@@ -11,7 +11,7 @@ The independent local scaffold is complete within its source/static scope. It do
 - `NativeHealthBridge` returns only a daily activity aggregate or a versioned sleep score. Raw samples, source payloads, GPS, audio, and user identifiers cannot cross this TypeScript boundary.
 - `FailClosedNativeActivityProvider` checks capability and permission before every read. It distinguishes unsupported, permission-required, denied, empty, delayed/error, partial, and available results.
 - HealthKit read authorization may remain `unknown`; an empty query is kept as `empty` and is never converted to denied access or zero steps.
-- `FailClosedNativeSleepScoreProvider` stays `not_configured` until both the read feature and an approved scorer version are supplied. DEC-05 remains OPEN.
+- The local synthetic scorer is approved and runs without a health API. `FailClosedNativeSleepScoreProvider` stays `not_configured` until a separately enabled native read feature supplies the reviewed scorer version; operational health access remains OFF.
 - No read path requests permission automatically. Permission prompting belongs to an explicit UI action after approved privacy copy.
 - The declaration scaffold contains read-only steps and sleep identifiers. Write, background, and historical permissions are empty or disabled.
 - `native/arucon-health` is discovered by Expo autolinking for Apple and Android. Its Swift and Kotlin code exposes only a versioned `readMode: disabled` contract; it imports no HealthKit/Health Connect client, has no permission launcher, and performs no query.
@@ -31,10 +31,11 @@ Official references checked 2026-09-19:
 - `NativeWidgetBridge` receives only the six-field `PetProjection` allowlist.
 - Runtime sanitization removes extra economic, health, identity, and domain fields before native shared storage receives a projection.
 - Reads and timeline reload requests receive no domain command writer. A reload result means only that the request was made; it is not evidence that the OS rendered it.
-- Widget native access is OFF by default. Development identifiers are fixed in `native/arucon-widget-template/contract.json`; the App Group is not registered or provisioned, and no Android receiver or iOS extension target is active.
+- Development identifiers are fixed in `native/arucon-widget-template/contract.json`. Clean prebuild now generates the iOS extension target/App Group entitlements and Android receiver/resources. Apple portal registration, signing, installation, and OS execution remain external or environment-blocked.
 - The tracked WidgetKit/AppWidget templates strictly decode the same six-field projection, model the existing four display states and five view statuses, read only shared storage, and expose only `arucondev://open/widget`. They perform no network, game command, reward, scheduled cadence, or health read.
 - The iOS template uses `.never` and the Android provider metadata uses `updatePeriodMillis=0`, so this checkpoint does not invent a refresh interval. Stale status is renderable but no native stale threshold is selected.
-- The plugin returns a testable DEV-only generation plan and rejects `widgetTargetsEnabled: true`. The templates are source preparation; Xcode target creation, Android source/resource copy and receiver registration, App Group signing, compilation, install, and OS rendering are `BLOCKED_ENV / NOT_RUN`.
+- The plugin's DEV-only generation plan is enabled in `app.json`. It creates the Xcode extension target, copies Android/iOS sources and resources, registers the receiver, and declares the EAS extension metadata. App Group signing, compilation, install, and OS rendering remain `BLOCKED_ENV / NOT_RUN`.
+- `native/arucon-widget` is an autolinked app-side bridge. It validates and stores only the six-field JSON projection and requests an OS reload. The approved local App composition enables this read-only snapshot path and reports missing modules/errors explicitly; actual OS rendering remains unverified.
 
 ## Local contract verification
 
@@ -42,13 +43,13 @@ The native contract tests cover default-OFF behavior, unsupported service, permi
 
 Expo autolinking `search` and `resolve` both find `arucon-health` for Apple and Android, including the podspec/Swift module and Gradle/Kotlin module. Apple modules-provider generation with `--packages arucon-health` emits the `AruconHealth` import and `AruconHealthModule.self` registration. This verifies build-graph discovery and provider generation only. Swift/Kotlin compilation and runtime invocation remain `BLOCKED_ENV / NOT_RUN`.
 
-After clean prebuild, run `node scripts/check-native-generation.mjs --output evidence/decision-audit/final-native-generation.json`. It checks the default-OFF app config, generated plugin markers, absence of generated health declarations, absence of Health SDK imports and permission-request APIs, and the disabled native contract. Its runtime fields remain explicitly `NOT_RUN`.
+After clean prebuild, run `node scripts/check-native-generation.mjs --output evidence/approved-mvp/native-generation.json`. It checks health declarations remain OFF, widget targets are generated, plugin markers are present, Health SDK imports and permission-request APIs are absent, and native runtime fields remain explicitly `NOT_RUN`.
 
 ## Remaining device gate
 
-Status is `BLOCKED_ENV / NOT_RUN` until approved native targets and SDKs are available. The required follow-up is:
+Tracked widget targets and build generation are ready. Native compilation/runtime remains `BLOCKED_ENV / NOT_RUN` until the platform SDKs are available. The required follow-up is:
 
-1. prepare SDK/targets and first build/launch with health reads OFF; approve only the product/legal details actually needed for later operational activation (technical structure already adopted under ADR-002/004);
+1. install or select the platform SDKs on an authorized host and perform the first build/launch with health reads OFF; approve only the product/legal details needed for later operational activation (technical structure is adopted under ADR-002/007);
 2. activate the existing config-plugin declaration gate with reviewed usage text and release scope;
 3. replace the native module's disabled contract with official platform clients without logging raw records;
 4. on iOS and Android physical devices, exercise denial, revocation, unsupported state, reboot, force quit, delayed records, foreground reconciliation, widget install/update/stale/error/open-app, and resource neutrality;
@@ -58,7 +59,7 @@ This checkpoint does not claim simulator or physical-device PASS.
 
 ## Reproducible environment inventory
 
-Run `node scripts/check-native-environment.mjs --output evidence/decision-audit/native-environment.json` from `mobile/`. The script performs read-only tool and target inventory, redacts device identifiers and simulator names, and records every app, Health API, widget, simulator, and physical-device execution field as `NOT_RUN`. It installs nothing and never reads health data.
+Run `node scripts/check-native-environment.mjs --output evidence/approved-mvp/native-environment.json` from `mobile/`. The script performs read-only CLT/Xcode/Swift/CocoaPods, Java, Android SDK/tool, simulator/emulator, and device inventory; redacts device identifiers, simulator names, and SDK paths; and records every app, Health API, widget, simulator, and physical-device execution field as `NOT_RUN`. It installs nothing and never reads health data.
 
 ## Dependency and prebuild readiness
 
@@ -72,6 +73,14 @@ Run `node scripts/check-native-environment.mjs --output evidence/decision-audit/
 - The final clean prebuild used SDK 57's bundled `expo-system-ui@57.0.4` and completed without the earlier `userInterfaceStyle` warning. Canonical output is `evidence/decision-audit/final-prebuild.log`.
 - The bundled GLB uses the Android-safe `arucon_tsundere_motion.glb` basename. Its SHA-256 remains `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`, byte-identical to the approved reference. The generated iOS project contains only the underscore basename; the old copied-asset basename is absent.
 - Android's generated source manifest represents both external-storage blocks as `tools:node="remove"`. These are removal directives, not granted runtime permissions. A merged release manifest still requires review on a build-capable Android host.
+
+## Approved MVP native generation
+
+- `widgetTargetsEnabled` is true only for tracked development target generation; `healthDeclarationsEnabled` remains false.
+- Offline clean prebuild generates and embeds `AruconWidget`, applies the development App Group to both iOS targets, and generates the Android provider/receiver/resources.
+- `node scripts/check-native-generation.mjs --output evidence/approved-mvp/native-generation.json` parses the Xcode project and verifies target attributes, exact source copies, receiver metadata, last-confirmed timestamp, no automatic cadence, `open_app` only, and absence of health declarations.
+- Apple and Android autolinking resolve both `arucon-health` and `arucon-widget`.
+- Current host evidence: Swift and Java are present; full Xcode/simulator SDK/CocoaPods and Android SDK/adb/emulator are absent. The iOS compile attempt reached `xcodebuild` and stopped because only Command Line Tools are selected. The Android attempt stopped before compilation because the sandbox denied creation of the Gradle distribution lock; the separate inventory also confirms the Android SDK is absent. Module invocation, widget install/render, simulator/emulator, and physical device remain `BLOCKED_ENV / NOT_RUN`.
 
 Official security references checked 2026-09-19:
 

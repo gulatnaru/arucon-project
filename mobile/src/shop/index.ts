@@ -104,3 +104,5 @@ export function devShopRows(catalog: readonly CatalogItem[] = DEV_SHOP_CATALOG):
     actionEnabled: false as const,
   }));
 }
+
+export * from './approvedCatalog';

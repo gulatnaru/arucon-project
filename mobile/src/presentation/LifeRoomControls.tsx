@@ -11,7 +11,7 @@ function ActionButton({ label, onPress }: { label: string; onPress: () => void }
   </Pressable>;
 }
 
-/** Small care panel for the room. Every action is delegated to DevLifeService by the host. */
+/** Small care panel for the room. Every action is delegated to the approved application service by the host. */
 export function LifeRoomControls({ state, onAction }: {
   state: PetState;
   onAction: (action: LifeRoomAction) => void;

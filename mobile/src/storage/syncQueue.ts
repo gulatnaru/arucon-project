@@ -59,7 +59,8 @@ export class SqliteSyncQueue implements SyncQueue {
       ORDER BY o.sequence
       LIMIT ?
     `, [nowMs, limit]);
-    return rows.map(row => {
+    const actions: SyncAction[] = [];
+    for (const row of rows) {
       if (!row.device_id || row.device_epoch === null || !Number.isSafeInteger(row.device_epoch) || row.device_epoch < 0) {
         throw new Error('DecisionRequired: outbox writer identity is not configured');
       }
@@ -72,10 +73,10 @@ export class SqliteSyncQueue implements SyncQueue {
         configVersion: row.config_version,
         events: parseEvents(row.event_json),
       };
-      const envelope = this.projector.project(local);
+      const envelope = await this.projector.project(local);
       if (!isIssuedSyntheticOutboundEnvelope(envelope)) throw new Error('Valid DEV outbound envelope required');
       if (envelope.petId !== local.petId || envelope.deviceId !== local.writer.deviceId) throw new Error('Outbound envelope identity mismatch');
-      return {
+      actions.push({
         actionId: local.actionId,
         petId: local.petId,
         localSequence: local.localSequence,
@@ -83,8 +84,9 @@ export class SqliteSyncQueue implements SyncQueue {
         configVersion: local.configVersion,
         attemptCount: row.attempt_count,
         envelope,
-      };
-    });
+      });
+    }
+    return actions;
   }
 
   async nextRunnableAtMs(): Promise<number | null> {
@@ -178,6 +180,37 @@ export class SqliteSyncQueue implements SyncQueue {
         SET sync_status = 'conflict', attempt_count = attempt_count + 1, last_error_code = ?, next_attempt_at_ms = 0
         WHERE command_id = ?
       `, [code, actionId]);
+    });
+  }
+
+  async unconfirmedActionIds(petId: string): Promise<readonly string[]> {
+    if (!petId) throw new Error('Invalid pet ID');
+    const rows = await this.db.getAllAsync<{ command_id: string }>(`
+      SELECT command_id FROM local_outbox
+      WHERE pet_id = ? AND sync_status IN ('pending', 'error', 'conflict')
+      ORDER BY sequence
+    `, [petId]);
+    return rows.map(row => row.command_id);
+  }
+
+  async preserveRecoveryConflicts(petId: string, actionIds: readonly string[]): Promise<void> {
+    if (!petId) throw new Error('Invalid pet ID');
+    const uniqueIds = [...new Set(actionIds)];
+    if (uniqueIds.some(actionId => !actionId)) throw new Error('Invalid recovery action ID');
+    await this.db.withExclusiveTransactionAsync(async tx => {
+      for (const actionId of uniqueIds) {
+        const row = await tx.getFirstAsync<Pick<OutboxRow, 'pet_id' | 'sync_status' | 'last_error_code'>>(
+          'SELECT pet_id, sync_status, last_error_code FROM local_outbox WHERE command_id = ?', [actionId],
+        );
+        if (!row || row.pet_id !== petId) throw new Error('Recovery action does not belong to pet');
+        if (row.sync_status === 'synced') throw new Error('Server-confirmed action cannot become a recovery conflict');
+        if (row.sync_status === 'conflict') continue;
+        await tx.runAsync(`
+          UPDATE local_outbox
+          SET sync_status = 'conflict', last_error_code = 'server_confirmed_recovery_unmerged', next_attempt_at_ms = 0
+          WHERE command_id = ?
+        `, [actionId]);
+      }
     });
   }
 

@@ -13,7 +13,7 @@
         "./plugins/withAruconNativeIntegration",
         {
           "healthDeclarationsEnabled": false,
-          "widgetTargetsEnabled": false
+          "widgetTargetsEnabled": true
         }
       ]
     ],
@@ -24,6 +24,25 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ]
+    },
+    "extra": {
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "AruconWidget",
+                  "bundleIdentifier": "com.arucon.dev.widget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": ["group.com.arucon.dev.widget"]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }
