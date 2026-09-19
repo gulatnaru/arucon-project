@@ -2,6 +2,12 @@
 
 이 목록은 **사용자에게 물어봐야 하는 지점**이다. 어떤 모델의 능력과도 무관하다. 한 가지 Hard Stop이 생겨도 독립 작업을 계속할 수 있으면 먼저 계속한다.
 
+### 2026-09-19 권한 적용 — 결정 재감사
+
+사용자는 제품 철학을 바꾸지 않는 가역적인 기술 선택을 `AUTO_DECIDE`로 위임했다. SQLite schema/index, repository 경계, 재시도 알고리즘, migration 구조, SDK 통합 방식과 테스트 전략은 대안 비교→ADR→구현/검증으로 진행한다. 관련 제품 DEC 전체를 승인한 것으로 해석하지 않는다. 경제·성장·건강 해석·복구 손실 UX·보존/삭제 정책은 추천 후 대기, 실제 민감정보/계정/결제/운영/관리자 행위는 외부 승인 경계를 유지한다. 구체적 분리는 [결정 요약](../DECISION-SUMMARY.md)과 [ADR-004](adr/ADR-004-technical-authority.md)를 따른다.
+
+이 작업에는 현재 `feature/arucon-mobile-autonomous`의 로컬 commit과 origin 동일 브랜치 일반 push가 명시 승인되어 HS-05의 해당 행위만 해제됐다. main/merge/force/history rewrite/tag/release/배포는 승인되지 않았다.
+
 ## HS-01 실제 건강정보
 
 멈춤 조건: 실제 사람의 HealthKit/Health Connect/센서/수면 기록을 읽거나 처리하려는 순간, 또는 실제 건강 원본을 로그/서버/분석 도구에 전달하려는 순간.

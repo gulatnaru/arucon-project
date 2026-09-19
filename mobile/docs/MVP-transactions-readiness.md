@@ -11,7 +11,7 @@ The production defaults fail closed with `DecisionRequired`. The code does not a
 
 ## Atomic contracts
 
-SQLite schema v5 retains the three development-scoped transaction tables introduced in v4 and adds the separate caller-owned one-time resolution ledger:
+SQLite schema v6 retains the three development-scoped transaction tables introduced in v4 and the caller-owned one-time resolution ledger introduced in v5; v6 only adds durable retry metadata to the existing outbox:
 
 - `dev_purchase_ledger`: stable purchase ID, quoted item/ownership, coin cost, catalog version, time, and committed result;
 - `dev_item_ownership`: one ownership key per pet, linked to one purchase ID;

@@ -53,7 +53,15 @@ export class SyntheticIdempotentServer implements SyncTransport {
     if (action.envelope.petId !== action.petId || action.envelope.deviceId !== action.writer.deviceId) {
       throw new Error('Outbound envelope identity mismatch');
     }
-    const fingerprint = JSON.stringify(action);
+    // Local retry bookkeeping must not alter the idempotency payload.
+    const fingerprint = JSON.stringify({
+      actionId: action.actionId,
+      petId: action.petId,
+      localSequence: action.localSequence,
+      writer: action.writer,
+      configVersion: action.configVersion,
+      envelope: action.envelope,
+    });
     const previous = this.committed.get(action.actionId);
     if (previous) {
       if (previous.fingerprint !== fingerprint) return { kind: 'conflict', code: 'synthetic_action_id_payload_mismatch' };

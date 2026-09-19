@@ -102,8 +102,8 @@ export class LocalPetStore {
     await this.db.withExclusiveTransactionAsync(async tx => {
       const row = await tx.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
       const version = row?.user_version ?? 0;
-      if (version > 5) throw new Error(`Unsupported SQLite schema ${version}; original database preserved`);
-      if (version === 5) return;
+      if (version > 6) throw new Error(`Unsupported SQLite schema ${version}; original database preserved`);
+      if (version === 6) return;
       if (version === 0) await tx.execAsync(`
         CREATE TABLE IF NOT EXISTS pet_snapshot (
           pet_id TEXT PRIMARY KEY NOT NULL,
@@ -193,7 +193,7 @@ export class LocalPetStore {
           UNION SELECT pet_id FROM dev_resolution_ledger;
       `);
       // Additive sync metadata does not delete acknowledged rows: retention and
-      // retry limits remain DEC-17 decisions. Existing v2 rows become pending.
+      // permanent-drop policy remain DEC-17 decisions. Existing v2 rows become pending.
       const columns = new Set((await tx.getAllAsync<{ name: string }>('PRAGMA table_info(local_outbox)')).map(column => column.name));
       if (!columns.has('sync_status')) await tx.execAsync(`ALTER TABLE local_outbox ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'pending'
         CHECK (sync_status IN ('pending', 'synced', 'conflict', 'error'))`);
@@ -208,6 +208,11 @@ export class LocalPetStore {
       if (!columns.has('device_epoch')) await tx.execAsync(`ALTER TABLE local_outbox ADD COLUMN device_epoch INTEGER
         CHECK (device_epoch IS NULL OR device_epoch >= 0)`);
       if (!columns.has('config_version')) await tx.execAsync('ALTER TABLE local_outbox ADD COLUMN config_version TEXT');
+      if (!columns.has('next_attempt_at_ms')) await tx.execAsync(`ALTER TABLE local_outbox ADD COLUMN next_attempt_at_ms INTEGER NOT NULL DEFAULT 0
+        CHECK (next_attempt_at_ms >= 0)`);
+      if (!columns.has('last_attempt_at_ms')) await tx.execAsync(`ALTER TABLE local_outbox ADD COLUMN last_attempt_at_ms INTEGER
+        CHECK (last_attempt_at_ms IS NULL OR last_attempt_at_ms >= 0)`);
+      if (!columns.has('retry_policy_version')) await tx.execAsync('ALTER TABLE local_outbox ADD COLUMN retry_policy_version TEXT');
       await tx.execAsync(`
         UPDATE local_outbox
         SET config_version = (
@@ -216,7 +221,7 @@ export class LocalPetStore {
             AND command_ledger.pet_id = local_outbox.pet_id
         )
         WHERE config_version IS NULL;
-        PRAGMA user_version = 5;
+        PRAGMA user_version = 6;
       `);
     });
   }

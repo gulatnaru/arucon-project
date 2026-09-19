@@ -15,6 +15,9 @@ type OutboxRow = {
   acknowledged_at_ms: number | null;
   device_id: string | null;
   device_epoch: number | null;
+  next_attempt_at_ms: number;
+  last_attempt_at_ms: number | null;
+  retry_policy_version: string | null;
 };
 
 function requireWhole(value: number, name: string): void {
@@ -35,17 +38,27 @@ function parseEvents(raw: string): readonly SyncPayloadEvent[] {
 export class SqliteSyncQueue implements SyncQueue {
   constructor(private readonly db: SqlConnection, private readonly projector: SyncOutboundEnvelopeProjector) {}
 
-  async listDispatchable(limit: number): Promise<readonly SyncAction[]> {
+  async listDispatchable(limit: number, nowMs: number): Promise<readonly SyncAction[]> {
     if (!Number.isSafeInteger(limit) || limit <= 0) throw new Error('Invalid sync batch limit');
+    requireWhole(nowMs, 'sync clock');
     const rows = await this.db.getAllAsync<OutboxRow>(`
       SELECT o.sequence, o.command_id, o.pet_id, o.event_json, o.config_version,
              o.sync_status, o.attempt_count, o.last_error_code, o.ack_sequence, o.acknowledged_at_ms,
-             o.device_id, o.device_epoch
+             o.device_id, o.device_epoch, o.next_attempt_at_ms, o.last_attempt_at_ms, o.retry_policy_version
       FROM local_outbox o
       WHERE o.sync_status IN ('pending', 'error')
+        AND o.next_attempt_at_ms <= ?
+        AND NOT EXISTS (
+          SELECT 1 FROM local_outbox earlier
+          WHERE earlier.pet_id = o.pet_id
+            AND earlier.device_id IS o.device_id
+            AND earlier.device_epoch IS o.device_epoch
+            AND earlier.sequence < o.sequence
+            AND earlier.sync_status IN ('pending', 'error', 'conflict')
+        )
       ORDER BY o.sequence
       LIMIT ?
-    `, [limit]);
+    `, [nowMs, limit]);
     return rows.map(row => {
       if (!row.device_id || row.device_epoch === null || !Number.isSafeInteger(row.device_epoch) || row.device_epoch < 0) {
         throw new Error('DecisionRequired: outbox writer identity is not configured');
@@ -68,9 +81,29 @@ export class SqliteSyncQueue implements SyncQueue {
         localSequence: local.localSequence,
         writer: local.writer,
         configVersion: local.configVersion,
+        attemptCount: row.attempt_count,
         envelope,
       };
     });
+  }
+
+  async nextRunnableAtMs(): Promise<number | null> {
+    const row = await this.db.getFirstAsync<{ next_attempt_at_ms: number | null }>(`
+      SELECT MIN(o.next_attempt_at_ms) AS next_attempt_at_ms
+      FROM local_outbox o
+      WHERE o.sync_status IN ('pending', 'error')
+        AND NOT EXISTS (
+          SELECT 1 FROM local_outbox earlier
+          WHERE earlier.pet_id = o.pet_id
+            AND earlier.device_id IS o.device_id
+            AND earlier.device_epoch IS o.device_epoch
+            AND earlier.sequence < o.sequence
+            AND earlier.sync_status IN ('pending', 'error', 'conflict')
+        )
+    `);
+    if (row?.next_attempt_at_ms === null || row?.next_attempt_at_ms === undefined) return null;
+    requireWhole(row.next_attempt_at_ms, 'next retry time');
+    return row.next_attempt_at_ms;
   }
 
   async acknowledge(actionId: string, ackSequence: number, confirmedAtMs: number): Promise<void> {
@@ -94,14 +127,24 @@ export class SqliteSyncQueue implements SyncQueue {
       await tx.runAsync(`
         UPDATE local_outbox
         SET sync_status = 'synced', attempt_count = attempt_count + 1, last_error_code = NULL,
-            ack_sequence = ?, acknowledged_at_ms = ?
+            ack_sequence = ?, acknowledged_at_ms = ?, next_attempt_at_ms = 0, retry_policy_version = NULL
         WHERE command_id = ?
       `, [ackSequence, confirmedAtMs, actionId]);
     });
   }
 
-  async recordRetryableError(actionId: string, code: string): Promise<void> {
+  async recordRetryableError(
+    actionId: string,
+    code: string,
+    attemptedAtMs: number,
+    nextAttemptAtMs: number,
+    retryPolicyVersion: string,
+  ): Promise<void> {
     requireCode(code);
+    requireWhole(attemptedAtMs, 'attempt time');
+    requireWhole(nextAttemptAtMs, 'next retry time');
+    if (nextAttemptAtMs <= attemptedAtMs) throw new Error('Retry time must follow attempt time');
+    if (!retryPolicyVersion.trim() || retryPolicyVersion.length > 80) throw new Error('Invalid retry policy version');
     await this.db.withExclusiveTransactionAsync(async tx => {
       const row = await tx.getFirstAsync<Pick<OutboxRow, 'sync_status'>>(
         'SELECT sync_status FROM local_outbox WHERE command_id = ?', [actionId],
@@ -111,9 +154,10 @@ export class SqliteSyncQueue implements SyncQueue {
       if (row.sync_status === 'conflict') throw new Error('DecisionRequired: conflict row requires DEC-10 resolution');
       await tx.runAsync(`
         UPDATE local_outbox
-        SET sync_status = 'error', attempt_count = attempt_count + 1, last_error_code = ?
+        SET sync_status = 'error', attempt_count = attempt_count + 1, last_error_code = ?,
+            last_attempt_at_ms = ?, next_attempt_at_ms = ?, retry_policy_version = ?
         WHERE command_id = ?
-      `, [code, actionId]);
+      `, [code, attemptedAtMs, nextAttemptAtMs, retryPolicyVersion, actionId]);
     });
   }
 
@@ -131,7 +175,7 @@ export class SqliteSyncQueue implements SyncQueue {
       }
       await tx.runAsync(`
         UPDATE local_outbox
-        SET sync_status = 'conflict', attempt_count = attempt_count + 1, last_error_code = ?
+        SET sync_status = 'conflict', attempt_count = attempt_count + 1, last_error_code = ?, next_attempt_at_ms = 0
         WHERE command_id = ?
       `, [code, actionId]);
     });

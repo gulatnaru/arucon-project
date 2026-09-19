@@ -1,0 +1,99 @@
+[
+  {
+    "name": "valid-boundary",
+    "valid": true,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": 9007199254740991,
+      "updatedAtMs": 0,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake"
+    }
+  },
+  {
+    "name": "extra-field",
+    "valid": false,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": 1,
+      "updatedAtMs": 1,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake",
+      "coin": 1
+    }
+  },
+  {
+    "name": "numeric-pet-id",
+    "valid": false,
+    "snapshot": {
+      "petId": 7,
+      "stateRevision": 1,
+      "updatedAtMs": 1,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake"
+    }
+  },
+  {
+    "name": "boolean-form-id",
+    "valid": false,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": 1,
+      "updatedAtMs": 1,
+      "formId": true,
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake"
+    }
+  },
+  {
+    "name": "fractional-revision",
+    "valid": false,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": 1.5,
+      "updatedAtMs": 1,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake"
+    }
+  },
+  {
+    "name": "unsafe-updated-at",
+    "valid": false,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": 1,
+      "updatedAtMs": 9007199254740992,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake"
+    }
+  },
+  {
+    "name": "negative-revision",
+    "valid": false,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": -1,
+      "updatedAtMs": 1,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "awake"
+    }
+  },
+  {
+    "name": "unknown-display-state",
+    "valid": false,
+    "snapshot": {
+      "petId": "synthetic-pet",
+      "stateRevision": 1,
+      "updatedAtMs": 1,
+      "formId": "arucon",
+      "personalityProfileId": "synthetic-profile",
+      "displayState": "feeding"
+    }
+  }
+]

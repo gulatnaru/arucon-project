@@ -1,0 +1,113 @@
+package com.arucon.widget
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.RemoteViews
+import com.arucon.dev.R
+import org.json.JSONObject
+
+private const val SNAPSHOT_KEY = "arucon.widget.snapshot.v1"
+private const val SNAPSHOT_PREFERENCES = "arucon.widget.snapshot.v1"
+private const val OPEN_APP_URL = "arucondev://open/widget"
+
+private enum class DisplayState(val wireValue: String) {
+  AWAKE("awake"),
+  SLEEPING("sleeping"),
+  HIBERNATING("hibernating"),
+  NEEDS_CARE("needs_care")
+}
+
+private enum class WidgetViewStatus { READY, STALE, MISSING, ERROR, UNSUPPORTED }
+
+private data class PetProjection(
+  val petId: String,
+  val stateRevision: Long,
+  val updatedAtMs: Long,
+  val formId: String,
+  val personalityProfileId: String,
+  val displayState: DisplayState
+)
+
+private object StrictProjectionDecoder {
+  private const val MAXIMUM_SAFE_INTEGER = 9_007_199_254_740_991L
+  private val allowedKeys = setOf(
+    "petId", "stateRevision", "updatedAtMs", "formId", "personalityProfileId", "displayState"
+  )
+
+  private fun requiredNonemptyString(json: JSONObject, key: String): String {
+    val raw = json.get(key)
+    require(raw is String && raw.isNotEmpty())
+    return raw
+  }
+
+  private fun requiredSafeInteger(json: JSONObject, key: String): Long {
+    val raw = json.get(key)
+    require(raw is Byte || raw is Short || raw is Int || raw is Long)
+    val value = (raw as Number).toLong()
+    require(value in 0..MAXIMUM_SAFE_INTEGER)
+    return value
+  }
+
+  fun decode(raw: String): PetProjection? = runCatching {
+    val json = JSONObject(raw)
+    val keys = mutableSetOf<String>()
+    val iterator = json.keys()
+    while (iterator.hasNext()) keys.add(iterator.next())
+    require(keys == allowedKeys)
+    val displayState = requiredNonemptyString(json, "displayState")
+    val state = DisplayState.entries.single { it.wireValue == displayState }
+    PetProjection(
+      petId = requiredNonemptyString(json, "petId"),
+      stateRevision = requiredSafeInteger(json, "stateRevision"),
+      updatedAtMs = requiredSafeInteger(json, "updatedAtMs"),
+      formId = requiredNonemptyString(json, "formId"),
+      personalityProfileId = requiredNonemptyString(json, "personalityProfileId"),
+      displayState = state
+    )
+  }.getOrNull()
+}
+
+private object ReadOnlySnapshotStore {
+  fun read(context: Context): PetProjection? {
+    val preferences = context.getSharedPreferences(SNAPSHOT_PREFERENCES, Context.MODE_PRIVATE)
+    val raw = preferences.getString(SNAPSHOT_KEY, null) ?: return null
+    return StrictProjectionDecoder.decode(raw)
+  }
+}
+
+class AruconWidgetProvider : AppWidgetProvider() {
+  override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
+    val projection = ReadOnlySnapshotStore.read(context)
+    val status = if (projection == null) WidgetViewStatus.MISSING else WidgetViewStatus.READY
+    appWidgetIds.forEach { appWidgetId ->
+      val views = RemoteViews(context.packageName, R.layout.arucon_widget)
+      views.setTextViewText(R.id.arucon_widget_name, projection?.formId ?: "아루콘")
+      views.setTextViewText(R.id.arucon_widget_state, statusText(status, projection))
+      val openApp = Intent(Intent.ACTION_VIEW, Uri.parse(OPEN_APP_URL)).setPackage(context.packageName)
+      val pendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        openApp,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+      )
+      views.setOnClickPendingIntent(R.id.arucon_widget_root, pendingIntent)
+      manager.updateAppWidget(appWidgetId, views)
+    }
+  }
+
+  private fun statusText(status: WidgetViewStatus, projection: PetProjection?): String = when (status) {
+    WidgetViewStatus.STALE -> "마지막 확인 상태 · 앱에서 확인"
+    WidgetViewStatus.MISSING, WidgetViewStatus.ERROR, WidgetViewStatus.UNSUPPORTED -> "앱에서 확인"
+    WidgetViewStatus.READY -> when (projection?.displayState) {
+      DisplayState.AWAKE -> "방에서 지내는 중"
+      DisplayState.SLEEPING -> "쉬는 중"
+      DisplayState.HIBERNATING -> "잠시 쉬는 중"
+      DisplayState.NEEDS_CARE -> "앱에서 상태 확인"
+      null -> "앱에서 확인"
+    }
+  }
+}

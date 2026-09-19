@@ -15,6 +15,8 @@ export type SyncAction = Readonly<{
   localSequence: number;
   writer: WriterIdentity;
   configVersion: string;
+  /** Number of completed delivery attempts persisted before this dispatch. */
+  attemptCount: number;
   envelope: SyntheticOutboundEnvelope;
 }>;
 
@@ -51,9 +53,16 @@ export type DeliveryResult =
   | Readonly<{ kind: 'conflict'; code: string }>;
 
 export interface SyncQueue {
-  listDispatchable(limit: number): Promise<readonly SyncAction[]>;
+  listDispatchable(limit: number, nowMs: number): Promise<readonly SyncAction[]>;
+  nextRunnableAtMs(): Promise<number | null>;
   acknowledge(actionId: string, ackSequence: number, confirmedAtMs: number): Promise<void>;
-  recordRetryableError(actionId: string, code: string): Promise<void>;
+  recordRetryableError(
+    actionId: string,
+    code: string,
+    attemptedAtMs: number,
+    nextAttemptAtMs: number,
+    retryPolicyVersion: string,
+  ): Promise<void>;
   recordConflict(actionId: string, code: string): Promise<void>;
   summary(petId: string): Promise<SyncSummary>;
 }

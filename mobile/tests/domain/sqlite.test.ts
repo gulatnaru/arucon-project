@@ -58,31 +58,34 @@ const activity = (commandId, providerId, sourceRevision, steps, overrides = {}) 
 test('SQLite schema migration is idempotent and refuses future schema without replacing it', async () => {
   const { db, store } = await setup();
   await store.migrate();
-  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 5);
-  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM pet_registry')).count, 1);
-  await db.execAsync('PRAGMA user_version = 6');
-  await assert.rejects(store.migrate(), /Unsupported SQLite schema/);
   assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM pet_registry')).count, 1);
+  await db.execAsync('PRAGMA user_version = 7');
+  await assert.rejects(store.migrate(), /Unsupported SQLite schema/);
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 7);
   assert.equal((await store.loadPet('pet-1')).food, 1);
 });
 
-test('fresh v0 migration creates v5 transaction and sync metadata without inventing a writer identity', async () => {
+test('fresh v0 migration creates v6 transaction and durable retry metadata without inventing a writer identity', async () => {
   const db = new NodeSqliteAdapter();
   const store = new LocalPetStore(db, DEV_GAME_CONFIG);
   await store.migrate();
-  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 5);
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
   const columns = new Set((await db.getAllAsync('PRAGMA table_info(local_outbox)')).map(column => column.name));
-  for (const name of ['sync_status', 'attempt_count', 'last_error_code', 'ack_sequence', 'acknowledged_at_ms', 'device_id', 'device_epoch', 'config_version']) {
+  for (const name of ['sync_status', 'attempt_count', 'last_error_code', 'ack_sequence', 'acknowledged_at_ms', 'device_id', 'device_epoch', 'config_version', 'next_attempt_at_ms', 'last_attempt_at_ms', 'retry_policy_version']) {
     assert.equal(columns.has(name), true, name);
   }
   await store.createPet(initialPet('pet-fresh', '새별', 'reserved', 0, DEV_GAME_CONFIG));
   await store.execute('pet-fresh', { type: 'interact', commandId: 'fresh-action', kind: 'observe' });
-  const row = await db.getFirstAsync('SELECT sync_status, attempt_count, device_id, device_epoch, config_version FROM local_outbox WHERE command_id = ?', ['fresh-action']);
+  const row = await db.getFirstAsync('SELECT sync_status, attempt_count, device_id, device_epoch, config_version, next_attempt_at_ms, last_attempt_at_ms, retry_policy_version FROM local_outbox WHERE command_id = ?', ['fresh-action']);
   assert.equal(row.sync_status, 'pending');
   assert.equal(row.attempt_count, 0);
   assert.equal(row.device_id, null);
   assert.equal(row.device_epoch, null);
   assert.equal(row.config_version, DEV_GAME_CONFIG.version);
+  assert.equal(row.next_attempt_at_ms, 0);
+  assert.equal(row.last_attempt_at_ms, null);
+  assert.equal(row.retry_policy_version, null);
   for (const table of ['dev_purchase_ledger', 'dev_item_ownership', 'dev_sleep_benefit_ledger', 'dev_resolution_ledger']) {
     assert.equal((await db.getFirstAsync(`SELECT COUNT(*) AS count FROM ${table}`)).count, 0);
   }
@@ -225,7 +228,7 @@ test('unreleased schema v1 migration backfills markers and sync metadata from ex
   await store.execute('pet-1', { type: 'interact', commandId: 'old', kind: 'greet' });
   await db.execAsync('DROP TABLE pet_registry; PRAGMA user_version = 1');
   await store.migrate();
-  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 5);
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM pet_registry WHERE pet_id = ?', ['pet-1'])).count, 1);
   assert.equal((await store.loadPet('pet-1')).revision, 1);
   await db.execAsync('DROP TABLE pet_registry; PRAGMA user_version = 1');
@@ -237,7 +240,7 @@ test('unreleased schema v1 migration backfills markers and sync metadata from ex
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM command_ledger WHERE pet_id = ?', ['pet-1'])).count, 1);
 });
 
-test('v2 to v5 migration failure preserves original schema and rows, then retries cleanly', async () => {
+test('v2 to v6 migration failure preserves original schema and rows, then retries cleanly', async () => {
   const db = new NodeSqliteAdapter();
   const state = initialPet('pet-legacy', '보존', 'reserved', 0, DEV_GAME_CONFIG);
   const stateJson = JSON.stringify(state);
@@ -262,14 +265,15 @@ test('v2 to v5 migration failure preserves original schema and rows, then retrie
   assert.equal((await db.getFirstAsync('SELECT state_json FROM pet_snapshot WHERE pet_id = ?', ['pet-legacy'])).state_json, stateJson);
   assert.equal((await db.getAllAsync('PRAGMA table_info(local_outbox)')).some(column => column.name === 'sync_status'), false);
   await store.migrate();
-  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 5);
-  const outbox = await db.getFirstAsync('SELECT sync_status, attempt_count FROM local_outbox WHERE command_id = ?', ['legacy-action']);
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
+  const outbox = await db.getFirstAsync('SELECT sync_status, attempt_count, next_attempt_at_ms FROM local_outbox WHERE command_id = ?', ['legacy-action']);
   assert.equal(outbox.sync_status, 'pending');
   assert.equal(outbox.attempt_count, 0);
+  assert.equal(outbox.next_attempt_at_ms, 0);
   assert.deepEqual(await store.loadPet('pet-legacy'), state);
 });
 
-test('v4 to v5 resolution-ledger marker backfill rolls back on failure and retries without losing the record', async () => {
+test('v4 to v6 resolution-ledger marker backfill rolls back on failure and retries without losing the record', async () => {
   const { db, store } = await setup();
   await db.runAsync(`
     INSERT INTO dev_resolution_ledger
@@ -278,16 +282,42 @@ test('v4 to v5 resolution-ledger marker backfill rolls back on failure and retri
   `, ['orphan-resolution-pet', 'first-evolution', 'resolution-1', 'DEC-08', 'synthetic-policy', '1', '{"value":"mallu"}']);
   await db.runAsync('DELETE FROM pet_registry WHERE pet_id = ?', ['orphan-resolution-pet']);
   await db.execAsync('PRAGMA user_version = 4');
-  db.failOn = 'PRAGMA user_version = 5';
+  db.failOn = 'PRAGMA user_version = 6';
   await assert.rejects(store.migrate(), /injected SQLite failure/);
   db.failOn = null;
   assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 4);
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM pet_registry WHERE pet_id = ?', ['orphan-resolution-pet'])).count, 0);
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_resolution_ledger WHERE pet_id = ?', ['orphan-resolution-pet'])).count, 1);
   await store.migrate();
-  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 5);
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM pet_registry WHERE pet_id = ?', ['orphan-resolution-pet'])).count, 1);
   assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_resolution_ledger WHERE pet_id = ?', ['orphan-resolution-pet'])).count, 1);
+});
+
+test('v5 to v6 retry metadata migration is atomic and preserves queued bytes across clean retry', async () => {
+  const { db, store } = await setup();
+  await store.execute('pet-1', { type: 'interact', commandId: 'queued-before-v6', kind: 'observe' });
+  const before = await db.getFirstAsync('SELECT event_json FROM local_outbox WHERE command_id = ?', ['queued-before-v6']);
+  await db.execAsync(`
+    ALTER TABLE local_outbox DROP COLUMN retry_policy_version;
+    ALTER TABLE local_outbox DROP COLUMN last_attempt_at_ms;
+    ALTER TABLE local_outbox DROP COLUMN next_attempt_at_ms;
+    PRAGMA user_version = 5;
+  `);
+  db.failOn = 'ALTER TABLE local_outbox ADD COLUMN next_attempt_at_ms';
+  await assert.rejects(store.migrate(), /injected SQLite failure/);
+  db.failOn = null;
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 5);
+  assert.equal((await db.getAllAsync('PRAGMA table_info(local_outbox)')).some(column => column.name === 'next_attempt_at_ms'), false);
+  assert.equal((await db.getFirstAsync('SELECT event_json FROM local_outbox WHERE command_id = ?', ['queued-before-v6'])).event_json, before.event_json);
+
+  await store.migrate();
+  assert.equal((await db.getFirstAsync('PRAGMA user_version')).user_version, 6);
+  const upgraded = await db.getFirstAsync('SELECT event_json, next_attempt_at_ms, last_attempt_at_ms, retry_policy_version FROM local_outbox WHERE command_id = ?', ['queued-before-v6']);
+  assert.equal(upgraded.event_json, before.event_json);
+  assert.equal(upgraded.next_attempt_at_ms, 0);
+  assert.equal(upgraded.last_attempt_at_ms, null);
+  assert.equal(upgraded.retry_policy_version, null);
 });
 
 test('persisted activity cursor blocks source mixing, stale revision and equal-revision conflict after reload', async () => {

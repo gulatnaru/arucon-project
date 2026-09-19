@@ -388,3 +388,15 @@ DEC-01~31의 기존 제품 승인 상태는 유지하고, v1.7 사용자 승인�
 - 하위 역할이 실제로 Astra를 상속한 것이 확인되면 비용 보호를 위해 반복 사용하지 않고 `ROUTING_MISMATCH`로 기록한다. 실제 모델 확인이 불가능하면 `ROUTING_UNVERIFIED`다.
 
 ENG-03은 ENG-02를 폐기하지 않고 **실행 비용/역할 배정 방식을 구체화해 대체**한다. 제품 DEC-01~32와 Hard Stop은 그대로다.
+
+### ENG-04 — 기술 결정 재감사와 승인 경계
+
+**상태: 사용자 위임에 따른 기술 범위 ACCEPTED (2026-09-19)**
+
+사용자는 a8aa900 체크포인트의 결정 대기 10개를 다시 감사하고, 제품 철학을 바꾸지 않는 가역적 기술 선택은 Astra가 대안을 비교해 ADR에 기록하고 구현·독립 검증하도록 지시했다. 기존 제품 DEC-01~18/24/25/31의 OPEN/PROPOSED를 일괄 APPROVED로 바꾸지 않는다.
+
+- 기술 범위: RN/Expo/TypeScript+SQLite 기존 구성, 계층/adapter 경계, 원자 ledger·additive migration·schema/index, 버전/실패 보존, 재시도/순서/single-flight, local Expo Module/config plugin, 합성 알림 idempotency, 검사 전략. [ADR-001~004](adr/README.md)에서 비교·선택한다.
+- 제품 범위: 보상 날짜/반올림 의미, 수면 scorer/배율, 진화/성격/성별/성장 기간, 가격·초기 지급, 다기기 이용 제한/미동기화 손실 UX, 알림 cadence, 공개 지원 범위. 추천과 승인 예시를 기다린다.
+- 외부 범위: 법정대리인 동의/보존 정책의 법적 확정, 실제 건강/계정/서비스/결제/배포, 관리자 설치. 사전 준비만 수행한다.
+
+구체적 이전/이후 추적은 [DECISION-SUMMARY](../DECISION-SUMMARY.md), 남은 사람 판단은 [DECISION-QUEUE](../DECISION-QUEUE.md)를 따른다. 제품값은 실제 승인 후에만 SRS/config/tests에 함께 반영한다. 이번 feature commit/일반 push는 허용되지만 main/merge/배포 권한으로 확대하지 않는다.

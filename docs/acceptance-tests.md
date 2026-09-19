@@ -542,3 +542,20 @@ QA 판정:
 시작 c99a4c0, feature/arucon-mobile-autonomous. 현재 판정 WAITING_FOR_HUMAN_DECISIONS, MVP 제품 완료 아님. 이번 변경 후 실제 `npm test` 147/147(pass147/fail0/skip0), lint/typecheck exit0, Android/iOS Expo JS export exit0, clean prebuild(native project generation only) exit0/warning0, npm audit exit0/total0, workflow38/38 및 regression assertion PASS. 명령/cwd/환경·검증별 증거는 [실행 보고서](../AUTONOMOUS-RUN-REPORT.md), 전체30항목은 [gap matrix](../MVP-GAP-MATRIX.md), 사용자 개입은 [결정 대기열](../DECISION-QUEUE.md)에 있다.
 
 원시 증거 `mobile/evidence/mvp-engineering/results.json`, `source-sha256.json`, `final-*.log`, `native-prebuild-final.log`, `dependency-audit.json`, 독립 review 기록은 Git 제외다. Node26.7.0/npm11.19.0/Python3.12. native compile BLOCKED_ENV, simulator/physical device/실제 권한·Health/Widget/visual/FPS 모두 NOT_RUN. JS 번들·생성 프로젝트·Node SQLite 테스트를 실기기 PASS로 표기하지 않는다. OPEN/PROPOSED는 그대로이며 독립 로컬 계약만 검증했다.
+
+## 2026-09-19 — a8aa900 이후 결정 재감사
+
+제품 DEC는 OPEN/PROPOSED 유지, 가역적 기술 선택만 ADR-001~004로 AUTO_DECIDE 채택했다. 원래 DQ10개 매핑과 추천은 DECISION-SUMMARY.md/DECISION-QUEUE.md, SRS14/14-1 전체 판정은 MVP-GAP-MATRIX.md를 따른다.
+
+- 실행 CWD: `mobile/`, Node26.7.0/npm11.19.0. 최종 `npm test` **179/179**, fail/skipped0; `npm run lint` warnings0 및 `npm run typecheck` PASS.
+- `EXPO_NO_TELEMETRY=1 EXPO_OFFLINE=1 CI=1 ./node_modules/.bin/expo export --platform all --max-workers 2 --output-dir evidence/decision-audit/metro`: Android/iOS **JS bundle** PASS.
+- `EXPO_NO_TELEMETRY=1 EXPO_OFFLINE=1 CI=1 ./node_modules/.bin/expo prebuild --clean --no-install --platform all --skip-dependency-update react,react-native`: **native project generation** PASS.
+- `node scripts/check-native-generation.mjs --output evidence/decision-audit/final-native-generation.json`: 기본 OFF·health 선언 없는 static scan PASS.
+- Local Expo autolinking discovery/resolve, Apple provider 생성·Swift parse·podspec/XML parse는 준비 검사만 PASS. Android provider-generation 명령 미지원 exit1은 resolve/실제 compile과 구분한다.
+- `npm audit --json`: sandbox DNS 실패 후 승인된 온라인 재실행 exit0, 취약점0.
+- repo root Python3.12 `validation/check_workflow.py` 38/38 및 validator regression PASS.
+- 독립 reviewer: sync/native/notification 초기61/61 및 추천 config 격리4/4. widget strict JSON type coercion P1 수정 후 독립22/22와 전체179/179 재검증. stale lint 문구 P2 정정.
+- Xcode/simctl/Android SDK/adb 없음: native SDK compile **BLOCKED_ENV**, simulator/emulator/physical device·실제 Health·위젯 설치/렌더·모션/FPS **NOT_RUN**.
+- 실제 계정/프로젝트·건강정보·결제·배포 없음. 이전147/147은 이 실행 증거로 사용하지 않았다.
+
+정확한 명령/exit/로그: ignored `mobile/evidence/decision-audit/results.json`, `native-final-validation.json`, `review-native-widget.md`, `source-sha256.json`. tracked 보고: AUTONOMOUS-RUN-REPORT.md. Native templates와 synthetic port 검증이 실기기/실서버 완료를 뜻하지 않는다.

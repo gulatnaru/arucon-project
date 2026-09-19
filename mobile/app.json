@@ -6,7 +6,17 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "plugins": ["expo-dev-client", ["expo-asset", { "assets": ["./assets/arucon_tsundere_motion.glb"] }]],
+    "plugins": [
+      "expo-dev-client",
+      ["expo-asset", { "assets": ["./assets/arucon_tsundere_motion.glb"] }],
+      [
+        "./plugins/withAruconNativeIntegration",
+        {
+          "healthDeclarationsEnabled": false,
+          "widgetTargetsEnabled": false
+        }
+      ]
+    ],
     "ios": { "supportsTablet": false, "bundleIdentifier": "com.arucon.dev" },
     "android": {
       "package": "com.arucon.dev",

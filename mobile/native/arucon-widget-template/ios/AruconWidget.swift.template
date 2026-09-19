@@ -1,0 +1,158 @@
+import Foundation
+import CoreFoundation
+import SwiftUI
+import WidgetKit
+
+private let snapshotKey = "arucon.widget.snapshot.v1"
+private let developmentAppGroup = "group.com.arucon.dev.widget"
+private let openAppURL = URL(string: "arucondev://open/widget")!
+
+private enum DisplayState: String, Decodable {
+  case awake
+  case sleeping
+  case hibernating
+  case needsCare = "needs_care"
+}
+
+private struct PetProjection: Decodable {
+  let petId: String
+  let stateRevision: Int
+  let updatedAtMs: Int64
+  let formId: String
+  let personalityProfileId: String
+  let displayState: DisplayState
+}
+
+private enum WidgetViewStatus {
+  case ready
+  case stale
+  case missing
+  case error
+  case unsupported
+}
+
+private enum StrictProjectionDecoder {
+  private static let maximumSafeInteger: Int64 = 9_007_199_254_740_991
+  private static let allowedKeys: Set<String> = [
+    "petId", "stateRevision", "updatedAtMs", "formId", "personalityProfileId", "displayState"
+  ]
+
+  private static func isNonemptyString(_ value: Any?) -> Bool {
+    guard let string = value as? String else { return false }
+    return !string.isEmpty
+  }
+
+  private static func isSafeInteger(_ value: Any?) -> Bool {
+    guard let number = value as? NSNumber,
+          CFGetTypeID(number) != CFBooleanGetTypeID() else {
+      return false
+    }
+    let integerTypeEncodings: Set<String> = ["c", "s", "i", "l", "q", "C", "S", "I", "L", "Q"]
+    guard integerTypeEncodings.contains(String(cString: number.objCType)) else { return false }
+    let integer = number.int64Value
+    return integer >= 0 && integer <= maximumSafeInteger
+  }
+
+  static func decode(_ data: Data) -> PetProjection? {
+    guard let object = try? JSONSerialization.jsonObject(with: data),
+          let dictionary = object as? [String: Any],
+          Set(dictionary.keys) == allowedKeys,
+          isNonemptyString(dictionary["petId"]),
+          isNonemptyString(dictionary["formId"]),
+          isNonemptyString(dictionary["personalityProfileId"]),
+          dictionary["displayState"] is String,
+          isSafeInteger(dictionary["stateRevision"]),
+          isSafeInteger(dictionary["updatedAtMs"]),
+          let projection = try? JSONDecoder().decode(PetProjection.self, from: data),
+          !projection.petId.isEmpty,
+          !projection.formId.isEmpty,
+          !projection.personalityProfileId.isEmpty,
+          projection.stateRevision >= 0,
+          projection.updatedAtMs >= 0,
+          projection.stateRevision <= maximumSafeInteger,
+          projection.updatedAtMs <= maximumSafeInteger else {
+      return nil
+    }
+    return projection
+  }
+}
+
+private enum ReadOnlySnapshotStore {
+  static func read() -> PetProjection? {
+    guard let defaults = UserDefaults(suiteName: developmentAppGroup),
+          let data = defaults.data(forKey: snapshotKey) else {
+      return nil
+    }
+    return StrictProjectionDecoder.decode(data)
+  }
+}
+
+private struct AruconWidgetEntry: TimelineEntry {
+  let date: Date
+  let status: WidgetViewStatus
+  let projection: PetProjection?
+}
+
+private struct AruconWidgetProvider: TimelineProvider {
+  func placeholder(in context: Context) -> AruconWidgetEntry {
+    AruconWidgetEntry(date: Date(), status: .unsupported, projection: nil)
+  }
+
+  func getSnapshot(in context: Context, completion: @escaping (AruconWidgetEntry) -> Void) {
+    let projection = ReadOnlySnapshotStore.read()
+    completion(AruconWidgetEntry(
+      date: Date(),
+      status: projection == nil ? .missing : .ready,
+      projection: projection
+    ))
+  }
+
+  func getTimeline(in context: Context, completion: @escaping (Timeline<AruconWidgetEntry>) -> Void) {
+    let projection = ReadOnlySnapshotStore.read()
+    let entry = AruconWidgetEntry(
+      date: Date(),
+      status: projection == nil ? .missing : .ready,
+      projection: projection
+    )
+    completion(Timeline(entries: [entry], policy: .never))
+  }
+}
+
+private struct AruconWidgetView: View {
+  let entry: AruconWidgetEntry
+
+  private var stateText: String {
+    switch entry.status {
+    case .stale: return "마지막 확인 상태 · 앱에서 확인"
+    case .missing, .error, .unsupported: return "앱에서 확인"
+    case .ready:
+      switch entry.projection?.displayState {
+      case .awake: return "방에서 지내는 중"
+      case .sleeping: return "쉬는 중"
+      case .hibernating: return "잠시 쉬는 중"
+      case .needsCare: return "앱에서 상태 확인"
+      case nil: return "앱에서 확인"
+      }
+    }
+  }
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text(entry.projection?.formId ?? "아루콘")
+      Text(stateText)
+    }
+    .widgetURL(openAppURL)
+  }
+}
+
+@main
+struct AruconWidget: Widget {
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: "AruconWidget", provider: AruconWidgetProvider()) { entry in
+      AruconWidgetView(entry: entry)
+    }
+    .configurationDisplayName("아루콘")
+    .description("마지막으로 확인된 아루콘 상태를 표시합니다.")
+    .supportedFamilies([.systemSmall])
+  }
+}

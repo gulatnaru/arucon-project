@@ -1,26 +1,26 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "runDate": "2026-09-19",
   "timezone": "Asia/Seoul",
   "status": "WAITING_FOR_HUMAN_DECISIONS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.8 sections 14 and 14-1, all 30 rows; not APP-stage completion",
-  "reason": "All independently implementable local pre-decision/pre-SDK work and independent QA are complete. Remaining production activation, native execution and external validation require documented human decisions, SDK preparation or sensitive/external authorization.",
-  "sourceBaseline": "c99a4c0ee9486193a7514983e29a778f361c9a84",
+  "reason": "Original ten DQ bundles re-audited. Reversible technical decisions adopted in ADR-001..004; independent local implementation and validation complete. Product choices, SDK/device preparation and sensitive/external approvals remain; recommendations are not activated.",
+  "sourceBaseline": "a8aa900aa148f7824305db458dc24250e0920802",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
     "root": "requested Astra orchestration/integration/Hard Stop decisions",
-    "builder": "arucon_builder / requested Sol, three existing/new agents",
+    "builder": "three existing arucon_builder roles reused for sync, native and notifications",
     "exploration": "arucon_explorer / requested Terra",
-    "independentReview": "existing Terra read-only explorer reused under reviewer instructions: dedicated reviewer allocation blocked by agent thread limit",
-    "luna": "allocation attempted; agent thread limit prevented use",
+    "independentReview": "existing read-only Terra explorer reused under reviewer instructions; dedicated reviewer slot unavailable; actual model/effort metadata not exposed",
+    "luna": "no free agent slot; narrow recommendation-isolation test delegated to existing builder, not root",
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed."
   },
   "completion": {
     "independentLocalEngineering": "COMPLETE",
-    "independentReview": "LOCAL_PASS_CLOSED",
+    "independentReview": "LOCAL_PASS_CLOSED_STATIC_NATIVE_SCOPE",
     "remainingIndependentWork": [],
     "productMvp": "NOT_COMPLETE",
     "nativeDevelopmentBuild": "BLOCKED_ENV",
@@ -32,18 +32,24 @@
   "implemented": [
     "single versioned balance registry with unresolved decision gates",
     "offline outbox replay/ack/conflict/privacy and recovery planner",
-    "SQLite v5 additive migration/failure recovery",
+    "SQLite v6 additive migration/failure recovery",
     "DEV atomic coin purchase/ownership and injected sleep recovery ledgers",
     "pure progression/RNG resolution and durable prepared-resolution ledger",
     "default-OFF native health/widget contracts",
     "synthetic account/device/consent revocation and outbound allowlist",
     "disabled notification delivery and non-blaming copy contract",
-    "native environment inventory, clean prebuild readiness and dependency remediation"
+    "native environment inventory, clean prebuild readiness and dependency remediation",
+    "AUTO_DECIDE ADR-001..004 and human-only DQ recommendations with original ten mapping",
+    "SQLite schema6 durable retry metadata and migration rollback; ordered stream dispatch, equal jitter, single-flight offline scheduler, no permanent drop",
+    "local Expo native module/autolinking/config plugin; health reads and permission requests absent, default OFF",
+    "read-only WidgetKit/AppWidget source templates and pure generation plan; target activation still disabled",
+    "synthetic notification planner and idempotent delivery/cancel/revoke contracts with injected policy",
+    "TEST_ONLY bonus-curve isolation proving source defaults and not_configured boundary remain unchanged"
   ],
   "lastValidation": {
     "mobileTests": {
       "command": "npm test",
-      "passed": 147,
+      "passed": 179,
       "failed": 0,
       "skipped": 0,
       "exit": 0
@@ -63,8 +69,10 @@
       "exit": 0
     },
     "workflowRegression": "PASS",
-    "evidence": "mobile/evidence/mvp-engineering/results.json",
-    "sourceManifest": "mobile/evidence/mvp-engineering/source-sha256.json"
+    "evidence": "mobile/evidence/decision-audit/results.json",
+    "sourceManifest": "mobile/evidence/decision-audit/source-sha256.json",
+    "nativeAutolinking": "PASS_STATIC_DISCOVERY_NOT_COMPILATION",
+    "widgetTemplates": "STATIC_CONTRACT_AND_SYNTAX_ONLY_NOT_NATIVE_EXECUTION"
   },
   "environment": {
     "node": "26.7.0",
@@ -73,18 +81,18 @@
     "androidSdk": false,
     "adb": false,
     "simctl": false,
-    "evidence": "mobile/evidence/mvp-engineering/native-environment.json"
+    "evidence": "mobile/evidence/decision-audit/native-environment.json"
   },
   "gapMatrix": [
     {
       "id": "M01",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "합성 명명/연령 및 계정·기기·철회 계약. DQ-06 실제 동의/가입"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "합성 명명/연령·계정/기기/철회 계약. DQ-06 법적 동의·실가입; DQ-01 초기값은 별도 제품 승인"
     },
     {
       "id": "M02",
       "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "집계/상한/수정/날짜 테스트, 기본 OFF native bridge. DQ-05 실제 권한·소스 지원"
+      "scopeAndResidual": "집계·권한 계약과 기본 OFF local Expo module/plugin/autolinking 준비. DQ-05 공개 지원·소스, DQ-09 실제 기록/기기"
     },
     {
       "id": "M03",
@@ -109,12 +117,12 @@
     {
       "id": "M07",
       "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "순수 level/stage·RNG·확정 결과 영속 계약. DQ-03 승인 resolver 및 App 운영 연결"
+      "scopeAndResidual": "주입 progression/RNG·단회 결과 영속 계약. DQ-03 추천 결정표/비율/성격·기간 승인 후 운영 연결"
     },
     {
       "id": "M08",
       "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "합성 score→섭취 배율·원자 회복 원장. DQ-02 scorer/날짜/회복 및 실제 기록"
+      "scopeAndResidual": "점수→섭취·회복 원장 및 추천형 TEST_ONLY 커브 격리. DQ-02 실제 산식·혜택 승인/실제 기록"
     },
     {
       "id": "M09",
@@ -149,7 +157,7 @@
     {
       "id": "M15",
       "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "위젯 projection/5상태·읽기 전용 native 계약. DQ-08 target/갱신, DQ-09 SDK/실제 앱 진입"
+      "scopeAndResidual": "read-only WidgetKit/AppWidget source template·6필드 decoder·generation plan 준비. DQ-08 최신성/알림 정책, DQ-09 target build/설치·기기 검증"
     },
     {
       "id": "M16",
@@ -169,12 +177,12 @@
     {
       "id": "M19",
       "status": "PASS",
-      "scopeAndResidual": "현재 문구/tone 계약 검사, 실제 알림 delivery disabled. DQ-08 발송 정책 별도"
+      "scopeAndResidual": "현재 문구/tone 및 합성 알림 중복/취소/철회 검사; 기본 disabled. DQ-08 실제 발송 정책은 미승인"
     },
     {
       "id": "V01",
       "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "OPEN/PROPOSED 유지, DQ-01~08 승인 후 SRS/config/예시 동기화"
+      "scopeAndResidual": "기술 AUTO_DECIDE ADR1~4만 채택, 제품 OPEN/PROPOSED 유지. DQ-01~08 정확한 값/예시 승인 필요"
     },
     {
       "id": "V02",
@@ -204,7 +212,7 @@
     {
       "id": "V07",
       "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "local outbox/ack/conflict/복구 planner/migration 실패 검사. DQ-07 운영 복구/다기기 + HS-02"
+      "scopeAndResidual": "schema6 보존 migration, durable retry/HOL/no-drop/single-flight/offline 및 fake ack 검증. DQ-07 다기기/분실복구 UX, 실서비스 HS-02"
     },
     {
       "id": "V08",
@@ -213,13 +221,13 @@
     },
     {
       "id": "V09",
-      "status": "HARD_STOP_DECISION",
-      "scopeAndResidual": "합성 scope/철회와 raw 차단 검사. DQ-06 법적 정책 및 실제 backend 접근 통제"
+      "status": "HARD_STOP_EXTERNAL",
+      "scopeAndResidual": "합성 scope/철회·raw 차단 검사. DQ-06 법적 정책·실backend 접근 통제 승인/검증"
     },
     {
       "id": "V10",
       "status": "PASS",
-      "scopeAndResidual": "이번 실행 command/cwd/환경/결과/증거를 acceptance와 실행 보고서에 별도 기록"
+      "scopeAndResidual": "결정 재감사의 실제 명령·179 tests·환경·review·증거를 별도 기록; 과거147/77 결과 미재사용"
     },
     {
       "id": "V11",
@@ -254,16 +262,30 @@
       "deployment"
     ],
     "publicationRecordScope": "This tracked record is written before its own checkpoint commit; actual HEAD/tracking/live-origin hashes and clean status are recorded after publication.",
-    "verificationEvidence": "mobile/evidence/mvp-engineering/publication.json"
+    "verificationEvidence": "mobile/evidence/decision-audit/publication.json"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
   "realPayment": false,
   "publicDeployment": false,
   "historicalBaseline": {
-    "checkpoint": "c99a4c0",
-    "priorApp04Regression": "13/13 historical; not reused as current execution evidence",
-    "priorApp06Tests": "77/77 historical; this run also executed a fresh 77-test baseline before changes"
+    "checkpoint": "a8aa900",
+    "priorTests": "147/147 historical, not reused as current execution evidence",
+    "earlierApp04": "13/13 historical",
+    "earlierApp06": "77/77 historical"
   },
-  "evidenceDirectory": "mobile/evidence/mvp-engineering"
+  "evidenceDirectory": "mobile/evidence/decision-audit",
+  "decisionAudit": {
+    "originalBundles": 10,
+    "autoDecisionRecords": [
+      "ADR-001",
+      "ADR-002",
+      "ADR-003",
+      "ADR-004"
+    ],
+    "humanBundlesWithResidual": 10,
+    "summary": "DECISION-SUMMARY.md",
+    "recommendationsActivated": false,
+    "note": "Technical subdecisions removed; bundle titles not merged to imply fewer substantive decisions."
+  }
 }
