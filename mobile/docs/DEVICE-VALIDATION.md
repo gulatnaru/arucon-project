@@ -1,6 +1,6 @@
 # Native / simulator / physical-device 검증 재개표
 
-2026-09-19 실제 환경: Xcode 없음(`xcodebuild -version` exit1), simctl 없음(exit72), Android SDK/adb/emulator 없음. 현재 native compile **BLOCKED_ENV**, simulator·physical device 실행 **NOT_RUN**. 근거: `evidence/mvp-engineering/environment.json`.
+2026-09-20 KST 최신 환경: Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0 및 iPhone 16e iOS 26.3 Simulator는 사용 가능하고 Android SDK/adb/emulator는 없다. 위젯 Swift 컴파일·링크는 통과했지만 앱 native compile은 ExpoModulesJSI 이후 `JavaScriptRuntime.swift` 동시성 오류로 xcodebuild exit 65였으며, Expo SDK 57의 공식 Xcode 26.4 이상 요구에도 미달한다. 현재 native compile **BLOCKED_ENV**, simulator 앱 실행·physical device 실행 **NOT_RUN**. 최신 근거는 `evidence/ios-widget-path-fix/`이며, 2026-09-19의 환경 기록은 당시 시점의 역사적 증거로 보존한다.
 
 JS/asset bundle 성공, native project 생성, Node SQLite, synthetic bridge 테스트는 각각 다른 증거이며 이 문서의 실제 실행을 대신하지 않는다.
 

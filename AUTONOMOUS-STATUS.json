@@ -1,12 +1,12 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-09-19",
+  "runDate": "2026-09-20",
   "timezone": "Asia/Seoul",
   "status": "WAITING_FOR_HUMAN_DECISIONS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "Six product defaults approved and independently implementable local code/integration/validation completed. Only legal, real-health, external-account, payments/release and system-environment gates remain.",
-  "sourceBaseline": "34ab069dc874947a0f71ff7b70c3be2b14065e00",
+  "reason": "iOS widget CNG path and reproducible ExpoModulesJSI constructor patch completed. Xcode26.3 is available but below Expo SDK57 documented26.4 minimum; whole app compile still fails with seven Swift pointer data-race diagnostics. External boundaries and environment remain.",
+  "sourceBaseline": "fce0bac7a0b240c3a396edc91f93d4e0c0d6b20c",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
@@ -16,19 +16,27 @@
     "independentReview": "arucon_reviewer / requested Terra High plus read-only explorer initial QA",
     "luna": "arucon_luna_worker / requested Luna: narrow README update",
     "spark": "not invoked; support not established",
-    "note": "Role requests do not prove backend model IDs; no metadata exposed."
+    "note": "Role requests do not prove backend model IDs; no metadata exposed.",
+    "currentRun": {
+      "builder": "ios_widget_path_fix / arucon_builder requested Sol",
+      "reviewer": "ios_widget_review / arucon_reviewer requested Terra High",
+      "explorer": "ios_docs_audit / arucon_explorer requested Terra",
+      "luna": "ios_environment_docs / arucon_luna_worker requested Luna",
+      "root": "Astra integration, native attempts and Git"
+    }
   },
   "completion": {
     "independentLocalEngineering": "COMPLETE",
-    "independentReview": "LOCAL_PASS_NATIVE_SOURCE_CNG_ONLY",
+    "independentReview": "SOURCE_PASS_NATIVE_APP_BUILD_FAILED",
     "remainingIndependentWork": [],
     "productMvp": "NOT_COMPLETE",
-    "nativeDevelopmentBuild": "BLOCKED_ENV",
+    "nativeDevelopmentBuild": "FAIL_IOS_COMPILER_INCOMPATIBILITY_BLOCKED_ENV_ANDROID_SDK_ABSENT",
     "simulatorExecution": "NOT_RUN",
     "physicalDeviceExecution": "NOT_RUN",
     "visualMotionFps": "NOT_RUN",
     "productionPolicies": "SIX_DEFAULTS_APPROVED_EXTERNAL_BOUNDARIES_OFF",
-    "formRendering": "APPROVED_2D_REFERENCE_PRESENT_EXPLICIT_COMMON_GLB_FALLBACK_FOUR_RUNTIME_ASSETS_NOT_DELIVERED"
+    "formRendering": "APPROVED_2D_REFERENCE_PRESENT_EXPLICIT_COMMON_GLB_FALLBACK_FOUR_RUNTIME_ASSETS_NOT_DELIVERED",
+    "iosWidgetCompileAndLink": "PASS_NOT_WIDGET_OS_EXECUTION"
   },
   "implemented": [
     "가입·연령·이름: 로컬 합성 온보딩/명명·scope·철회 계약. 실제 미성년 동의·가입은 EXT-LEGAL/ACCOUNT.",
@@ -52,31 +60,32 @@
     "비난 없는 안내: 앱 안 상태 안내 우선·중립 문구·합성 알림 중복/철회 검사. 실제 발송 비활성."
   ],
   "lastValidation": {
-    "mobileTests": {
-      "command": "npm test",
-      "tests": 236,
-      "pass": 236,
-      "fail": 0,
-      "cancelled": 0,
-      "skipped": 0,
-      "todo": 0,
-      "exit": 0
-    },
+    "scope": "iOS build troubleshooting; prior236 tests are historical",
+    "npmCiOffline": "PASS_POSTINSTALL_PATCH_REPRODUCED_NOT_FRESH_NETWORK_AUDIT",
     "lint": "PASS",
     "typecheck": "PASS",
-    "androidJsBundle": "PASS_NOT_NATIVE_BUILD",
-    "iosJsBundle": "PASS_NOT_NATIVE_BUILD",
-    "cleanNativeProjectGeneration": "PASS_NOT_NATIVE_BUILD",
-    "nativeAutolinking": "PASS_STATIC_DISCOVERY_NOT_COMPILATION",
-    "workflow": {
-      "passed": 38,
-      "total": 38,
-      "exit": 0
+    "iosWidgetCompileAndLink": "PASS",
+    "iosAppNativeBuild": {
+      "status": "FAIL",
+      "exit": 65,
+      "reason": "JavaScriptRuntime.swift pointer data-race diagnostics (7); Xcode26.3 below SDK57 minimum26.4"
     },
-    "workflowRegression": "PASS",
-    "evidence": "mobile/evidence/approved-mvp/results.json",
-    "sourceManifest": "mobile/evidence/approved-mvp/staged-source-sha256.json",
-    "nativeEvidence": "mobile/evidence/approved-mvp/native-final-validation.json"
+    "simulatorAppExecution": "NOT_RUN",
+    "physicalDeviceExecution": "NOT_RUN",
+    "evidence": "mobile/evidence/ios-widget-path-fix/",
+    "targetedNativeTests": {
+      "command": "node --import tsx --test tests/native/nativeIntegrationPlugin.test.ts tests/native/expoModulesJsiCompatibility.test.ts",
+      "tests": 9,
+      "pass": 9,
+      "fail": 0,
+      "exit": 0,
+      "independentReviewer": true
+    },
+    "workflow": {
+      "version": "v1.9",
+      "passed": 38,
+      "total": 38
+    }
   },
   "environment": {
     "node": "26.7.0",
@@ -84,13 +93,18 @@
     "commandLineTools": true,
     "swift": true,
     "java": true,
-    "fullXcode": false,
-    "iosSimulatorSdk": false,
+    "fullXcode": true,
+    "iosSimulatorSdk": true,
     "androidSdk": false,
     "adb": false,
     "emulator": false,
-    "simctl": false,
-    "evidence": "mobile/evidence/approved-mvp/native-environment.json"
+    "simctl": true,
+    "evidence": "mobile/evidence/ios-widget-path-fix/native-environment.json",
+    "xcodeVersion": "26.3",
+    "swiftVersion": "6.2.4",
+    "cocoaPodsVersion": "1.17.0",
+    "simulatorRuntime": "iOS26.3",
+    "expoSdkMinimumXcode": "26.4"
   },
   "gapMatrix": [
     {
@@ -166,7 +180,7 @@
     {
       "id": "M15",
       "status": "BLOCKED_ENV",
-      "scopeAndResidual": "6필드 timestamp/open_app bridge·native target/CNG 준비, 경제 명령 없음. 설치/OS 갱신·위젯 실행은 EXT-ENV/ACCOUNT."
+      "scopeAndResidual": "iOS widget source path repaired; Swift compile/link PASS. Whole app compiler failure and Android SDK absence block app/widget OS execution."
     },
     {
       "id": "M16",
@@ -236,7 +250,7 @@
     {
       "id": "V10",
       "status": "PASS",
-      "scopeAndResidual": "이번 소스의 fresh 236개 검사·lint/typecheck·두 OS JS bundle·CNG·독립 QA, BLOCKED_ENV/NOT_RUN 분리."
+      "scopeAndResidual": "Historical236 tests preserved separately. Current targeted source/static checks and widget compilation distinguished from whole-app exit65 and NOT_RUN execution."
     },
     {
       "id": "V11",
@@ -250,7 +264,7 @@
     "EXT-HEALTH real health reads remain OFF",
     "EXT-ACCOUNT actual accounts/cloud/signing",
     "EXT-RELEASE actual payments/store/release/support declaration",
-    "EXT-ENV missing SDK/simulator/device; no system installation"
+    "EXT-ENV Xcode26.3 below ExpoSDK57 minimum26.4; iOS compiler failure, Android SDK absent; system install not performed"
   ],
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
@@ -269,7 +283,7 @@
       "deployment"
     ],
     "publicationRecordScope": "This tracked record is written before its own checkpoint commit; actual HEAD/tracking/live-origin hashes and clean status are recorded after publication.",
-    "verificationEvidence": "mobile/evidence/approved-mvp/publication.json"
+    "verificationEvidence": "mobile/evidence/ios-widget-path-fix/publication.json"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -279,9 +293,37 @@
     "checkpoint": "34ab069",
     "priorTests": "179/179 historical, not reused as current evidence",
     "earlierApp04": "13/13 historical",
-    "earlierApp06": "77/77 historical"
+    "earlierApp06": "77/77 historical",
+    "approvedMvpValidation": {
+      "mobileTests": {
+        "command": "npm test",
+        "tests": 236,
+        "pass": 236,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "exit": 0
+      },
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "androidJsBundle": "PASS_NOT_NATIVE_BUILD",
+      "iosJsBundle": "PASS_NOT_NATIVE_BUILD",
+      "cleanNativeProjectGeneration": "PASS_NOT_NATIVE_BUILD",
+      "nativeAutolinking": "PASS_STATIC_DISCOVERY_NOT_COMPILATION",
+      "workflow": {
+        "passed": 38,
+        "total": 38,
+        "exit": 0
+      },
+      "workflowRegression": "PASS",
+      "evidence": "mobile/evidence/approved-mvp/results.json",
+      "sourceManifest": "mobile/evidence/approved-mvp/staged-source-sha256.json",
+      "nativeEvidence": "mobile/evidence/approved-mvp/native-final-validation.json"
+    },
+    "approvedMvpValidationDate": "2026-09-19"
   },
-  "evidenceDirectory": "mobile/evidence/approved-mvp",
+  "evidenceDirectory": "mobile/evidence/ios-widget-path-fix",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [

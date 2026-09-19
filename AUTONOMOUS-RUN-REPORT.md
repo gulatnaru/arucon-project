@@ -1,8 +1,61 @@
+# iOS 로컬 빌드 오류 수정 실행 보고서
+
+2026-09-20 KST · 시작 `fce0bac7a0b240c3a396edc91f93d4e0c0d6b20c` · `feature/arucon-mobile-autonomous`
+
+## 현재 판정
+
+**WAITING_FOR_HUMAN_DECISIONS / MVP_NOT_COMPLETE**. 첨부 로그의 `AruconWidget/AruconWidget/AruconWidget.swift` 경로 결함을 수정했다. 실제 위젯 Swift compile/link는 통과했지만 **전체 iOS 앱은 아직 빌드 실패**다. Xcode26.3은 Expo SDK57의 [공식 최소26.4+](https://docs.expo.dev/versions/latest/#support-for-android-and-ios-versions)에 미달한다. 시스템 설치는 HS-08 경계로 수행하지 않았다.
+
+## 이번 변경과 검증
+
+- CNG plugin이 위젯 group 안의 파일을 basename으로 참조하고, 기존 잘못된 target도 중복 생성 없이 수리한다. 새 생성·재적용·기존 결함 회귀를 추가했다.
+- `expo-modules-jsi@57.1.0`의 잘못된 constructor `SWIFT_RETURNS_RETAINED` 두 곳을 버전/내용 검사 후 수정하는 postinstall script를 추가했다. 메모리 shared ownership 선언은 유지하며, 다른 버전/예상 밖 소스는 거절한다. [Expo upstream issue49214](https://github.com/expo/expo/issues/49214), 선택/제거 조건은 ADR-008을 따른다.
+- `npm ci --offline` **exit0**, postinstall `patched` 확인. 두 번째 적용은 `already-patched`. package graph는 유지하고 lock의 root install-script metadata만 일치시켰다. npm의 offline audit 표시는 새 네트워크 보안 감사 결과로 사용하지 않는다.
+- 경로/JSI 호환성 영향 테스트 **9/9 PASS**, 독립 reviewer 재실행. 원본 헤더 `swiftc` exit1 → 두 주석만 수정한 헤더 exit0도 독립 재현했다.
+- `npm run lint`, `npm run typecheck` **PASS**. 게임/경제 코드는 변경하지 않았으며 과거 전체236/236을 이번 실행으로 재사용하지 않는다.
+- Expo iOS prebuild 및 generated source 경로 검사 PASS. SDK57 prebuild가 기본 clean으로 ios를 재생성해 Pods/workspace를 지웠으므로 설치돼 있던 CocoaPods로 `pod install --no-repo-update`를 실행해 복구했다(exit0). 재생성 산출물은 ignored이며 Git에 포함하지 않는다.
+
+## 실제 native 실행 결과
+
+| 대상/시도 | 결과 |
+|---|---|
+| 도구 inventory | Xcode26.3 / Swift6.2.4 / CocoaPods1.17.0 / iOS Simulator 사용 가능 |
+| simulator 대상 | iPhone16e, iOS26.3; compile SDK iphonesimulator26.2 |
+| 첫 workspace build | prebuild 직후 workspace 부재 exit66; Pods 복구 후 해결 |
+| Pods 복구 후 build | 위젯 Swift compile/link PASS, JSI constructor annotation 오류로 전체 앱 exit65 |
+| npm ci + constructor patch 후 build | 기존 경로/annotation 오류 없음. `JavaScriptRuntime.swift`의 `resultPtr/thisPtr/argumentsPtr` data-race 진단7개로 전체 앱 **exit65** |
+| iOS 앱 설치/실행·위젯 OS 렌더 | **NOT_RUN** — 전체 앱 build 실패 |
+| Android native/emulator | **BLOCKED_ENV** — SDK/adb/emulator 부재; 이번 Android build 미시도 |
+| physical device / 화면·터치·모션·FPS | **NOT_RUN** |
+| 실제 건강/민감정보·계정·결제·배포 | 수행하지 않음; Health OFF 유지 |
+
+동시성 검사를 끄거나 unchecked pointer 전달을 추가하지 않았다. Xcode26.4+ 환경에서 재빌드해 잔여 호환성을 확인해야 하며, 업그레이드만으로 모든 오류가 해결된다고 보증하지 않는다. 동일 명령을 현재26.3에서 반복해도 앱 실행 검증을 진행할 수 없다. 이번에 시작한 Metro는 종료했다.
+
+## 독립 리뷰·라우팅
+
+- `ios_widget_path_fix`: arucon_builder/Sol 요청 — CNG 수리·회귀·guarded lifecycle patch·ADR-008.
+- `ios_widget_review`: arucon_reviewer/Terra High 요청 — source generation/9개 영향 검사/헤더 Swift 재현·npm ci 검토. 수정 소스는 PASS, 전체 앱 컴파일 P1 실패는 잔여로 분리.
+- `ios_docs_audit`: arucon_explorer/Terra 요청 — 현재 환경 주장과 과거 기록의 문서 감사.
+- `ios_environment_docs`: arucon_luna_worker/Luna 요청 — 모바일 문서의 환경/재개 절차 정정.
+- 루트 Astra 역할 — 실제 도구/빌드 실행·공식 요구 대조·HS-08 판정·통합 문서/Git. 실제 backend model metadata는 미노출이므로 ROUTING_UNVERIFIED.
+
+로그/독립 리뷰: `mobile/evidence/ios-widget-path-fix/`의 `npm-ci.log`, `prebuild.log`, `pod-install.log`, `native-environment.json`, `native-generation.json`, `xcodebuild-after-pods.log`, `xcodebuild-compatibility.log`, `review.md`, `dependency-review.md`. 증거·Pods·node_modules·생성 native·DB·영상은 Git 제외다. 아래 2026-09-19 전체 검증 기록은 당시 이력으로 보존한다.
+
+## Git·재개
+
+feature의 일반 commit/push만 기존 승인 범위로 수행한다. 이 문서는 자기 commit 이전에 쓰며 실제 HEAD/tracking/live origin 및 clean status는 `mobile/evidence/ios-widget-path-fix/publication.json`과 최종 응답에 기록한다. mobile은 root Git 일반 디렉터리다. main/merge/force/tag/release/배포는 하지 않는다.
+
+재개: Xcode26.4+ 환경 준비 후 `npm ci` → 필요 시 `expo prebuild --no-clean --platform ios --no-install`와 `pod install --no-repo-update` → 현재 source/header 확인 → iOS native build → 성공할 때만 simulator 설치·앱 smoke/위젯·lifecycle 검증. 정확한 절차와 남은 외부 경계는 NEXT-RESUME 및 DECISION-QUEUE 참조.
+
+---
+
+## 2026-09-19 승인 MVP 구현 이력 (현재 실행 결과 아님)
+
 # 승인된 MVP 정책 구현·통합 실행 보고서
 
 2026-09-19 · 시작 `34ab069dc874947a0f71ff7b70c3be2b14065e00` · `feature/arucon-mobile-autonomous`
 
-## 판정
+## 2026-09-19 당시 판정
 
 **WAITING_FOR_HUMAN_DECISIONS / MVP_NOT_COMPLETE**. 승인된 여섯 방향과 그 안에서 독립적으로 할 수 있는 로컬 구현·자동검증을 완료했다. 남은 일은 법률 / 실제 건강정보 / 외부 계정 / 실결제·출시 / 시스템 환경이다. 제품 계수·케어표·코인 가격·기술 선택을 다시 사람 결정 대기 상태로 돌리지 않는다.
 
@@ -18,7 +71,7 @@ SRS §14의19행과 §14-1의11행 판정은 [MVP-GAP-MATRIX](MVP-GAP-MATRIX.md)
 - 위젯 strict6필드·시각·open_app bridge와 iOS WidgetKit extension/Android receiver 생성, 앱의 read-only snapshot 게시 경로를 연결했다. 건강 권한·읽기는 OFF, 위젯은 경제 명령을 실행하지 않는다.
 - 앱 안 안내를 우선하고 실제 건강/계정/서버 연결이 아님을 표시한다. 합성 동의/scope/철회·실결제 비활성·원본/비밀 outbound 차단 경계를 유지했다.
 
-## 실제 실행한 최종 검사
+## 2026-09-19 당시 실행한 최종 검사
 
 | 명령/검사 | 결과 | 범위 |
 |---|---|---|
@@ -42,9 +95,9 @@ SRS §14의19행과 §14-1의11행 판정은 [MVP-GAP-MATRIX](MVP-GAP-MATRIX.md)
 - 앱 통합: 미래 자정으로 시계를 전진시키던 수면 fixture를 완료된 전일 기록과 현재 적용 시각으로 수정했다. formId→renderer 계약 및 명시적인 공통 GLB fallback을 연결하고 fresh19/19 독립 재검증을 했다. approved service·합성 sync controller·소유 가구·위젯/상태 안내를 source/계약 검사로 검토했다. 실제 렌더/모션 실행을 대신하지 않는다. 최종 review 기록은 `review-app*.md/log`다.
 - 중간 WIP typecheck 실패와 최초 native 환경 실패는 숨기지 않고 해당 로그에 보존했다. 최종 소스의 정적 검사와 자동 테스트는 위 표 기준이다.
 
-## 환경·simulator·physical device 구분
+## 2026-09-19 당시 환경 기록 (현재 환경 아님)
 
-macOS에 Command Line Tools/Swift와 Java21이 있다. full Xcode/iOS Simulator SDK/simctl/CocoaPods 및 Android SDK/platform/build-tools/adb/emulator가 없다. 시스템 설치·관리자 작업·계정 인증은 수행하지 않았다.
+2026-09-19 당시 macOS에는 Command Line Tools/Swift와 Java21이 있었고, full Xcode/iOS Simulator SDK/simctl/CocoaPods 및 Android SDK/platform/build-tools/adb/emulator는 없었다. 아래 표는 그날의 결과다. 2026-09-20 현재 환경·실패 결과는 이 문서 맨 위 표를 따른다. 당시 시스템 설치·관리자 작업·계정 인증은 수행하지 않았다.
 
 | 대상 | 결과 |
 |---|---|
@@ -75,6 +128,6 @@ CNG 생성/Swift parse/JS bundle을 실기기 통과로 표현하지 않는다. 
 
 이 문서는 자신의 checkpoint commit 이전에 작성된다. 이 문서를 포함하는 HEAD/원격 추적/live origin의 최종 비교와 clean status는 `mobile/evidence/approved-mvp/publication.json` 및 최종 응답에 기록한다. main push/merge, force/history rewrite, tag/release, 배포는 수행하지 않는다.
 
-## 다음 작업
+## 2026-09-19 당시 다음 작업 (최신 절차는 NEXT-RESUME)
 
 [DECISION-QUEUE](DECISION-QUEUE.md)의 준비된 외부/환경 가지부터 재개한다. SDK 준비만 되면 실제 건강 읽기 OFF 상태로 native compile/simulator 및 별도 physical device 검증을 먼저 수행할 수 있다. 건강/실계정/법적 정책/결제·출시는 명시된 추가 승인 범위에서만 수행한다. 승인된 여섯 제품 방향은 다시 승인 요청하지 않는다.

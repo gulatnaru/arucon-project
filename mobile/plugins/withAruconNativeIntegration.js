@@ -208,9 +208,81 @@ function stripQuotes(value) {
 function findTarget(project, name) {
   const section = project.pbxNativeTargetSection();
   for (const [uuid, target] of Object.entries(section)) {
-    if (!uuid.endsWith('_comment') && stripQuotes(target?.name) === name) return { uuid, target };
+    if (!uuid.endsWith('_comment') && stripQuotes(target?.name) === name) {
+      return { uuid, pbxNativeTarget: target };
+    }
   }
   return null;
+}
+
+function findGroup(project, name) {
+  const section = project.hash.project.objects.PBXGroup ?? {};
+  for (const [uuid, group] of Object.entries(section)) {
+    if (!uuid.endsWith('_comment') && stripQuotes(group?.name) === name) return { uuid, pbxGroup: group };
+  }
+  return null;
+}
+
+function findWidgetSourceFileReference(project, target) {
+  const buildPhases = project.hash.project.objects.PBXSourcesBuildPhase ?? {};
+  const buildFiles = project.hash.project.objects.PBXBuildFile ?? {};
+  const fileReferences = project.pbxFileReferenceSection();
+  for (const phaseReference of target.pbxNativeTarget.buildPhases ?? []) {
+    const phase = buildPhases[phaseReference.value];
+    if (!phase) continue;
+    for (const buildFileReference of phase.files ?? []) {
+      const buildFile = buildFiles[buildFileReference.value];
+      const fileReference = buildFile && fileReferences[buildFile.fileRef];
+      const referenceName = path.basename(stripQuotes(fileReference?.name ?? fileReference?.path ?? ''));
+      if (referenceName === `${IOS_WIDGET_TARGET_NAME}.swift`) {
+        return { uuid: buildFile.fileRef, fileReference };
+      }
+    }
+  }
+  return null;
+}
+
+function resolveIosWidgetSourceReference(project, target) {
+  const sourceReference = findWidgetSourceFileReference(project, target);
+  if (!sourceReference) return null;
+
+  const groups = project.hash.project.objects.PBXGroup ?? {};
+  const groupPaths = [];
+  let childUuid = sourceReference.uuid;
+  const visited = new Set();
+  while (!visited.has(childUuid)) {
+    visited.add(childUuid);
+    const parentEntry = Object.entries(groups).find(([uuid, group]) =>
+      !uuid.endsWith('_comment') && group?.children?.some(child => child.value === childUuid));
+    if (!parentEntry) break;
+    const [parentUuid, parentGroup] = parentEntry;
+    const groupPath = stripQuotes(parentGroup.path ?? '');
+    if (groupPath) groupPaths.unshift(groupPath);
+    childUuid = parentUuid;
+  }
+
+  return {
+    fileRefUuid: sourceReference.uuid,
+    relativePath: path.posix.join(
+      ...groupPaths.map(value => value.replaceAll('\\', '/')),
+      stripQuotes(sourceReference.fileReference.path).replaceAll('\\', '/'),
+    ),
+  };
+}
+
+function repairIosWidgetSourceReference(project, target, group) {
+  const sourceReference = findWidgetSourceFileReference(project, target);
+  if (!sourceReference) {
+    throw new Error(`${IOS_WIDGET_TARGET_NAME} target is missing its Swift source reference`);
+  }
+
+  sourceReference.fileReference.path = `${IOS_WIDGET_TARGET_NAME}.swift`;
+  sourceReference.fileReference.sourceTree = '"<group>"';
+  const existingChildren = group.pbxGroup.children ?? [];
+  if (!existingChildren.some(child => child.value === sourceReference.uuid)) {
+    existingChildren.push({ value: sourceReference.uuid, comment: `${IOS_WIDGET_TARGET_NAME}.swift` });
+  }
+  group.pbxGroup.children = existingChildren;
 }
 
 function configureWidgetTargetBuildSettings(project, target) {
@@ -230,29 +302,37 @@ function configureWidgetTargetBuildSettings(project, target) {
 }
 
 function addIosWidgetTarget(project) {
-  if (findTarget(project, IOS_WIDGET_TARGET_NAME)) return project;
-  const target = project.addTarget(
-    IOS_WIDGET_TARGET_NAME,
-    'app_extension',
-    IOS_WIDGET_TARGET_NAME,
-    IOS_WIDGET_BUNDLE_IDENTIFIER,
-  );
-  const sourcePath = `${IOS_WIDGET_TARGET_NAME}/${IOS_WIDGET_TARGET_NAME}.swift`;
-  project.addBuildPhase([sourcePath], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
-  project.addBuildPhase([], 'PBXFrameworksBuildPhase', 'Frameworks', target.uuid);
-  project.addBuildPhase([], 'PBXResourcesBuildPhase', 'Resources', target.uuid);
-  project.addFramework('System/Library/Frameworks/WidgetKit.framework', { target: target.uuid });
-  project.addFramework('System/Library/Frameworks/SwiftUI.framework', { target: target.uuid });
-  const group = project.addPbxGroup([sourcePath], IOS_WIDGET_TARGET_NAME, IOS_WIDGET_TARGET_NAME);
-  project.addToPbxGroup(group.uuid, project.getFirstProject().firstProject.mainGroup);
+  let target = findTarget(project, IOS_WIDGET_TARGET_NAME);
+  let group = findGroup(project, IOS_WIDGET_TARGET_NAME);
+  if (!target) {
+    target = project.addTarget(
+      IOS_WIDGET_TARGET_NAME,
+      'app_extension',
+      IOS_WIDGET_TARGET_NAME,
+      IOS_WIDGET_BUNDLE_IDENTIFIER,
+    );
+    const sourcePath = `${IOS_WIDGET_TARGET_NAME}/${IOS_WIDGET_TARGET_NAME}.swift`;
+    project.addBuildPhase([sourcePath], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
+    project.addBuildPhase([], 'PBXFrameworksBuildPhase', 'Frameworks', target.uuid);
+    project.addBuildPhase([], 'PBXResourcesBuildPhase', 'Resources', target.uuid);
+    project.addFramework('System/Library/Frameworks/WidgetKit.framework', { target: target.uuid });
+    project.addFramework('System/Library/Frameworks/SwiftUI.framework', { target: target.uuid });
+    group = project.addPbxGroup([], IOS_WIDGET_TARGET_NAME, IOS_WIDGET_TARGET_NAME);
+    project.addToPbxGroup(group.uuid, project.getFirstProject().firstProject.mainGroup);
+    project.addTargetAttribute('ProvisioningStyle', 'Automatic', target);
+    project.addTargetAttribute('SystemCapabilities', {
+      'com.apple.ApplicationGroups.iOS': { enabled: 1 },
+    }, target);
+    project.addTargetAttribute('SystemCapabilities', {
+      'com.apple.ApplicationGroups.iOS': { enabled: 1 },
+    }, project.getFirstTarget());
+  }
+  if (!group) {
+    group = project.addPbxGroup([], IOS_WIDGET_TARGET_NAME, IOS_WIDGET_TARGET_NAME);
+    project.addToPbxGroup(group.uuid, project.getFirstProject().firstProject.mainGroup);
+  }
+  repairIosWidgetSourceReference(project, target, group);
   configureWidgetTargetBuildSettings(project, target);
-  project.addTargetAttribute('ProvisioningStyle', 'Automatic', target);
-  project.addTargetAttribute('SystemCapabilities', {
-    'com.apple.ApplicationGroups.iOS': { enabled: 1 },
-  }, target);
-  project.addTargetAttribute('SystemCapabilities', {
-    'com.apple.ApplicationGroups.iOS': { enabled: 1 },
-  }, project.getFirstTarget());
   return project;
 }
 
@@ -303,6 +383,7 @@ module.exports._internal = {
   applyAndroidWidgetReceiver,
   applyIosWidgetAppGroup,
   createWidgetGenerationPlan,
+  resolveIosWidgetSourceReference,
   applyAndroidHealthDeclarations,
   applyIosHealthDeclarations,
 };

@@ -21,7 +21,9 @@ npm start
 
 `npm run ios`/`npm run android`는 로컬 개발 빌드를 만들고 실행합니다. Expo Go나 브라우저 캡처를 설치형 앱 검증으로 대신하지 않습니다. 장치 없이 JavaScript 자산 묶기만 확인하려면 `npx expo export --platform ios --output-dir dist`를 사용합니다. `ios/`, `android/`, `dist/`, `node_modules/`는 Git 대상이 아닙니다.
 
-현재 환경에는 full Xcode/iOS Simulator와 Android SDK/emulator가 없어 네이티브 compile은 `BLOCKED_ENV`, simulator/physical device 실행은 `NOT_RUN`입니다. 위 명령은 해당 도구가 설치된 환경에서만 실행할 수 있습니다. 로컬 MVP의 입력은 `SYNTHETIC_LOCAL` 합성 활동·수면 세션이며, 위젯은 마지막 갱신 시각을 보여 주는 read-only 앱 연결입니다.
+2026-09-20 KST 재확인: Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0은 사용 가능하지만 Android SDK/adb/emulator는 없습니다. 위젯 소스의 Swift 컴파일·링크는 통과했으나 Expo SDK 57의 앱 네이티브 컴파일은 `JavaScriptRuntime.swift` Swift 동시성 오류로 exit 65였고, SDK 57 공식 요구 Xcode 26.4 이상에도 미달합니다. 따라서 앱 native compile은 `BLOCKED_ENV`, simulator 앱 실행과 physical device 실행은 `NOT_RUN`입니다. `expo prebuild`는 SDK 57에서 ios 프로젝트를 정리할 수 있으므로 재생성 시 `--no-clean`을 지원하는 현재 CLI인지 먼저 `npx expo prebuild --help`로 확인하고, 기존 native 산출물을 보존해야 할 때만 해당 옵션을 사용합니다. 이 기록은 npm ci 성공이나 JavaScript 번들 성공을 native build PASS로 해석하지 않습니다.
+
+로컬 MVP의 입력은 `SYNTHETIC_LOCAL` 합성 활동·수면 세션이며, 위젯은 마지막 갱신 시각을 보여 주는 read-only 앱 연결입니다.
 
 동기화 데모는 한 쓰기 기기와 명시적 handoff를 사용합니다. fake authority는 앱 재시작 뒤 재생성하지 않으며, durable writer fence와 충돌 증거를 보존합니다. 이 경계는 로컬 검증용이며 실제 서버 권한이나 계정 복구를 증명하지 않습니다.
 

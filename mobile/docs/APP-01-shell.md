@@ -18,4 +18,4 @@
 
 ## 미리 확인된 환경 제약
 
-이 개발 호스트는 Node.js 26.7.0과 Xcode Command Line Tools만 확인됐다. `xcodebuild -version`은 전체 Xcode가 없어 실패했다. `adb`/`emulator` 명령도 발견되지 않았다. 네이티브 실행/캡처를 못하면 `확인 불가`로 분리한다. 전역 SDK 설치나 계정 생성은 실행하지 않았다.
+역사적 APP-01 기록 당시에는 Node.js 26.7.0과 Xcode Command Line Tools만 확인됐다. 2026-09-20 KST 재확인에서는 Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0이 사용 가능했지만 Android SDK/adb/emulator는 없었다. 위젯 Swift 컴파일·링크는 통과했으나 앱 native compile은 Swift 동시성 오류로 exit 65였고, 앱 실행·화면 캡처는 수행하지 않았다. 이 문서의 네이티브 수용 판정은 계속 `확인 불가`/`BLOCKED_ENV`이며 전역 SDK 설치나 계정 생성은 실행하지 않았다.

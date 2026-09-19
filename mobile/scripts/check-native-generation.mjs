@@ -6,6 +6,8 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const xcode = require('xcode');
+const { resolveIosWidgetSourceReference } =
+  require('../plugins/withAruconNativeIntegration')._internal;
 
 const projectRoot = process.cwd();
 const outputArg = process.argv.indexOf('--output');
@@ -87,6 +89,10 @@ const combinedModule = `${swiftModule}\n${kotlinModule}\n${swiftWidgetModule}\n$
 const nativeTargets = parsedXcodeProject.pbxNativeTargetSection();
 const widgetTarget = Object.entries(nativeTargets).find(([key, value]) =>
   !key.endsWith('_comment') && `${value?.name ?? ''}`.replaceAll('"', '') === 'AruconWidget');
+const widgetSourceReference = widgetTarget ? resolveIosWidgetSourceReference(parsedXcodeProject, {
+  uuid: widgetTarget[0],
+  pbxNativeTarget: widgetTarget[1],
+}) : null;
 
 const checks = {
   pluginRegistered: Boolean(pluginEntry),
@@ -103,6 +109,8 @@ const checks = {
   noPermissionRequestApi: !/request(?:Read)?Permission|requestPermissions/.test(combinedModule),
   iosXcodeProjectParses: Boolean(parsedXcodeProject),
   iosWidgetTargetGenerated: Boolean(widgetTarget),
+  iosWidgetSourceReferenceResolvesToGeneratedFile:
+    widgetSourceReference?.relativePath === 'AruconWidget/AruconWidget.swift',
   iosTargetAttributesHaveNoUndefinedKey: !iosProjectText.includes('\n\t\t\t\t\tundefined = {'),
   iosMainAndWidgetTargetsHaveAppGroupCapability: (iosProjectText.match(/com\.apple\.ApplicationGroups\.iOS/gu) ?? []).length === 2,
   iosWidgetBundleAndEntitlementsGenerated: iosProjectText.includes('PRODUCT_BUNDLE_IDENTIFIER = "com.arucon.dev.widget"') &&

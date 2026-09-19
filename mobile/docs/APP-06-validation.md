@@ -1,13 +1,17 @@
 # APP-06 — 통합 QA 기록
 
-기준일: 2026-09-19 KST. 체크포인트 `3b52a5b`에서 기존 구현을 유지하여 APP-05/06을 재개한 모바일 개발 후보다. 과거 별도 `mobile` 저장소의 55개 테스트·Windows 빌드 기록은 이 소스의 증거로 재사용하지 않는다. 전체 판정은 **PARTIAL**이며 설치형 앱 실행과 MVP 출시 완료를 뜻하지 않는다.
+기준일: 2026-09-19 KST의 APP-06 실행 기록이며, 2026-09-20 KST 네이티브 재검증 결과를 아래 최신 부록에 덧붙였다. 체크포인트 `3b52a5b`에서 기존 구현을 유지하여 APP-05/06을 재개한 모바일 개발 후보다. 과거 별도 `mobile` 저장소의 55개 테스트·Windows 빌드 기록은 이 소스의 증거로 재사용하지 않는다. 전체 판정은 **PARTIAL**이며 설치형 앱 실행과 MVP 출시 완료를 뜻하지 않는다.
+
+### 2026-09-20 네이티브 재검증 부록
+
+Xcode 26.3, iOS 26.3 iPhone 16e Simulator, Swift 6.2.4, CocoaPods 1.17.0을 확인했다. 위젯 `AruconWidget.swift`는 실제 xcodebuild에서 컴파일·링크됐지만 앱 빌드는 `JavaScriptRuntime.swift` Swift 동시성 오류로 exit 65였다. Expo SDK 57의 공식 Xcode 26.4 이상 요구에도 미달하므로 앱 native compile은 **BLOCKED_ENV**로 유지한다. Simulator 앱 실행, widget OS 렌더링, physical device 검증은 **NOT_RUN**이다. Android SDK/adb/emulator도 없다. 기존 77/77 및 번들 결과는 2026-09-19 실행 증거이며 이번 native 실패를 덮어쓰지 않는다.
 
 ## 실행 환경과 증거
 
 - macOS, Node 26.7.0, npm 11.19.0, Expo SDK 57, React Native 0.86.3, React 19.2.3.
 - Python 3.12.14 번들 런타임으로 저장소 문서 검사 38/38과 회귀 assertion을 실행했다. 시스템 Python 3.9.6은 `tomllib`이 없어 사용할 수 없었다.
 - 로컬 증거 폴더: `../evidence/resume-app05-06/`. 로그와 생성 번들은 Git에서 제외된다. 최종 명령·결과는 루트 [실행 보고서](../../AUTONOMOUS-RUN-REPORT.md)에 기록한다.
-- Xcode/Simulator와 Android SDK/adb가 없다. Java 21만 설치되어 있다. 네이티브 개발 빌드·위젯 extension은 **BLOCKED_ENV**이며 실제 앱 캡처·영상·FPS·Expo SQLite 네이티브 실행·APK/IPA는 **NOT_RUN / 확인 불가**다. Metro export는 JavaScript/자산 번들 검사다.
+- 당시 APP-06 실행 시점에는 Xcode/Simulator와 Android SDK/adb가 없었다. 최신 재검증에서는 Xcode/Simulator가 확인됐지만 앱 native compile이 exit 65로 실패했다. 따라서 네이티브 개발 빌드·앱 실행·위젯 OS 렌더링은 **BLOCKED_ENV / NOT_RUN**이며 실제 앱 캡처·영상·FPS·Expo SQLite 네이티브 실행·APK/IPA도 **NOT_RUN / 확인 불가**다. Metro export는 JavaScript/자산 번들 검사다.
 - GLB 사본 SHA-256은 `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`이며 원본과 동일하다. 승인 아트를 재디자인하지 않았다.
 - 앱 자체 코드의 `fetch`, URL, 콘솔 로그, 실제 건강 SDK·인증·결제 연결을 검색했다. 합성 활동/수면과 로컬 SQLite만 사용한다. 이는 의존성 전체에 대한 보안 감사나 실제 OS 권한 검증을 뜻하지 않는다.
 

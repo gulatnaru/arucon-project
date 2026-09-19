@@ -6,7 +6,8 @@
 
 1. AGENTS.md, AUTONOMOUS-STATUS.json, AUTONOMOUS-RUN-REPORT.md, DECISION-SUMMARY.md, DECISION-QUEUE.md, MVP-GAP-MATRIX.md와 SRS14/14-1 및 관련 DEC/ADR를 읽는다.
 2. feature/arucon-mobile-autonomous, root Git 일반 mobile 디렉터리, mobile/.git/gitlink 없음과 변경 상태를 확인한다. 기존 작업을 다시 구현하지 않는다.
-3. 이번 최종 자동 검사 236/236, lint/typecheck/두 OS JS bundle 및 CNG/static 검사는 실행됐으나 미래 작업의 fresh 증거로 재사용하지 않는다. native compile BLOCKED_ENV, simulator/physical device/visual runtime NOT_RUN이다.
+3. 2026-09-19 전체236/236 및 두 OS JS bundle은 과거 이력이다. 2026-09-20 위젯 경로/JSI constructor 호환성 수정 후 npm ci 재현 및 영향 검사를 실행했다. 위젯 Swift compile/link는 통과했으나 전체 앱 xcodebuild는 JavaScriptRuntime.swift pointer data-race 7개로 exit65다. Xcode26.3은 Expo SDK57의 공식 최소26.4+ 미달이다. simulator 자체는 사용 가능하며 앱/physical device/visual runtime은 NOT_RUN이다.
+4. ADR-008과 `mobile/evidence/ios-widget-path-fix/`를 확인한다. Xcode26.4+ 환경 제공 뒤 설치된 도구만 사용해 재빌드한다. 현재 26.3에서 같은 명령 반복이나 concurrency 검사 완화로 PASS를 만들지 않는다. Expo57 prebuild는 기본 clean이므로 기존 생성 프로젝트를 유지하려면 `--no-clean`을 명시한다.
 
 ## 진화형 runtime 아트 잔여
 

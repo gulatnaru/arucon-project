@@ -6,6 +6,10 @@ This checkpoint adds local contracts, build-discoverable Expo Modules, and gener
 
 The independent local scaffold is complete within its source/static scope. It does not satisfy the SRS 14-1 physical-device gate.
 
+## Latest host result (2026-09-20 KST)
+
+Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0, and an iPhone 16e iOS 26.3 Simulator are available. Android SDK/adb/emulator are absent. The corrected widget source path compiled and linked in the native build, but the app build stopped at `JavaScriptRuntime.swift` with seven Swift concurrency errors (xcodebuild exit 65). Expo SDK 57 documents Xcode 26.4 or newer for this toolchain, so native app compilation remains `BLOCKED_ENV`; simulator app launch and physical-device/widget OS rendering remain `NOT_RUN`. This updates the older environment paragraph below without changing its historical evidence.
+
 ## Health boundary
 
 - `NativeHealthBridge` returns only a daily activity aggregate or a versioned sleep score. Raw samples, source payloads, GPS, audio, and user identifiers cannot cross this TypeScript boundary.
@@ -47,7 +51,7 @@ After clean prebuild, run `node scripts/check-native-generation.mjs --output evi
 
 ## Remaining device gate
 
-Tracked widget targets and build generation are ready. Native compilation/runtime remains `BLOCKED_ENV / NOT_RUN` until the platform SDKs are available. The required follow-up is:
+Tracked widget targets and build generation are ready. Native compilation/runtime remains `BLOCKED_ENV / NOT_RUN` until a supported iOS toolchain and Android SDK are available. The required follow-up is:
 
 1. install or select the platform SDKs on an authorized host and perform the first build/launch with health reads OFF; approve only the product/legal details needed for later operational activation (technical structure is adopted under ADR-002/007);
 2. activate the existing config-plugin declaration gate with reviewed usage text and release scope;
@@ -80,7 +84,7 @@ Run `node scripts/check-native-environment.mjs --output evidence/approved-mvp/na
 - Offline clean prebuild generates and embeds `AruconWidget`, applies the development App Group to both iOS targets, and generates the Android provider/receiver/resources.
 - `node scripts/check-native-generation.mjs --output evidence/approved-mvp/native-generation.json` parses the Xcode project and verifies target attributes, exact source copies, receiver metadata, last-confirmed timestamp, no automatic cadence, `open_app` only, and absence of health declarations.
 - Apple and Android autolinking resolve both `arucon-health` and `arucon-widget`.
-- Current host evidence: Swift and Java are present; full Xcode/simulator SDK/CocoaPods and Android SDK/adb/emulator are absent. The iOS compile attempt reached `xcodebuild` and stopped because only Command Line Tools are selected. The Android attempt stopped before compilation because the sandbox denied creation of the Gradle distribution lock; the separate inventory also confirms the Android SDK is absent. Module invocation, widget install/render, simulator/emulator, and physical device remain `BLOCKED_ENV / NOT_RUN`.
+- Historical host evidence above remains preserved. The latest iOS attempt reached and compiled/linked the widget target, then stopped in the app's ExpoModulesJSI/React Native Swift concurrency path (xcodebuild exit 65). Android SDK/adb/emulator remain absent. Module invocation, widget install/render, simulator app launch, and physical device remain `BLOCKED_ENV / NOT_RUN`.
 
 Official security references checked 2026-09-19:
 

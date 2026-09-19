@@ -2,9 +2,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 const plugin = require('../../plugins/withAruconNativeIntegration');
+const xcode = require('xcode');
 const {
   ANDROID_HEALTH_CONNECT_PACKAGE,
   ANDROID_HEALTH_READ_PERMISSIONS,
@@ -12,8 +14,24 @@ const {
   applyAndroidWidgetReceiver,
   applyIosHealthDeclarations,
   applyIosWidgetAppGroup,
+  addIosWidgetTarget,
   createWidgetGenerationPlan,
+  resolveIosWidgetSourceReference,
 } = plugin._internal;
+
+function widgetTargets(project) {
+  return Object.entries(project.pbxNativeTargetSection()).filter(([key, value]) =>
+    !key.endsWith('_comment') && `${value?.name ?? ''}`.replaceAll('"', '') === 'AruconWidget');
+}
+
+function widgetTarget(project) {
+  const [uuid, pbxNativeTarget] = widgetTargets(project)[0];
+  return { uuid, pbxNativeTarget };
+}
+
+function projectFixture(relativePath) {
+  return xcode.project(fileURLToPath(new URL(relativePath, import.meta.url))).parseSync();
+}
 
 function names(entries) {
   return (entries ?? []).map(entry => entry.$?.['android:name']);
@@ -113,4 +131,39 @@ test('widget generation adds only the development App Group and read-only Androi
   assert.deepEqual(names(applyAndroidWidgetReceiver(enabled, false).manifest.application[0].receiver), [
     'com.example.UnrelatedReceiver',
   ]);
+});
+
+test('fresh iOS widget target resolves its source once through the group path', () => {
+  const project = projectFixture(
+    '../../node_modules/react-native-safe-area-context/ios/RNSafeAreaContext.xcodeproj/project.pbxproj',
+  );
+
+  addIosWidgetTarget(project);
+  const target = widgetTarget(project);
+  const resolved = resolveIosWidgetSourceReference(project, target);
+  const fileReference = project.pbxFileReferenceSection()[resolved.fileRefUuid];
+  assert.equal(resolved.relativePath, 'AruconWidget/AruconWidget.swift');
+  assert.equal(fileReference.path, 'AruconWidget.swift');
+  assert.equal(fileReference.sourceTree, '"<group>"');
+
+  addIosWidgetTarget(project);
+  assert.equal(widgetTargets(project).length, 1);
+  assert.deepEqual(resolveIosWidgetSourceReference(project, widgetTarget(project)), resolved);
+});
+
+test('existing iOS widget target repairs a duplicated group-relative source path', () => {
+  const project = projectFixture('../../ios/app.xcodeproj/project.pbxproj');
+  const target = widgetTarget(project);
+  const before = resolveIosWidgetSourceReference(project, target);
+  const fileReference = project.pbxFileReferenceSection()[before.fileRefUuid];
+  fileReference.path = 'AruconWidget/AruconWidget.swift';
+
+  addIosWidgetTarget(project);
+
+  assert.equal(
+    resolveIosWidgetSourceReference(project, widgetTarget(project)).relativePath,
+    'AruconWidget/AruconWidget.swift',
+  );
+  assert.equal(fileReference.path, 'AruconWidget.swift');
+  assert.equal(fileReference.sourceTree, '"<group>"');
 });

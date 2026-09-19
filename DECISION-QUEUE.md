@@ -36,9 +36,9 @@
 
 ## EXT-ENV — 시스템 환경·기기
 
-- 남은 사람 작업: full Xcode/iOS Simulator와 Android SDK/emulator/테스트 기기를 준비하거나 필요한 시스템 설치를 별도 수행/승인.
-- 재조사: CLT/Swift와 Java는 존재하나 실제 native app compile에 필요한 SDK/Simulator/Android toolchain이 없다. 최신 inventory는 `mobile/evidence/approved-mvp/native-environment.json`.
-- 준비 범위: source templates·CNG generation·autolinking·정적 syntax/config tests. 설치되지 않은 SDK를 자동 설치하지 않는다.
+- 남은 사람 작업: Expo SDK 57의 [공식 최소 Xcode 26.4+](https://docs.expo.dev/versions/latest/#support-for-android-and-ios-versions)를 충족하는 개발 환경과 Android SDK/emulator/테스트 기기 준비. 시스템 설치는 사용자가 별도 수행/승인한다.
+- 2026-09-20 재조사: Xcode26.3/Swift6.2.4/CocoaPods1.17.0 및 iPhone16e iOS26.3 simulator는 사용 가능하다. Android SDK/adb/emulator는 없다. 최신 inventory는 `mobile/evidence/ios-widget-path-fix/native-environment.json`.
+- 실행/잔여: 위젯 Swift compile/link PASS. 전체 앱은 경로와 constructor annotation 수정 후에도 ExpoModulesJSI JavaScriptRuntime.swift의 pointer data-race 진단 7개로 xcodebuild exit65. iOS는 도구 부재가 아닌 공식 최소 미달/컴파일 호환성 BLOCKED_ENV다. simulator 앱 실행·OS 위젯 렌더·실기기 NOT_RUN. ADR-008의 재현 가능한 프로젝트 수정은 완료했고 동시성 검사는 완화하지 않았다.
 - 선택지: 이미 준비된 개발 호스트/기기 제공 / 관리자가 필요한 SDK 설치 / 로컬 계약 검사 상태 유지. **추천: 준비된 개발 환경 제공.**
 - 이후 첫 검증: environment inventory → 실제 건강 읽기 OFF native compile/simulator → lifecycle/저장/화면/위젯·모션/FPS → physical device 검증. simulator와 실기기는 별도 기록.
 
