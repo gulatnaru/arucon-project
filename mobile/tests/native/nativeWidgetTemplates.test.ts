@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const mobileRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const templateRoot = path.join(mobileRoot, 'native/arucon-widget-template');
+const widgetBridgePodspec = path.join(mobileRoot, 'native/arucon-widget/ios/AruconWidgetBridge.podspec');
 
 async function source(relativePath: string) {
   return readFile(path.join(templateRoot, relativePath), 'utf8');
@@ -103,4 +104,9 @@ test('widget templates use DEV identifiers while provisioning and OS execution r
   assert.equal(contract.ios.extensionBundleIdentifier, 'com.arucon.dev.widget');
   assert.equal(contract.android.providerClass, 'com.arucon.widget.AruconWidgetProvider');
   assert.equal(contract.activation, 'development_enabled');
+});
+
+test('iOS widget bridge supports the host deployment floor so Expo registers the module', async () => {
+  const podspec = await readFile(widgetBridgePodspec, 'utf8');
+  assert.match(podspec, /s\.platforms\s*=\s*\{ :ios => '15\.1' \}/);
 });

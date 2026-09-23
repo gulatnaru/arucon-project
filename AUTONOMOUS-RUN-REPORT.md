@@ -1,5 +1,16 @@
 # Expo SDK 55 호환성 마이그레이션 보고서
 
+## 2026-09-20 Simulator 검증 최신 부록
+
+현재 HEAD는 `0f102f8`, 브랜치는 `feature/arucon-mobile-autonomous`이며 이번 검증에서는 commit/push를 수행하지 않았다. `open -a Simulator`는 exit0, iPhone 16e iOS 26.3 Simulator는 booted 상태였다. `simctl launch <Simulator> com.arucon.dev`는 exit0과 PID 18389를 반환했고 `ps`로 프로세스를 확인했다. `pluginkit`으로 `com.arucon.dev.widget` 등록도 확인했다. 이번에는 native 재빌드를 하지 않았으며, 기존 SDK55 `xcodebuild` exit0 증거를 유지한다.
+
+새 targeted native/scene/storage/widget 검사는 **64/64 PASS**다. `01-launch.png`는 빈 배경의 앱 열기 확인창, `02-loaded.png`와 `03-direct-launch.png`는 개발 클라이언트의 “No development servers found” 배경 위 확인창이다. 02와 03만 SHA-256이 동일하며 별개의 동작 증거가 아니다. CUA가 Mac 잠금 상태에서 차단되어 사용자의 잠금 해제 대기 중이므로 실제 방/GLB/이동/목적지 변경/쓰다듬기/식사/수면/SQLite 종료 복원/background/reduced-motion/safe-area/widget 홈 렌더는 **NOT_RUN / BLOCKED_HOST_LOCKED**다. 현재 Accessibility/Screen Recording 권한 상태는 잠금 때문에 확인하지 못했다. 위젯 extension 등록은 PASS지만 GLB 또는 WidgetKit visual PASS로 해석하지 않는다. physical device는 NOT_RUN, Health는 계속 OFF다. Metro는 localhost:8081에서 실행 중이며 연결·번들 로드 성공은 아직 확인되지 않았다.
+
+이번 명령/cwd/시각/HEAD/원시 출력은 `mobile/evidence/simulator-validation/commands-verified.log`, 13개 요청 항목과 증거 SHA는 같은 폴더 `session.md`에 기록했다. Terra explorer는 실제 UI/저장 호출 경로를 매핑했고 Terra reviewer는 화면·단위 검사·문서의 판정 범위를 검토했다. Luna는 상태 문서를 정정했다. 각 effective model은 `ROUTING_UNVERIFIED`이며 제품 결함이 확정되지 않아 구현 역할은 호출하지 않았다.
+
+## SDK55 마이그레이션 이력
+
+
 2026-09-20 KST · baseline `0e795d9` · `feature/arucon-mobile-autonomous` · **SDK55 체크포인트 commit/push 수행**
 
 ## 현재 결과

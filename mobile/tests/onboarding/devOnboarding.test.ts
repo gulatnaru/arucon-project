@@ -24,6 +24,22 @@ test('proposed name bounds are applied only to the DEV preview', () => {
   assert.equal(normalizeDevGivenName('가'.repeat(12)).length, 12);
 });
 
+test('grapheme validation works without Intl.Segmenter as on Hermes', () => {
+  const descriptor = Object.getOwnPropertyDescriptor(Intl, 'Segmenter');
+  Object.defineProperty(Intl, 'Segmenter', { configurable: true, value: undefined });
+  try {
+    assert.equal(normalizeDevGivenName(' 구름 '), '구름');
+    assert.equal(normalizeDevGivenName('👨‍👩‍👧‍👦'.repeat(12)), '👨‍👩‍👧‍👦'.repeat(12));
+    assert.throws(() => normalizeDevGivenName('👨‍👩‍👧‍👦'.repeat(13)), /1–12 graphemes/);
+
+    const draft = setSyntheticAge({ ...createDevOnboardingDraft(), givenNameInput: 'Sim test' }, '2000-01-01', '2026-09-19');
+    assert.equal(buildDevPetPreview(draft).displayName, 'Sim test콘');
+  } finally {
+    if (descriptor) Object.defineProperty(Intl, 'Segmenter', descriptor);
+    else Reflect.deleteProperty(Intl, 'Segmenter');
+  }
+});
+
 test('synthetic age boundary and guardian state cannot become verified', () => {
   assert.equal(reviewSyntheticAge('2012-09-20', '2026-09-19'), 'test_under_14');
   assert.equal(reviewSyntheticAge('2012-09-19', '2026-09-19'), 'test_14_or_over');

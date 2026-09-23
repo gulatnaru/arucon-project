@@ -1,3 +1,5 @@
+import { countGraphemes } from 'unicode-segmenter/grapheme';
+
 /** Local synthetic preview only. DEC-11 and DEC-15 do not authorize real signup. */
 export type DevAgeRoute = 'unreviewed' | 'test_under_14' | 'test_14_or_over';
 export type DevGuardianConsent = 'not_assessed' | 'pending' | 'revoked';
@@ -26,18 +28,11 @@ export function createDevOnboardingDraft(): DevOnboardingDraft {
   return { kind: 'DEV_FIXTURE_ONLY', givenNameInput: '', testBirthDateInput: '', ageRoute: 'unreviewed', guardianConsent: 'not_assessed' };
 }
 
-function graphemeCount(value: string): number {
-  // A missing Segmenter must fail closed rather than apply a different length rule.
-  const Segmenter = (Intl as typeof Intl & { Segmenter?: new (locale: string, options: { granularity: 'grapheme' }) => { segment: (input: string) => Iterable<unknown> } }).Segmenter;
-  if (!Segmenter) throw new Error('Grapheme segmentation unavailable');
-  return Array.from(new Segmenter('ko', { granularity: 'grapheme' }).segment(value)).length;
-}
-
 /** DEC-15 proposed 1–12 grapheme rule, restricted to a DEV fixture. */
 export function normalizeDevGivenName(input: string): string {
   const value = input.normalize('NFC').trim();
   if (!value || /\p{Cc}/u.test(value)) throw new Error('Invalid given name');
-  const length = graphemeCount(value);
+  const length = countGraphemes(value);
   if (length < 1 || length > 12) throw new Error('Given name must have 1–12 graphemes');
   return value;
 }

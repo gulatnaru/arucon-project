@@ -2,11 +2,11 @@
   "schemaVersion": 6,
   "runDate": "2026-09-20",
   "timezone": "Asia/Seoul",
-  "status": "SDK55_MIGRATION_VALIDATED_WITH_UI_LIMITS",
+  "status": "SDK55_SIMULATOR_PROCESS_VALIDATED_WITH_HOST_LOCK_LIMITS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "Requested SDK55 migration validated on macOS15.6/Xcode26.3 without Expo-internal patches. Native compile/install and simulator process start passed. Expo CLI GUI activation lacks macOS automation permission; visual/interactive/physical and wider MVP gates are not claimed complete.",
-  "sourceBaseline": "0e795d94056f63d3192cbd9422a1c9823f3df401",
+  "reason": "SDK55 native compile/install, simulator process start, widget extension registration, and targeted 64/64 checks passed. Host is locked and CUA access is unavailable, so visual/interactive/widget-home/physical gates remain unrun.",
+  "sourceBaseline": "0f102f839e7db1d4d244ef697c906731f23a780c",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
@@ -19,9 +19,9 @@
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
     "currentRun": {
       "root": "requested Astra integration/native verification",
-      "builder": "sdk55_migration / arucon_builder requested Sol",
-      "explorer": "sdk55_api_audit / arucon_explorer requested Terra",
-      "reviewer": "sdk55_review / arucon_reviewer requested Terra High",
+      "builder": "NOT_INVOKED_NO_PRODUCT_DEFECT_ESTABLISHED",
+      "explorer": "simulator_flow_map / arucon_explorer requested Terra",
+      "reviewer": "simulator_evidence_review / arucon_reviewer requested Terra High",
       "luna": "sdk55_docs / arucon_luna_worker requested Luna"
     }
   },
@@ -35,11 +35,29 @@
     "nativeDevelopmentBuild": "PASS_IOS_ANDROID_NOT_RUN_BLOCKED_ENV",
     "simulatorExecution": "PASS_INSTALL_AND_PROCESS_START_ONLY",
     "physicalDeviceExecution": "NOT_RUN",
-    "visualMotionFps": "NOT_EVALUATED",
+    "visualMotionFps": "NOT_RUN_BLOCKED_HOST_LOCKED",
     "productionPolicies": "SIX_DEFAULTS_APPROVED_EXTERNAL_BOUNDARIES_OFF",
     "formRendering": "APPROVED_2D_REFERENCE_PRESENT_EXPLICIT_COMMON_GLB_FALLBACK_FOUR_RUNTIME_ASSETS_NOT_DELIVERED",
     "iosWidgetCompileAndLink": "PASS_INSTALLED_WITH_APP_NOT_WIDGET_OS_RENDER",
-    "migration": "COMPLETE"
+    "migration": "COMPLETE",
+    "latestSimulatorEvidence": "mobile/evidence/simulator-validation/",
+    "latestSimulatorGate": "PASS_PROCESS_START_AND_WIDGET_REGISTRATION_ONLY",
+    "latestSimulatorBlock": "BLOCKED_HOST_LOCKED",
+    "latestTargetedRegression": "64/64 PASS",
+    "simulatorValidation": {
+      "selectedChecks": "64/64 PASS",
+      "runtime": "iOS26.3_iPhone16e_AVAILABLE",
+      "processStart": "PASS_PID18389",
+      "widgetRegistration": "PASS_COM_ARUCON_DEV_WIDGET",
+      "screenshots": "01-blank-background_confirmation; 02-and-03-identical-development-client-background_confirmation",
+      "host": "BLOCKED_HOST_LOCKED_CUA_ACCESS_UNAVAILABLE",
+      "currentAccessibilityAndScreenRecordingPermissions": "UNVERIFIED_HOST_LOCKED",
+      "rawEvidence": "mobile/evidence/simulator-validation/commands-verified.log",
+      "requestMatrix": "mobile/evidence/simulator-validation/session.md",
+      "visualAndInteraction": "NOT_RUN_BLOCKED_HOST_LOCKED",
+      "physicalDevice": "NOT_RUN",
+      "metro": "RUNNING_LOCALHOST_8081"
+    }
   },
   "implemented": [
     "가입·연령·이름: 로컬 합성 온보딩/명명·scope·철회 계약. 실제 미성년 동의·가입은 EXT-LEGAL/ACCOUNT.",
@@ -63,7 +81,7 @@
     "비난 없는 안내: 앱 안 상태 안내 우선·중립 문구·합성 알림 중복/철회 검사. 실제 발송 비활성."
   ],
   "lastValidation": {
-    "scope": "SDK55 migration plus generated widget executable repair",
+    "scope": "SDK55 migration history; latest simulator validation is recorded separately",
     "mobileTests": {
       "command": "npm test",
       "tests": 239,
@@ -325,8 +343,10 @@
     ],
     "publicationRecordScope": "This tracked record is written before its own checkpoint commit; final local/tracking/live-origin hashes and clean status are recorded in ignored evidence and the final response.",
     "verificationEvidence": "mobile/evidence/sdk55-migration/final-git-audit.json",
-    "commitPerformed": true,
-    "pushPerformed": true,
+    "commitPerformed": false,
+    "pushPerformed": false,
+    "checkpoint": "0f102f8",
+    "originCheckpointHistory": "SDK55 migration checkpoint was committed/pushed before this simulator validation; this run made no commit/push",
     "preCheckpointHead": "0e795d94056f63d3192cbd9422a1c9823f3df401"
   },
   "realHealthDataRead": false,

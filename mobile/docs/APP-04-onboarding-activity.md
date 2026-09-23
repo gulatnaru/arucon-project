@@ -4,7 +4,7 @@
 
 ## DEV 온보딩
 
-`DevOnboardingScreen`은 이름 본문과 합성 생년월일을 받아 `DevPetPreview` 한 개를 반환한다. 입력창의 `콘`은 고정 표시하고 저장용 `givenName`과 `formId=arucon`을 분리한다. 이름 1~12 grapheme, NFC, 양끝 공백, 제어문자 검사는 DEC-15의 **DEV fixture**다. `Intl.Segmenter`가 없는 런타임은 다른 분할 규칙으로 조용히 처리하지 않고 오류를 낸다.
+`DevOnboardingScreen`은 이름 본문과 합성 생년월일을 받아 `DevPetPreview` 한 개를 반환한다. 입력창의 `콘`은 고정 표시하고 저장용 `givenName`과 `formId=arucon`을 분리한다. 이름 1~12 grapheme, NFC, 양끝 공백, 제어문자 검사는 DEC-15의 **DEV fixture**다. Hermes처럼 `Intl.Segmenter`가 없는 런타임에서도 `unicode-segmenter`의 UAX #29 extended grapheme 분할을 사용해 같은 1~12 grapheme 정책을 적용한다.
 
 연령 분기는 SRS 원문의 14세 경계를 테스트할 뿐이다. 보호자 상태는 `not_assessed/pending/revoked`만 표현하며 `verified`가 없다. 미성년 합성 미리보기에도 `operationalSignUpEnabled=false`다. 실제 계정, 동의 증빙, 펫 발급, 저장은 이 경계에 없다. 미리보기를 호출자가 반복해서 받아도 이 모듈은 펫·재화를 발급하지 않는다.
 
@@ -18,4 +18,4 @@
 
 ## 검증 경계
 
-합성 테스트는 이름·연령 경계·동의 미검증, 상태 의미, 입력 유효성, 공급자 혼합 차단, 중복·역순 revision, APP-02 활동 정산 연결 후 EXP/체력 불변을 검사한다. `ActivityStatusView`는 아직 화면에 연결되지 않았지만, `DevOnboardingScreen`은 앱에 연결되어 온보딩 완료 시 DEV SQLite(`arucon-dev.db`)에 로컬 펫을 생성한다. 네이티브 렌더·OS 백그라운드·실기기 권한 및 실제 건강 기록은 확인하지 않았다(HS-01/02).
+합성 테스트는 이름·연령 경계·동의 미검증, 상태 의미, 입력 유효성, 공급자 혼합 차단, 중복·역순 revision, APP-02 활동 정산 연결 후 EXP/체력 불변을 검사한다. `Intl.Segmenter`가 없는 조건의 한글 NFC, emoji, 12/13 grapheme 경계와 재현 입력은 Node targeted test 5/5로 통과했다. SDK 55 Hermes Simulator의 수정 후 온보딩 완료는 별도 런타임 검증 중이다. `ActivityStatusView`는 아직 화면에 연결되지 않았지만, `DevOnboardingScreen`은 앱에 연결되어 온보딩 완료 시 DEV SQLite(`arucon-dev.db`)에 로컬 펫을 생성한다. 네이티브 렌더·OS 백그라운드·실기기 권한 및 실제 건강 기록은 확인하지 않았다(HS-01/02).

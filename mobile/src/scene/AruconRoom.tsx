@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, AppState, type AppStateStatus, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { AccessibilityInfo, AppState, type AppStateStatus, PixelRatio, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { GLView, type ExpoWebGLRenderingContext } from 'expo-gl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RoomController, type ProjectedHits } from './RoomController';
+import { roomRenderSurfaceScale, selectRoomRendererConfig } from './rendererConfig';
 import type { RoomProps } from './types';
 
 export type { RoomProps } from './types';
+
+const RENDERER_CONFIG = selectRoomRendererConfig(__DEV__);
+const RENDER_SURFACE_SCALE = roomRenderSurfaceScale(PixelRatio.get(), RENDERER_CONFIG.maxPixelRatio);
+const RENDER_SURFACE_PERCENT = `${RENDER_SURFACE_SCALE * 100}%` as `${number}%`;
 
 export function AruconRoom(props: RoomProps) {
   const insets = useSafeAreaInsets();
@@ -79,7 +84,17 @@ export function AruconRoom(props: RoomProps) {
 
   return (
     <View style={styles.root} onLayout={onLayout}>
-      <GLView style={StyleSheet.absoluteFill} onContextCreate={onContextCreate} />
+      <View pointerEvents="none" style={styles.renderSurface}>
+        <GLView
+          style={{
+            width: RENDER_SURFACE_PERCENT,
+            height: RENDER_SURFACE_PERCENT,
+            transform: [{ scale: 1 / RENDER_SURFACE_SCALE }],
+          }}
+          msaaSamples={RENDERER_CONFIG.msaaSamples}
+          onContextCreate={onContextCreate}
+        />
+      </View>
       <Pressable
         testID="floor-hit-area"
         accessibilityRole="button"
@@ -126,6 +141,7 @@ export function AruconRoom(props: RoomProps) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#f2ebdc' },
+  renderSurface: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
   floorHit: { position: 'absolute', left: 0, right: 0 },
   petHit: { position: 'absolute', width: 74, height: 86, borderRadius: 35 },
   furnitureHit: { position: 'absolute', width: 52, height: 52, borderRadius: 26 },

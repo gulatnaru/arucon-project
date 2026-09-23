@@ -2,12 +2,13 @@ import { Asset } from 'expo-asset';
 import { File } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FLOOR, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
 import { disposeSceneObject, retainLoadedModel, RafGate } from './lifecycle';
 import { COMMON_PREVIEW_ASSET_KEY, selectFormPresentation, type FormPresentation } from './formPresentation';
 import { holdReducedPose } from './clipPresentation';
+import { parseGlb } from './gltfRuntime';
+import { selectRoomRendererConfig } from './rendererConfig';
 import type { FloorPoint, RoomProps } from './types';
 
 // The source artifact is copied byte-for-byte from references/floor-navigation-03.
@@ -36,6 +37,7 @@ export class RoomController {
     new THREE.MeshBasicMaterial({ color: 0x9eaa92 }),
   );
   private readonly furniture: Partial<Record<HitName, THREE.Object3D>> = {};
+  private readonly rendererConfig = selectRoomRendererConfig(__DEV__);
   private mixer?: THREE.AnimationMixer;
   private modelReady = false;
   private clips = new Map<string, THREE.AnimationClip>();
@@ -87,7 +89,11 @@ export class RoomController {
       addEventListener: () => {},
       removeEventListener: () => {},
     } as unknown as HTMLCanvasElement;
-    this.renderer = new THREE.WebGLRenderer({ canvas, context: gl as unknown as WebGLRenderingContext, antialias: true });
+    this.renderer = new THREE.WebGLRenderer({
+      canvas,
+      context: gl as unknown as WebGLRenderingContext,
+      antialias: this.rendererConfig.contextAntialias,
+    });
     // Expo GL already supplies a device-resolution drawing buffer.
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight, false);
@@ -151,7 +157,9 @@ export class RoomController {
   }
 
   private material(color: number, roughness = 0.95) {
-    return new THREE.MeshStandardMaterial({ color, roughness });
+    return this.rendererConfig.roomMaterial === 'lambert'
+      ? new THREE.MeshLambertMaterial({ color })
+      : new THREE.MeshStandardMaterial({ color, roughness });
   }
 
   private addBox(parent: THREE.Object3D, color: number, size: [number, number, number], at: [number, number, number]) {
@@ -208,9 +216,7 @@ export class RoomController {
       const bytes = await new File(asset.localUri).bytes();
       if (this.disposed) return;
       const data = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
-      const gltf = await new Promise<Awaited<ReturnType<GLTFLoader['parseAsync']>>>((resolve, reject) => {
-        new GLTFLoader().parse(data, '', resolve, reject);
-      });
+      const gltf = await parseGlb(data);
       const loaded = retainLoadedModel(gltf.scene, this.disposed);
       if (!loaded) return;
       loaded.scale.setScalar(0.62);

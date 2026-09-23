@@ -6,7 +6,9 @@ Pod::Spec.new do |s|
   s.license        = { :type => 'Proprietary' }
   s.author         = 'Arucon'
   s.homepage       = 'https://github.com/gulatnaru/arucon-project'
-  s.platforms      = { :ios => '16.4' }
+  # Keep the disabled scaffold linkable by the app target so Expo can register
+  # the contract module without enabling a health API or permission.
+  s.platforms      = { :ios => '15.1' }
   s.swift_version  = '5.9'
   s.source         = { :git => 'https://github.com/gulatnaru/arucon-project.git' }
   s.static_framework = true

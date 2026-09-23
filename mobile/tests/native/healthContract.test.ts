@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   FailClosedNativeActivityProvider,
   FailClosedNativeSleepScoreProvider,
@@ -17,6 +20,9 @@ import {
   IOS_HEALTHKIT_SCAFFOLD,
   NATIVE_HEALTH_READ_DEFAULTS,
 } from '../../src/native/platformDeclarations';
+
+const mobileRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const healthPodspec = path.join(mobileRoot, 'native/arucon-health/ios/AruconHealth.podspec');
 
 const day: GameDayWindow = { id: '2026-09-19', timezone: 'Asia/Seoul', startUtcMs: 1_000, endUtcMs: 10_000 };
 
@@ -141,4 +147,10 @@ test('native declaration scaffold requests read-only minimums and no background 
   assert.deepEqual(ANDROID_HEALTH_CONNECT_SCAFFOLD.readPermissions, [
     'android.permission.health.READ_STEPS', 'android.permission.health.READ_SLEEP',
   ]);
+});
+
+test('disabled iOS health scaffold supports the host deployment floor for module registration', async () => {
+  const podspec = await readFile(healthPodspec, 'utf8');
+  assert.match(podspec, /s\.platforms\s*=\s*\{ :ios => '15\.1' \}/);
+  assert.doesNotMatch(podspec, /HealthKit|HKHealthStore|requestAuthorization/);
 });
