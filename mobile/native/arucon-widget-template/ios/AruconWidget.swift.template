@@ -98,6 +98,17 @@ private struct AruconWidgetEntry: TimelineEntry {
   let projection: PetProjection?
 }
 
+private extension View {
+  @ViewBuilder
+  func aruconWidgetBackground(_ color: Color) -> some View {
+    if #available(iOSApplicationExtension 17.0, *) {
+      containerBackground(for: .widget) { color }
+    } else {
+      background(color)
+    }
+  }
+}
+
 private struct AruconWidgetProvider: TimelineProvider {
   private func entry() -> AruconWidgetEntry {
     switch ReadOnlySnapshotStore.read() {
@@ -126,6 +137,20 @@ private struct AruconWidgetProvider: TimelineProvider {
 private struct AruconWidgetView: View {
   let entry: AruconWidgetEntry
 
+  private let cardBackground = Color(red: 1.0, green: 0.976, blue: 0.941)
+  private let primaryText = Color(red: 0.251, green: 0.200, blue: 0.180)
+  private let secondaryText = Color(red: 0.357, green: 0.298, blue: 0.271)
+
+  private var formDisplayName: String {
+    switch entry.projection?.formId {
+    case "mallu": return "말루"
+    case "mono": return "모노"
+    case "piko": return "피코"
+    case "mongle": return "몽글"
+    default: return "아루콘"
+    }
+  }
+
   private var stateText: String {
     switch entry.status {
     case .stale: return "마지막 확인 상태 · 앱에서 확인"
@@ -148,13 +173,34 @@ private struct AruconWidgetView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading) {
-      Text(entry.projection?.formId ?? "아루콘")
-      Text(stateText)
+    VStack(alignment: .leading, spacing: 6) {
+      HStack(spacing: 8) {
+        Image("arucon_widget_pet")
+          .resizable()
+          .scaledToFit()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .accessibilityLabel("아루콘의 모습")
+        VStack(alignment: .leading, spacing: 3) {
+          Text(formDisplayName)
+            .font(.headline)
+            .foregroundStyle(primaryText)
+            .lineLimit(1)
+          Text(stateText)
+            .font(.caption)
+            .foregroundStyle(secondaryText)
+            .lineLimit(2)
+        }
+      }
       if let lastUpdatedText {
-        Text(lastUpdatedText).font(.caption2)
+        Text(lastUpdatedText)
+          .font(.caption2)
+          .foregroundStyle(secondaryText)
+          .lineLimit(1)
+          .minimumScaleFactor(0.75)
       }
     }
+    .padding(12)
+    .aruconWidgetBackground(cardBackground)
     .widgetURL(openAppURL)
   }
 }

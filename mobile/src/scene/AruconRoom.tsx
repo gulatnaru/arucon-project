@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, AppState, type AppStateStatus, PixelRatio, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { GLView, type ExpoWebGLRenderingContext } from 'expo-gl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RoomController, type ProjectedHits } from './RoomController';
+import { RoomController } from './RoomController';
+import type { ProjectedHits } from './projectedHits';
+import { shouldResumeRoomOnContext } from './lifecycle';
 import { roomRenderSurfaceScale, selectRoomRendererConfig } from './rendererConfig';
 import type { RoomProps } from './types';
 
@@ -37,7 +39,7 @@ export function AruconRoom(props: RoomProps) {
       controller.current = room;
       room.setPresentation({ ...latest.current, reducedMotion: systemReduced || latest.current.reducedMotion });
       void room.loadPet();
-      if (AppState.currentState === 'active') room.resume();
+      if (shouldResumeRoomOnContext(AppState.currentState)) room.resume();
     } catch (cause) {
       setError(`방을 열지 못했어요: ${cause instanceof Error ? cause.message : String(cause)}`);
     }

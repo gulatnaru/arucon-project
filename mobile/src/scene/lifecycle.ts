@@ -16,6 +16,15 @@ export function retainLoadedModel<T extends THREE.Object3D>(root: T, disposed: b
   return root;
 }
 
+/**
+ * Android can create the GL context before React Native resolves the initial
+ * AppState. Treat that startup-only unknown state as foreground-ready; explicit
+ * inactive/background states remain paused and later events own the lifecycle.
+ */
+export function shouldResumeRoomOnContext(appState: string | null): boolean {
+  return appState === null || appState === 'unknown' || appState === 'active';
+}
+
 export class RafGate {
   private id: number | null = null;
   private active = false;

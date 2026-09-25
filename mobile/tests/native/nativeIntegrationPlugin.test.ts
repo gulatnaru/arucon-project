@@ -1,7 +1,10 @@
 // @ts-nocheck -- the config plugin is intentionally CommonJS for Expo CLI loading.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
@@ -11,6 +14,7 @@ const {
   ANDROID_HEALTH_CONNECT_PACKAGE,
   ANDROID_HEALTH_READ_PERMISSIONS,
   applyAndroidHealthDeclarations,
+  applyAndroidFontScaleConfigChange,
   applyAndroidWidgetReceiver,
   applyIosHealthDeclarations,
   applyIosWidgetAppGroup,
@@ -28,6 +32,24 @@ function widgetTargets(project) {
 function widgetTarget(project) {
   const [uuid, pbxNativeTarget] = widgetTargets(project)[0];
   return { uuid, pbxNativeTarget };
+}
+
+function widgetPetAssetResource(project, target) {
+  const fileReferences = project.pbxFileReferenceSection();
+  const widgetGroup = Object.entries(project.hash.project.objects.PBXGroup ?? {}).find(([uuid, value]) =>
+    !uuid.endsWith('_comment') && `${value?.path ?? value?.name ?? ''}`.replaceAll('"', '') === 'AruconWidget');
+  assert.ok(widgetGroup, 'widget group is required');
+  const fileRef = (widgetGroup[1].children ?? [])
+    .map(child => [child.value, fileReferences[child.value]])
+    .find(([, value]) => `${value?.path ?? ''}`.replaceAll('"', '') === 'arucon_widget_pet.png');
+  assert.ok(fileRef, 'widget pet asset file reference is required');
+  const relativePath = `${widgetGroup[1].path ?? ''}/${fileRef[1].path ?? ''}`
+    .replaceAll('"', '').replaceAll('\\', '/');
+  const buildFiles = project.hash.project.objects.PBXBuildFile ?? {};
+  const resourcePhase = project.pbxResourcesBuildPhaseObj(target.uuid);
+  const memberships = (resourcePhase.files ?? []).filter(reference =>
+    buildFiles[reference.value]?.fileRef === fileRef[0]);
+  return { relativePath, memberships };
 }
 
 function projectFixture(relativePath) {
@@ -85,6 +107,27 @@ test('explicit declaration mode emits read-only minimums and requires reviewed i
     /WRITE|BACKGROUND|HISTORY|ACTIVITY_RECOGNITION|RECORD_AUDIO|LOCATION/.test(name)), false);
 });
 
+test('Android MainActivity handles font scale changes without recreating the JS runtime', () => {
+  const base = { manifest: { application: [{ activity: [
+    { $: { 'android:name': 'com.example.UnrelatedActivity', 'android:configChanges': 'orientation' } },
+    { $: { 'android:name': '.MainActivity', 'android:configChanges': 'keyboard|screenSize' } },
+  ] }] } };
+  const configured = applyAndroidFontScaleConfigChange(base);
+  assert.equal(configured.manifest.application[0].activity[0].$['android:configChanges'], 'orientation');
+  assert.equal(
+    configured.manifest.application[0].activity[1].$['android:configChanges'],
+    'keyboard|screenSize|fontScale',
+  );
+  assert.equal(
+    applyAndroidFontScaleConfigChange(configured).manifest.application[0].activity[1].$['android:configChanges'],
+    'keyboard|screenSize|fontScale',
+  );
+  assert.throws(
+    () => applyAndroidFontScaleConfigChange({ manifest: { application: [{}] } }),
+    /Android MainActivity is required/u,
+  );
+});
+
 test('widget generation plan fixes DEV-only identifiers, six fields, five states and open_app only', () => {
   assert.deepEqual(createWidgetGenerationPlan(), {
     mode: 'cng_source_and_target',
@@ -97,11 +140,13 @@ test('widget generation plan fixes DEV-only identifiers, six fields, five states
       appGroup: 'group.com.arucon.dev.widget',
       extensionBundleIdentifier: 'com.arucon.dev.widget',
       sourceTemplate: 'native/arucon-widget-template/ios/AruconWidget.swift.template',
+      petAssetTemplate: 'native/arucon-widget-template/assets/arucon_widget_pet.png',
     },
     android: {
       providerClass: 'com.arucon.widget.AruconWidgetProvider',
       sharedPreferences: 'arucon.widget.snapshot.v1',
       sourceTemplate: 'native/arucon-widget-template/android/src/com/arucon/widget/AruconWidgetProvider.kt.template',
+      petAssetTemplate: 'native/arucon-widget-template/assets/arucon_widget_pet.png',
     },
     targetActivation: 'development_enabled',
   });
@@ -144,7 +189,7 @@ test('iOS widget Info.plist names the generated extension executable', () => {
   });
 });
 
-test('fresh iOS widget target resolves its source once through the group path', () => {
+test('fresh iOS widget target resolves source and pet resource once through the group path', async t => {
   const project = projectFixture(
     '../../node_modules/react-native-safe-area-context/ios/RNSafeAreaContext.xcodeproj/project.pbxproj',
   );
@@ -156,25 +201,83 @@ test('fresh iOS widget target resolves its source once through the group path', 
   assert.equal(resolved.relativePath, 'AruconWidget/AruconWidget.swift');
   assert.equal(fileReference.path, 'AruconWidget.swift');
   assert.equal(fileReference.sourceTree, '"<group>"');
+  const initialResource = widgetPetAssetResource(project, target);
+  assert.equal(initialResource.relativePath, 'AruconWidget/arucon_widget_pet.png');
+  assert.equal(initialResource.memberships.length, 1);
+  assert.equal(initialResource.memberships[0].comment, 'arucon_widget_pet.png in Resources');
 
   addIosWidgetTarget(project);
   assert.equal(widgetTargets(project).length, 1);
   assert.deepEqual(resolveIosWidgetSourceReference(project, widgetTarget(project)), resolved);
+  assert.equal(widgetPetAssetResource(project, widgetTarget(project)).memberships.length, 1);
+
+  const resourcePhase = project.pbxResourcesBuildPhaseObj(target.uuid);
+  const detached = widgetPetAssetResource(project, target).memberships[0];
+  resourcePhase.files = resourcePhase.files.filter(reference => reference.value !== detached.value);
+  delete project.hash.project.objects.PBXBuildFile[detached.value];
+  delete project.hash.project.objects.PBXBuildFile[`${detached.value}_comment`];
+  addIosWidgetTarget(project);
+  assert.equal(widgetPetAssetResource(project, widgetTarget(project)).memberships.length, 1);
+
+  const temporaryDirectory = await mkdtemp(join(tmpdir(), 'arucon-widget-resource-pbxproj-'));
+  t.after(async () => rm(temporaryDirectory, { recursive: true, force: true }));
+  const temporaryProjectPath = join(temporaryDirectory, 'project.pbxproj');
+  await writeFile(temporaryProjectPath, project.writeSync(), 'utf8');
+  const reparsed = xcode.project(temporaryProjectPath).parseSync();
+  assert.deepEqual(widgetPetAssetResource(reparsed, widgetTarget(reparsed)), {
+    relativePath: 'AruconWidget/arucon_widget_pet.png',
+    memberships: widgetPetAssetResource(reparsed, widgetTarget(reparsed)).memberships,
+  });
+  assert.equal(widgetPetAssetResource(reparsed, widgetTarget(reparsed)).memberships.length, 1);
 });
 
-test('existing iOS widget target repairs a duplicated group-relative source path', () => {
-  const project = projectFixture('../../ios/app.xcodeproj/project.pbxproj');
-  const target = widgetTarget(project);
-  const before = resolveIosWidgetSourceReference(project, target);
-  const fileReference = project.pbxFileReferenceSection()[before.fileRefUuid];
-  fileReference.path = 'AruconWidget/AruconWidget.swift';
+test('iOS widget resource ignores a same-named file outside the widget group', () => {
+  const project = projectFixture(
+    '../../node_modules/react-native-safe-area-context/ios/RNSafeAreaContext.xcodeproj/project.pbxproj',
+  );
+  project.addFile('arucon_widget_pet.png', project.getFirstProject().firstProject.mainGroup);
+  addIosWidgetTarget(project);
+  const matchingReferences = Object.entries(project.pbxFileReferenceSection()).filter(([uuid, value]) =>
+    !uuid.endsWith('_comment') && `${value?.path ?? ''}`.replaceAll('"', '') === 'arucon_widget_pet.png');
+  assert.equal(matchingReferences.length, 2);
+  const resource = widgetPetAssetResource(project, widgetTarget(project));
+  assert.equal(resource.relativePath, 'AruconWidget/arucon_widget_pet.png');
+  assert.equal(resource.memberships.length, 1);
+});
+
+test('existing iOS widget target repairs a duplicated group-relative source path', async t => {
+  const generatedProject = projectFixture(
+    '../../node_modules/react-native-safe-area-context/ios/RNSafeAreaContext.xcodeproj/project.pbxproj',
+  );
+  addIosWidgetTarget(generatedProject);
+  const generatedTarget = widgetTarget(generatedProject);
+  const generatedSource = resolveIosWidgetSourceReference(generatedProject, generatedTarget);
+  generatedProject.pbxFileReferenceSection()[generatedSource.fileRefUuid].path =
+    'AruconWidget/AruconWidget.swift';
+
+  const temporaryDirectory = await mkdtemp(join(tmpdir(), 'arucon-widget-pbxproj-'));
+  t.after(async () => {
+    assert.equal(dirname(temporaryDirectory), tmpdir());
+    assert.match(basename(temporaryDirectory), /^arucon-widget-pbxproj-/u);
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  });
+  const temporaryProjectPath = join(temporaryDirectory, 'project.pbxproj');
+  await writeFile(temporaryProjectPath, generatedProject.writeSync(), 'utf8');
+
+  const project = xcode.project(temporaryProjectPath).parseSync();
+  const duplicated = resolveIosWidgetSourceReference(project, widgetTarget(project));
+  assert.equal(duplicated.relativePath, 'AruconWidget/AruconWidget/AruconWidget.swift');
 
   addIosWidgetTarget(project);
+  await writeFile(temporaryProjectPath, project.writeSync(), 'utf8');
 
+  const repairedProject = xcode.project(temporaryProjectPath).parseSync();
+  const repaired = resolveIosWidgetSourceReference(repairedProject, widgetTarget(repairedProject));
+  const repairedFileReference = repairedProject.pbxFileReferenceSection()[repaired.fileRefUuid];
   assert.equal(
-    resolveIosWidgetSourceReference(project, widgetTarget(project)).relativePath,
+    repaired.relativePath,
     'AruconWidget/AruconWidget.swift',
   );
-  assert.equal(fileReference.path, 'AruconWidget.swift');
-  assert.equal(fileReference.sourceTree, '"<group>"');
+  assert.equal(repairedFileReference.path, 'AruconWidget.swift');
+  assert.equal(repairedFileReference.sourceTree, '"<group>"');
 });

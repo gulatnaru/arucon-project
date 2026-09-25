@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { RafGate, retainLoadedModel } from '../../src/scene/lifecycle';
+import { RafGate, retainLoadedModel, shouldResumeRoomOnContext } from '../../src/scene/lifecycle';
 import { MOTION, advanceWalk, shouldPauseDecorativeMotion, springStep, reducedPoseTime, cueDuration } from '../../src/scene/motion';
 import { holdReducedPose } from '../../src/scene/clipPresentation';
+import { projectedHitsEqual, type ProjectedHits } from '../../src/scene/projectedHits';
 
 test('late GLB parse after unmount disposes geometry and material', () => {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -33,6 +34,49 @@ test('foreground resume schedules exactly one RAF and pause cancels it', () => {
   gate.stop(); stale(0);
   assert.equal(gate.scheduled, false);
   assert.equal(gate.running, false);
+});
+
+test('cold Android GL context starts while initial AppState is unresolved', () => {
+  let requests = 0;
+  const cancelled: number[] = [];
+  const gate = new RafGate(() => { requests++; return requests; }, id => cancelled.push(id));
+  assert.equal(shouldResumeRoomOnContext(null), true);
+  assert.equal(shouldResumeRoomOnContext('unknown'), true);
+  assert.equal(shouldResumeRoomOnContext('active'), true);
+  assert.equal(shouldResumeRoomOnContext('inactive'), false);
+  assert.equal(shouldResumeRoomOnContext('background'), false);
+  if (shouldResumeRoomOnContext(null)) gate.resume(() => {});
+  assert.equal(requests, 1);
+  assert.equal(gate.running, true);
+  assert.equal(gate.scheduled, true);
+  gate.stop();
+  assert.deepEqual(cancelled, [1]);
+});
+
+test('idle hit projections are deduplicated while visible movement is published', () => {
+  const previous: ProjectedHits = {
+    pet: { x: 100, y: 200, visible: true },
+    table: { x: 20, y: 30, visible: true },
+    cushion: { x: 40, y: 50, visible: false },
+    toilet: { x: 60, y: 70, visible: false },
+    ball: { x: 80, y: 90, visible: false },
+  };
+  const unchanged = Object.fromEntries(
+    Object.entries(previous).map(([name, hit]) => [name, { ...hit }]),
+  ) as ProjectedHits;
+  assert.equal(projectedHitsEqual(previous, unchanged), true);
+  assert.equal(projectedHitsEqual(previous, {
+    ...unchanged,
+    pet: { ...unchanged.pet, x: unchanged.pet.x + 0.49 },
+  }), true);
+  assert.equal(projectedHitsEqual(previous, {
+    ...unchanged,
+    pet: { ...unchanged.pet, x: unchanged.pet.x + 0.51 },
+  }), false);
+  assert.equal(projectedHitsEqual(previous, {
+    ...unchanged,
+    ball: { ...unchanged.ball, visible: true },
+  }), false);
 });
 
 test('reduced motion holds idle, touch and meal poses while keeping manual travel', () => {

@@ -8,6 +8,7 @@ const {
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const plist = require('@expo/plist').default;
+const PbxFile = require('xcode/lib/pbxFile');
 
 const IOS_HEALTH_ENTITLEMENT = 'com.apple.developer.healthkit';
 const IOS_HEALTH_READ_DESCRIPTION = 'NSHealthShareUsageDescription';
@@ -22,6 +23,10 @@ const IOS_WIDGET_TARGET_NAME = 'AruconWidget';
 const IOS_WIDGET_APP_GROUP = 'group.com.arucon.dev.widget';
 const IOS_WIDGET_BUNDLE_IDENTIFIER = 'com.arucon.dev.widget';
 const ANDROID_WIDGET_PROVIDER = 'com.arucon.widget.AruconWidgetProvider';
+const WIDGET_PET_ASSET_TEMPLATE = 'native/arucon-widget-template/assets/arucon_widget_pet.png';
+const ANDROID_WIDGET_BACKGROUND_TEMPLATE =
+  'native/arucon-widget-template/android/res/drawable/arucon_widget_background.xml.template';
+const IOS_WIDGET_PET_ASSET_NAME = 'arucon_widget_pet.png';
 const WIDGET_TEMPLATE_PLAN = Object.freeze({
   mode: 'cng_source_and_target',
   devOnlyIdentifiers: true,
@@ -35,11 +40,13 @@ const WIDGET_TEMPLATE_PLAN = Object.freeze({
     appGroup: IOS_WIDGET_APP_GROUP,
     extensionBundleIdentifier: IOS_WIDGET_BUNDLE_IDENTIFIER,
     sourceTemplate: 'native/arucon-widget-template/ios/AruconWidget.swift.template',
+    petAssetTemplate: WIDGET_PET_ASSET_TEMPLATE,
   }),
   android: Object.freeze({
     providerClass: ANDROID_WIDGET_PROVIDER,
     sharedPreferences: 'arucon.widget.snapshot.v1',
     sourceTemplate: 'native/arucon-widget-template/android/src/com/arucon/widget/AruconWidgetProvider.kt.template',
+    petAssetTemplate: WIDGET_PET_ASSET_TEMPLATE,
   }),
   targetActivation: 'development_enabled',
 });
@@ -92,6 +99,20 @@ function applyAndroidHealthDeclarations(androidManifest, options) {
     if (root.queries.length === 0) root.queries.push(query);
     else root.queries[0] = query;
   }
+  return nextManifest;
+}
+
+function applyAndroidFontScaleConfigChange(androidManifest) {
+  const nextManifest = structuredClone(androidManifest);
+  const activities = nextManifest.manifest.application?.[0]?.activity ?? [];
+  const mainActivity = activities.find(activity => {
+    const name = activity?.$?.['android:name'];
+    return name === '.MainActivity' || name?.endsWith('.MainActivity');
+  });
+  if (!mainActivity) throw new Error('Android MainActivity is required');
+  const configChanges = `${mainActivity.$['android:configChanges'] ?? ''}`.split('|').filter(Boolean);
+  if (!configChanges.includes('fontScale')) configChanges.push('fontScale');
+  mainActivity.$['android:configChanges'] = configChanges.join('|');
   return nextManifest;
 }
 
@@ -160,6 +181,16 @@ function withAndroidWidgetSources(config, enabled) {
       'native/arucon-widget-template/android/res/xml/arucon_widget_info.xml.template',
       path.join(platformRoot, 'app/src/main/res/xml/arucon_widget_info.xml'),
     );
+    await copyTemplate(
+      root,
+      ANDROID_WIDGET_BACKGROUND_TEMPLATE,
+      path.join(platformRoot, 'app/src/main/res/drawable/arucon_widget_background.xml'),
+    );
+    await copyTemplate(
+      root,
+      WIDGET_PET_ASSET_TEMPLATE,
+      path.join(platformRoot, 'app/src/main/res/drawable-nodpi/arucon_widget_pet.png'),
+    );
     return current;
   }]);
 }
@@ -187,6 +218,11 @@ function withIosWidgetSources(config, enabled) {
       root,
       WIDGET_TEMPLATE_PLAN.ios.sourceTemplate,
       path.join(targetRoot, `${IOS_WIDGET_TARGET_NAME}.swift`),
+    );
+    await copyTemplate(
+      root,
+      WIDGET_PET_ASSET_TEMPLATE,
+      path.join(targetRoot, IOS_WIDGET_PET_ASSET_NAME),
     );
     await fs.writeFile(
       path.join(targetRoot, `${IOS_WIDGET_TARGET_NAME}-Info.plist`),
@@ -286,6 +322,38 @@ function repairIosWidgetSourceReference(project, target, group) {
   group.pbxGroup.children = existingChildren;
 }
 
+function ensureIosWidgetPetAssetResource(project, target, group) {
+  const fileReferences = project.pbxFileReferenceSection();
+  const groupChildren = group.pbxGroup.children ?? [];
+  let fileRefEntry = groupChildren
+    .map(child => [child.value, fileReferences[child.value]])
+    .find(([, fileReference]) => stripQuotes(fileReference?.path) === IOS_WIDGET_PET_ASSET_NAME);
+  let resourceFile;
+  if (!fileRefEntry) {
+    resourceFile = new PbxFile(IOS_WIDGET_PET_ASSET_NAME, { target: target.uuid });
+    resourceFile.fileRef = project.generateUuid();
+    project.addToPbxFileReferenceSection(resourceFile);
+    project.addToPbxGroup(resourceFile, group.uuid);
+    fileRefEntry = [resourceFile.fileRef, fileReferences[resourceFile.fileRef]];
+  }
+
+  const resourcePhase = project.pbxResourcesBuildPhaseObj(target.uuid);
+  const buildFiles = project.hash.project.objects.PBXBuildFile ?? {};
+  const alreadyBundled = (resourcePhase.files ?? []).some(reference =>
+    buildFiles[reference.value]?.fileRef === fileRefEntry[0]);
+  if (alreadyBundled) return;
+
+  resourceFile ??= {
+    basename: IOS_WIDGET_PET_ASSET_NAME,
+    fileRef: fileRefEntry[0],
+    group: 'Resources',
+  };
+  resourceFile.uuid = project.generateUuid();
+  resourceFile.target = target.uuid;
+  project.addToPbxBuildFileSection(resourceFile);
+  project.addToPbxResourcesBuildPhase(resourceFile);
+}
+
 function configureWidgetTargetBuildSettings(project, target) {
   const list = project.hash.project.objects.XCConfigurationList[target.pbxNativeTarget.buildConfigurationList];
   const configurations = project.pbxXCBuildConfigurationSection();
@@ -333,6 +401,7 @@ function addIosWidgetTarget(project) {
     project.addToPbxGroup(group.uuid, project.getFirstProject().firstProject.mainGroup);
   }
   repairIosWidgetSourceReference(project, target, group);
+  ensureIosWidgetPetAssetResource(project, target, group);
   configureWidgetTargetBuildSettings(project, target);
   return project;
 }
@@ -361,7 +430,8 @@ function withAruconNativeIntegration(config, rawOptions = {}) {
   });
   config = withAndroidManifest(config, current => {
     const withoutHealth = applyAndroidHealthDeclarations(current.modResults, options);
-    current.modResults = applyAndroidWidgetReceiver(withoutHealth, options.widgetTargetsEnabled);
+    const withWidget = applyAndroidWidgetReceiver(withoutHealth, options.widgetTargetsEnabled);
+    current.modResults = applyAndroidFontScaleConfigChange(withWidget);
     return current;
   });
   config = withAndroidWidgetSources(config, options.widgetTargetsEnabled);
@@ -382,6 +452,7 @@ module.exports._internal = {
   ANDROID_WIDGET_PROVIDER,
   addIosWidgetTarget,
   applyAndroidWidgetReceiver,
+  applyAndroidFontScaleConfigChange,
   applyIosWidgetAppGroup,
   createWidgetGenerationPlan,
   resolveIosWidgetSourceReference,

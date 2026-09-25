@@ -9,6 +9,7 @@ import { COMMON_PREVIEW_ASSET_KEY, selectFormPresentation, type FormPresentation
 import { holdReducedPose } from './clipPresentation';
 import { parseGlb } from './gltfRuntime';
 import { selectRoomRendererConfig } from './rendererConfig';
+import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
 import type { FloorPoint, RoomProps } from './types';
 
 // The source artifact is copied byte-for-byte from references/floor-navigation-03.
@@ -19,9 +20,6 @@ const PET_ASSET = require('../../assets/arucon_tsundere_motion.glb') as number;
 const FORM_ASSETS: Record<FormPresentation['assetKey'], number> = {
   [COMMON_PREVIEW_ASSET_KEY]: PET_ASSET,
 };
-
-type HitName = 'pet' | 'table' | 'cushion' | 'toilet' | 'ball';
-export type ProjectedHits = Record<HitName, { x: number; y: number; visible: boolean }>;
 
 export class RoomController {
   readonly scene = new THREE.Scene();
@@ -48,6 +46,7 @@ export class RoomController {
   private readonly frames = new RafGate((callback) => requestAnimationFrame(callback), (id) => cancelAnimationFrame(id));
   private disposed = false;
   private width: number;
+  private lastPublishedProjection: ProjectedHits | null = null;
   private height: number;
   private lastProjection = 0;
   private idleTime = 0;
@@ -277,13 +276,16 @@ export class RoomController {
     if (this.disposed || this.width <= 0 || this.height <= 0) return;
     this.scene.updateMatrixWorld(true);
     const pet = this.project(this.petAnchor, 0.75);
-    this.onProjection({
+    const hits: ProjectedHits = {
       pet: { ...pet, visible: this.modelReady && pet.visible },
       table: this.project(this.furniture.table ?? this.scene, 0.45),
       cushion: this.project(this.furniture.cushion ?? this.scene, 0.28),
       toilet: this.project(this.furniture.toilet ?? this.scene, 0.4),
       ball: this.project(this.furniture.ball ?? this.scene, 0.2),
-    });
+    };
+    if (this.lastPublishedProjection && projectedHitsEqual(this.lastPublishedProjection, hits)) return;
+    this.lastPublishedProjection = hits;
+    this.onProjection(hits);
   }
 
   screenToFloor(x: number, y: number): FloorPoint | null {

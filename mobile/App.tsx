@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, AppState, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, AppState, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as SQLite from 'expo-sqlite';
 import { AruconRoom } from './src/scene/AruconRoom';
@@ -16,6 +16,7 @@ import { APPROVED_GAME_CONFIG } from './src/domain/config';
 import { DomainActionRejected } from './src/domain/engine';
 import { initialPet, type PetState } from './src/domain/model';
 import { LocalPetStore, expoSqliteConnection, type SqlConnection } from './src/storage/sqlite';
+import { openAruconDatabase } from './src/storage/appDatabase';
 import type { SyncStatusViewModel } from './src/sync/status';
 import { ReadOnlyWriterError, WriterRegistrationRequiredError } from './src/sync/writeGuard';
 import { approvedLocalExpoNativeWidgetBridge } from './src/native/aruconWidgetModule';
@@ -217,7 +218,7 @@ function AppContent() {
     bootingRef.current = true;
     setPhase('loading');
     try {
-      if (!databaseRef.current) databaseRef.current = await SQLite.openDatabaseAsync('arucon-dev.db');
+      if (!databaseRef.current) databaseRef.current = await openAruconDatabase();
       if (!connectionRef.current) connectionRef.current = expoSqliteConnection(databaseRef.current);
       const connection = connectionRef.current;
       const store = new LocalPetStore(connection, APPROVED_GAME_CONFIG);
@@ -463,6 +464,7 @@ function AppContent() {
     </View>
     <View style={[styles.top, { top: insets.top + 8 }]}>
       <ApprovedStatusPanel
+        name={`${pet.givenName}콘`}
         badge={runtimeBadge}
         migrationNotice={migrationNotice}
         syncText={syncStatus ? syncStatusText(syncStatus) : '동기화 상태 확인 중'}
@@ -471,8 +473,14 @@ function AppContent() {
         widgetText={widgetText}
         writerMode={writerMode}
       />
-      <Pressable accessibilityRole="button" style={styles.fixtureToggle} onPress={() => setFixtureVisible(value => !value)}>
-        <Text style={styles.badgeText}>{fixtureVisible ? '합성 도구 닫기' : '합성 도구'}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="합성 도구 열기"
+        accessibilityState={{ expanded: fixtureVisible }}
+        style={styles.fixtureToggle}
+        onPress={() => setFixtureVisible(true)}
+      >
+        <Text style={styles.badgeText}>합성 도구</Text>
       </Pressable>
     </View>
     <View style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
@@ -484,27 +492,69 @@ function AppContent() {
       {busy && <Text style={styles.notice}>로컬 저장 중…</Text>}
       {journal && <ScrollView style={styles.preview}><Text>생활 기록</Text>{journal.map(entry => <Text key={entry.id}>{journalEventText(entry.event)}</Text>)}</ScrollView>}
       {preview && <ScrollView style={styles.preview}><Text>{preview}</Text></ScrollView>}
-      {fixtureVisible && <ScrollView style={styles.fixtureScroll}><ApprovedFixturePanel onAction={doApprovedAction} /></ScrollView>}
       <LifeRoomControls state={pet} onAction={doLifeAction} />
     </View>
+    <Modal
+      animationType="slide"
+      onRequestClose={() => setFixtureVisible(false)}
+      transparent
+      visible={fixtureVisible}
+    >
+      <View style={[styles.fixtureBackdrop, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20 }]}>
+        <View accessibilityViewIsModal style={styles.fixtureSheet}>
+          <View style={styles.fixtureHeader}>
+            <View style={styles.fixtureHeadingText}>
+              <Text accessibilityRole="header" style={styles.fixtureTitle}>합성 도구</Text>
+              <Text style={styles.fixtureScope}>SOURCE_SYNTHETIC · LOCAL_ONLY</Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="합성 도구 닫기"
+              onPress={() => setFixtureVisible(false)}
+              style={styles.fixtureClose}
+            >
+              <Text style={styles.fixtureCloseText}>닫기</Text>
+            </Pressable>
+          </View>
+          <ScrollView
+            accessibilityLabel="합성 도구 목록"
+            contentContainerStyle={styles.fixtureContent}
+            showsVerticalScrollIndicator
+          >
+            <ApprovedFixturePanel onAction={doApprovedAction} />
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
   </View>;
 }
 
 export default function App() {
-  return <SafeAreaProvider><AppContent /></SafeAreaProvider>;
+  return <SafeAreaProvider>
+    <StatusBar barStyle="dark-content" backgroundColor="#f2ebdc" />
+    <AppContent />
+  </SafeAreaProvider>;
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#f2ebdc' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 12, backgroundColor: '#f2ebdc' },
   onboarding: { flex: 1, backgroundColor: '#f2ebdc' },
-  top: { position: 'absolute', left: 16, right: 16, gap: 5 },
-  fixtureToggle: { alignSelf: 'flex-end', backgroundColor: '#fff9eddd', padding: 8, borderRadius: 10 },
+  top: { position: 'absolute', left: 12, right: 12, flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
+  fixtureToggle: { minHeight: 52, justifyContent: 'center', backgroundColor: '#fff9edee', paddingHorizontal: 10, borderRadius: 12 },
   badgeText: { fontSize: 12, fontWeight: '700', color: '#604638' },
   bottom: { position: 'absolute', left: 8, right: 8, gap: 6 },
   notice: { alignSelf: 'center', backgroundColor: '#fff9eddd', padding: 6, borderRadius: 8, color: '#604638' },
   preview: { maxHeight: 110, backgroundColor: '#fff9ed', borderRadius: 12, padding: 10 },
-  fixtureScroll: { maxHeight: 180 },
+  fixtureBackdrop: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 12, backgroundColor: '#251c1788' },
+  fixtureSheet: { maxHeight: '82%', minHeight: 280, borderRadius: 20, padding: 14, gap: 10, backgroundColor: '#fff9ed' },
+  fixtureHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  fixtureHeadingText: { flex: 1, gap: 2 },
+  fixtureTitle: { fontSize: 20, fontWeight: '800', color: '#51392b' },
+  fixtureScope: { fontSize: 11, fontWeight: '700', color: '#46695b' },
+  fixtureClose: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 12, backgroundColor: '#785943' },
+  fixtureCloseText: { color: '#ffffff', fontWeight: '800' },
+  fixtureContent: { paddingBottom: 8 },
   errorBox: { backgroundColor: '#ffdfd6', padding: 10, borderRadius: 10, gap: 6 },
   errorTitle: { fontSize: 18, fontWeight: '700' },
   retryButton: { backgroundColor: '#fff9ed', padding: 10, borderRadius: 10 },

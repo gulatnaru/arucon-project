@@ -99,7 +99,7 @@ class AruconWidgetProvider : AppWidgetProvider() {
     }
     appWidgetIds.forEach { appWidgetId ->
       val views = RemoteViews(context.packageName, R.layout.arucon_widget)
-      views.setTextViewText(R.id.arucon_widget_name, projection?.formId ?: "아루콘")
+      views.setTextViewText(R.id.arucon_widget_name, formDisplayName(projection?.formId))
       views.setTextViewText(R.id.arucon_widget_state, statusText(status, projection))
       views.setTextViewText(R.id.arucon_widget_updated_at, lastUpdatedText(context, projection))
       val openApp = Intent(Intent.ACTION_VIEW, Uri.parse(OPEN_APP_URL)).setPackage(context.packageName)
@@ -119,6 +119,14 @@ class AruconWidgetProvider : AppWidgetProvider() {
     val formattedDate = DateFormat.getDateFormat(context).format(date)
     val formattedTime = DateFormat.getTimeFormat(context).format(date)
     return "마지막 확인: $formattedDate $formattedTime"
+  }
+
+  private fun formDisplayName(formId: String?): String = when (formId) {
+    "mallu" -> "말루"
+    "mono" -> "모노"
+    "piko" -> "피코"
+    "mongle" -> "몽글"
+    else -> "아루콘"
   }
 
   private fun statusText(status: WidgetViewStatus, projection: PetProjection?): String = when (status) {

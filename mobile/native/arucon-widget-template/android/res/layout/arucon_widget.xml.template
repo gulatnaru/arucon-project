@@ -3,21 +3,61 @@
   android:id="@+id/arucon_widget_root"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:background="@drawable/arucon_widget_background"
   android:orientation="vertical"
-  android:padding="16dp">
-  <TextView
-    android:id="@+id/arucon_widget_name"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="아루콘" />
-  <TextView
-    android:id="@+id/arucon_widget_state"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="앱에서 확인" />
+  android:padding="12dp">
+  <LinearLayout
+    android:id="@+id/arucon_widget_content"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+    <ImageView
+      android:id="@+id/arucon_widget_pet"
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_marginEnd="8dp"
+      android:layout_weight="1"
+      android:adjustViewBounds="true"
+      android:contentDescription="아루콘의 모습"
+      android:scaleType="fitCenter"
+      android:src="@drawable/arucon_widget_pet" />
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:gravity="center_vertical"
+      android:orientation="vertical">
+      <TextView
+        android:id="@+id/arucon_widget_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="아루콘"
+        android:textColor="#40332E"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+      <TextView
+        android:id="@+id/arucon_widget_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="앱에서 확인"
+        android:textColor="#5B4C45"
+        android:textSize="12sp" />
+    </LinearLayout>
+  </LinearLayout>
   <TextView
     android:id="@+id/arucon_widget_updated_at"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="" />
+    android:layout_marginTop="6dp"
+    android:maxLines="1"
+    android:text=""
+    android:textColor="#76665E"
+    android:textSize="10sp" />
 </LinearLayout>

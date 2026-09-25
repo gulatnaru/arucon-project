@@ -5,11 +5,14 @@ export type RoomRendererConfig = {
   roomMaterial: 'standard' | 'lambert';
 };
 
+// Release uses the same bounded budget until physical-device measurements can
+// justify a capability-gated quality tier. The GLB, motion and room geometry
+// remain identical; this only bounds fragment work and material complexity.
 const RELEASE_RENDERER: RoomRendererConfig = {
-  msaaSamples: 4,
-  contextAntialias: true,
-  maxPixelRatio: Number.POSITIVE_INFINITY,
-  roomMaterial: 'standard',
+  msaaSamples: 0,
+  contextAntialias: false,
+  maxPixelRatio: 1.65,
+  roomMaterial: 'lambert',
 };
 
 /**

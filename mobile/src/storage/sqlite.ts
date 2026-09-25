@@ -17,6 +17,41 @@ export interface SqlConnection extends SqlExecutor {
   withExclusiveTransactionAsync<T>(work: (tx: SqlExecutor) => Promise<T>): Promise<T>;
 }
 
+const SQLITE_BUSY_RETRY_DELAYS_MS = [50, 100, 200, 400, 800] as const;
+
+type BusyRetryOptions = Readonly<{
+  delaysMs?: readonly number[];
+  sleep?: (delayMs: number) => Promise<void>;
+}>;
+
+function isSqliteBusy(error: unknown): boolean {
+  const seen = new Set<unknown>();
+  let current = error;
+  for (let depth = 0; depth < 5 && current !== null && current !== undefined && !seen.has(current); depth++) {
+    seen.add(current);
+    const message = current instanceof Error ? current.message
+      : typeof current === 'object' && 'message' in current ? String(current.message)
+        : typeof current === 'string' ? current : '';
+    if (/database is (?:locked|busy)|SQLITE_BUSY/iu.test(message)) return true;
+    current = typeof current === 'object' && 'cause' in current ? current.cause : null;
+  }
+  return false;
+}
+
+/** Retries only SQLite lock contention; all other failures remain fail-closed. */
+export async function retrySqliteBusy<T>(operation: () => Promise<T>, options: BusyRetryOptions = {}): Promise<T> {
+  const delays = options.delaysMs ?? SQLITE_BUSY_RETRY_DELAYS_MS;
+  const sleep = options.sleep ?? ((delayMs: number) => new Promise<void>(resolve => setTimeout(resolve, delayMs)));
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (!isSqliteBusy(error) || attempt >= delays.length) throw error;
+      await sleep(delays[attempt]);
+    }
+  }
+}
+
 /** Expo's transaction callback returns void; this adapter safely carries the work result out. */
 export function expoSqliteConnection(database: SQLiteDatabase): SqlConnection {
   const executor = (db: SQLiteDatabase): SqlExecutor => ({
@@ -28,14 +63,16 @@ export function expoSqliteConnection(database: SQLiteDatabase): SqlConnection {
   return {
     ...executor(database),
     async withExclusiveTransactionAsync<T>(work: (tx: SqlExecutor) => Promise<T>): Promise<T> {
-      let result: T | undefined;
-      let completed = false;
-      await database.withExclusiveTransactionAsync(async tx => {
-        result = await work(executor(tx));
-        completed = true;
+      return retrySqliteBusy(async () => {
+        let result: T | undefined;
+        let completed = false;
+        await database.withExclusiveTransactionAsync(async tx => {
+          result = await work(executor(tx));
+          completed = true;
+        });
+        if (!completed) throw new Error('SQLite transaction did not complete');
+        return result as T;
       });
-      if (!completed) throw new Error('SQLite transaction did not complete');
-      return result as T;
     },
   };
 }
