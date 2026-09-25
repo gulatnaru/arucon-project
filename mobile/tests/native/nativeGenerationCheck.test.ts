@@ -111,6 +111,70 @@ test('native generation checker supports Android-only CNG and rejects invalid pl
   assert.equal(Object.values(report.checks).every(Boolean), true);
   assert.equal(report.checks.androidMainActivityHandlesFontScaleChanges, true);
 
+  const widgetBridgePath = join(
+    fixtureRoot,
+    'native/arucon-widget/android/src/main/java/com/arucon/widgetbridge/AruconWidgetBridgeModule.kt',
+  );
+  const widgetBridge = await readFile(widgetBridgePath, 'utf8');
+  await writeFile(widgetBridgePath, widgetBridge.replace(
+    '    Name("AruconWidgetBridge")',
+    '    Name("AruconWidgetBridge")\n\n    AsyncFunction("claimReward") { "forbidden" }',
+  ), 'utf8');
+  const commandViolationResult = spawnSync(process.execPath, [checkerPath, '--platform', 'android'], {
+    cwd: fixtureRoot,
+    encoding: 'utf8',
+  });
+  assert.equal(
+    commandViolationResult.status,
+    1,
+    `${commandViolationResult.stdout}\n${commandViolationResult.stderr}`,
+  );
+  const commandViolationReport = JSON.parse(commandViolationResult.stdout);
+  assert.equal(commandViolationReport.checks.widgetBridgeContainsNoHealthOrGameCommands, false);
+  assert.equal(commandViolationReport.checks.noHealthSdkImports, true);
+  assert.equal(commandViolationReport.checks.noPermissionRequestApi, true);
+  await writeFile(widgetBridgePath, widgetBridge, 'utf8');
+
+  const healthModulePath = join(
+    fixtureRoot,
+    'native/arucon-health/android/src/main/java/com/arucon/health/AruconHealthModule.kt',
+  );
+  const healthModule = await readFile(healthModulePath, 'utf8');
+  await writeFile(healthModulePath, healthModule.replace(
+    'package com.arucon.health',
+    'package com.arucon.health\n\nimport androidx.health.connect.client.HealthConnectClient',
+  ), 'utf8');
+  const healthSdkViolationResult = spawnSync(process.execPath, [checkerPath, '--platform', 'android'], {
+    cwd: fixtureRoot,
+    encoding: 'utf8',
+  });
+  assert.equal(
+    healthSdkViolationResult.status,
+    1,
+    `${healthSdkViolationResult.stdout}\n${healthSdkViolationResult.stderr}`,
+  );
+  const healthSdkViolationReport = JSON.parse(healthSdkViolationResult.stdout);
+  assert.equal(healthSdkViolationReport.checks.noHealthSdkImports, false);
+  assert.equal(healthSdkViolationReport.checks.widgetBridgeContainsNoHealthOrGameCommands, true);
+
+  await writeFile(healthModulePath, healthModule.replace(
+    '    Name("AruconHealth")',
+    '    Name("AruconHealth")\n\n    AsyncFunction("requestPermissions") { "forbidden" }',
+  ), 'utf8');
+  const permissionViolationResult = spawnSync(process.execPath, [checkerPath, '--platform', 'android'], {
+    cwd: fixtureRoot,
+    encoding: 'utf8',
+  });
+  assert.equal(
+    permissionViolationResult.status,
+    1,
+    `${permissionViolationResult.stdout}\n${permissionViolationResult.stderr}`,
+  );
+  const permissionViolationReport = JSON.parse(permissionViolationResult.stdout);
+  assert.equal(permissionViolationReport.checks.noPermissionRequestApi, false);
+  assert.equal(permissionViolationReport.checks.widgetBridgeContainsNoHealthOrGameCommands, true);
+  await writeFile(healthModulePath, healthModule, 'utf8');
+
   const widgetInfoPath = join(fixtureRoot, 'android', 'app', 'src', 'main', 'res', 'xml', 'arucon_widget_info.xml');
   const widgetInfo = await readFile(widgetInfoPath, 'utf8');
   await writeFile(widgetInfoPath, widgetInfo.replace(
@@ -140,4 +204,22 @@ test('native generation checker supports Android-only CNG and rejects invalid pl
   });
   assert.notEqual(invalidResult.status, 0);
   assert.match(invalidResult.stderr, /--platform must be one of: all, android, ios/u);
+});
+
+test('native generation checker allows the disabled iOS health boundary comment', async () => {
+  const swiftHealthModule = await readFile(
+    join(mobileRoot, 'native/arucon-health/ios/AruconHealth/AruconHealthModule.swift'),
+    'utf8',
+  );
+  assert.match(swiftHealthModule, /imports no HealthKit API/u);
+
+  const iosResult = spawnSync(process.execPath, [checkerPath, '--platform', 'ios'], {
+    cwd: mobileRoot,
+    encoding: 'utf8',
+  });
+  assert.equal(iosResult.status, 0, `${iosResult.stdout}\n${iosResult.stderr}`);
+  const report = JSON.parse(iosResult.stdout);
+  assert.equal(report.checks.noHealthSdkImports, true);
+  assert.equal(report.checks.noPermissionRequestApi, true);
+  assert.equal(report.checks.widgetBridgeContainsNoHealthOrGameCommands, true);
 });

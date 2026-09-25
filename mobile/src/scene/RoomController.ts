@@ -1,14 +1,22 @@
 import { Asset } from 'expo-asset';
-import { File } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
+import { Platform } from 'react-native';
 import * as THREE from 'three';
 import { FLOOR, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
-import { disposeSceneObject, retainLoadedModel, RafGate } from './lifecycle';
+import { readAssetBytes } from './assetBytes';
+import {
+  disposeSceneObject,
+  FrameSubmissionGate,
+  retainLoadedModel,
+  RafGate,
+  shouldPublishProjection,
+} from './lifecycle';
 import { COMMON_PREVIEW_ASSET_KEY, selectFormPresentation, type FormPresentation } from './formPresentation';
 import { holdReducedPose } from './clipPresentation';
 import { parseGlb } from './gltfRuntime';
-import { selectRoomRendererConfig } from './rendererConfig';
+import { roomFrameSubmissionIntervalMs, selectRoomRendererConfig } from './rendererConfig';
 import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
 import type { FloorPoint, RoomProps } from './types';
 
@@ -20,6 +28,7 @@ const PET_ASSET = require('../../assets/arucon_tsundere_motion.glb') as number;
 const FORM_ASSETS: Record<FormPresentation['assetKey'], number> = {
   [COMMON_PREVIEW_ASSET_KEY]: PET_ASSET,
 };
+let uncachedAssetSequence = 0;
 
 export class RoomController {
   readonly scene = new THREE.Scene();
@@ -36,6 +45,8 @@ export class RoomController {
   );
   private readonly furniture: Partial<Record<HitName, THREE.Object3D>> = {};
   private readonly rendererConfig = selectRoomRendererConfig(__DEV__);
+  private readonly submissionIntervalMs: number;
+  private readonly submissions: FrameSubmissionGate;
   private mixer?: THREE.AnimationMixer;
   private modelReady = false;
   private clips = new Map<string, THREE.AnimationClip>();
@@ -93,6 +104,22 @@ export class RoomController {
       context: gl as unknown as WebGLRenderingContext,
       antialias: this.rendererConfig.contextAntialias,
     });
+    const rendererIdentity = Platform.OS === 'ios' ? {
+      renderer: String(gl.getParameter(gl.RENDERER)),
+      vendor: String(gl.getParameter(gl.VENDOR)),
+      version: String(gl.getParameter(gl.VERSION)),
+    } : undefined;
+    this.submissionIntervalMs = roomFrameSubmissionIntervalMs(
+      Platform.OS,
+      rendererIdentity,
+    );
+    this.submissions = new FrameSubmissionGate(this.submissionIntervalMs);
+    if (__DEV__ && rendererIdentity) {
+      console.info('[AruconRoom] GL submission profile', {
+        ...rendererIdentity,
+        intervalMs: this.submissionIntervalMs,
+      });
+    }
     // Expo GL already supplies a device-resolution drawing buffer.
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight, false);
@@ -118,7 +145,8 @@ export class RoomController {
     const halfWidth = halfHeight * (width / height);
     Object.assign(this.camera, { left: -halfWidth, right: halfWidth, top: halfHeight, bottom: -halfHeight });
     this.camera.updateProjectionMatrix();
-    this.publishProjection();
+    this.submissions.markDirty();
+    if (this.submissionIntervalMs === 0) this.publishProjection();
   }
 
   setPresentation(props: RoomProps) {
@@ -152,7 +180,8 @@ export class RoomController {
       if (!this.mixer) this.pendingMealToken = props.mealCue.token;
       else { this.lastMealToken = props.mealCue.token; this.playCue('eat', 1.2); }
     }
-    this.publishProjection();
+    this.submissions.markDirty();
+    if (this.submissionIntervalMs === 0) this.publishProjection();
   }
 
   private material(color: number, roughness = 0.95) {
@@ -212,7 +241,15 @@ export class RoomController {
       const asset = Asset.fromModule(FORM_ASSETS[this.formPresentation.assetKey]);
       await asset.downloadAsync();
       if (!asset.localUri) throw new Error('GLB local URI is unavailable');
-      const bytes = await new File(asset.localUri).bytes();
+      const bytes = await readAssetBytes({
+        platform: Platform.OS,
+        bundleUri: Platform.OS === 'ios' ? Paths.bundle.uri : '',
+        source: new File(asset.localUri),
+        hash: asset.hash,
+        type: asset.type,
+        createCacheFile: name => new File(Paths.cache, name),
+        uniqueSuffix: () => `${Date.now()}-${uncachedAssetSequence++}`,
+      });
       if (this.disposed) return;
       const data = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
       const gltf = await parseGlb(data);
@@ -221,6 +258,7 @@ export class RoomController {
       loaded.scale.setScalar(0.62);
       this.petAnchor.add(loaded);
       this.modelReady = true;
+      this.submissions.markDirty();
       this.mixer = new THREE.AnimationMixer(loaded);
       for (const clip of gltf.animations) this.clips.set(clip.name, clip);
       this.selectClip(this.sleeping ? 'sleep' : `idle_${this.profile}`);
@@ -229,7 +267,7 @@ export class RoomController {
         this.pendingMealToken = undefined;
         this.playCue('eat', 1.2);
       }
-      this.publishProjection();
+      if (this.submissionIntervalMs === 0) this.publishProjection();
     } catch (error) {
       if (!this.disposed) this.onError(`아루콘 모델을 열지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -261,6 +299,7 @@ export class RoomController {
     this.idleTime = 0;
     this.cueRemaining = cueDuration(clip.duration, rate, this.reducedMotion);
     this.selectClip(name, true, rate);
+    this.submissions.markDirty();
   }
 
   playBall() { this.playCue(this.profile === 'reserved' ? 'tsundere_ball' : 'honest_ball', 1.6); }
@@ -309,6 +348,7 @@ export class RoomController {
     this.targetRing.position.set(target.x, 0.035, target.z);
     this.targetRing.visible = true;
     this.selectClip('walk');
+    this.submissions.markDirty();
     return target;
   }
 
@@ -319,6 +359,7 @@ export class RoomController {
     this.postTouchRemaining = 0;
     this.idleTime = 0;
     this.selectClip(this.profile === 'reserved' ? 'pet_reserved' : 'pet_expressive');
+    this.submissions.markDirty();
     return true;
   }
 
@@ -327,10 +368,11 @@ export class RoomController {
     this.touchHolding = false; this.touchTime = 0;
     this.postTouchRemaining = this.reducedMotion ? MOTION.reducedPoseSeconds : MOTION.postTouchSeconds;
     if (!this.postTouchRemaining) this.selectClip(`idle_${this.profile}`);
+    this.submissions.markDirty();
     return true;
   }
 
-  private tick = () => {
+  private tick = (timestamp: number) => {
     if (this.disposed) return;
     const dt = Math.min(MOTION.maxCatchupSeconds, this.clock.getDelta());
     if (this.cueRemaining > 0) {
@@ -375,15 +417,29 @@ export class RoomController {
     }
     if (this.activeAction) this.activeAction.paused = shouldPauseDecorativeMotion(this.reducedMotion, !!this.path.length, this.touchHolding || this.postTouchRemaining > 0, this.cueRemaining > 0);
     this.mixer?.update(dt);
-    this.renderer.render(this.scene, this.camera);
-    this.gl.endFrameEXP();
+    const frameSubmitted = this.submissions.shouldSubmit(
+      timestamp,
+      this.modelReady || this.submissionIntervalMs === 0,
+    );
+    if (frameSubmitted) {
+      this.renderer.render(this.scene, this.camera);
+      this.gl.endFrameEXP();
+    }
     const now = Date.now();
-    if (now - this.lastProjection >= 80) { this.lastProjection = now; this.publishProjection(); }
+    if (shouldPublishProjection(
+      this.submissionIntervalMs > 0,
+      frameSubmitted,
+      now - this.lastProjection,
+    )) {
+      this.lastProjection = now;
+      this.publishProjection();
+    }
     this.frames.schedule(this.tick);
   };
 
   resume() {
     if (this.disposed || this.frames.running) return;
+    this.submissions.markDirty();
     this.clock.start(); this.frames.resume(this.tick);
   }
 

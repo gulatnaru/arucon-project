@@ -156,6 +156,7 @@ const pluginEntry = appConfig.expo?.plugins?.find(entry =>
 const pluginOptions = pluginEntry?.[1];
 const combinedGenerated = `${iosInfo}\n${iosEntitlements}\n${iosWidgetInfo}\n${iosWidgetEntitlements}\n${androidManifest}`;
 const combinedModule = `${swiftModule}\n${kotlinModule}\n${swiftWidgetModule}\n${kotlinWidgetModule}`;
+const combinedWidgetModule = `${swiftWidgetModule}\n${kotlinWidgetModule}`;
 const nativeTargets = checkIos ? parsedXcodeProject.pbxNativeTargetSection() : {};
 const widgetTarget = Object.entries(nativeTargets).find(([key, value]) =>
   !key.endsWith('_comment') && `${value?.name ?? ''}`.replaceAll('"', '') === 'AruconWidget');
@@ -233,7 +234,7 @@ const checks = {
     (!checkAndroid || (kotlinWidgetModule.includes('require(keys == PROJECTION_KEYS)') &&
       kotlinWidgetModule.includes('9_007_199_254_740_991L'))),
   widgetBridgeContainsNoHealthOrGameCommands:
-    !/HealthKit|health\.connect|feed|reward|purchase|claim/iu.test(combinedModule),
+    !/HealthKit|health\.connect|feed|reward|purchase|claim/iu.test(combinedWidgetModule),
 };
 
 const checkedFiles = Object.fromEntries(Object.entries(files).filter(([key]) =>

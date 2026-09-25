@@ -25,6 +25,14 @@ export function shouldResumeRoomOnContext(appState: string | null): boolean {
   return appState === null || appState === 'unknown' || appState === 'active';
 }
 
+export function shouldPublishProjection(
+  throttledRenderer: boolean,
+  frameSubmitted: boolean,
+  elapsedSinceLastMs: number,
+): boolean {
+  return throttledRenderer ? frameSubmitted : elapsedSinceLastMs >= 80;
+}
+
 export class RafGate {
   private id: number | null = null;
   private active = false;
@@ -47,4 +55,31 @@ export class RafGate {
     return true;
   }
   stop() { this.active = false; this.generation++; if (this.id !== null) this.cancel(this.id); this.id = null; }
+}
+
+/**
+ * Keep simulation on RAF while throttling asynchronous Expo GL frame batches.
+ * Dirty frames bypass the cadence once so discrete UI changes are not hidden.
+ */
+export class FrameSubmissionGate {
+  private lastSubmission: number | null = null;
+  private dirty = true;
+
+  constructor(private readonly minimumIntervalMs: number) {}
+
+  markDirty() { this.dirty = true; }
+
+  shouldSubmit(timestamp: number, continuous: boolean) {
+    if (this.lastSubmission === null || this.dirty) {
+      this.lastSubmission = timestamp;
+      this.dirty = false;
+      return true;
+    }
+    if (!continuous) return false;
+    if (timestamp < this.lastSubmission || timestamp - this.lastSubmission >= this.minimumIntervalMs) {
+      this.lastSubmission = timestamp;
+      return true;
+    }
+    return false;
+  }
 }

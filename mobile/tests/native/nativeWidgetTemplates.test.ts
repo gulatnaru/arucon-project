@@ -122,10 +122,22 @@ test('widget templates render the approved common pet preview on a high-contrast
   assert.match(androidLayout, /android:id="@\+id\/arucon_widget_content"/);
   assert.match(androidLayout, /android:id="@\+id\/arucon_widget_updated_at"[\s\S]*android:layout_width="match_parent"/);
   assert.match(androidBackground, /<solid android:color="#FFF9F0"/);
-  assert.match(swift, /Image\("arucon_widget_pet"\)/);
+  assert.match(swift, /Bundle\.main\.url\(forResource: "arucon_widget_pet", withExtension: "png"\)/);
+  assert.match(swift, /CGImageSourceCreateWithURL\(imageURL as CFURL, nil\)/);
+  assert.match(swift, /CGImageSourceCreateThumbnailAtIndex/);
+  assert.match(swift, /kCGImageSourceThumbnailMaxPixelSize: maximumPixelDimension/);
+  assert.match(swift, /UIImage\(cgImage: thumbnail, scale: 1, orientation: \.up\)/);
+  assert.match(swift, /Image\(uiImage: petImage\)/);
+  assert.doesNotMatch(swift, /Image\("arucon_widget_pet"\)/);
+  assert.doesNotMatch(swift, /UIImage\(contentsOfFile:/);
   assert.match(swift, /\.accessibilityLabel\("아루콘의 모습"\)/);
   assert.match(swift, /cardBackground = Color/);
   assert.match(swift, /VStack\(alignment: \.leading, spacing: 6\)/);
+  assert.match(swift, /date: updatedAt\.formatted\(date: \.numeric, time: \.omitted\)/);
+  assert.match(swift, /time: updatedAt\.formatted\(date: \.omitted, time: \.shortened\)/);
+  const dateLineIndex = swift.indexOf('Text("마지막 확인 · \\(lastUpdatedText.date)")');
+  const timeLineIndex = swift.indexOf('Text(lastUpdatedText.time)');
+  assert.ok(dateLineIndex >= 0 && timeLineIndex > dateLineIndex);
   assert.match(swift, /\.minimumScaleFactor\(0\.75\)/);
   assert.match(swift, /#available\(iOSApplicationExtension 17\.0, \*\)/);
   assert.match(swift, /containerBackground\(for: \.widget\) \{ color \}/);
@@ -137,6 +149,16 @@ test('widget templates render the approved common pet preview on a high-contrast
     assert.ok(kotlin.includes(`"${formId}" -> "${displayName}"`));
   }
   assert.deepEqual([...petAsset.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  const sourceWidth = petAsset.readUInt32BE(16);
+  const sourceHeight = petAsset.readUInt32BE(20);
+  const maximumPixelDimension = Number(
+    swift.match(/maximumPixelDimension = (\d+)/)?.[1],
+  );
+  const observedWidgetArchivePixelBudget = 1_039_262.4;
+  assert.deepEqual([sourceWidth, sourceHeight], [1_254, 1_254]);
+  assert.ok(sourceWidth * sourceHeight > observedWidgetArchivePixelBudget);
+  assert.ok(maximumPixelDimension > 0);
+  assert.ok(maximumPixelDimension ** 2 < observedWidgetArchivePixelBudget);
   assert.ok(petAsset.length > 1_000);
 });
 

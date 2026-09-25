@@ -1,42 +1,50 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-09-25",
+  "runDate": "2026-09-26",
   "timezone": "Asia/Seoul",
-  "status": "WINDOWS_ENGINEERING_COMPLETE_PRODUCT_MVP_NOT_COMPLETE",
+  "status": "IOS_RELEASE_VALIDATED_WITH_HOST_LOCK_AND_MOTION_LIMITS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "Authorized Windows Android engineering is complete: source/build, Font130, widget/footer/tap/rest, and bounded renderer A/B evidence are recorded. Product MVP stays incomplete because iOS/macOS, physical-device performance/support, and external gates remain separate.",
-  "sourceBaseline": "3310d38",
-  "sourceCheckpoint": "5493d08",
+  "reason": "Fresh macOS iOS Release compile/install/launch and embedded GLB/cache/storage validation passed. Final input rechecks are blocked by the automatically locked Mac; 3Hz motion texture and physical FPS remain unapproved.",
+  "sourceBaseline": "5da0048",
+  "sourceCheckpoint": "5da0048",
   "currentGapMatrixDocument": "MVP-GAP-MATRIX.md",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
     "root": "requested Astra orchestration/integration/Hard Stop decisions",
-    "builder": "three existing arucon_builder roles reused for sync, native and notifications",
+    "builder": "arucon_builder / requested gpt-5.6-sol",
     "exploration": "arucon_explorer / requested Terra",
     "independentReview": "arucon_reviewer / requested Terra High plus read-only explorer initial QA",
-    "luna": "arucon_luna_worker / requested Luna: narrow README update",
+    "luna": "arucon_luna_worker / requested gpt-5.6-luna: validation documentation",
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
     "currentRun": {
       "root": "requested Astra integration/native verification",
-      "builder": "requested Sol: AppState, widget/native, SQLite/fontScale CNG, and release renderer fixes",
-      "explorer": "requested Terra: Android runtime and native/renderer evidence mapping",
-      "reviewer": "requested Terra High: widget iOS17/static source review and evidence boundary review",
-      "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
+      "explorer": ["ios_current_cng_audit / Terra", "ios_widget_runtime_audit / Terra"],
+      "builder": ["ios_checker_scope_fix / Sol", "ios_widget_asset_fix / Sol"],
+      "reviewer": "ios_final_review / Terra High",
+      "luna": "ios_validation_docs / Luna",
+      "effective": "ROUTING_UNVERIFIED"
     }
   },
-  "completion": {
-    "independentLocalEngineering": "ENGINEERING_COMPLETE_WINDOWS_SCOPED",
-    "productMvp": "NOT_COMPLETE",
-    "androidRuntime": "PARTIAL_SYNTHETIC_AVD_OBSERVED",
-    "androidReleaseCompile": "PASS_X86_64",
-    "widgetRuntimeQa": "PASS_OBSERVED_ANDROID_FOOTER_TAP_REST",
-    "iosCurrentRuntime": "NOT_RUN_ON_WINDOWS"
+  "historicalWindowsRouting": {
+    "root": "requested Astra integration/native verification",
+    "builder": "requested Sol: AppState, widget/native, SQLite/fontScale CNG, and release renderer fixes",
+    "explorer": "requested Terra: Android runtime and native/renderer evidence mapping",
+    "reviewer": "requested Terra High: widget iOS17/static source review and evidence boundary review",
+    "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
-  "lastValidation": {
-    "scope": "Current Windows source, native-build, and observed-runtime validation",
+  "completion": {
+    "independentLocalEngineering": "IOS_VALIDATION_PARTIAL_SOFTWARE_RENDERER_HOST_LOCK_LIMITS",
+    "productMvp": "NOT_COMPLETE",
+    "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
+    "androidReleaseCompile": "PASS_X86_64",
+    "widgetRuntimeQa": "iOS_OBSERVED_WIDGET_IMAGE_TIME_TAP_RETURN; Windows Android observation historical",
+    "iosCurrentRuntime": "PASS_RELEASE_INSTALL_LAUNCH_GLB_CACHE_STORAGE_HOST_LOCKED_RECHECK"
+  },
+  "historicalWindowsValidation": {
+    "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
     "mobileTests": {
       "command": "npm test",
       "tests": 254,
@@ -63,15 +71,39 @@
     "apkRebuild": "PASS_DEBUG_AND_RELEASE_X86_64_2M06S_943_TASKS_39_EXECUTED",
     "iosCompileAndRuntime": "NOT_RUN_ON_WINDOWS"
   },
+  "lastValidation": {
+    "scope": "Fresh macOS iOS focused validation",
+    "mobileTests": {
+      "command": "node --import tsx --test tests/native/*.test.ts tests/scene/*.test.ts tests/storage/sqliteBusyRetry.test.ts tests/domain/sqlite.test.ts",
+      "tests": 82,
+      "pass": 82,
+      "fail": 0,
+      "skipped": 0,
+      "exit": 0
+    },
+    "sceneFinalTargeted": {"tests": 25, "pass": 25, "fail": 0, "exit": 0, "note": "separate targeted result; not added to 82; 77/20 are intermediate"},
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "cngChecker": {"tests": 27, "pass": 27, "fail": 0, "exit": 0},
+    "freshWorkflow": {"tests": 38, "pass": 38, "fail": 0, "exit": 0, "python": "3.12.14", "executable": "/Users/heung/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3", "provenance": "mobile/evidence/ios-5da0048/workflow-provenance.json", "note": "system Python tomllib failure was resolved without installation"},
+    "debugCompile": "PASS_SOURCE_DEBUG_NATIVE_BUILD_EXIT0",
+    "releaseCompile": "PASS_XCODEBUILD_RELEASE_FINAL_EXIT0_INSTALL_LAUNCH_OBSERVED",
+    "mainJsBundle": "3.4MB",
+    "renderer": "Exact iOS Apple Software Renderer fallback resolved Release stall; final CPU sample 46.4%; benchmark/FPS approval not claimed",
+    "assetRuntimeFix": "iOS bundle cache copy before File.bytes; cache/original SHA-256 both 6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f; metadata stable on relaunch; Android original path preserved",
+    "evidence": "mobile/evidence/ios-5da0048",
+    "physicalDevice": "NOT_RUN",
+    "finalInputRecheck": "BLOCKED_HOST_LOCKED"
+  },
   "environment": {
-    "host": "Windows 10 Home 19045",
-    "node": "24.19.0",
-    "npm": "11.17.0",
-    "androidToolchain": "project-local Temurin17/SDK36/build-tools36/NDK27.1/Gradle9/Emulator37.1.11",
-    "androidAvd": "Arucon_API_36",
+    "host": "macOS 15.6",
+    "node": "26.7.0",
+    "npm": "11.19.0",
+    "androidToolchain": "preserved historical Windows Android toolchain",
+    "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
-    "hostGpu": "FAILED_OPENGL_CORE_UNSUPPORTED",
-    "softwareEmulator": "RESTORED"
+    "hostGpu": "Apple Software Renderer",
+    "softwareEmulator": "iOS Simulator Apple Software Renderer fallback resolved in final Release; CPU sample 46.4%; benchmark/FPS unapproved"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
@@ -162,7 +194,7 @@
   "historicalMacLastValidation": {
     "scope": "Mac SDK55 validation is historical; Windows Android compile/AVD evidence is current and recorded separately below",
     "mobileTests": {
-      "command": "npm test",
+      "command": "focused fresh suite (77 tests)",
       "tests": 239,
       "pass": 239,
       "fail": 0,
@@ -402,7 +434,7 @@
     "EXT-HEALTH real health reads remain OFF",
     "EXT-ACCOUNT actual accounts/cloud/signing",
     "EXT-RELEASE actual payments/store/release/support declaration",
-    "EXT-ENV local Android SDK/AVD is available; remaining environment gates are macOS iOS runtime/WidgetKit observation and physical-hardware performance/support acceptance."
+    "EXT-ENV final Release input recheck requires Mac unlock; motion quality, physical-hardware performance and supported-OS acceptance remain unapproved. Windows Android engineering remains complete in its historical scope."
   ],
   "historicalMacGit": {
     "branch": "feature/arucon-mobile-autonomous",
@@ -428,7 +460,7 @@
     "originCheckpointHistory": "SDK55 migration checkpoint was committed/pushed before this simulator validation; this run made no commit/push",
     "preCheckpointHead": "0e795d94056f63d3192cbd9422a1c9823f3df401"
   },
-  "git": {
+  "historicalWindowsGit": {
     "branch": "feature/arucon-mobile-autonomous",
     "sourceCheckpoint": "5493d08",
     "sourceCommitPerformed": true,
@@ -439,6 +471,18 @@
     "pushPerformed": false,
     "pushStatus": "BLOCKED_EXISTING_GITHUB_AUTHENTICATION_UNAVAILABLE",
     "remoteCheckpointAtAttempt": "3310d38ce1aedba5f915f97c6387f087b34050a0"
+  },
+  "git": {
+    "branch": "feature/arucon-mobile-autonomous",
+    "sourceCheckpoint": "5da0048",
+    "sourceCommitPerformed": false,
+    "docsCheckpointAndPush": "pending root verification and publication",
+    "verificationEvidence": "mobile/evidence/ios-5da0048/git-audit.json",
+    "publicationRecordScope": "Prepared before own checkpoint; final local/tracking/origin hashes and clean status are recorded in ignored audit and final response.",
+    "documentationCheckpoint": null,
+    "pushPerformed": false,
+    "pushStatus": "PENDING_ROOT_VERIFICATION_AND_AUTHORIZED_FEATURE_PUSH",
+    "remoteCheckpointAtAttempt": "5da0048"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -506,7 +550,7 @@
       }
     }
   },
-  "evidenceDirectory": "mobile/evidence/windows-android-runtime/",
+  "evidenceDirectory": "mobile/evidence/ios-5da0048/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [

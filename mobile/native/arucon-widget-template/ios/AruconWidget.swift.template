@@ -1,6 +1,8 @@
 import Foundation
 import CoreFoundation
+import ImageIO
 import SwiftUI
+import UIKit
 import WidgetKit
 
 private let snapshotKey = "arucon.widget.snapshot.v1"
@@ -92,6 +94,25 @@ private enum ReadOnlySnapshotStore {
   }
 }
 
+private enum WidgetPetArtwork {
+  // The source PNG stays shared with Android. Decode a bounded iOS copy so WidgetKit can archive the view.
+  private static let maximumPixelDimension = 384
+
+  static let image: UIImage? = {
+    guard let imageURL = Bundle.main.url(forResource: "arucon_widget_pet", withExtension: "png"),
+          let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, nil),
+          let thumbnail = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceThumbnailMaxPixelSize: maximumPixelDimension,
+          ] as CFDictionary) else {
+      return nil
+    }
+    return UIImage(cgImage: thumbnail, scale: 1, orientation: .up)
+  }()
+}
+
 private struct AruconWidgetEntry: TimelineEntry {
   let date: Date
   let status: WidgetViewStatus
@@ -166,20 +187,25 @@ private struct AruconWidgetView: View {
     }
   }
 
-  private var lastUpdatedText: String? {
+  private var lastUpdatedText: (date: String, time: String)? {
     guard let updatedAtMs = entry.projection?.updatedAtMs else { return nil }
     let updatedAt = Date(timeIntervalSince1970: Double(updatedAtMs) / 1_000)
-    return "마지막 확인: \(updatedAt.formatted(date: .abbreviated, time: .shortened))"
+    return (
+      date: updatedAt.formatted(date: .numeric, time: .omitted),
+      time: updatedAt.formatted(date: .omitted, time: .shortened)
+    )
   }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       HStack(spacing: 8) {
-        Image("arucon_widget_pet")
-          .resizable()
-          .scaledToFit()
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .accessibilityLabel("아루콘의 모습")
+        if let petImage = WidgetPetArtwork.image {
+          Image(uiImage: petImage)
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityLabel("아루콘의 모습")
+        }
         VStack(alignment: .leading, spacing: 3) {
           Text(formDisplayName)
             .font(.headline)
@@ -192,11 +218,15 @@ private struct AruconWidgetView: View {
         }
       }
       if let lastUpdatedText {
-        Text(lastUpdatedText)
-          .font(.caption2)
-          .foregroundStyle(secondaryText)
-          .lineLimit(1)
-          .minimumScaleFactor(0.75)
+        VStack(alignment: .leading, spacing: 0) {
+          Text("마지막 확인 · \(lastUpdatedText.date)")
+            .lineLimit(1)
+          Text(lastUpdatedText.time)
+            .lineLimit(1)
+        }
+        .font(.caption2)
+        .foregroundStyle(secondaryText)
+        .minimumScaleFactor(0.75)
       }
     }
     .padding(12)

@@ -3,7 +3,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { roomRenderSurfaceScale, selectRoomRendererConfig } from '../../src/scene/rendererConfig';
+import {
+  roomFrameSubmissionIntervalMs,
+  roomRenderSurfaceScale,
+  selectRoomRendererConfig,
+} from '../../src/scene/rendererConfig';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -28,5 +32,25 @@ test('development and release renderer profiles share the measured bounded fragm
   assert.equal(roomRenderSurfaceScale(Number.NaN, 1.65), 1);
   assert.match(roomView, /roomRenderSurfaceScale\(PixelRatio\.get\(\), RENDERER_CONFIG\.maxPixelRatio\)/u);
   assert.match(roomView, /msaaSamples=\{RENDERER_CONFIG\.msaaSamples\}/u);
+  assert.match(roomView, /sizeRef\.current = nextSize;[\s\S]*?setSize\(nextSize\)/u);
+  assert.match(roomView, /new RoomController\(gl, currentSize\.width, currentSize\.height/u);
+  assert.match(roomView, /controller\.current\?\.resize\(size\.width, size\.height\)/u);
   assert.match(controller, /new THREE\.MeshLambertMaterial/u);
+});
+
+test('only the iOS Apple Software Renderer uses the throttled Expo GL submission cadence', () => {
+  const softwareRenderer = {
+    renderer: 'Apple Software Renderer',
+    vendor: 'Apple Inc.',
+    version: 'OpenGL ES 3.0 APPLE-23.0.2',
+  };
+  const physicalRenderer = {
+    renderer: 'Apple GPU',
+    vendor: 'Apple Inc.',
+    version: 'OpenGL ES 3.0 APPLE-23.0.2',
+  };
+  assert.equal(roomFrameSubmissionIntervalMs('ios', softwareRenderer), 333);
+  assert.equal(roomFrameSubmissionIntervalMs('ios', physicalRenderer), 0);
+  assert.equal(roomFrameSubmissionIntervalMs('android', softwareRenderer), 0);
+  assert.equal(roomFrameSubmissionIntervalMs('ios'), 0);
 });

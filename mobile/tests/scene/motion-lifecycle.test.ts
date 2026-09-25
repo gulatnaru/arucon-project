@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { RafGate, retainLoadedModel, shouldResumeRoomOnContext } from '../../src/scene/lifecycle';
+import {
+  FrameSubmissionGate,
+  RafGate,
+  retainLoadedModel,
+  shouldPublishProjection,
+  shouldResumeRoomOnContext,
+} from '../../src/scene/lifecycle';
 import { MOTION, advanceWalk, shouldPauseDecorativeMotion, springStep, reducedPoseTime, cueDuration } from '../../src/scene/motion';
 import { holdReducedPose } from '../../src/scene/clipPresentation';
 import { projectedHitsEqual, type ProjectedHits } from '../../src/scene/projectedHits';
@@ -34,6 +40,28 @@ test('foreground resume schedules exactly one RAF and pause cancels it', () => {
   gate.stop(); stale(0);
   assert.equal(gate.scheduled, false);
   assert.equal(gate.running, false);
+});
+
+test('frame submission keeps the first and dirty frames while throttling continuous cadence', () => {
+  const submissions = new FrameSubmissionGate(100);
+  assert.equal(submissions.shouldSubmit(0, false), true);
+  assert.equal(submissions.shouldSubmit(16, false), false);
+  assert.equal(submissions.shouldSubmit(99, true), false);
+  assert.equal(submissions.shouldSubmit(100, true), true);
+  assert.equal(submissions.shouldSubmit(150, true), false);
+  submissions.markDirty();
+  submissions.markDirty();
+  assert.equal(submissions.shouldSubmit(151, false), true);
+  assert.equal(submissions.shouldSubmit(152, false), false);
+  assert.equal(submissions.shouldSubmit(250, true), false);
+  assert.equal(submissions.shouldSubmit(251, true), true);
+});
+
+test('throttled hit projections publish only with the frame that contains their positions', () => {
+  assert.equal(shouldPublishProjection(true, false, 1_000), false);
+  assert.equal(shouldPublishProjection(true, true, 0), true);
+  assert.equal(shouldPublishProjection(false, true, 79), false);
+  assert.equal(shouldPublishProjection(false, true, 80), true);
 });
 
 test('cold Android GL context starts while initial AppState is unresolved', () => {

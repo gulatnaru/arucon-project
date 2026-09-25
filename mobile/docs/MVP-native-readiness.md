@@ -1,12 +1,22 @@
 # MVP native readiness scaffold
 
-## Scope and current result
+## 2026-09-26 current validation appendix
+
+SDK55.0.31 / iOS 26.3 Simulator Release validation passed within host-lock and motion limits. Focused fresh tests are 82/82 and final scene checks are 25/25, with lint/typecheck, CNG 27/27, and workflow 38/38 passing. Final Release compile/install/launch passed with Metro stopped; the embedded `main.jsbundle` is 3.4 MB. Final CPU sample is 46.4%; benchmark/FPS and 3Hz motion texture remain unapproved. Android, physical devices, and unknown renderers are unchanged.
+
+The SDK55 Release path now copies the iOS bundled asset into cache before `File.bytes`, reuses valid hash/size, and cleans invalid hash state. Cache and source SHA-256 both equal `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`; relaunch metadata is stable. Android keeps its original path.
+
+Windows Android engineering is complete in its own historical scope. Android 17/17, debug/release, FontScale, and widget runtime evidence are preserved as Windows evidence and are not counted as this iOS run. Health remains OFF: no real HealthKit/Health Connect read, account, payment, signing account, or physical-device gate is enabled. The current final input recheck is blocked by automatic host lock (`BLOCKED_HOST_LOCKED`); this replaces the older historical “Android SDK absent” and interactive permission wait wording.
+
+## Historical scaffold scope (2026-09-19/20)
+
+The following scaffold and host-result statements describe the earlier preparation stage. Their `NOT_RUN`/`BLOCKED_ENV` wording is historical; use the current appendix and run report for today's results. The Health OFF and read-only widget boundaries remain current requirements.
 
 This checkpoint adds local contracts, build-discoverable Expo Modules, and generated development widget targets for future HealthKit, Health Connect, and home-widget integration. All health reads are OFF. No health entitlement, health manifest permission, health SDK client, real health record, signed App Group, installed widget, or OS-verified widget execution is active.
 
 The independent local scaffold is complete within its source/static scope. It does not satisfy the SRS 14-1 physical-device gate.
 
-## Latest host result (2026-09-20 KST, SDK55 migration)
+## Historical host result (2026-09-20 KST, SDK55 migration)
 
 Expo SDK 55.0.31, React Native 0.83.10, React 19.2.0, Xcode 26.3, Swift 6.2.4, CocoaPods 1.17.0, and an iPhone 16e iOS 26.3 Simulator are available. Android SDK/adb/emulator are absent. SDK55 prebuild generated the same widget target and the native iOS app compiled and installed successfully; separate `simctl launch` returned a process PID. The final Expo CLI GUI activation step exited 1 because System Events permission is unavailable, recorded as `BLOCKED_ENV_AUTOMATION_PERMISSION`. CUA accessibility/screen recording permission is pending, so GLB rendering, touch/motion, and WidgetKit OS rendering are `NOT_EVALUATED`; physical device remains `NOT_RUN`. Evidence is in `evidence/sdk55-migration/`. The prior SDK57 failure remains historical.
 

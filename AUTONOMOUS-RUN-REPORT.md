@@ -1,4 +1,27 @@
-# Windows Android engineering report with retained SDK history
+# Fresh macOS iOS validation report — 5da0048
+
+2026-09-26 KST · branch `feature/arucon-mobile-autonomous` · root Git normal · Health OFF.
+
+Current result: `IOS_RELEASE_VALIDATED_WITH_HOST_LOCK_AND_MOTION_LIMITS`. macOS 15.6 / Xcode 26.3 / iOS 26.3 iPhone 16e. Focused source tests 82/82, separately rerun scene tests 25/25, lint, typecheck, CNG 27/27, and workflow 38/38 passed; these are not counts of Simulator UI tests. Final Release `xcodebuild` exited 0. With Metro stopped and port 8081 without a listener, install/launch and the embedded `main.jsbundle` passed. Existing stale iOS PNG/widget template/PBX artifacts were preserved as history and current Expo CNG artifacts were regenerated; Pods passed.
+
+Observed evidence in `mobile/evidence/ios-5da0048`: source GLB visible, input responsive, CPU samples approximately 26.9–38.5%, and widget home image/time fully visible. Widget tap opened the room and returned; SQL before/after diff was zero. Synthetic economy/storage checks matched before and after restart: food 1, coins 10, EXP 8,812,500, meals 1, registry 1, integrity OK. Reduced motion preserved movement and stopped idle roaming after arrival; normal input/motion was observed. Touch deformation remains PARTIAL because 3Hz visual smoothness was not approved.
+
+The final Release path includes the iOS cache copy and software fallback. `30-release-final-room.png` shows the full GLB room; `31-release-cache-relaunch.png` shows GLB after relaunch. Cache and source SHA-256 both equal `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`, cache metadata is stable, and `release-final-storage.json` records food1/coin10/EXP8812500/meals1/registry1/integrityOK. Final CPU sample is 46.4%; benchmark/FPS approval is not claimed. The earlier software-render stall and the separate bundle-read permission error are retained as resolved failures. The Mac is now locked, so final Release input and normal/reduced rechecks are `BLOCKED_HOST_LOCKED`; prior Debug input/meal/sleep/storage/widget/reduced observations remain valid. Independent source, native-build, widget, cache and scoped-runtime reviews passed. This document is prepared before its own feature checkpoint; actual publication hashes and status are recorded in `mobile/evidence/ios-5da0048/git-audit.json` and the final response.
+
+## Delegation for this macOS run
+
+| Agent | Role / requested model | Effective model | Work |
+|---|---|---|---|
+| `ios_current_cng_audit` | explorer / GPT-5.6 Terra | ROUTING_UNVERIFIED | Stale CNG, GL queue, hit projection and SDK file-read investigation |
+| `ios_widget_runtime_audit` | explorer / GPT-5.6 Terra | ROUTING_UNVERIFIED | Installed widget assets and App Group diagnosis |
+| `ios_checker_scope_fix` | builder / GPT-5.6 Sol | ROUTING_UNVERIFIED | Checker scope, renderer/layout/input and release asset-read fixes |
+| `ios_widget_asset_fix` | builder / GPT-5.6 Sol | ROUTING_UNVERIFIED | Widget image lookup, thumbnail budget and timestamp layout |
+| `ios_final_review` | reviewer / GPT-5.6 Terra high | ROUTING_UNVERIFIED | Independent source, native, observed-runtime and documentation review |
+| `ios_validation_docs` | documentation worker / GPT-5.6 Luna | ROUTING_UNVERIFIED | Status, gap, decision and resume documentation |
+
+The root coordinated native builds, Simulator observations, integration and publication. No Spark role was invoked. Role configuration does not prove the backend model identifier.
+
+## Historical Windows Android record
 
 ## 2026-09-25 Windows Android 실제 실행 부록 (현재)
 

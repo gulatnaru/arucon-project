@@ -20,6 +20,7 @@ export function AruconRoom(props: RoomProps) {
   const latest = useRef(props);
   const touchAccepted = useRef(false);
   const [size, setSize] = useState({ width: 1, height: 1 });
+  const sizeRef = useRef(size);
   const [hits, setHits] = useState<ProjectedHits | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [systemReduced, setSystemReduced] = useState(false);
@@ -28,14 +29,17 @@ export function AruconRoom(props: RoomProps) {
 
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
-    setSize({ width, height });
+    const nextSize = { width, height };
+    sizeRef.current = nextSize;
+    setSize(nextSize);
     controller.current?.resize(width, height);
   }, []);
 
   const onContextCreate = useCallback((gl: ExpoWebGLRenderingContext) => {
     if (controller.current) return;
     try {
-      const room = new RoomController(gl, size.width, size.height, setHits, setError);
+      const currentSize = sizeRef.current;
+      const room = new RoomController(gl, currentSize.width, currentSize.height, setHits, setError);
       controller.current = room;
       room.setPresentation({ ...latest.current, reducedMotion: systemReduced || latest.current.reducedMotion });
       void room.loadPet();
@@ -43,9 +47,10 @@ export function AruconRoom(props: RoomProps) {
     } catch (cause) {
       setError(`방을 열지 못했어요: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
-  }, [size.width, size.height, systemReduced]);
+  }, [systemReduced]);
 
   useEffect(() => { latest.current = props; }, [props]);
+  useEffect(() => { controller.current?.resize(size.width, size.height); }, [size.width, size.height]);
   useEffect(() => {
     controller.current?.setPresentation({ ...latest.current, reducedMotion: systemReduced || latest.current.reducedMotion });
   }, [props.formId, props.personality, props.sleeping, props.reducedMotion, props.tableInstalled, props.toiletInstalled, props.ballVisible, props.cushionVisible, props.mealCue, systemReduced]);

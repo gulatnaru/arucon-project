@@ -1,4 +1,6 @@
-# 외부 승인·환경 대기열 — 승인된 MVP 기본 정책 이후
+# 외부 승인·환경 대기열 — fresh iOS validation
+
+2026-09-26 baseline `5da0048`: iOS Release compile/install/launch and GLB/cache/storage validation passed with Metro OFF. Final CPU sample is 46.4%; motion quality and physical FPS remain unapproved. Final Release input and normal/reduced rechecks are blocked by Mac lock. Independent source and scoped-runtime reviews passed; this record precedes its own authorized feature publication.
 
 2026-09-19 · 기준34ab069 이후 사용자 승인. 기존 여섯 제품 방향과 그 안의 가역 config/ADR 세부값은 승인됐다. 수면 계수·케어 결정표·작은 코인 카탈로그·SQLite/재시도·단일 쓰기/이전·위젯/앱 안 안내를 다시 제품 질문으로 반환하지 않는다. 구현/검증 결과는 DECISION-SUMMARY와 실행 보고서에서 확인한다.
 
@@ -36,11 +38,11 @@
 
 ## EXT-ENV — 시스템 환경·기기·UI 검증
 
-- 현재: macOS SDK55 이력의 iOS native compile/install/process start PASS와 UI 제한을 보존한다. Windows Android AVD에서는 synthetic onboarding/room, meal force-stop/relaunch SQLite equality, touch/floor arrival, corrected reduced motion, sleep UI 및 old widget bind/tap을 실제 관찰했다. Health OFF와 외부 경계는 유지한다.
-- Windows local engineering 완료: Font130 runtime, widget footer/tap/rest, source suite254/254/lint/typecheck, targeted17/17, CNG16/16, and current debug/release x86_64 build. balanced-renderer A/B is PARTIAL/NOT_PASS, not GL FPS/physical acceptance. Evidence is archived as ignored `mobile/evidence/windows-android-runtime/` with manifest only; patches/dependency directories are excluded. iOS current runtime/OS widget render는 Windows에서 NOT_RUN이며 별도 macOS manual/automation scope가 필요하다.
-- 남은 external/environment gates: macOS iOS CNG/static/native compile/simulator+WidgetKit observation, physical-device performance and supported-OS acceptance, plus the existing legal/Health/account/payment/release decisions. Windows software-host instability (SystemUI ANR) is recorded and is not an app ANR or a renderer-fix claim.
+- 현재: fresh macOS iOS Simulator에서 source GLB/input/widget image-time/tap return/reduced motion/SQLite restart equality를 관찰했다. 정확한 iOS Apple Software Renderer에만 Debug/Release 공통 333ms 제출 제한을 적용했다. Visual smoothness/FPS is not approved. Windows Android and old Mac host-lock results remain historical. Health OFF와 외부 경계는 유지한다.
+- Fresh checks: focused82/82, lint/typecheck, final scene25/25, checker27/27, workflow38/38; Release compile/install/launch and GLB/cache/storage PASS. Physical device remains NOT_RUN; final input recheck is BLOCKED_HOST_LOCKED.
+- 남은 external/environment gates: Mac 잠금 해제 후 최종 Release 입력·모션 재확인, physical-device performance and supported-OS acceptance, plus the existing legal/Health/account/payment/release decisions. CNG, native compilation, Release cold rendering and observed Debug/WidgetKit checks are already recorded. Windows software-host instability remains historical.
 - 선택지: 필요한 UI 권한을 직접 허용하고 합성 검증 재개 / 사용자가 Simulator를 수동 조작해 검증 / 별도 준비된 Android·실기기 환경 제공. **추천: 현 iOS Simulator의 합성 UI·저장·위젯 검증부터 진행.**
-- 이후 첫 검증: Metro 실행→개발 앱 연결→합성 온보딩/GLB/식사/lifecycle/위젯→별도 physical device 검증. 실제 Health 접근은 계속 OFF다. 프로세스 시작을 실제 화면/모션 PASS로 사용하지 않는다.
+- 이후 첫 검증: Mac 잠금 해제→설치된 Metro 비의존 Release 앱의 입력/모션/reduced-motion 재확인→별도 승인된 physical device 검증. 실제 Health 접근은 계속 OFF다. 프로세스 시작을 실제 화면/모션 PASS로 사용하지 않는다.
 
 ## 재개 규칙
 
@@ -48,4 +50,4 @@
 
 ## EXT-GIT-AUTH — feature checkpoint publication
 
-Normal push to `feature/arucon-mobile-autonomous` is already authorized. This Windows Git installation lacks usable GitHub authentication, so push failed and origin remained `3310d38`. The user must authenticate an existing account with repository write access; do not create an account or place tokens in chat, Git, or logs. Then fetch, inspect divergence, and retry a normal feature push. Local reviewed checkpoints and the final publication record are preserved. Main/merge/force/tag/release remain prohibited.
+Normal push to `feature/arucon-mobile-autonomous` is authorized. The baseline remote check returned `5da0048`; the historical Windows authentication failure was not reproduced by that read. Current scoped code/runtime reviews passed. Final publication results belong to `mobile/evidence/ios-5da0048/git-audit.json` and the final response, written after this checkpoint. Main/merge/force/tag/release remain prohibited.

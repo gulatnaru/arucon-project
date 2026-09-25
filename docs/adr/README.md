@@ -16,6 +16,7 @@ The 2026-09-19 user delegation accepts reversible technical choices under AUTO_D
 - [ADR-009 Expo SDK 55 compatibility](ADR-009-expo-sdk-55-compatibility.md) — official SDK 55 dependency graph for macOS 15.6 / Xcode 26.3; supersedes ADR-008's temporary SDK 57 JSI patch while retaining its widget-path decision.
 - [ADR-010 Windows portable Android toolchain](ADR-010-windows-portable-android-toolchain.md) — project-local Android build/AVD tooling; platform-scoped only.
 - [ADR-011 Android runtime evidence classification](ADR-011-android-runtime-evidence-classification.md) — observed synthetic AVD results and explicit pending boundaries.
+- [ADR-012 iOS Simulator GL submission](ADR-012-ios-simulator-gl-submission.md) — Apple Software Renderer cadence, frame-aligned hit projection, and layout/context ordering.
 
 DEC-12/17 are approved only for local technical choices; final supported OS, legal retention, real services and release claims remain gated. DEC-31 release/environment scope remains OPEN.
 
