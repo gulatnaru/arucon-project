@@ -11,3 +11,7 @@ On a macOS host, first use the repository lock and run `cd mobile && npm ci`. Re
 Physical-device performance, final supported-OS declaration, real Health permissions/data, account/cloud/signing, payment/store, legal policies, and public release remain separate external gates. Feature-branch commit and normal push are authorized; before performing them, record the exact staged files, local/tracking/origin hashes, and clean status. Main/merge/force/history rewrite/tag/release/deployment remain out of scope.
 
 The release renderer uses MSAA 0/no AA, DPR1.65, and Lambert shading. It preserves GLB/features and visible room shading on the observed release path. Its A/B cannot claim a physical-device performance gain because median/legacy/high-input results regress despite some aggregate and percentile improvements.
+
+## Publication follow-up
+
+Local implementation `5493d08` and report `c2ac5fb` are committed. Push was attempted and failed because this Windows Git installation has no usable GitHub authentication; origin remained `3310d38`. Read `mobile/evidence/windows-android-runtime/git-audit.json` for the exact final local metadata checkpoint and clean status. After existing-account authentication, fetch the feature branch, inspect divergence, and perform the already-authorized normal push. Do not request renewed technical approval or use force/main/tag/release.

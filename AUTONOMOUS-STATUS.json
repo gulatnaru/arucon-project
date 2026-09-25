@@ -37,10 +37,22 @@
   },
   "lastValidation": {
     "scope": "Current Windows source, native-build, and observed-runtime validation",
-    "mobileTests": { "command": "npm test", "tests": 254, "pass": 254, "fail": 0, "skipped": 0, "exit": 0 },
+    "mobileTests": {
+      "command": "npm test",
+      "tests": 254,
+      "pass": 254,
+      "fail": 0,
+      "skipped": 0,
+      "exit": 0
+    },
     "lint": "PASS",
     "typecheck": "PASS",
-    "targetedNativeAndRenderer": { "tests": 17, "pass": 17, "fail": 0, "exit": 0 },
+    "targetedNativeAndRenderer": {
+      "tests": 17,
+      "pass": 17,
+      "fail": 0,
+      "exit": 0
+    },
     "androidIntegratedDebugWidgetCompile": "PASS",
     "androidReleaseCompile": "PASS_X86_64_2M06S_943_TASKS_39_EXECUTED_CNG_ANDROID_16_OF_16",
     "fontScaleCngPatch": "PASS_ANDROID_RELEASE_RUNTIME_1_TO_1_3_TO_1_TO_1_3",
@@ -422,7 +434,11 @@
     "sourceCommitPerformed": true,
     "docsCheckpointAndPush": "recorded after publication in verificationEvidence",
     "verificationEvidence": "mobile/evidence/windows-android-runtime/git-audit.json",
-    "publicationRecordScope": "Written before its own documentation commit; final local/tracking/origin hashes and clean status are recorded in ignored evidence."
+    "publicationRecordScope": "Written before its own documentation commit; final local/tracking/origin hashes and clean status are recorded in ignored evidence.",
+    "documentationCheckpoint": "c2ac5fb",
+    "pushPerformed": false,
+    "pushStatus": "BLOCKED_EXISTING_GITHUB_AUTHENTICATION_UNAVAILABLE",
+    "remoteCheckpointAtAttempt": "3310d38ce1aedba5f915f97c6387f087b34050a0"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,

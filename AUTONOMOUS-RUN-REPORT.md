@@ -226,3 +226,9 @@ CNG 생성/Swift parse/JS bundle을 실기기 통과로 표현하지 않는다. 
 ## 2026-09-19 당시 다음 작업 (최신 절차는 NEXT-RESUME)
 
 [DECISION-QUEUE](DECISION-QUEUE.md)의 준비된 외부/환경 가지부터 재개한다. SDK 준비만 되면 실제 건강 읽기 OFF 상태로 native compile/simulator 및 별도 physical device 검증을 먼저 수행할 수 있다. 건강/실계정/법적 정책/결제·출시는 명시된 추가 승인 범위에서만 수행한다. 승인된 여섯 제품 방향은 다시 승인 요청하지 않는다.
+
+## Final Windows publication result
+
+Implementation checkpoint `5493d08` and reviewed documentation checkpoint `c2ac5fb` were committed locally. Final independent code/evidence/document review passed; workflow 38/38 and validator regression passed. A normal feature push was attempted, but Git Credential Manager had no usable GitHub authentication. A noninteractive retry failed with terminal credentials unavailable; no credentials were requested or stored in this report. Live origin remains `3310d38`. No push, merge, tag, release, or deployment occurred. A final local metadata checkpoint records this result; exact final local/tracking/origin hashes and clean status are in ignored `mobile/evidence/windows-android-runtime/git-audit.json`.
+
+Existing-account GitHub authentication is the only remaining publication action. After the user authenticates this Git installation, resume with a fetch/divergence check and ordinary feature push. All current Windows engineering is complete; this does not change the product, iOS, physical-performance, or external gates above.

@@ -45,3 +45,7 @@
 ## 재개 규칙
 
 승인된 여섯 방향은 재승인을 묻지 않고 이어 구현한다. 위 항목 중 준비된 가지부터 구현→영향 테스트→독립 reviewer→수정→재검증한다. 승인·실행 없는 외부/기기 gate를 PASS로 바꾸지 않는다. 최종 기준은 SRS14/14-1 전체다.
+
+## EXT-GIT-AUTH — feature checkpoint publication
+
+Normal push to `feature/arucon-mobile-autonomous` is already authorized. This Windows Git installation lacks usable GitHub authentication, so push failed and origin remained `3310d38`. The user must authenticate an existing account with repository write access; do not create an account or place tokens in chat, Git, or logs. Then fetch, inspect divergence, and retry a normal feature push. Local reviewed checkpoints and the final publication record are preserved. Main/merge/force/tag/release remain prohibited.
