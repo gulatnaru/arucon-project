@@ -6,6 +6,10 @@
 
 Expo55.0.31/RN0.83.10/React19.2.0으로 정렬해 macOS15.6/Xcode26.3에서 native compile과 Simulator 설치·프로세스 시작을 통과했다. iOS26.3 runtime도 있다. `expo run:ios` 전체는 마지막 Simulator 창 활성화의 System Events 권한 부족으로 exit1이며 별도 xcodebuild exit0와 구분한다. 실제 GLB·터치/모션·OS 위젯 UI는 권한 대기로 NOT_EVALUATED, physical device NOT_RUN, Android SDK 부재다. 최신 전체239개/lint/typecheck/doctor20개/두 JS bundle/CNG25개 검사는 이번 실행이다. 2026-09-19의236개와 SDK57 빌드 실패는 역사적 증거로 보존한다.
 
+### 2026-09-25 Windows Android 실제 관찰 (현재)
+
+앞 문단의 Android SDK 부재는 2026-09-20 macOS 이력이다. Windows에서 project-local SDK36/NDK27.1로 AVD synthetic runtime, source254/254/lint/typecheck, targeted17/17, CNG16/16, current x86_64 debug/release builds, Font130 runtime, widget footer/tap/rest를 기록했다. Balanced-renderer A/B is PARTIAL/NOT_PASS, not GL FPS/physical proof. Windows scoped engineering is complete; iOS current execution은 Windows에서 NOT_RUN이고 전체 product status는 `MVP_NOT_COMPLETE`다.
+
 ## §14 MVP Definition of Done
 
 | ID | 요구 | 분류 | 현재 구현/잔여 |
@@ -21,10 +25,10 @@ Expo55.0.31/RN0.83.10/React19.2.0으로 정렬해 macOS15.6/Xcode26.3에서 nati
 | M09 | 체력 경계 | PASS | 시간/소화·승인 행동 경계와 무료 교감·실제 걷기 비소모·저체력 허용 자동 검사. |
 | M10 | 청결·청소·기분 | PASS | 승인 config·청결 상태/분할·기존 상태 보존 자동 검사. 실제 화면은 M13. |
 | M11 | 청결만 기운 없음·자연 회복 | PASS | 청결 단일 원인·약 없는 회복·선택 약 코인50 원자 처리 검사. |
-| M12 | 배회·표정·터치 | NEEDS_DEVICE_VALIDATION | 기존 renderer/입력·reduced-motion 계약 유지. 실제 GL/터치/모션은 EXT-ENV. |
-| M13 | 방·가독성·말캉 실제 검토 | BLOCKED_ENV | 승인 2D 참고형 존재, form renderer 연결·명시적 공통 GLB fallback. 네 전용 rigged runtime asset 납품 및 실제 렌더/영상/FPS 수용은 미완료(EXT-RELEASE/ENV). |
+| M12 | 배회·표정·터치 | PARTIAL_DEVICE_VALIDATION | Windows AVD에서 normal touch lean/restore, floor arrival, corrected reduced-motion을 합성 입력으로 관찰. 전체 motion/FPS와 iOS는 미실행. |
+| M13 | 방·가독성·말캉 실제 검토 | PARTIAL_DEVICE_VALIDATION | Windows AVD cold/warm room/GLB와 compact UI를 관찰. Release balanced renderer (MSAA0/no AA, DPR1.65, Lambert) warm render PASS; runtime A/B is PARTIAL/NOT_PASS and physical gain is unproven. 네 전용 rigged asset, 영상/FPS 수용과 iOS는 미완료(EXT-RELEASE/ENV). |
 | M14 | 상점·현금 경계 | HARD_STOP_EXTERNAL | 초기 코인 약/식탁/공/쿠션과 구매 원자성 구현. cash disabled. 실제 결제 gate는 EXT-RELEASE/V08. |
-| M15 | 두 OS 위젯 | BLOCKED_ENV | 6필드 timestamp/open_app bridge·SDK55 CNG25 검사와 iOS 위젯 compile/앱 동반 설치 PASS, 경제 명령 없음. OS 위젯 화면/갱신은 UI 검증 대기, Android native는 SDK 부재(EXT-ENV/ACCOUNT). |
+| M15 | 두 OS 위젯 | PARTIAL_DEVICE_VALIDATION | Android footer/home/tap/rest is observed PASS; iOS17 containerBackground/target-phase PNG/footer static review closed; targeted native17/17, Android debug/release compile, source suite254/254/lint/typecheck PASS. iOS OS render NOT_RUN. 경제 명령 없음. |
 | M16 | 동면 부정 진행 정지 | PASS | 승인 로컬 config·경계/복귀·정지 자동 검사. OS lifecycle는 V03/V06. |
 | M17 | 단일 config | PASS | APPROVED_MVP_POLICY/APPROVED_GAME_CONFIG와 역사적 DEV fixture 분리, SRS9-4/ADR005 연결. |
 | M18 | 건강 원본 미전송 | PASS | 현재 local/fake/nativeOFF 경로 allowlist·원본/비밀 차단 검사. 실제 연결 후 재검증 의무 유지. |
@@ -36,16 +40,16 @@ Expo55.0.31/RN0.83.10/React19.2.0으로 정렬해 macOS15.6/Xcode26.3에서 nati
 |---|---|---|---|
 | V01 | 승인·SRS/config/tests 일치 | HARD_STOP_EXTERNAL | 여섯 제품 방향과 가역 config 승인 반영. 출시 전체에 필요한 법률·실서비스·지원 OS 승인은 잔여. |
 | V02 | 중복·상한·분수·과거·날짜 | PASS | 승인 로컬 정책의 합성 경계/재시도/분할 검사. 실제 공급자 데이터는 V05/V06. |
-| V03 | 식사 OS 종료·재시작 | BLOCKED_ENV | SQLite 실패/rollback/reload·중복 방지 자동 검사. 실제 앱 프로세스 강제 종료는 미실행. |
+| V03 | 식사 OS 종료·재시작 | PARTIAL_DEVICE_VALIDATION | Windows AVD meal 후 force-stop/relaunch를 관찰: SQLite integrity_check OK 및 food0/coin5/EXP15M/meals1/registry1 동일. iOS 및 final fresh regression은 미실행/PENDING. |
 | V04 | 시각/RNG·분할·복합 상태 | PASS | 주입 시간/난수·단회 결과·시간 경계·복합 상태 자동 검사. |
 | V05 | 수면 승인 예시+실제 기록 | HARD_STOP_EXTERNAL | 승인 산식과 합성 예시/분할/무기록 검사 완료. 실제 플랫폼 기록은 EXT-HEALTH/ENV. |
 | V06 | 두 OS 권한/철회/재부팅 | BLOCKED_ENV | fake 오류/철회·권한 OFF·native scaffold. SDK/기기와 실제 건강 접근 승인 필요. |
 | V07 | 오프라인/이전/복구/migration | HARD_STOP_EXTERNAL | schema7 additive migration·재시도/HOL·단일 writer/fence·명시 이전·확인분 복구 한계 합성 검사. 실제 계정/서버는 EXT-ACCOUNT. |
 | V08 | 실결제 실패/중복/복원/환불 | HARD_STOP_EXTERNAL | 현금 비활성 port/catalog 경계. 실결제 및 플랫폼 sandbox는 EXT-RELEASE/ACCOUNT. |
 | V09 | 동의/정책·접근 통제 | HARD_STOP_EXTERNAL | fake scope/철회·privacy allowlist 검사. 법적 정책과 실제 backend 접근 검증 필요. |
-| V10 | 실제 환경/명령/증거 | PASS | 현재239개/doctor20개/lint/typecheck/두 JS bundle/CNG25개/독립 QA 및 xcodebuild exit0·설치/process PASS. Expo GUI exit1·visual/physical 미실행을 분리하고 과거 결과 보존. |
+| V10 | 실제 환경/명령/증거 | PARTIAL_DEVICE_VALIDATION | macOS historical evidence와 Windows Android current evidence를 분리 보존. Windows source254/254/lint/typecheck/native17/17, CNG Android16/16, debug/release x86_64 compile, Font130, footer/tap/rest, release cold/warm GLB PASS. Renderer A/B PARTIAL/NOT_PASS; iOS NOT_RUN. |
 | V11 | 차단 결함·인간 출시 판단 | HARD_STOP_EXTERNAL | 독립 로컬 코드 QA와 외부/실기기 미검증 구분. 최종 출시 판단은 EXT-RELEASE. |
 
 ## 종료 판단
 
-이번 SDK55 마이그레이션과 네이티브 컴파일·설치 검증은 완료했다. SRS 전체의 시각/위젯/lifecycle 검증은 현재 UI 자동화 권한 또는 수동 검증이 필요해 남아 있다. iOS SDK/runtime 부재나 compiler failure 상태는 해소됐고, Android SDK와 실기기는 미준비다. 상태는 SDK55_MIGRATION_VALIDATED_WITH_UI_LIMITS, 전체 제품은 MVP_NOT_COMPLETE다. 법률/실제 건강/계정/결제·출시의 외부 경계는 유지한다. 실제 검증·독립 리뷰는 AUTONOMOUS-RUN-REPORT.md, 승인과 재개 항목은 DECISION-SUMMARY.md 및 DECISION-QUEUE.md에 있다.
+macOS SDK55 migration history와 Windows Android partial runtime evidence는 모두 보존한다. Windows scoped engineering is complete, with balanced-renderer A/B explicitly PARTIAL/NOT_PASS. iOS current runtime is NOT_RUN on Windows. 상태는 `WINDOWS_ENGINEERING_COMPLETE_PRODUCT_MVP_NOT_COMPLETE`, 전체 제품은 `MVP_NOT_COMPLETE`다. 법률/실제 건강/계정/결제·출시의 외부 경계는 유지한다.

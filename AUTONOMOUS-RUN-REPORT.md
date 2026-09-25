@@ -1,6 +1,41 @@
-# Expo SDK 55 호환성 마이그레이션 보고서
+# Windows Android engineering report with retained SDK history
 
-## 2026-09-20 Simulator 검증 최신 부록
+## 2026-09-25 Windows Android 실제 실행 부록 (현재)
+
+Source checkpoint: `5493d08` (24 mobile source/test/asset files). Documentation and validation remain a separate pending checkpoint; no final push is claimed here.
+
+Windows 10 Home 19045의 `feature/arucon-mobile-autonomous` HEAD `3310d38`에서 프로젝트 로컬 Temurin 17, Android SDK/build-tools 36, NDK 27.1, Gradle 9 및 Emulator 37.1.11로 실제 Android debug APK를 컴파일하고 AVD `Arucon_API_36`에서 설치·실행했다. 이 부록은 아래 macOS iOS 이력을 대체하지 않는다. 모든 입력은 합성이고 Health는 OFF이며, 실제 계정·결제·스토어·관리자 작업은 수행하지 않았다.
+
+| 관찰/검사 | 상태 | 근거 |
+|---|---|---|
+| Android x86_64 debug compile | PASS | `android-build.log`: 13m58s, 366 tasks, APK 63,158,450 bytes, SHA-256 `C19315CE8C1E77027368E440A8BB8476EEF2B615B066881A373F36FB54143A19` |
+| AVD boot/install/launch 및 합성 onboarding/room | PASS (관찰 범위) | `android-emulator-install.log`, `android-onboarding.png`, `android-room-first.png`, `android-cold-v2.png`, `android-cold-second.png` |
+| meal 후 force-stop/relaunch SQLite 복원 | PASS (관찰 범위) | `android-after-meal.sqlite`, `android-after-restore.sqlite`; integrity_check OK, food 0/coin 5/EXP 15,000,000/meals 1/registry 1 일치 |
+| reduced motion | PASS (관찰 범위) | `android-reduced-correct.mp4`; `transition_animation_scale=0`로 기록 후 원래 `1.0` 복원. arrival at 5s and same pose at 10/20/28s are reduced-motion evidence. |
+| normal touch / floor arrival | PASS (관찰 범위) | `android-touch.mp4` shows normal touch lean/restore; floor arrival was observed in earlier videos. Misnamed `android-reduced-v2.mp4` used the wrong OS setting and is not valid reduced-motion evidence. |
+| sleep UI | PASS (관찰 범위) | `android-ui-sleep-feed.xml`; 합성 70분에서 multiplier 1.175, 즉시 EXP 없음, 휴식 중 feed 거절/깨우기 복귀 |
+| widget home/footer/tap | PASS (observed Android scope) | `android-widget-footer.png` fully reads `9/25/26 7:53 AM`; tap opens the room (`android-widget-tapped.png`) and activities report topResumed MainActivity. After app rest→HOME, widget shows `쉬는 중` with updated 7:54 AM (`android-balanced-rest.png`, `android-widget-sleep.png`). |
+| widget/footer source repair / targeted checks | PASS (source scope) | iOS17 `containerBackground`, target phase PNG, timestamp footer, Android/iOS widget template asset path; static review closed and native checker/plugin/templates/renderer 17/17 PASS. iOS compile/runtime remains NOT_RUN on Windows. |
+| Android final debug/release x86_64 compile | PASS | current rebuild exit0, 2m06s, 943 tasks/39 executed. Debug SHA-256 `4290D27DD6A3F82AF9DC563D50666F0E72960A0D1AD29293751F2DDF53129105`, release `A2F318723CD20E3FF005758900ADA49630CEE4CC6F67667976B717D5C25247BD`. Earlier builds/hashes are retained as history. |
+| current source suite / final widget runtime QA | PASS / PASS (observed Android scope) | `npm test` 254/254, 0 skipped; lint/typecheck and CNG Android16/16 PASS. Footer/home/tap/rest observations are recorded above. |
+| perf improvement | NOT_PROVEN | `android-perf-idle-v2.txt`: projection callback dedupe A/B가 overall FPS를 개선했다는 근거 없음; ViewRoot 약 24/s, jank 약 65%, p50 약 25ms |
+| Font 130 activity recreation storage DB | PASS (observed Android scope) | simple busy retry failure history is retained. React Native `fontScale` activity-recreation CNG manifest patch rebuilt successfully; release APK install/retry observed 1→1.3→1→1.3 without errors, same PID 3500, and resized UI XML/PNG (`android-release-font100.xml`, `android-release-font130.xml`, `android-release-font130-repeat.xml`). |
+
+콜드 시작 GL blank 문제는 initial `null`/unknown AppState resume guard 뒤 실제 방이 바로 보이는 것으로 재관찰했다. 상태바 대비, compact default UI, details/fixture modal, 최소 48dp action은 `android-cold-second.png`와 `android-fixtures-v2.png` 범위에서 확인했다. These initial static/partial captures do not establish overall motion/FPS. They do not negate the separately observed final Android widget footer/home/tap/rest PASS. Host GPU mode는 OpenGL Core unsupported로 실패했고 software mode를 복원했다. 재시작 뒤 software emulator의 app/SystemUI transient ANR dialogs와 4-core warmed app visibility는 smoothness PASS 근거가 아니다.
+
+Release APK 설치 후 `adb reverse --list`는 empty였고, cold MainActivity launch에서 bundled GLB room이 보였다 (`android-release-first.png`). Widget footer/tap/rest observation is PASS on the Android AVD, and balanced-renderer warm room render is PASS in the observed Android AVD scope. Runtime A/B is separately PARTIAL/NOT_PASS; it is not GL FPS or physical acceptance. Feature commit/push is authorized; the final audit must record the resulting local/tracking/origin hashes and clean status.
+
+Release balanced renderer is source-validated and warm-render PASS on this Android AVD. Release uses MSAA 0/no AA, DPR 1.65, and Lambert shading; these settings were previously dev-only. The tradeoff keeps GLB/features while making room shading visible on the tested release path. It is a bounded release rendering choice, not a physical-device performance claim.
+
+The current release APK installs with `adb install -r`, has no adb reverse dependency, and native MainActivity launch succeeds. The first post-boot capture (`android-balanced-first.png`) showed a SystemUI—not Arucon—"isn't responding" dialog. After waiting, the GLB room rendered (`android-balanced-warm.png`). Preserve this host-instability limitation: the renderer change does not claim to fix host ANRs or establish physical acceptance.
+
+Runtime A/B is **PARTIAL / NOT_PASS**. Aggregate frame samples changed from baseline 772/42.434s (18.19/s) to balanced 1241/47.189s (26.30/s); modern jank 64.38%→42.79%, p90 53→44ms, p95 65→53ms, and p99 101→69ms. Median regressed 19→32ms, legacy jank 47.8%→87.83%, and high-input jank 84→746. This is host-software evidence only, not GL FPS, not causal proof, and not a physical-device acceptance result.
+
+Scoped Windows authorized engineering is complete. Product MVP remains NOT_COMPLETE. Evidence is archived in ignored `mobile/evidence/windows-android-runtime/`: 123 evidence files plus manifest, limited to `android*.png`, `.mp4`, `.sqlite`, `.xml`, `.txt`, `.log`, `.json`, `.md`; patches and dependency directories are excluded. The static workflow passes 38/38 (`generatedvalidation/v1.9-static-check.json`). Feature commit/push is authorized but awaits root evidence/audit.
+
+Windows evidence is archived at `mobile/evidence/windows-android-runtime/`. The emulator and owned Metro port 8088 are stopped; font scale and transition settings are restored to 1. Requested Sol/Terra role effectiveness remains `ROUTING_UNVERIFIED` because backend model metadata was not exposed.
+
+## Historical 2026-09-20 macOS Simulator validation
 
 현재 HEAD는 `0f102f8`, 브랜치는 `feature/arucon-mobile-autonomous`이며 이번 검증에서는 commit/push를 수행하지 않았다. `open -a Simulator`는 exit0, iPhone 16e iOS 26.3 Simulator는 booted 상태였다. `simctl launch <Simulator> com.arucon.dev`는 exit0과 PID 18389를 반환했고 `ps`로 프로세스를 확인했다. `pluginkit`으로 `com.arucon.dev.widget` 등록도 확인했다. 이번에는 native 재빌드를 하지 않았으며, 기존 SDK55 `xcodebuild` exit0 증거를 유지한다.
 

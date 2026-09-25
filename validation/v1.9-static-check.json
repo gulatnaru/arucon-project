@@ -6,7 +6,7 @@
     {
       "name": "AGENTS under 32KiB",
       "ok": true,
-      "detail": "4296"
+      "detail": "4614"
     },
     {
       "name": "AGENTS says Astra not default worker",

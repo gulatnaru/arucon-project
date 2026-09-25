@@ -36,9 +36,9 @@
 
 ## EXT-ENV — 시스템 환경·기기·UI 검증
 
-- 현재: 사용자 요청으로 OS 업그레이드 없이 SDK55.0.31로 마이그레이션했다. 공식 최소 Xcode26.2를 현 Xcode26.3/macOS15.6이 충족하며 iOS native compile/install/process start PASS다. iOS26.3 Simulator runtime도 사용 가능하다. 기존 SDK57의 Xcode26.4+ 미달은 현재 차단 원인이 아니다.
-- 남은 사람 작업: 필요 시 macOS 자동화/System Events 및 CUA 접근성·화면 기록 권한을 허용하거나 Simulator 화면을 수동 검증. Android SDK/emulator/실기기 준비. 권한 변경·시스템 설치는 자동 수행하지 않았다.
-- 실행/잔여: 전체239개·doctor20개·CNG25개·독립 QA, xcodebuild exit0 및 simctl process start exit0. `expo run:ios`는 컴파일/설치 후 창 활성화에서 exit1(`BLOCKED_ENV_AUTOMATION_PERMISSION`). 화면/GLB/터치/모션/OS 위젯은 NOT_EVALUATED, physical device NOT_RUN. 근거 `mobile/evidence/sdk55-migration/`, ADR009.
+- 현재: macOS SDK55 이력의 iOS native compile/install/process start PASS와 UI 제한을 보존한다. Windows Android AVD에서는 synthetic onboarding/room, meal force-stop/relaunch SQLite equality, touch/floor arrival, corrected reduced motion, sleep UI 및 old widget bind/tap을 실제 관찰했다. Health OFF와 외부 경계는 유지한다.
+- Windows local engineering 완료: Font130 runtime, widget footer/tap/rest, source suite254/254/lint/typecheck, targeted17/17, CNG16/16, and current debug/release x86_64 build. balanced-renderer A/B is PARTIAL/NOT_PASS, not GL FPS/physical acceptance. Evidence is archived as ignored `mobile/evidence/windows-android-runtime/` with manifest only; patches/dependency directories are excluded. iOS current runtime/OS widget render는 Windows에서 NOT_RUN이며 별도 macOS manual/automation scope가 필요하다.
+- 남은 external/environment gates: macOS iOS CNG/static/native compile/simulator+WidgetKit observation, physical-device performance and supported-OS acceptance, plus the existing legal/Health/account/payment/release decisions. Windows software-host instability (SystemUI ANR) is recorded and is not an app ANR or a renderer-fix claim.
 - 선택지: 필요한 UI 권한을 직접 허용하고 합성 검증 재개 / 사용자가 Simulator를 수동 조작해 검증 / 별도 준비된 Android·실기기 환경 제공. **추천: 현 iOS Simulator의 합성 UI·저장·위젯 검증부터 진행.**
 - 이후 첫 검증: Metro 실행→개발 앱 연결→합성 온보딩/GLB/식사/lifecycle/위젯→별도 physical device 검증. 실제 Health 접근은 계속 OFF다. 프로세스 시작을 실제 화면/모션 PASS로 사용하지 않는다.
 

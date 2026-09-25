@@ -1,12 +1,14 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-09-20",
+  "runDate": "2026-09-25",
   "timezone": "Asia/Seoul",
-  "status": "SDK55_SIMULATOR_PROCESS_VALIDATED_WITH_HOST_LOCK_LIMITS",
+  "status": "WINDOWS_ENGINEERING_COMPLETE_PRODUCT_MVP_NOT_COMPLETE",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "SDK55 native compile/install, simulator process start, widget extension registration, and targeted 64/64 checks passed. Host is locked and CUA access is unavailable, so visual/interactive/widget-home/physical gates remain unrun.",
-  "sourceBaseline": "0f102f839e7db1d4d244ef697c906731f23a780c",
+  "reason": "Authorized Windows Android engineering is complete: source/build, Font130, widget/footer/tap/rest, and bounded renderer A/B evidence are recorded. Product MVP stays incomplete because iOS/macOS, physical-device performance/support, and external gates remain separate.",
+  "sourceBaseline": "3310d38",
+  "sourceCheckpoint": "5493d08",
+  "currentGapMatrixDocument": "MVP-GAP-MATRIX.md",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
   "routing": {
@@ -19,23 +21,57 @@
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
     "currentRun": {
       "root": "requested Astra integration/native verification",
-      "builder": "NOT_INVOKED_NO_PRODUCT_DEFECT_ESTABLISHED",
-      "explorer": "simulator_flow_map / arucon_explorer requested Terra",
-      "reviewer": "simulator_evidence_review / arucon_reviewer requested Terra High",
-      "luna": "sdk55_docs / arucon_luna_worker requested Luna"
+      "builder": "requested Sol: AppState, widget/native, SQLite/fontScale CNG, and release renderer fixes",
+      "explorer": "requested Terra: Android runtime and native/renderer evidence mapping",
+      "reviewer": "requested Terra High: widget iOS17/static source review and evidence boundary review",
+      "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
     }
   },
   "completion": {
-    "independentLocalEngineering": "COMPLETE",
+    "independentLocalEngineering": "ENGINEERING_COMPLETE_WINDOWS_SCOPED",
+    "productMvp": "NOT_COMPLETE",
+    "androidRuntime": "PARTIAL_SYNTHETIC_AVD_OBSERVED",
+    "androidReleaseCompile": "PASS_X86_64",
+    "widgetRuntimeQa": "PASS_OBSERVED_ANDROID_FOOTER_TAP_REST",
+    "iosCurrentRuntime": "NOT_RUN_ON_WINDOWS"
+  },
+  "lastValidation": {
+    "scope": "Current Windows source, native-build, and observed-runtime validation",
+    "mobileTests": { "command": "npm test", "tests": 254, "pass": 254, "fail": 0, "skipped": 0, "exit": 0 },
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "targetedNativeAndRenderer": { "tests": 17, "pass": 17, "fail": 0, "exit": 0 },
+    "androidIntegratedDebugWidgetCompile": "PASS",
+    "androidReleaseCompile": "PASS_X86_64_2M06S_943_TASKS_39_EXECUTED_CNG_ANDROID_16_OF_16",
+    "fontScaleCngPatch": "PASS_ANDROID_RELEASE_RUNTIME_1_TO_1_3_TO_1_TO_1_3",
+    "widgetIos17StaticReview": "CLOSED_PASS",
+    "widgetTimestampFooter": "PASS_ANDROID_VISUAL_9_25_26_7_53_AM_TAP_REST",
+    "releaseBalancedRenderer": "PARTIAL_NOT_PASS_MSAA0_NO_AA_DPR1_65_LAMBERT_HOST_SOFTWARE_AB",
+    "balancedReleaseRuntime": "INSTALL_R_PASS_NO_ADB_REVERSE_NATIVE_MAINACTIVITY_LAUNCH_SYSTEMUI_ANR_THEN_WARM_GLB_ROOM",
+    "apkRebuild": "PASS_DEBUG_AND_RELEASE_X86_64_2M06S_943_TASKS_39_EXECUTED",
+    "iosCompileAndRuntime": "NOT_RUN_ON_WINDOWS"
+  },
+  "environment": {
+    "host": "Windows 10 Home 19045",
+    "node": "24.19.0",
+    "npm": "11.17.0",
+    "androidToolchain": "project-local Temurin17/SDK36/build-tools36/NDK27.1/Gradle9/Emulator37.1.11",
+    "androidAvd": "Arucon_API_36",
+    "healthAccess": "OFF",
+    "hostGpu": "FAILED_OPENGL_CORE_UNSUPPORTED",
+    "softwareEmulator": "RESTORED"
+  },
+  "historicalMacCompletion": {
+    "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
     "independentReview": "PASS_SOURCE_CNG_NATIVE_WITH_UI_LIMITS",
     "remainingIndependentWork": [
       "Simulator visual/GLB/touch/motion and widget OS interaction validation after UI automation permission or manual testing"
     ],
     "productMvp": "NOT_COMPLETE",
-    "nativeDevelopmentBuild": "PASS_IOS_ANDROID_NOT_RUN_BLOCKED_ENV",
+    "nativeDevelopmentBuild": "PASS_ANDROID_DEBUG_COMPILE_IOS_HISTORICAL_ONLY",
     "simulatorExecution": "PASS_INSTALL_AND_PROCESS_START_ONLY",
     "physicalDeviceExecution": "NOT_RUN",
-    "visualMotionFps": "NOT_RUN_BLOCKED_HOST_LOCKED",
+    "visualMotionFps": "PARTIAL_ANDROID_OBSERVED_PERFORMANCE_NOT_PROVEN",
     "productionPolicies": "SIX_DEFAULTS_APPROVED_EXTERNAL_BOUNDARIES_OFF",
     "formRendering": "APPROVED_2D_REFERENCE_PRESENT_EXPLICIT_COMMON_GLB_FALLBACK_FOUR_RUNTIME_ASSETS_NOT_DELIVERED",
     "iosWidgetCompileAndLink": "PASS_INSTALLED_WITH_APP_NOT_WIDGET_OS_RENDER",
@@ -59,6 +95,37 @@
       "metro": "RUNNING_LOCALHOST_8081"
     }
   },
+  "windowsAndroidRuntime": {
+    "host": "Windows 10 Home 19045",
+    "headAtStart": "3310d38",
+    "androidDebugCompile": "PASS_13M58S_366_TASKS",
+    "avdBootInstallLaunch": "PASS_SYNTHETIC_OBSERVED",
+    "roomAndColdStart": "PASS_SYNTHETIC_OBSERVED",
+    "mealForceStopRelaunchSqlite": "PASS_SYNTHETIC_OBSERVED",
+    "normalTouchFloorArrival": "PASS_SYNTHETIC_OBSERVED",
+    "reducedMotion": "PASS_TRANSITION_ANIMATION_SCALE_0_RESTORED_1",
+    "sleepUi": "PASS_SYNTHETIC_OBSERVED",
+    "oldWidgetBindTap": "PASS_SYNTHETIC_OBSERVED_HISTORICAL_OLD_BIND_TAP_FINAL_WIDGET_PASS_RECORDED_SEPARATELY",
+    "baselineBeforeUiPerfChanges": "245/245 tests; native 8/8; Android checker 15/15",
+    "finalFullSuite": "PASS_254_OF_254_0_SKIPPED",
+    "widgetSourceAndTargetedNative": "PASS_17_OF_17_IOS17_CONTAINER_BACKGROUND_TARGET_PHASE_PNG_FOOTER_RENDERER",
+    "androidIntegratedDebugWidgetCompile": "PASS",
+    "androidReleaseCompile": "PASS_X86_64_2M06S_943_TASKS_39_EXECUTED",
+    "finalApkSha256": {
+      "debug": "4290D27DD6A3F82AF9DC563D50666F0E72960A0D1AD29293751F2DDF53129105",
+      "release": "A2F318723CD20E3FF005758900ADA49630CEE4CC6F67667976B717D5C25247BD"
+    },
+    "finalWidgetNativeBuild": "PASS_OBSERVED_ANDROID_SCOPE",
+    "font130ActivityRecreationStorageDb": "PASS_OBSERVED_ANDROID_RELEASE_BUSY_RETRY_HISTORY_RETAINED",
+    "performance": "PARTIAL_NOT_PASS_HOST_SOFTWARE_AB_NOT_GL_FPS_OR_PHYSICAL_ACCEPTANCE",
+    "iosCurrentRuntimeOnWindows": "NOT_RUN",
+    "iosDirectoryPresent": false,
+    "iosActualTestPath": false,
+    "evidenceDirectory": "mobile/evidence/windows-android-runtime/",
+    "evidenceArchive": "PASS_123_FILES_PLUS_MANIFEST",
+    "workflow": "PASS_38_OF_38_generatedvalidation/v1.9-static-check.json",
+    "environmentRestored": "fontScale1_transitionAnimationScale1_emulatorStopped_metro8088Stopped"
+  },
   "implemented": [
     "가입·연령·이름: 로컬 합성 온보딩/명명·scope·철회 계약. 실제 미성년 동의·가입은 EXT-LEGAL/ACCOUNT.",
     "활동→먹이·코인·상한·폴백: 승인 config·중복/분수/상한/과거 수정·불완전 집계 보류·fake/오류 처리. 실제 건강 읽기 OFF, 지원 OS 최종 선언 전 EXT-HEALTH/ENV/RELEASE.",
@@ -80,8 +147,8 @@
     "건강 원본 미전송: 현재 local/fake/nativeOFF 경로 allowlist·원본/비밀 차단 검사. 실제 연결 후 재검증 의무 유지.",
     "비난 없는 안내: 앱 안 상태 안내 우선·중립 문구·합성 알림 중복/철회 검사. 실제 발송 비활성."
   ],
-  "lastValidation": {
-    "scope": "SDK55 migration history; latest simulator validation is recorded separately",
+  "historicalMacLastValidation": {
+    "scope": "Mac SDK55 validation is historical; Windows Android compile/AVD evidence is current and recorded separately below",
     "mobileTests": {
       "command": "npm test",
       "tests": 239,
@@ -129,7 +196,7 @@
     "simulatorRuntime": "AVAILABLE_iOS26.3_NOT_BLOCKED_ENV_SIM_RUNTIME",
     "visualGlbTouchMotionWidgetOs": "NOT_EVALUATED",
     "physicalDeviceExecution": "NOT_RUN",
-    "androidNativeCompile": "NOT_RUN_BLOCKED_ENV",
+    "androidNativeCompile": "PASS_WINDOWS_DEBUG_COMPILE_SEPARATE_FROM_HISTORICAL_MAC_VALIDATION",
     "firstInstallFailure": "stale SDK57 npm peer graph ERESOLVE; clean SDK55 lock resolved without force",
     "firstNativeInstallFailure": "CFBundleExecutable missing in generated widget plist; fixed in CNG plugin and regression tested",
     "evidence": "mobile/evidence/sdk55-migration/",
@@ -139,7 +206,7 @@
       "total": 38
     }
   },
-  "environment": {
+  "historicalMacEnvironment": {
     "node": "26.7.0",
     "npm": "11.19.0",
     "commandLineTools": true,
@@ -147,9 +214,9 @@
     "java": true,
     "fullXcode": true,
     "iosSimulatorSdk": true,
-    "androidSdk": false,
-    "adb": false,
-    "emulator": false,
+    "androidSdk": true,
+    "adb": true,
+    "emulator": true,
     "simctl": true,
     "evidence": "mobile/evidence/sdk55-migration/environment.json",
     "xcodeVersion": "26.3",
@@ -165,7 +232,7 @@
     "automationPermission": "BLOCKED_ENV_AUTOMATION_PERMISSION",
     "simulatorRuntimeAvailable": true
   },
-  "gapMatrix": [
+  "historicalMacGapMatrix": [
     {
       "id": "M01",
       "status": "HARD_STOP_EXTERNAL",
@@ -323,9 +390,9 @@
     "EXT-HEALTH real health reads remain OFF",
     "EXT-ACCOUNT actual accounts/cloud/signing",
     "EXT-RELEASE actual payments/store/release/support declaration",
-    "EXT-ENV Android SDK/device missing; macOS GUI automation permissions pending. iOS SDK55 compile/install/process start passed on current host; OS upgrade not required for this SDK."
+    "EXT-ENV local Android SDK/AVD is available; remaining environment gates are macOS iOS runtime/WidgetKit observation and physical-hardware performance/support acceptance."
   ],
-  "git": {
+  "historicalMacGit": {
     "branch": "feature/arucon-mobile-autonomous",
     "rootRepository": true,
     "mobileLayout": "ordinary_directory",
@@ -348,6 +415,14 @@
     "checkpoint": "0f102f8",
     "originCheckpointHistory": "SDK55 migration checkpoint was committed/pushed before this simulator validation; this run made no commit/push",
     "preCheckpointHead": "0e795d94056f63d3192cbd9422a1c9823f3df401"
+  },
+  "git": {
+    "branch": "feature/arucon-mobile-autonomous",
+    "sourceCheckpoint": "5493d08",
+    "sourceCommitPerformed": true,
+    "docsCheckpointAndPush": "recorded after publication in verificationEvidence",
+    "verificationEvidence": "mobile/evidence/windows-android-runtime/git-audit.json",
+    "publicationRecordScope": "Written before its own documentation commit; final local/tracking/origin hashes and clean status are recorded in ignored evidence."
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -415,7 +490,7 @@
       }
     }
   },
-  "evidenceDirectory": "mobile/evidence/sdk55-migration",
+  "evidenceDirectory": "mobile/evidence/windows-android-runtime/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [

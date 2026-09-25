@@ -29,7 +29,7 @@
 | DQ-06 계정/동의 | fake scope·철회·오류·비전송 경계 | 법률·외부 계정/프로젝트 |
 | DQ-07 동기화/복구 | single writer·handoff·fence·복구 안내 구현 | 실제 backend/account와 법적 보존/삭제 |
 | DQ-08 위젯/알림 | timestamp/read-only·앱 안 안내, native 준비 | 실제 기기 검증·서명/플랫폼 계정 |
-| DQ-09 환경 | SDK55 공식 조합으로 migration; Xcode26.3 native compile/install/process start PASS | macOS UI 자동화 권한 또는 수동 검증; Android SDK/실기기 준비 |
+| DQ-09 환경 | macOS SDK55 iOS compile/install/process 이력과 Windows Android source/build/Font130/widget partial runtime 관찰을 분리 보존 | balanced-renderer A/B is PARTIAL/NOT_PASS; iOS current UI/OS widget render와 physical device 검증 |
 | DQ-10 보안/출시 | 중복/형식/순서 정합성 검사·비난 없는 오류 유지 | 법률/상표·실결제/출시. 행동 임계값으로 처벌하는 새 기능은 도입하지 않음 |
 
 ## 기술 결정 연결
@@ -44,7 +44,7 @@
 ## 권한과 완료 의미
 
 - 로컬 합성 입력은 실제 건강 접근을 포함하지 않는다. 법적 동의/실미성년 계정은 미활성이다.
-- 현재 SDK55.0.31/RN0.83.10/React19.2.0은 macOS15.6/Xcode26.3에서 공식 지원 조합이다. iOS native compile/install/process start PASS이며 runtime도 있다. Expo CLI 창 활성화는 macOS 권한으로 exit1, 화면/모션은 미검증이다. Android SDK/emulator 부재. 최신 증거 `mobile/evidence/sdk55-migration/`.
+- macOS SDK55.0.31/RN0.83.10/React19.2.0 이력에서는 iOS native compile/install/process start PASS이며 Expo CLI 창 활성화는 macOS 권한으로 exit1, 화면/모션은 미검증이다. 2026-09-25 Windows에서는 Android SDK/emulator로 source254/254, native17/17, debug/release build, Font130, widget footer/tap/rest 관찰을 기록했다. renderer A/B is PARTIAL/NOT_PASS. 이 두 환경은 합쳐서 iOS/Android 전체 runtime PASS가 아니다. Windows evidence 경로는 `mobile/evidence/windows-android-runtime/`이다.
 - native project generation·parse·JS bundle과 실제 native compile·simulator·physical device를 분리한다.
 - 1차 외형 논리와 승인 아트/최종모션도 구분한다. 승인 2D 참고 시트는 존재한다. formId는 렌더러까지 전달되지만 전용 rigged/animated runtime asset이 없는 네 진화형은 명시적인 공통 GLB fallback을 사용한다. 이를 최종 진화 아트 렌더 통과로 표현하지 않는다.
 - SRS14/14-1 전체30행은 MVP-GAP-MATRIX.md에서 로컬 충족·외부·환경 잔여로 판정한다. 실기기/실서비스 미실행을 PASS로 바꾸지 않는다.
@@ -58,6 +58,10 @@ DECISION-QUEUE.md에는 **법률 / 실제 건강정보 / 외부 계정 / 실결�
 ## 2026-09-20 SDK55 마이그레이션 (현재)
 
 ADR009가 임시 JSI 패치를 대체했고 패치와 postinstall을 제거했다. 전체239개/doctor20개/lint/typecheck/두 JS bundle/CNG25개 PASS. CFBundleExecutable 누락을 독립 리뷰로 발견해 CNG에서 수정했고 native compile/install/process 시작을 통과했다. `expo run:ios` 전체는 마지막 GUI 활성화 exit1이며 xcodebuild exit0와 분리한다. 제품 정책/DB7/3D asset/모션/위젯 계약은 유지했다. 실제 GLB·위젯 UI·모션·실기기는 미검증이며 feature 체크포인트 commit/push만 수행했다. main/merge/deploy는 하지 않았다.
+
+## 2026-09-25 Windows Android partial runtime (current)
+
+ADR-010은 project-local Android toolchain 선택을, ADR-011은 actual evidence classification을 기록한다. Android AVD에서 synthetic onboarding/room, meal force-stop/relaunch SQLite equality, normal touch/floor arrival, corrected reduced-motion, sleep UI, widget footer/tap/rest를 관찰했다. Health는 OFF이고 실제 accounts/payment/store/admin 작업은 없다. iOS17 `containerBackground`/target-phase PNG/footer widget repair의 static review is closed; targeted native17/17, Android debug/release build, source suite254/254/lint/typecheck, and Font130 runtime PASS다. Renderer A/B is PARTIAL/NOT_PASS; iOS compile/runtime remains NOT_RUN. 현재 Android 관찰은 end-to-end performance or release readiness를 대체하지 않는다.
 
 ## 2026-09-20 SDK57 빌드 수정 이력 (현재 baseline 아님)
 
