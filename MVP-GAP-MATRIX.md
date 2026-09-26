@@ -1,5 +1,9 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## Current physical gate — 2026-09-26 / baseline `b6aee5b`
+
+Physical gate is `BLOCKED_ENV`: iOS has no observed USB device (`devicectl` devices=[]; `xctrace` only Mac/Simulators), zero signing identities/profiles, and only unsigned iphoneos compile evidence (`BUILD SUCCEEDED`). Android physical device count is **UNKNOWN** because adb/SDK are absent and wireless discovery was not verified. All physical runtime, motion, input-to-photon, FPS, thermal and battery validation is **NOT_RUN**. iOS CNG `23/23` is PASS only for generation. Evidence is `mobile/evidence/physical-b6aee5b/`; read-only readiness tooling and the physical runbook are implemented, with final source checks in the current run report. These preparations close no physical runtime or performance gate. Health OFF; DEC31 performance budget OPEN.
+
 ## 2026-09-26 unlock resume appendix — c0719ea
 
 Installed Release (`fixed-bundle-sha256.txt` 기준 `main.jsbundle` SHA = DerivedData SHA, Metro 8081 absent)에서 상세 화면, 바닥 이동/연속 retarget, AX touch 응답, 휴식 pose, feed 거절과 wake 후 성공, reduced motion ON/OFF 복원을 실제 확인했다. `mobile/evidence/ios-release-c0719ea/`에 기록했다. UI notice 잔존은 `App.tsx` 한 줄 수정 후 대상 lint/typecheck와 Release rebuild `BUILD SUCCEEDED`로 확인했다. restart 비교와 widget before/after diff는 각각 상태 동일·diff0이며, 08 거절→09 wake/feed 성공에서 낡은 notice가 없다.

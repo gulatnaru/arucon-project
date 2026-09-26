@@ -1,5 +1,12 @@
 # 외부 승인·환경 대기열 — fresh iOS validation
 
+## Current physical-device gate — 2026-09-26 / baseline `b6aee5b`
+
+- 상태: iOS와 Android 모두 `BLOCKED_ENV`. iOS `devicectl` devices=[]이고 `xctrace`는 Mac/Simulator만 관찰했으며 USB iPhone은 없음. signing identity 0, provisioning profile 0. iOS CNG `23/23`와 unsigned iphoneos Release compile(`BUILD SUCCEEDED`)은 설치·실기기 실행 PASS가 아니다.
+- Android adb/SDK가 없어 실기기 수는 **UNKNOWN**이며 0으로 추정하지 않는다. wireless discovery도 확인하지 않았다. 모든 physical runtime/motion/input-to-photon/FPS/thermal/battery는 `NOT_RUN`이다. Health OFF, DEC31 numeric budget OPEN.
+- 증거: `mobile/evidence/physical-b6aee5b/readiness.json`, `ios-generation.json`, `iphoneos-unsigned-build.log`. 준비 script/docs와 parser tests를 추가했다. 최종 자동 검사 결과는 현재 run report에 기록하며, 실기기 기능/모션/성능 PASS는 없다.
+- 재개 조건: iPhone USB 연결·Trust/unlock·Developer Mode, 기존 authorized Apple signing/team 및 host/widget App Group provisioning, 기존 Android adb/platform-tools와 USB debugging 승인. 외부 계정 생성·보안 우회·설치는 수행하지 않는다.
+
 ## 2026-09-26 unlock resume update — c0719ea
 
 Mac host-lock은 해제됐다. Metro 8081 없이 설치된 Release의 `fixed-bundle-sha256.txt` 기준 `main.jsbundle`/DerivedData SHA 일치와 실제 Release 입력·휴식·급식·reduced motion ON/OFF 흐름을 확인했다. restart 비교 상태는 동일했고 widget before/after diff는 0이었다. 증거: `mobile/evidence/ios-release-c0719ea/`. UI notice 잔존은 `App.tsx` 한 줄 수정, 대상 lint/typecheck, Release rebuild `BUILD SUCCEEDED`로 닫았으며 08 거절 후 09 wake/feed 성공에서 낡은 notice가 없다.
@@ -44,11 +51,11 @@ Historical pre-unlock baseline `5da0048`: iOS Release compile/install/launch and
 
 ## EXT-ENV — 시스템 환경·기기·UI 검증
 
-- 현재: fresh macOS iOS Simulator에서 source GLB/input/widget image-time/tap return/reduced motion/SQLite restart equality를 관찰했다. 정확한 iOS Apple Software Renderer에만 Debug/Release 공통 333ms 제출 제한을 적용했다. Visual smoothness/FPS is not approved. Windows Android and old Mac host-lock results remain historical. Health OFF와 외부 경계는 유지한다.
+- Historical Simulator record: fresh macOS iOS Simulator에서 source GLB/input/widget image-time/tap return/reduced motion/SQLite restart equality를 관찰했다. 정확한 iOS Apple Software Renderer에만 Debug/Release 공통 333ms 제출 제한을 적용했다. Visual smoothness/FPS is not approved. Windows Android and old Mac host-lock results remain historical. Health OFF와 외부 경계는 유지한다. Current next gate is physical readiness above.
 - c0719ea 소스 검사 이력: focused82/82, lint/typecheck, final scene25/25, checker27/27, workflow38/38; Release compile/install/launch and GLB/cache/storage PASS. Physical device remains NOT_RUN; Release input recheck passed after unlock.
 - 남은 external/environment gates: 333ms 모션의 최종 품질 수용, physical-device performance and supported-OS acceptance, plus the existing legal/Health/account/payment/release decisions. CNG, native compilation, Release cold rendering and observed Debug/WidgetKit checks are already recorded. Windows software-host instability remains historical.
-- 선택지: 필요한 UI 권한을 직접 허용하고 합성 검증 재개 / 사용자가 Simulator를 수동 조작해 검증 / 별도 준비된 Android·실기기 환경 제공. **추천: 현 iOS Simulator의 합성 UI·저장·위젯 검증부터 진행.**
-- 이후 첫 검증: 확인된 Release 실행 증거 검토→별도 승인된 physical device 검증. 실제 Health 접근은 계속 OFF다. 프로세스 시작을 실제 화면/모션 PASS로 사용하지 않는다.
+- 다음 준비: 이 Mac에 iPhone과 기존 development signing을 준비하거나, Android SDK/adb가 이미 있는 Windows 호스트에 실제 Android를 연결한다. **추천: 준비되는 실제 기기부터 시작하고 완료된 Simulator/emulator 검증은 반복하지 않는다.**
+- 이후 첫 검증: `mobile/docs/PHYSICAL-VALIDATION.md`에 따라 연결 상태 재탐색→실제 기기 Release 설치/콜드 시작→입력·저장·위젯·성능 측정. 실제 Health 접근은 계속 OFF다. 프로세스 시작을 실제 화면/모션 PASS로 사용하지 않는다.
 
 ## 재개 규칙
 

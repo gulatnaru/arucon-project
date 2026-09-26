@@ -1,5 +1,24 @@
 # iOS validation history and Release input resume
 
+## Current physical-device gate — 2026-09-26 / baseline `b6aee5b`
+
+Fresh physical readiness is blocked by the host environment. `devicectl` succeeded but reported zero connected iOS devices; `xctrace` saw only the Mac and Simulators. No USB iPhone was observed. Code-signing identities and provisioning profiles are both zero. macOS 15.6, Xcode 26.3, iPhoneOS SDK 26.2. iOS CNG `23/23` passed and an unsigned iphoneos Release build with `CODE_SIGNING_ALLOWED=NO` exited 0 (`BUILD SUCCEEDED`), but this is compile evidence only; install and physical execution are **not PASS**. Evidence: `mobile/evidence/physical-b6aee5b/ios-generation.json`, `iphoneos-unsigned-build.log`.
+
+Android physical readiness is also `BLOCKED_ENV`: adb/Android SDK are absent, Java 21 is present, and Android device count is **UNKNOWN** (do not infer zero; wireless discovery was not verified). All iOS/Android physical runtime, motion, input-to-photon, FPS, thermal and battery checks are **NOT_RUN**. Health remains OFF; no app logic, GLB or motion behavior changed. DEC31 numeric performance budget remains OPEN with no invented threshold. Required setup is a trusted/unlocked iPhone with Developer Mode, existing authorized Apple signing/team and host/widget App Group provisioning, plus an existing Android adb/platform-tools environment with USB debugging approval. No account creation, security bypass, or installation was performed.
+
+Added `mobile/scripts/check-physical-readiness.mjs`, parser/redaction/path tests and `mobile/docs/PHYSICAL-VALIDATION.md`. The read-only probe distinguishes unknown/missing/unauthorized/emulator states, redacts identifiers, and keeps all 14 physical measurements `NOT_RUN`. Root's host-enabled CLI exited 0 and saved `readiness.json`; the builder's sandbox-only CoreDevice timeout is not the final inventory result. Independent review found explicit-disconnection precedence and dangling-output-symlink defects; both were fixed with regression assertions. Root's final typecheck exposed callback typing errors; explicit JSDoc/test parameter types fixed them without suppression or compiler-option changes. Final readiness tests 6/6, targeted ESLint and typecheck exited 0; independent reviewer rechecked the fixes and closed this preparation scope as PASS_SOURCE. Physical execution remains BLOCKED_ENV/NOT_RUN.
+
+Fresh automatic evidence: iOS CNG 23/23, unsigned iPhoneOS Release compile exit 0, targeted readiness tests 6/6, targeted ESLint exit 0, workflow 38/38. During review, `npm test -- --test-name-pattern='physical|readiness' tests/native/physicalReadiness.test.ts` expanded the package test glob and actually ran 269/269 tests (exit 0, no skips) before final tooling fixes. This was a source test run, not Simulator/emulator or physical execution. The final targeted rerun is recorded separately in `readiness-tests.log`; earlier 82/25/27/254 counts are not reused.
+
+| Agent | Role / requested model | Effective model | Current work |
+|---|---|---|---|
+| `physical_readiness_audit` | explorer / GPT-5.6 Terra | ROUTING_UNVERIFIED | Existing measurement paths and device readiness gaps |
+| `physical_preflight_tools` | builder / GPT-5.6 Sol | ROUTING_UNVERIFIED | Read-only preflight, regression tests and measurement runbook |
+| `physical_readiness_review` | reviewer / GPT-5.6 Terra high | ROUTING_UNVERIFIED | Independent classification, output safety and evidence review |
+| `physical_validation_docs` | worker / GPT-5.6 Luna | ROUTING_UNVERIFIED | Current physical gate in four reports |
+
+Root performed native compile, host inventory, final type/integration checks and checkpoint publication. Effective backend model metadata was unavailable; Spark was not used. Publication follows scoped review and staged-file audit; resulting hashes are reported separately after commit/push.
+
 ## 2026-09-26 macOS unlock Release resume appendix — c0719ea
 
 Mac unlock 이후 설치된 Release 앱을 Metro 없이 재개 검증했다. `fixed-bundle-sha256.txt` 기준으로 installed/DerivedData `main.jsbundle` SHA가 일치했고 Metro 8081 listener는 없었다. Release 상세 화면, 바닥 이동과 연속 retarget, Accessibility 펫 touch 응답, 휴식 pose, feed 거절, wake 후 feed 성공, reduced motion ON 이동 유지와 도착 후 idle 정지, OFF 복원을 실제 화면에서 확인했다. 증거는 `mobile/evidence/ios-release-c0719ea/01-release-input.mp4`~`13-widget-returned-room.png`에 있다.

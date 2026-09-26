@@ -2,12 +2,12 @@
   "schemaVersion": 6,
   "runDate": "2026-09-26",
   "timezone": "Asia/Seoul",
-  "status": "IOS_RELEASE_SIMULATOR_INPUT_VALIDATED_WITH_MOTION_LIMITS",
+  "status": "PHYSICAL_VALIDATION_BLOCKED_ENV",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "Mac unlock restored UI access. Release synthetic input, movement/retarget, touch response, meal/sleep, reduced-motion toggle/restore, widget state/tap and SQLite restart preservation were observed. A stale notice was fixed and revalidated. Motion quality and physical-device performance remain unapproved.",
-  "sourceBaseline": "c0719ea8e061a2c7a68202ee0e7f053ff01a5ecb",
-  "sourceCheckpoint": "c0719ea",
+  "reason": "Physical-device inventory found no iOS target or signing identity/profile. This Mac has no adb/Android SDK; Android physical target count is unknown. Unsigned iPhoneOS Release compile passed, but physical runtime, motion quality and performance were not run. Completed Simulator/emulator observations are historical and were not repeated.",
+  "sourceBaseline": "b6aee5b18883d2b69f85f13ad72b42b5da26a823",
+  "sourceCheckpoint": "b6aee5b",
   "currentGapMatrixDocument": "MVP-GAP-MATRIX.md",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
@@ -20,6 +20,14 @@
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
     "currentRun": {
+      "root": "requested Astra physical readiness, native build and integration",
+      "explorer": "physical_readiness_audit / arucon_explorer / requested GPT-5.6 Terra",
+      "builder": "physical_preflight_tools / arucon_builder / requested GPT-5.6 Sol",
+      "reviewer": "physical_readiness_review / arucon_reviewer / requested GPT-5.6 Terra high",
+      "luna": "physical_validation_docs / arucon_luna_worker / requested GPT-5.6 Luna",
+      "effective": "ROUTING_UNVERIFIED"
+    },
+    "checkpointRunB6aee5b": {
       "root": "requested Astra orchestration and actual UI verification",
       "builder": "release_notice_fix / arucon_builder / requested GPT-5.6 Sol",
       "reviewer": "release_resume_review / arucon_reviewer / requested GPT-5.6 Terra high",
@@ -43,7 +51,7 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "LOCAL_RELEASE_FUNCTIONAL_VALIDATION_COMPLETE_WITH_MOTION_LIMITS",
+    "independentLocalEngineering": "PHYSICAL_VALIDATION_PREPARATION_COMPLETE_RUNTIME_BLOCKED_ENV",
     "productMvp": "NOT_COMPLETE",
     "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
     "androidReleaseCompile": "PASS_X86_64",
@@ -102,7 +110,7 @@
     "physicalDevice": "NOT_RUN",
     "finalInputRecheck": "BLOCKED_HOST_LOCKED"
   },
-  "lastValidation": {
+  "checkpointValidationB6aee5b": {
     "scope": "Release input resume after Mac unlock; not a rerun of the c0719ea full source checks",
     "baseline": "c0719ea",
     "codeChange": "App.tsx clears previous notice after the task busy guard",
@@ -135,11 +143,47 @@
     "hostLock": "RESOLVED",
     "evidence": "mobile/evidence/ios-release-c0719ea"
   },
+  "lastValidation": {
+    "scope": "Physical-device preparation on macOS; no Simulator/emulator repetition",
+    "baseline": "b6aee5b",
+    "iosDeviceInventory": "SUCCESS_ZERO_TARGETS",
+    "iosSigningIdentities": 0,
+    "iosProvisioningProfiles": 0,
+    "androidAdb": "MISSING",
+    "androidSdk": "NOT_FOUND_IN_CHECKED_LOCATIONS",
+    "androidPhysicalDeviceCount": null,
+    "usbPhoneObservation": "NONE_OBSERVED; Android wireless inventory unavailable",
+    "iosNativeGeneration": { "passed": 23, "total": 23, "exit": 0 },
+    "iosUnsignedDeviceTargetReleaseCompile": {
+      "status": "PASS_BUILD_ONLY",
+      "exit": 0,
+      "sdk": "iphoneos26.2",
+      "signingAllowed": false,
+      "physicalInstallOrExecution": "NOT_RUN"
+    },
+    "iosPhysicalGate": "BLOCKED_ENV",
+    "androidPhysicalGate": "BLOCKED_ENV",
+    "physicalFunctionalValidation": "NOT_RUN",
+    "physicalMotionQuality": "NOT_RUN",
+    "physicalTouchLatency": "NOT_RUN",
+    "physicalSustainedFrames": "NOT_RUN",
+    "physicalThermalAndBattery": "NOT_RUN",
+    "numericPerformanceBudget": "DEC-31_OPEN",
+    "healthReads": "OFF",
+    "readinessTests": { "passed": 6, "total": 6, "exit": 0 },
+    "targetedLint": "PASS_EXIT_0",
+    "typecheck": "PASS_EXIT_0_AFTER_CALLBACK_TYPE_FIX",
+    "workflow": { "passed": 38, "total": 38, "exit": 0 },
+    "reviewSourceSuiteBeforeFinalToolingFixes": { "passed": 269, "total": 269, "exit": 0, "note": "npm test expanded the full source test glob; not physical or Simulator runtime validation" },
+    "independentReview": "PASS_SOURCE_AFTER_FIXES_PHYSICAL_RUNTIME_NOT_RUN",
+    "evidence": "mobile/evidence/physical-b6aee5b",
+    "measurementProtocol": "mobile/docs/PHYSICAL-VALIDATION.md"
+  },
   "environment": {
     "host": "macOS 15.6",
     "node": "26.7.0",
     "npm": "11.19.0",
-    "androidToolchain": "preserved historical Windows Android toolchain",
+    "androidToolchain": "CURRENT_MAC_ADB_AND_SDK_MISSING; historical Windows toolchain recorded separately",
     "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
