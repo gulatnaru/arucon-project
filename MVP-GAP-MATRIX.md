@@ -1,6 +1,12 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-2026-09-26 baseline: `5da0048`. macOS 15.6/Xcode 26.3/iOS 26.3 iPhone16e Simulator Release cold-render validation passed within host-lock and motion limits. Release compile/install/launch passed with Metro OFF; final GLB/cache/storage evidence passes and CPU sample is 46.4%. Focused source tests 82/82, scene25/25 separate, lint/typecheck, CNG27/27 and workflow38/38 passed. Final Release input rechecks are blocked by Mac lock; motion quality and physical FPS remain unapproved. Prior Windows 254/254 and old 99.7% stall records are historical.
+## 2026-09-26 unlock resume appendix — c0719ea
+
+Installed Release (`fixed-bundle-sha256.txt` 기준 `main.jsbundle` SHA = DerivedData SHA, Metro 8081 absent)에서 상세 화면, 바닥 이동/연속 retarget, AX touch 응답, 휴식 pose, feed 거절과 wake 후 성공, reduced motion ON/OFF 복원을 실제 확인했다. `mobile/evidence/ios-release-c0719ea/`에 기록했다. UI notice 잔존은 `App.tsx` 한 줄 수정 후 대상 lint/typecheck와 Release rebuild `BUILD SUCCEEDED`로 확인했다. restart 비교와 widget before/after diff는 각각 상태 동일·diff0이며, 08 거절→09 wake/feed 성공에서 낡은 notice가 없다.
+
+현재 host-lock 차단은 없고 Release 기능 관찰 gate는 완료됐다. 333ms software-renderer 모션 부드러움/FPS와 physical-device 수용은 계속 `PARTIAL/NOT_RUN`; product MVP는 `MVP_NOT_COMPLETE`다. 과거 82/25/CNG27/workflow38은 기존 실행 이력이며 이번 rerun이 아니다.
+
+Historical pre-unlock record — 2026-09-26 baseline: `5da0048`. macOS 15.6/Xcode 26.3/iOS 26.3 iPhone16e Simulator Release cold-render validation passed within host-lock and motion limits. Release compile/install/launch passed with Metro OFF; final GLB/cache/storage evidence passes and CPU sample is 46.4%. Focused source tests 82/82, scene25/25 separate, lint/typecheck, CNG27/27 and workflow38/38 passed. Final Release input rechecks are blocked by Mac lock; motion quality and physical FPS remain unapproved. Prior Windows 254/254 and old 99.7% stall records are historical.
 
 2026-09-19 · 시작 `34ab069` · SRS v1.9 §14 전체19행 + §14-1 전체11행. PASS는 표에 명시한 로컬 코드/자동 검증 범위다. native generation/parse/JS bundle은 네이티브 compile·simulator·physical device 검증이 아니다.
 
@@ -27,7 +33,7 @@ Expo55.0.31/RN0.83.10/React19.2.0으로 정렬해 macOS15.6/Xcode26.3에서 nati
 | M09 | 체력 경계 | PASS | 시간/소화·승인 행동 경계와 무료 교감·실제 걷기 비소모·저체력 허용 자동 검사. |
 | M10 | 청결·청소·기분 | PASS | 승인 config·청결 상태/분할·기존 상태 보존 자동 검사. 실제 화면은 M13. |
 | M11 | 청결만 기운 없음·자연 회복 | PASS | 청결 단일 원인·약 없는 회복·선택 약 코인50 원자 처리 검사. |
-| M12 | 배회·표정·터치 | PARTIAL_DEVICE_VALIDATION | iOS Simulator에서 normal input/arrival/reduced-motion을 관찰하고 touch deformation은 PARTIAL; final input recheck BLOCKED_HOST_LOCKED, FPS/physical 미승인. Windows AVD evidence는 historical. |
+| M12 | 배회·표정·터치 | PARTIAL_DEVICE_VALIDATION | iOS Simulator에서 normal input/arrival/reduced-motion을 관찰하고 touch deformation은 PARTIAL; Release 입력 재검증 완료, FPS/physical 미승인. Windows AVD evidence는 historical. |
 | M13 | 방·가독성·말캉 실제 검토 | PARTIAL_DEVICE_VALIDATION | iOS Release final GLB room visible with cache fallback; CPU sample 46.4%. 3Hz motion texture/FPS/physical acceptance remain unapproved. Windows renderer evidence is historical. |
 | M14 | 상점·현금 경계 | HARD_STOP_EXTERNAL | 초기 코인 약/식탁/공/쿠션과 구매 원자성 구현. cash disabled. 실제 결제 gate는 EXT-RELEASE/V08. |
 | M15 | 두 OS 위젯 | PARTIAL_DEVICE_VALIDATION | iOS widget image/time and tap/return observed; Android footer/home/tap/rest remains historical Windows evidence. Economic commands absent. |
@@ -42,16 +48,16 @@ Expo55.0.31/RN0.83.10/React19.2.0으로 정렬해 macOS15.6/Xcode26.3에서 nati
 |---|---|---|---|
 | V01 | 승인·SRS/config/tests 일치 | HARD_STOP_EXTERNAL | 여섯 제품 방향과 가역 config 승인 반영. 출시 전체에 필요한 법률·실서비스·지원 OS 승인은 잔여. |
 | V02 | 중복·상한·분수·과거·날짜 | PASS | 승인 로컬 정책의 합성 경계/재시도/분할 검사. 실제 공급자 데이터는 V05/V06. |
-| V03 | 식사 OS 종료·재시작 | PARTIAL_DEVICE_VALIDATION | iOS synthetic before/after restart matched food1/coin10/EXP8812500/meals1/registry1/integrityOK; final input recheck blocked. Windows AVD result historical. |
+| V03 | 식사 OS 종료·재시작 | PARTIAL_DEVICE_VALIDATION | iOS synthetic before/after restart matched food1/coin10/EXP8812500/meals1/registry1/integrityOK; Release 재검증에서도 food0/coin15/EXP25125000/meals3/registry1/integrityOK 보존. Windows AVD result historical. |
 | V04 | 시각/RNG·분할·복합 상태 | PASS | 주입 시간/난수·단회 결과·시간 경계·복합 상태 자동 검사. |
 | V05 | 수면 승인 예시+실제 기록 | HARD_STOP_EXTERNAL | 승인 산식과 합성 예시/분할/무기록 검사 완료. 실제 플랫폼 기록은 EXT-HEALTH/ENV. |
 | V06 | 두 OS 권한/철회/재부팅 | BLOCKED_ENV | fake 오류/철회·권한 OFF·native scaffold. SDK/기기와 실제 건강 접근 승인 필요. |
 | V07 | 오프라인/이전/복구/migration | HARD_STOP_EXTERNAL | schema7 additive migration·재시도/HOL·단일 writer/fence·명시 이전·확인분 복구 한계 합성 검사. 실제 계정/서버는 EXT-ACCOUNT. |
 | V08 | 실결제 실패/중복/복원/환불 | HARD_STOP_EXTERNAL | 현금 비활성 port/catalog 경계. 실결제 및 플랫폼 sandbox는 EXT-RELEASE/ACCOUNT. |
 | V09 | 동의/정책·접근 통제 | HARD_STOP_EXTERNAL | fake scope/철회·privacy allowlist 검사. 법적 정책과 실제 backend 접근 검증 필요. |
-| V10 | 실제 환경/명령/증거 | PARTIAL_DEVICE_VALIDATION | Current iOS focused82/82, scene25/25 separate, lint/typecheck/CNG27/27/workflow38/38, Release compile/install/launch and GLB/cache/storage PASS; final input host lock and physical FPS remain. Windows Android evidence is historical. |
+| V10 | 실제 환경/명령/증거 | PARTIAL_DEVICE_VALIDATION | Current iOS focused82/82, scene25/25 separate, lint/typecheck/CNG27/27/workflow38/38, Release compile/install/launch and GLB/cache/storage PASS; Release 입력 차단은 해소됐으며 물리 기기/FPS 수용은 남음. Windows Android evidence is historical. |
 | V11 | 차단 결함·인간 출시 판단 | HARD_STOP_EXTERNAL | 독립 로컬 코드 QA와 외부/실기기 미검증 구분. 최종 출시 판단은 EXT-RELEASE. |
 
 ## 종료 판단
 
-Windows scoped engineering remains complete in its recorded 2026-09-25 scope. The current macOS result is `IOS_RELEASE_VALIDATED_WITH_HOST_LOCK_AND_MOTION_LIMITS`: Debug interaction and widget observations plus Release cold rendering/cache/storage passed at their recorded scope. Final Release input remains blocked by host lock; motion quality and physical-device performance remain unapproved. The overall product is `MVP_NOT_COMPLETE`. 법률/실제 건강/계정/결제·출시의 외부 경계는 유지한다.
+Windows scoped engineering remains complete in its recorded 2026-09-25 scope. The current macOS result is `IOS_RELEASE_SIMULATOR_INPUT_VALIDATED_WITH_MOTION_LIMITS`: Debug interaction and widget observations plus Release cold rendering/cache/storage passed at their recorded scope. Release input was verified after Mac unlock; motion quality and physical-device performance remain unapproved. The overall product is `MVP_NOT_COMPLETE`. 법률/실제 건강/계정/결제·출시의 외부 경계는 유지한다.

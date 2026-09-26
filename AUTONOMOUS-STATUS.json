@@ -2,12 +2,12 @@
   "schemaVersion": 6,
   "runDate": "2026-09-26",
   "timezone": "Asia/Seoul",
-  "status": "IOS_RELEASE_VALIDATED_WITH_HOST_LOCK_AND_MOTION_LIMITS",
+  "status": "IOS_RELEASE_SIMULATOR_INPUT_VALIDATED_WITH_MOTION_LIMITS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "Fresh macOS iOS Release compile/install/launch and embedded GLB/cache/storage validation passed. Final input rechecks are blocked by the automatically locked Mac; 3Hz motion texture and physical FPS remain unapproved.",
-  "sourceBaseline": "5da0048",
-  "sourceCheckpoint": "5da0048",
+  "reason": "Mac unlock restored UI access. Release synthetic input, movement/retarget, touch response, meal/sleep, reduced-motion toggle/restore, widget state/tap and SQLite restart preservation were observed. A stale notice was fixed and revalidated. Motion quality and physical-device performance remain unapproved.",
+  "sourceBaseline": "c0719ea8e061a2c7a68202ee0e7f053ff01a5ecb",
+  "sourceCheckpoint": "c0719ea",
   "currentGapMatrixDocument": "MVP-GAP-MATRIX.md",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
@@ -20,6 +20,13 @@
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
     "currentRun": {
+      "root": "requested Astra orchestration and actual UI verification",
+      "builder": "release_notice_fix / arucon_builder / requested GPT-5.6 Sol",
+      "reviewer": "release_resume_review / arucon_reviewer / requested GPT-5.6 Terra high",
+      "luna": "release_resume_docs / arucon_luna_worker / requested GPT-5.6 Luna",
+      "effective": "ROUTING_UNVERIFIED"
+    },
+    "checkpointRunC0719ea": {
       "root": "requested Astra integration/native verification",
       "explorer": ["ios_current_cng_audit / Terra", "ios_widget_runtime_audit / Terra"],
       "builder": ["ios_checker_scope_fix / Sol", "ios_widget_asset_fix / Sol"],
@@ -36,12 +43,12 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "IOS_VALIDATION_PARTIAL_SOFTWARE_RENDERER_HOST_LOCK_LIMITS",
+    "independentLocalEngineering": "LOCAL_RELEASE_FUNCTIONAL_VALIDATION_COMPLETE_WITH_MOTION_LIMITS",
     "productMvp": "NOT_COMPLETE",
     "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
     "androidReleaseCompile": "PASS_X86_64",
     "widgetRuntimeQa": "iOS_OBSERVED_WIDGET_IMAGE_TIME_TAP_RETURN; Windows Android observation historical",
-    "iosCurrentRuntime": "PASS_RELEASE_INSTALL_LAUNCH_GLB_CACHE_STORAGE_HOST_LOCKED_RECHECK"
+    "iosCurrentRuntime": "PASS_OBSERVED_RELEASE_INPUT_RENDER_WIDGET_STORAGE"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -71,7 +78,7 @@
     "apkRebuild": "PASS_DEBUG_AND_RELEASE_X86_64_2M06S_943_TASKS_39_EXECUTED",
     "iosCompileAndRuntime": "NOT_RUN_ON_WINDOWS"
   },
-  "lastValidation": {
+  "checkpointValidationC0719ea": {
     "scope": "Fresh macOS iOS focused validation",
     "mobileTests": {
       "command": "node --import tsx --test tests/native/*.test.ts tests/scene/*.test.ts tests/storage/sqliteBusyRetry.test.ts tests/domain/sqlite.test.ts",
@@ -94,6 +101,39 @@
     "evidence": "mobile/evidence/ios-5da0048",
     "physicalDevice": "NOT_RUN",
     "finalInputRecheck": "BLOCKED_HOST_LOCKED"
+  },
+  "lastValidation": {
+    "scope": "Release input resume after Mac unlock; not a rerun of the c0719ea full source checks",
+    "baseline": "c0719ea",
+    "codeChange": "App.tsx clears previous notice after the task busy guard",
+    "checks": {
+      "eslintAppTsx": "PASS",
+      "typecheck": "PASS",
+      "releaseBuild": "PASS_EXIT_0",
+      "priorFocused82": "HISTORICAL_NOT_RERUN"
+    },
+    "runtime": {
+      "inputAndRetarget": "PASS_OBSERVED_RELEASE",
+      "touchResponse": "PASS_INPUT_AND_ECONOMIC_NEUTRALITY",
+      "sleepMealNotice": "PASS_OBSERVED_RELEASE",
+      "reducedMotion": "PASS_MOVEMENT_AND_IDLE_STOP; restored OFF",
+      "widget": "PASS_IMAGE_TIMESTAMP_SLEEP_STATE_TAP_RETURN",
+      "widgetEconomicNeutrality": "PASS_DIFF_0",
+      "restart": {
+        "food": 0,
+        "coin": 15,
+        "exp": 25125000,
+        "meals": 3,
+        "registry": 1,
+        "integrity": "ok"
+      }
+    },
+    "independentReview": "PASS_OBSERVED_SCOPE_NO_REMAINING_DEFECT",
+    "motionQuality": "PARTIAL_SOFTWARE_RENDERER_333MS",
+    "physicalDevice": "NOT_RUN",
+    "healthReads": "OFF",
+    "hostLock": "RESOLVED",
+    "evidence": "mobile/evidence/ios-release-c0719ea"
   },
   "environment": {
     "host": "macOS 15.6",
@@ -434,7 +474,7 @@
     "EXT-HEALTH real health reads remain OFF",
     "EXT-ACCOUNT actual accounts/cloud/signing",
     "EXT-RELEASE actual payments/store/release/support declaration",
-    "EXT-ENV final Release input recheck requires Mac unlock; motion quality, physical-hardware performance and supported-OS acceptance remain unapproved. Windows Android engineering remains complete in its historical scope."
+    "EXT-ENV host lock is resolved and Release synthetic input was verified; motion quality, physical-hardware performance and supported-OS acceptance remain unapproved."
   ],
   "historicalMacGit": {
     "branch": "feature/arucon-mobile-autonomous",
@@ -472,7 +512,7 @@
     "pushStatus": "BLOCKED_EXISTING_GITHUB_AUTHENTICATION_UNAVAILABLE",
     "remoteCheckpointAtAttempt": "3310d38ce1aedba5f915f97c6387f087b34050a0"
   },
-  "git": {
+  "checkpointPreparationC0719ea": {
     "branch": "feature/arucon-mobile-autonomous",
     "sourceCheckpoint": "5da0048",
     "sourceCommitPerformed": false,
@@ -483,6 +523,15 @@
     "pushPerformed": false,
     "pushStatus": "PENDING_ROOT_VERIFICATION_AND_AUTHORIZED_FEATURE_PUSH",
     "remoteCheckpointAtAttempt": "5da0048"
+  },
+  "git": {
+    "branch": "feature/arucon-mobile-autonomous",
+    "sourceCheckpoint": "c0719ea",
+    "sourceCommitPerformed": false,
+    "pushPerformed": false,
+    "pushStatus": "PENDING_AUTHORIZED_FEATURE_CHECKPOINT",
+    "verificationEvidence": "mobile/evidence/ios-release-c0719ea/git-audit.json",
+    "publicationRecordScope": "Prepared before its own checkpoint; final hashes and clean status are recorded in the ignored audit and final response."
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -550,7 +599,7 @@
       }
     }
   },
-  "evidenceDirectory": "mobile/evidence/ios-5da0048/",
+  "evidenceDirectory": "mobile/evidence/ios-release-c0719ea/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [

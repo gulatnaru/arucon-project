@@ -83,10 +83,11 @@ This ADR does not select a physical-device release frame rate.
 - The final release storage snapshot reports food 1, coin 10, EXP 8,812,500, meals 1,
   registry 1, and SQLite integrity OK. A single 46.4% CPU process snapshot was observed;
   it is neither an FPS measurement nor a performance benchmark.
-- Release input could not be repeated because the Mac UI was locked. Earlier debug
-  runs observed detail, room movement and retarget, touch lifecycle, meal, and sleep
-  behavior on the same 333 ms software-renderer path. This does not replace release
-  input evidence.
+- At the original checkpoint, Release input was blocked by Mac lock. The subsequent
+  unlock resume from `c0719ea` directly verified Release detail, movement/retarget,
+  touch response, meal/sleep, reduced-motion toggling, widget return and SQLite
+  persistence. Evidence is in `mobile/evidence/ios-release-c0719ea/`; the 333 ms motion
+  quality and physical-device limits still apply.
 - Physical iOS debug and release builds are NOT_RUN for this decision. No
   physical-device performance PASS follows from the Simulator fallback.
 - Expo GL exposes no asynchronous frame-completion callback here. Cadence reduces queue

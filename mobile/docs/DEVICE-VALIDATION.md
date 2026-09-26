@@ -1,10 +1,16 @@
 # Native / simulator / physical-device 검증 재개표
 
-## 2026-09-26 fresh iOS checkpoint
+## 2026-09-26 macOS unlock Release resume — c0719ea
 
-Baseline `5da0048`, macOS 15.6, Xcode 26.3, iOS 26.3 iPhone 16e Simulator. `npm ci` PASS; focused source suite 82/82, lint/typecheck, separately rerun scene suite 25/25, CNG checker 27/27, and Pods PASS. Current Expo CNG artifacts replaced stale iOS PNG/widget template/PBX history. Source GLB was visible; normal input responded; widget 384px ImageIO thumbnail and two-line local date/time fully rendered; tap opened the room and returned; SQL before/after diff was zero. Synthetic restart state matched: food1/coin10/EXP8812500/meals1/registry1/integrityOK. Reduced motion kept movement and stopped idle roaming after arrival. Touch deformation is visual PARTIAL at 3Hz.
+Metro 8081 listener 없이 설치된 Release를 재개했고 `fixed-bundle-sha256.txt` 기준 installed `main.jsbundle` SHA와 DerivedData SHA가 일치했다. Release 상세, 바닥 이동·연속 retarget, Accessibility 펫 touch 응답, 휴식 pose, feed 거절→wake→feed 성공, reduced motion ON 이동 유지·도착 후 idle 정지·OFF 복원을 실제 확인했다. 증거는 `mobile/evidence/ios-release-c0719ea/`의 `01-release-input.mp4`~`13-widget-returned-room.png`이다. restart comparison은 food0/coin15/EXP25125000/multiplier1.175/sleepingfalse/meals3/registry1/integrityok 동일, widget before/after diff는 0이었다.
 
-Final iOS Release path uses the cache copy and software fallback; GLB is visible in `30-release-final-room.png` and after relaunch in `31-release-cache-relaunch.png`. Cache/source SHA-256 match `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`; final CPU sample is 46.4%. The earlier software-render stall and the separate bundle-read permission error are resolved failures. Final input and normal/reduced rechecks are `BLOCKED_HOST_LOCKED`; motion quality and physical FPS remain unapproved. Health remains OFF.
+성공 후 남던 거절 notice는 `App.tsx` busy guard 통과 후 `setNotice('')` 한 줄로 수정했다. 대상 lint/typecheck와 Release 재빌드(`release-notice-build.log`, `BUILD SUCCEEDED`)를 통과했고 08 거절 후 09 wake/feed 성공에서 실제 notice 소멸을 확인했다. OS reduced OFF와 펫 awake도 복원됐다. 현재 host-lock 차단은 없고 Release 기능 관찰 gate는 완료됐다. 333ms software-renderer 모션 부드러움/FPS와 physical-device는 계속 `PARTIAL/NOT_RUN`; Health는 OFF, product MVP는 `MVP_NOT_COMPLETE`다.
+
+## Historical 2026-09-26 pre-unlock fresh iOS checkpoint (`5da0048`)
+
+Baseline `5da0048`, macOS 15.6, Xcode 26.3, iOS 26.3 iPhone 16e Simulator. `npm ci` PASS; focused source suite 82/82, lint/typecheck, separately rerun scene suite 25/25, CNG checker 27/27, and Pods PASS. Current Expo CNG artifacts replaced stale iOS PNG/widget template/PBX history. Source GLB was visible; normal input responded; widget 384px ImageIO thumbnail and two-line local date/time fully rendered; tap opened the room and returned; SQL before/after diff was zero. Synthetic restart state matched: food1/coin10/EXP8812500/meals1/registry1/integrityOK. Reduced motion kept movement and stopped idle roaming after arrival. Touch deformation is visual PARTIAL at 3Hz. Final input and normal/reduced rechecks were BLOCKED_HOST_LOCKED at this snapshot; the unlock resume appendix above supersedes that current-state sentence.
+
+Final iOS Release path uses the cache copy and software fallback; GLB is visible in `30-release-final-room.png` and after relaunch in `31-release-cache-relaunch.png`. Cache/source SHA-256 match `6971e18721e03784a22033d5f73bcd90474862117f1cb7d694dc326d254e984f`; final CPU sample is 46.4%. The earlier software-render stall and the separate bundle-read permission error are resolved failures. At that historical snapshot, input and normal/reduced rechecks were `BLOCKED_HOST_LOCKED`; motion quality and physical FPS remain unapproved. Health remains OFF.
 
 ## Historical 2026-09-20 environment record
 
@@ -25,20 +31,20 @@ JS/asset bundle 성공, native project 생성, Node SQLite, synthetic bridge 테
 
 | 검증 | simulator/emulator | physical iOS | physical Android | 필요한 증거 |
 |---|---|---|---|---|
-| local development/release build/install/start | iOS Debug/Release compile/install/launch PASS; final Release input BLOCKED_HOST_LOCKED | NOT_RUN | NOT_RUN | `xcodebuild-release-final.log`, `30/31` captures, embedded bundle |
+| local development/release build/install/start | iOS Debug/Release compile/install/launch PASS; Release input PASS_OBSERVED_SCOPE | NOT_RUN | NOT_RUN | 이번 `release-notice-build.log`, `fixed-bundle-sha256.txt`, `10-release-restored.png` |
 | 합성 온보딩·이름·콘 표시 | 기존 펫 복원·이름 표시 PASS; 새 온보딩 이번 NOT_RUN | NOT_RUN | NOT_RUN | `Sim콘` 화면 및 기존 SQLite 보존 |
-| 합성 활동→food/coin→직접/자동 식사 | Debug 직접 급식 PASS; 자동급식 이번 NOT_RUN | NOT_RUN | NOT_RUN | `04` video, `sqlite-after-walk/meal` |
-| 식사 전·transaction 중·commit 직후 종료/relaunch | commit 후 종료/재설치/복원 PASS; 전/중 fault injection NOT_RUN | NOT_RUN | NOT_RUN | `sqlite-restore-comparison.json`, `release-final-storage.json` |
-| foreground/background·긴 부재·동면·복귀 | Settings/Home/widget 복귀 관찰 PASS; 동면 통제 시나리오 NOT_RUN | NOT_RUN | NOT_RUN | `19` video 및 자원 전후 비교 |
+| 합성 활동→food/coin→직접/자동 식사 | Release 직접 급식 PASS; 자동급식 이번 NOT_RUN | NOT_RUN | NOT_RUN | 이번 `08-fixed-build-rejection.png`, `09-notice-cleared-success.png`, `after-meal.json`, `fixed-before-restart.json` |
+| 식사 전·transaction 중·commit 직후 종료/relaunch | commit 후 종료/재설치/복원 PASS; 전/중 fault injection NOT_RUN | NOT_RUN | NOT_RUN | 이번 `restart-comparison.json`; 이전 `ios-5da0048/sqlite-restore-comparison.json` |
+| foreground/background·긴 부재·동면·복귀 | Settings/Home/widget 복귀 관찰 PASS; 동면 통제 시나리오 NOT_RUN | NOT_RUN | NOT_RUN | 이번 `11-widget-return.mp4`, `13-widget-returned-room.png`, `widget-before.json` / `widget-after.json` |
 | Expo SQLite migration 실패/손상 snapshot | NOT_RUN | NOT_RUN | NOT_RUN | 합성 DB/rollback/original bytes 보존 |
 | 두 성격·floor hit·배회·touch/meal pose | PARTIAL_OBSERVED | NOT_RUN | NOT_RUN | normal input/arrival/trace; touch smoothness pending |
-| OS 동작 줄이기 변경·복귀 | PASS_OBSERVED_SIMULATOR_SCOPE | NOT_RUN | NOT_RUN | reduced-motion captures/video |
+| OS 동작 줄이기 변경·복귀 | PASS_OBSERVED_SIMULATOR_SCOPE | NOT_RUN | NOT_RUN | 이번 `04-reduce-on.png`, `05-reduced-motion.mp4`, `07-reduce-restored-off.png` |
 | FPS·프레임 시간·배터리/백그라운드 중지 | NOT_RUN | NOT_RUN | NOT_RUN | 측정 도구/구간/기기·raw 수치; 예산 DEC-31 |
 | screen reader·touch target·색/큰 글꼴 | NOT_RUN | NOT_RUN | NOT_RUN | 실제 포커스/접근성 동작 |
-| portrait 기본 safe area·컨트롤 잘림 | PASS_OBSERVED_DEFAULT_VIEWPORT | NOT_RUN | NOT_RUN | `17/20/30/31` captures; 큰 글꼴/VoiceOver 수용 아님 |
+| portrait 기본 safe area·컨트롤 잘림 | PASS_OBSERVED_DEFAULT_VIEWPORT | NOT_RUN | NOT_RUN | 이번 `09/10/13` captures; 큰 글꼴/VoiceOver 수용 아님 |
 | native Health 거부·철회·미지원·지연/재부팅 | NOT_RUN | NOT_RUN | NOT_RUN | DQ-05/HS-01 승인 후 최소 메타데이터만 |
-| native widget 설치·갱신시각·stale·앱 진입 | home image/time/tap PASS; 모든 stale/error 전환 검증 아님 | NOT_RUN | NOT_RUN | `18/19/20` actual home/tap evidence |
-| widget read/reload와 앱 자원 중립 | 위젯 진입 전후 food/coin/EXP/meal 불변 PASS | NOT_RUN | NOT_RUN | `sqlite-before/after-widget-tap.json` diff 0 |
+| native widget 설치·갱신시각·stale·앱 진입 | home image/time/tap PASS; 모든 stale/error 전환 검증 아님 | NOT_RUN | NOT_RUN | 이번 `11-widget-return.mp4`, `12-widget-sleep.png`, `13-widget-returned-room.png` |
+| widget read/reload와 앱 자원 중립 | 위젯 진입 전후 food/coin/EXP/meal 불변 PASS | NOT_RUN | NOT_RUN | 이번 `widget-before.json` / `widget-after.json` diff 0 |
 | auth scope·철회·다기기/offline 복구 | NOT_RUN | NOT_RUN | NOT_RUN | DQ-06/07 및 별도 synthetic 테스트 계정 승인 |
 | 결제 실패·중복·복원·환불 | NOT_RUN | NOT_RUN | NOT_RUN | DQ-04/HS-03 승인 후 해당 환경 결과 |
 

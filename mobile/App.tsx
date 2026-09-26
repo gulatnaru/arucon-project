@@ -131,6 +131,7 @@ function AppContent() {
 
   const runTask = useCallback(async (task: () => Promise<AppTaskResult>, cue?: AppMealCuePolicy) => {
     if (busyRef.current) return;
+    setNotice('');
     busyRef.current = true;
     setBusy(true);
     try {
