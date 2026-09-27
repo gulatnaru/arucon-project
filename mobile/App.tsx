@@ -498,7 +498,8 @@ function AppContent() {
     reactionRuntimeRef.current = null;
     clearReactionPresentation();
     setEvaluation(null);
-    setNotice('합성 비교를 종료하고 기존형 기본 방으로 돌아왔어요.');
+    setPreview(null);
+    setNotice('');
     const petId = petRef.current?.petId;
     if (petId) void installReactionRuntime(petId);
   }, [clearReactionPresentation, installReactionRuntime]);
