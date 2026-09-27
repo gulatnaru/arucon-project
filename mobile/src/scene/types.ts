@@ -1,4 +1,5 @@
 import type { FormId } from '../domain/model';
+import type { ReactNode } from 'react';
 import type { RoomPerformanceSummary } from './performanceProbe';
 import type { RoomRendererProfileId } from './rendererConfig';
 import type { CharacterCandidateId } from './characterCandidates';
@@ -21,6 +22,10 @@ export type RoomProps = {
   /** Local engineering profile. It does not change game time or animation rates. */
   rendererProfileId?: RoomRendererProfileId;
   interactionEnabled?: boolean;
+  /** Measured UI exclusion zones and pet-anchored speech, in room points. */
+  topOcclusion?: number;
+  bottomOcclusion?: number;
+  reactionBubble?: ReactNode;
   /** Reversible common-form comparison; it never mutates formId or saved state. */
   characterCandidateId?: CharacterCandidateId;
   /** Comparison view rotates only the loaded character inside the unchanged room. */
@@ -29,7 +34,7 @@ export type RoomProps = {
   reactionPresentation?: RoomPresentationBatch;
   /** Accepted direct input supersedes only interruptible reaction presentation. */
   onInteractionIntent?: (intent: 'pet' | 'move' | 'furniture') => void;
-  onPetTouch?: () => void;
+  onPetTouch?: (target: 'head' | 'body' | 'unknown') => void;
   onFurnitureHit?: (furniture: 'table' | 'cushion' | 'toilet' | 'ball') => void;
   onMove?: (target: { x: number; z: number }) => void;
   onStatus?: (message: string) => void;

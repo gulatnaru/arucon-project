@@ -1,4 +1,5 @@
 import { Asset } from 'expo-asset';
+import { prepareCpuMorphs } from './cpuMorph';
 import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 import { Platform } from 'react-native';
@@ -16,7 +17,7 @@ import {
 import { COMMON_PREVIEW_ASSET_KEY, selectFormPresentation, type FormPresentation } from './formPresentation';
 import { holdReducedPose } from './clipPresentation';
 import { parseGlb } from './gltfRuntime';
-import { resolveRoomRendererProfile, type ResolvedRoomRendererProfile, type RoomRendererProfileId } from './rendererConfig';
+import { isAppleSoftwareRenderer, resolveRoomRendererProfile, type ResolvedRoomRendererProfile, type RoomRendererProfileId } from './rendererConfig';
 import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
 import type { FloorPoint, RoomProps } from './types';
 import { RoomPerformanceProbe, type RoomPerformanceSummary } from './performanceProbe';
@@ -64,6 +65,7 @@ export class RoomController {
   );
   private readonly furniture: Partial<Record<HitName, THREE.Object3D>> = {};
   private readonly rendererConfig: ResolvedRoomRendererProfile;
+  private readonly softwareRenderer: boolean;
   private readonly submissionIntervalMs: number;
   private readonly submissions: FrameSubmissionGate;
   private readonly performanceProbe: RoomPerformanceProbe;
@@ -105,6 +107,8 @@ export class RoomController {
   private touchHolding = false;
   private touchTime = 0;
   private postTouchRemaining = 0;
+  private petPulseRemaining = 0;
+  private updateCpuMorphs: (() => void) | null = null;
   private press = 0;
   private pressVelocity = 0;
   private walkSpeed = 0;
@@ -141,6 +145,7 @@ export class RoomController {
       version: String(gl.getParameter(gl.VERSION)),
     } : undefined;
     this.rendererConfig = resolveRoomRendererProfile(rendererProfileId, __DEV__, Platform.OS, rendererIdentity);
+    this.softwareRenderer = isAppleSoftwareRenderer(Platform.OS, rendererIdentity);
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       context: gl as unknown as WebGLRenderingContext,
@@ -319,6 +324,8 @@ export class RoomController {
       const loaded = retainLoadedModel(gltf.scene, this.disposed || generation !== this.petLoadGeneration);
       if (!loaded) return;
       applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial);
+      this.updateCpuMorphs = this.softwareRenderer && this.rendererConfig.id === 'software_low_resolution'
+        ? prepareCpuMorphs(loaded) : null;
       loaded.scale.setScalar(0.62);
       this.petOrientation.rotation.y = this.comparisonMode ? comparisonCameraYaw(this.comparisonCameraAngle) : 0;
       this.mixer?.stopAllAction();
@@ -412,7 +419,10 @@ export class RoomController {
 
   private applyPresentationState(restartClip: boolean) {
     const selected = this.presentationState.clip;
-    if (selected && restartClip) this.selectClip(selected.name, false, selected.rate, true);
+    if (selected && restartClip) {
+      this.selectClip(selected.name, false, selected.rate, true);
+      if (/^(pet_|tsundere_touch|honest_touch)/u.test(selected.name)) this.petPulseRemaining = 0.4;
+    }
     const hold = this.presentationState.holdPose;
     if (hold && this.mixer) {
       const clip = this.clips.get(hold.clip);
@@ -525,7 +535,7 @@ export class RoomController {
   private publishProjection() {
     if (this.disposed || this.width <= 0 || this.height <= 0) return;
     this.scene.updateMatrixWorld(true);
-    const pet = this.project(this.petAnchor, 0.75);
+    const pet = this.project(this.loadedPet?.getObjectByName('AruconRoot') ?? this.petAnchor, 0.75);
     const hits: ProjectedHits = {
       pet: { ...pet, visible: this.modelReady && pet.visible },
       table: this.project(this.furniture.table ?? this.scene, 0.45),
@@ -584,6 +594,7 @@ export class RoomController {
   beginAccessiblePet(inputStartedAtMs: number) {
     if (!this.canStartPet()) return false;
     this.interruptFreePresentation();
+    this.petPulseRemaining = 0.4;
     this.performanceProbe.recordInputHandled(inputStartedAtMs, 'accessibility');
     return true;
   }
@@ -651,10 +662,17 @@ export class RoomController {
       }
     }
     if (this.touchHolding) this.touchTime += dt;
+    this.petPulseRemaining = Math.max(0, this.petPulseRemaining - dt);
+    if (!this.comparisonMode && !this.path.length &&
+        (this.touchHolding || this.petPulseRemaining > 0 || this.presentationState !== EMPTY_ROOM_PRESENTATION)) {
+      const targetFacing = this.presentationState.gaze === 'aside' ? -0.22 : 0;
+      this.facing += Math.atan2(Math.sin(targetFacing - this.facing), Math.cos(targetFacing - this.facing)) * (1 - Math.exp(-10 * dt));
+      this.petAnchor.rotation.y = this.facing;
+    }
     let springRemaining = dt;
     while (springRemaining > 1e-9) {
       const h = Math.min(MOTION.simulationStep, springRemaining);
-      const next = springStep(this.press, this.pressVelocity, this.touchHolding && !this.reducedMotion, h);
+      const next = springStep(this.press, this.pressVelocity, (this.touchHolding || this.petPulseRemaining > 0) && !this.reducedMotion, h);
       this.press = next.press; this.pressVelocity = next.velocity;
       springRemaining -= h;
     }
@@ -663,7 +681,7 @@ export class RoomController {
     this.petAnchor.scale.set(1 + squeeze * 0.04, 1 - squeeze * 0.08, 1 + squeeze * 0.04);
     if (this.postTouchRemaining > 0) {
       this.postTouchRemaining = Math.max(0, this.postTouchRemaining - dt);
-      if (this.postTouchRemaining === 0) this.selectClip(`idle_${this.profile}`);
+      if (this.postTouchRemaining === 0) this.restoreBaseClip();
     }
     if (this.activeAction) {
       this.activeAction.paused = this.presentationHoldRemaining > 0 ||
@@ -676,10 +694,14 @@ export class RoomController {
       this.modelReady || this.submissionIntervalMs === 0,
     );
     if (frameSubmitted) {
+      this.updateCpuMorphs?.();
       this.renderer.render(this.scene, this.camera);
       this.performanceProbe.recordRenderWorkload(this.renderer.info.render);
       this.gl.endFrameEXP();
-      this.performanceProbe.recordSubmission(timestamp);
+      // Expo's public queue barrier prevents software GL from accumulating old
+      // poses behind current UI input. Never patch the SDK or use this on hardware.
+      if (this.updateCpuMorphs) this.gl.flushEXP();
+      this.performanceProbe.recordSubmission(performance.now());
     }
     const now = Date.now();
     if (shouldPublishProjection(

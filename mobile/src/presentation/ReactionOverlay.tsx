@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { reactionDialogueDisplayMode, type ReactionDialogueView } from './reactionPresentation';
 
 export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = false, onToggleReduceDialogue }: {
@@ -22,7 +22,6 @@ export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = fals
   }
   return <View accessibilityLiveRegion="polite" style={styles.bubble} testID="reaction-dialogue">
     <View style={styles.heading}>
-      <Text style={styles.text}>{view.text}</Text>
       {!!onToggleReduceDialogue && <Pressable
         accessibilityRole="switch"
         accessibilityLabel="대사 적게"
@@ -36,7 +35,9 @@ export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = fals
         <Text style={styles.close}>닫기</Text>
       </Pressable>
     </View>
-    {!!view.choices.length && <View style={styles.choices}>
+    <ScrollView style={styles.message} contentContainerStyle={styles.messageContent} bounces={false}>
+      <Text style={styles.text}>{view.text}</Text>
+      {!!view.choices.length && <View style={styles.choices}>
       {view.choices.map(choice => <Pressable
         key={choice.id}
         accessibilityRole="button"
@@ -45,19 +46,22 @@ export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = fals
       >
         <Text style={styles.choiceText}>{choice.label}</Text>
       </Pressable>)}
-    </View>}
+      </View>}
+    </ScrollView>
   </View>;
 }
 
 const styles = StyleSheet.create({
-  bubble: { alignSelf: 'center', width: '92%', borderRadius: 16, padding: 12, gap: 8, backgroundColor: '#fff9edee' },
+  bubble: { width: '100%', flexShrink: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8, gap: 4, backgroundColor: '#fff9ed' },
   reduced: { alignSelf: 'center', minHeight: 38, justifyContent: 'center', borderRadius: 12, paddingHorizontal: 12, backgroundColor: '#fff9edcc' },
   reducedText: { color: '#715443', fontSize: 12, fontWeight: '800' },
-  heading: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  text: { flex: 1, color: '#51392b', fontSize: 15, lineHeight: 21, fontWeight: '600' },
+  heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16, minHeight: 44 },
+  message: { flexShrink: 1, maxHeight: 240 },
+  messageContent: { paddingBottom: 4 },
+  text: { color: '#51392b', fontSize: 15, lineHeight: 21, fontWeight: '600' },
   close: { color: '#715443', fontWeight: '800' },
   reduceToggle: { color: '#46695b', fontSize: 12, fontWeight: '800' },
-  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 8 },
   choice: { minHeight: 44, justifyContent: 'center', borderRadius: 12, paddingHorizontal: 12, backgroundColor: '#785943' },
   choiceText: { color: '#fff', fontWeight: '700' },
 });

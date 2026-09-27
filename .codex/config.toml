@@ -1,5 +1,5 @@
-# Arucon v1.9 multi-model autonomous defaults.
-# Root = Astra orchestrator. Child roles explicitly pin cheaper/specialized models.
+# Arucon v1.9: ASTRA_DIRECT for quality recovery/FUN (2026-09-28 user instruction).
+# Historical child role definitions are preserved, but spawning is disabled.
 model = "gpt-6-astra"
 model_reasoning_effort = "high"
 plan_mode_reasoning_effort = "high"
@@ -10,5 +10,5 @@ sandbox_mode = "workspace-write"
 network_access = true
 
 [agents]
-enabled = true
+enabled = false
 max_concurrent_threads_per_session = 4

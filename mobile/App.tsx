@@ -111,6 +111,9 @@ function AppContent() {
   const [mealCue, setMealCue] = useState<MealCue | null>(null);
   const [growthCue, setGrowthCue] = useState<AppGrowthCue | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [topHeight, setTopHeight] = useState(72);
+  const [controlsHeight, setControlsHeight] = useState(130);
+  const [evaluationHeight, setEvaluationHeight] = useState(280);
   const [runtimeBadge, setRuntimeBadge] = useState('로컬 미리보기 · 건강 연결 꺼짐');
   const [migrationNotice, setMigrationNotice] = useState('로컬 저장 상태 확인 중');
   const [syncStatus, setSyncStatus] = useState<SyncStatusViewModel | null>(null);
@@ -214,11 +217,11 @@ function AppContent() {
     }
   }, []);
 
-  const runTask = useCallback(async (task: () => Promise<AppTaskResult>, cue?: AppMealCuePolicy) => {
+  const runTask = useCallback(async (task: () => Promise<AppTaskResult>, cue?: AppMealCuePolicy, quiet = false) => {
     if (busyRef.current) return;
     setNotice('');
     busyRef.current = true;
-    setBusy(true);
+    if (!quiet) setBusy(true);
     try {
       const beforeExp = petRef.current?.totalExpUnits ?? 0;
       const result = await task();
@@ -534,7 +537,7 @@ function AppContent() {
     }
   }, [evaluation, startLiveReaction]);
 
-  const doLifeAction = useCallback((action: LifeRoomAction) => {
+  const doLifeAction = useCallback((action: LifeRoomAction, touchTarget: 'head' | 'body' | 'unknown' = 'unknown') => {
     const service = serviceRef.current;
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
@@ -569,8 +572,8 @@ function AppContent() {
         break;
       }
       case 'touch':
-        startLiveReaction('petting', { touchTarget: 'unknown' });
-        void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); });
+        startLiveReaction('petting', { touchTarget });
+        void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); }, undefined, true);
         break;
     }
   }, [actionId, runTask, serviceTime, startLiveReaction]);
@@ -729,10 +732,19 @@ function AppContent() {
         comparisonCameraAngle={evaluation?.cameraAngle}
         rendererProfileId={rendererProfileId}
         interactionEnabled={journal === null && !fixtureVisible}
+        topOcclusion={insets.top + (evaluation ? 8 : topHeight + 16)}
+        bottomOcclusion={insets.bottom + (evaluation ? evaluationHeight : controlsHeight) + 16}
+        reactionBubble={reactionDialogue ? <ReactionOverlay
+          view={reactionDialogue}
+          onChoice={choiceId => reactionRuntimeRef.current?.choose(choiceId)}
+          onClose={() => reactionRuntimeRef.current?.cancel('user')}
+          reduceDialogue={reduceDialogue}
+          onToggleReduceDialogue={() => setReduceDialogue(value => !value)}
+        /> : null}
         reactionPresentation={reactionPresentation}
         onPerformanceSummary={summary => { performanceSummaryRef.current = summary; }}
         onInteractionIntent={() => reactionRuntimeRef.current?.cancel('superseded')}
-        onPetTouch={() => evaluation ? startLiveReaction('petting', { touchTarget: 'unknown' }) : doLifeAction('touch')}
+        onPetTouch={target => evaluation ? startLiveReaction('petting', { touchTarget: target }) : doLifeAction('touch', target)}
         onFurnitureHit={name => {
           if (evaluation) {
             if (name === 'ball') startLiveReaction('ball');
@@ -752,7 +764,7 @@ function AppContent() {
         onStatus={setNotice}
       />
     </View>
-    {!evaluation && <View style={[styles.top, { top: insets.top + 8 }]}>
+    {!evaluation && <View onLayout={event => setTopHeight(event.nativeEvent.layout.height)} style={[styles.top, { top: insets.top + 8 }]}>
       <ApprovedStatusPanel
         name={`${pet.givenName}콘`}
         badge={runtimeBadge}
@@ -777,16 +789,7 @@ function AppContent() {
         <Text style={styles.badgeText}>합성 도구</Text>
       </Pressable>
     </View>}
-    <View pointerEvents="box-none" style={[styles.reactionLayer, { bottom: insets.bottom + (evaluation ? 276 : 142) }]}>
-      <ReactionOverlay
-        view={reactionDialogue}
-        onChoice={choiceId => reactionRuntimeRef.current?.choose(choiceId)}
-        onClose={() => reactionRuntimeRef.current?.cancel('user')}
-        reduceDialogue={reduceDialogue}
-        onToggleReduceDialogue={() => setReduceDialogue(value => !value)}
-      />
-    </View>
-    {!evaluation && <View style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
+    {!evaluation && <View onLayout={event => setControlsHeight(event.nativeEvent.layout.height)} style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
       {!!notice && <Text style={styles.notice}>{notice}</Text>}
       {failure && <View style={styles.errorBox}>
         <Text>저장 중 오류: {failure}</Text>
@@ -796,7 +799,7 @@ function AppContent() {
       {preview && <ScrollView style={styles.preview}><Text>{preview}</Text></ScrollView>}
       <LifeRoomControls state={pet} onAction={doLifeAction} />
     </View>}
-    {evaluation && <View style={[styles.evaluation, { bottom: insets.bottom + 8 }]}>
+    {evaluation && <View onLayout={event => setEvaluationHeight(event.nativeEvent.layout.height)} style={[styles.evaluation, { bottom: insets.bottom + 8 }]}>
       {preview && <Text style={styles.evaluationPreview}>{preview}</Text>}
       <FunEvaluationPanel
         state={evaluation}
@@ -865,7 +868,6 @@ const styles = StyleSheet.create({
   fixtureToggle: { minHeight: 52, justifyContent: 'center', backgroundColor: '#fff9edee', paddingHorizontal: 10, borderRadius: 12 },
   badgeText: { fontSize: 12, fontWeight: '700', color: '#604638' },
   bottom: { position: 'absolute', left: 8, right: 8, gap: 6 },
-  reactionLayer: { position: 'absolute', left: 8, right: 8 },
   evaluation: { position: 'absolute', left: 8, right: 8, gap: 5 },
   evaluationPreview: { alignSelf: 'center', borderRadius: 8, padding: 6, backgroundColor: '#fff9edee', color: '#274d40' },
   notice: { alignSelf: 'center', backgroundColor: '#fff9eddd', padding: 6, borderRadius: 8, color: '#604638' },

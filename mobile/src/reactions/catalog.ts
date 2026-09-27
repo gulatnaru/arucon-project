@@ -27,7 +27,7 @@ const line = (id: string, text: string, presentation: ReactionPresentation, next
   id,
   kind: 'line' as const,
   text,
-  minReadMs: 1_400,
+  minReadMs: 2_600,
   presentation,
   ...((nextId ?? (id === 'start' ? 'after' : id === 'after' || id === 'play' || id === 'rest' ? 'end' : undefined)) ? { nextId: nextId ?? (id === 'start' ? 'after' : id === 'after' || id === 'play' || id === 'rest' ? 'end' : undefined) } : {}),
 });
@@ -107,6 +107,36 @@ const ALTERNATIVE_SCENES: ReactionDefinition[] = [
   { ...BASE_CATALOG.find((r) => r.id === 'greeting_expressive')!, id: 'greeting_expressive_approach', family: 'greeting.approach', presentation: clip('quiet_approach', 'content', 'user'), dialogue: { startId: 'start', nodes: [line('start', '먼저 가까이 갈게!', clip('quiet_approach', 'content', 'user'), 'end'), end] } },
 ];
 
-export const REACTION_CATALOG: ReactionCatalog = [...BASE_CATALOG, ...ALTERNATIVE_SCENES];
+const PET_COMPANIONSHIP: ReactionDefinition[] = (['reserved', 'expressive'] as const).flatMap(personality => {
+  const reserved = personality === 'reserved';
+  const petClip = reserved ? 'pet_reserved' : 'pet_expressive';
+  const leanClip = reserved ? 'tsundere_touch' : 'honest_touch';
+  const idle = reserved ? 'idle_reserved' : 'idle_expressive';
+  const conditions = { triggers: ['petting' as const], personalities: [personality], sleeping: false, hibernating: false };
+  return [
+    { id: `petting_${personality}_lean`, family: 'petting.lean', priority: 80, conditions, repeat,
+      presentation: clip(leanClip, 'content', 'user'), dialogue: { startId: 'start', nodes: [
+        line('start', reserved ? '……여기 기대 있을게.' : '포근해! 조금 기대도 돼?', clip(leanClip, 'content', 'user')),
+        line('after', reserved ? '네 옆은 편하네.' : '고마워. 이제 옆에 앉을래.', clip('quiet_approach', 'content', 'user')), end,
+      ] } },
+    { id: `petting_${personality}_greet`, family: 'petting.eye_contact', priority: 80, conditions, repeat,
+      presentation: clip(reserved ? 'tsundere_greet' : 'honest_greet', 'interested', 'user'),
+      dialogue: { startId: 'start', nodes: [
+        line('start', reserved ? '보고 있었어. 잠깐만.' : '눈 마주쳤다!', clip(reserved ? 'tsundere_greet' : 'honest_greet', 'interested', 'user')),
+        line('after', reserved ? '……한 번 더 봐줄게.' : '다음엔 나도 먼저 인사할게.', clip(idle, 'content', 'user')), end,
+      ] } },
+    { id: `petting_${personality}_invite`, family: 'petting.companion_choice', priority: 80, conditions, repeat,
+      presentation: clip(petClip, 'content', 'user'), dialogue: { startId: 'start', nodes: [
+        line('start', reserved ? '……조금만 더 있다 가.' : '같이 있으니까 좋아!', clip(petClip, 'content', 'user')),
+        line('after', reserved ? '여긴 자리 있어.' : '옆자리 비워 뒀어.', clip(idle, 'content', 'user'), 'choice'),
+        { id: 'choice', kind: 'choice' as const, prompt: '어떻게 함께 있을까?', timeoutMs: null,
+          choices: [{ id: 'lean', label: '조금 더 쓰다듬기', nextId: 'lean' }, { id: 'rest', label: '나란히 쉬기', nextId: 'rest' }] },
+        line('lean', reserved ? '……싫지는 않아.' : '응, 여기!', clip(petClip, 'content', 'user'), 'end'),
+        line('rest', reserved ? '조용히 같이 있자.' : '나란히 쉬자.', clip('quiet_approach', 'content', 'rest'), 'end'), end,
+      ] } },
+  ];
+});
+
+export const REACTION_CATALOG: ReactionCatalog = [...BASE_CATALOG, ...ALTERNATIVE_SCENES, ...PET_COMPANIONSHIP];
 
 export default REACTION_CATALOG;

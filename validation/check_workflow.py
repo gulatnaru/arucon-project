@@ -7,8 +7,10 @@ def check(name, ok, detail=''):
 
 agents = (ROOT/'AGENTS.md').read_text(encoding='utf-8')
 check('AGENTS under 32KiB', len(agents.encode()) < 32768, str(len(agents.encode())))
-check('AGENTS says Astra not default worker', '모든 코드를 직접 작성하는 기본 워커가 아니다' in agents)
 config=tomllib.loads((ROOT/'.codex/config.toml').read_text(encoding='utf-8'))
+check('ASTRA_DIRECT explicit in root instructions', 'ASTRA_DIRECT' in agents and '새 서브에이전트를 생성하지 않는다' in agents)
+check('project subagents disabled for direct mode', config.get('agents', {}).get('enabled') is False)
+check('self review is not independent review', 'SELF_REVIEW' in agents)
 check('root Astra', config.get('model')=='gpt-6-astra', str(config.get('model')))
 expected={
  'arucon_builder.toml':('gpt-5.6-sol','high','workspace-write'),

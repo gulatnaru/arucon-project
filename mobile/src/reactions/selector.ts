@@ -113,7 +113,25 @@ export function selectReaction(options: SelectReactionOptions): ReactionSelectio
   }
 
   const usedRepeatOverride = eligible.length === 0 && contextual.length > 0;
-  const pool = eligible.length ? eligible : contextual;
+  let pool = eligible.length ? eligible : contextual;
+  // Cooldown exhaustion must not collapse back to the same highest-priority
+  // phrase. Prefer the least recently shown contextual family, never a foreign
+  // situation or personality. Randomness only breaks the remaining ties.
+  const lastShown = (candidate: ReactionDefinition) => Math.max(-1, ...options.memory.records
+    .filter(record => record.family === candidate.family).map(record => record.shownAtMs));
+  if (pool.length > 1) {
+    if (usedRepeatOverride) {
+      const oldest = Math.min(...pool.map(lastShown));
+      pool = pool.filter(candidate => lastShown(candidate) === oldest);
+    } else {
+      const recent = options.memory.records.find(record => pool.some(candidate => candidate.family === record.family));
+      const alternatives = pool.filter(candidate => candidate.family !== recent?.family);
+      if (alternatives.length) pool = alternatives;
+      const previousClip = options.catalog.find(candidate => candidate.id === recent?.reactionId)?.presentation.clip;
+      const differentMotion = pool.filter(candidate => candidate.presentation.clip !== previousClip);
+      if (differentMotion.length) pool = differentMotion;
+    }
+  }
   const reaction = pool.length ? choose(pool, options.random ?? Math.random) : fallbackFor(options.context);
   return {
     reaction,

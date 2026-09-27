@@ -3,7 +3,7 @@ import { AccessibilityInfo, AppState, type AppStateStatus, PixelRatio, Platform,
 import { GLView, type ExpoWebGLRenderingContext } from 'expo-gl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RoomController } from './RoomController';
-import type { ProjectedHits } from './projectedHits';
+import { petBubbleBounds, type ProjectedHits } from './projectedHits';
 import { shouldResumeRoomOnContext } from './lifecycle';
 import { roomRenderSurfaceScale, resolveRoomRendererProfile } from './rendererConfig';
 import type { RoomProps } from './types';
@@ -16,13 +16,16 @@ export function AruconRoom(props: RoomProps) {
   const controller = useRef<RoomController | null>(null);
   const latest = useRef(props);
   const petGesture = useRef(new PetGestureSession());
+  const touchTarget = useRef<'head' | 'body' | 'unknown'>('unknown');
   const [size, setSize] = useState({ width: 1, height: 1 });
   const sizeRef = useRef(size);
   const [hits, setHits] = useState<ProjectedHits | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [systemReduced, setSystemReduced] = useState(false);
-  const topLimit = insets.top + 74;
-  const bottomLimit = size.height - insets.bottom - 94;
+  const [bubbleHeight, setBubbleHeight] = useState(100);
+  const topLimit = props.topOcclusion ?? insets.top + 74;
+  const bottomLimit = size.height - (props.bottomOcclusion ?? insets.bottom + 94);
+  const bubble = petBubbleBounds(hits?.pet ?? { x: size.width / 2, y: size.height / 2 }, size.width, topLimit, bottomLimit, bubbleHeight);
   const rendererProfileId = props.rendererProfileId ?? 'automatic';
   const requestedRendererProfile = useRef(rendererProfileId);
   const [effectiveRendererProfileId, setEffectiveRendererProfileId] = useState(rendererProfileId);
@@ -156,7 +159,7 @@ export function AruconRoom(props: RoomProps) {
         testID="floor-hit-area"
         accessibilityRole="button"
         accessibilityLabel="빈 바닥으로 아루콘 이동"
-        style={[styles.floorHit, { top: topLimit, bottom: insets.bottom + 94 }]}
+        style={[styles.floorHit, { top: topLimit, bottom: props.bottomOcclusion ?? insets.bottom + 94 }]}
         onPress={(event) => onFloor(event.nativeEvent.locationX, event.nativeEvent.locationY + topLimit)}
       />
       {(['table', 'cushion', 'toilet', 'ball'] as const).map((name) => {
@@ -197,6 +200,7 @@ export function AruconRoom(props: RoomProps) {
             controller.current?.cancelPet();
           }}
           onPressIn={(event) => {
+            touchTarget.current = event.nativeEvent.locationY < 36 ? 'head' : 'body';
             const room = controller.current;
             const startedAtMs = performance.now();
             const result = petGesture.current.begin(
@@ -225,11 +229,22 @@ export function AruconRoom(props: RoomProps) {
               }
               latest.current.onInteractionIntent?.('pet');
             }
-            latest.current.onPetTouch?.();
-            latest.current.onStatus?.('아루콘이 손길에 반응했어요.');
+            latest.current.onPetTouch?.(activation === 'accessible_activation' ? 'unknown' : touchTarget.current);
           }}
         />
       )}
+      {!!props.reactionBubble && hits?.pet.visible && bubble.maxHeight > 0 && <View
+        pointerEvents="box-none"
+        style={{ position: 'absolute', left: bubble.left, top: bubble.top, width: bubble.width, maxHeight: bubble.maxHeight }}
+      >
+        <View onLayout={event => setBubbleHeight(event.nativeEvent.layout.height)} style={{ maxHeight: bubble.maxHeight }}>
+          {props.reactionBubble}
+        </View>
+        <View pointerEvents="none" style={{ position: 'absolute', left: bubble.tailLeft,
+          ...(bubble.below ? { top: -7, transform: [{ rotate: '180deg' }] } : { bottom: -7 }),
+          borderLeftWidth: 7, borderRightWidth: 7, borderTopWidth: 8,
+          borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: '#fff9ed' }} />
+      </View>}
       {error && <View style={[styles.error, { top: insets.top + 78 }]} accessibilityRole="alert"><Text style={styles.errorText}>{error}</Text></View>}
     </View>
   );
