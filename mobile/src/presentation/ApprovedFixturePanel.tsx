@@ -4,7 +4,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 export type ApprovedFixtureAction =
   | 'synthetic_walk' | 'synthetic_sleep_none' | 'synthetic_sleep_70'
   | 'growth_status' | 'resolve_growth' | 'shop_medicine' | 'shop_table'
-  | 'shop_ball' | 'shop_cushion' | 'widget_snapshot' | 'sync_status' | 'sync_handoff';
+  | 'shop_ball' | 'shop_cushion' | 'widget_snapshot' | 'sync_status' | 'sync_handoff'
+  | 'renderer_legacy_333' | 'renderer_low_resolution' | 'renderer_automatic' | 'performance_export'
+  | 'evaluation_mode';
 
 const ROWS: readonly { action: ApprovedFixtureAction; label: string }[] = [
   { action: 'synthetic_walk', label: 'SOURCE_SYNTHETIC · 걸음 500' },
@@ -19,6 +21,11 @@ const ROWS: readonly { action: ApprovedFixtureAction; label: string }[] = [
   { action: 'widget_snapshot', label: '위젯 마지막 확인 시각' },
   { action: 'sync_status', label: '로컬 동기화 상태' },
   { action: 'sync_handoff', label: '기기 이전 준비 상태' },
+  { action: 'evaluation_mode', label: 'SOURCE_SYNTHETIC · 반응/아트 비교' },
+  { action: 'renderer_legacy_333', label: '렌더 비교 · legacy 후보' },
+  { action: 'renderer_low_resolution', label: '렌더 비교 · low-resolution 후보' },
+  { action: 'renderer_automatic', label: '렌더 비교 · 자동' },
+  { action: 'performance_export', label: 'FUN-01 성능 JSON 저장' },
 ];
 
 export function ApprovedFixturePanel({ onAction }: { onAction: (action: ApprovedFixtureAction) => void }) {

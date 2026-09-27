@@ -1,13 +1,16 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-09-26",
+  "runDate": "2026-09-27",
   "timezone": "Asia/Seoul",
-  "status": "PHYSICAL_VALIDATION_BLOCKED_ENV",
+  "status": "BLOCKED_WITH_CHECKPOINT",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "SRS v1.9 sections 14 and 14-1, all 30 rows",
-  "reason": "Physical-device inventory found no iOS target or signing identity/profile. This Mac has no adb/Android SDK; Android physical target count is unknown. Unsigned iPhoneOS Release compile passed, but physical runtime, motion quality and performance were not run. Completed Simulator/emulator observations are historical and were not repeated.",
-  "sourceBaseline": "b6aee5b18883d2b69f85f13ad72b42b5da26a823",
-  "sourceCheckpoint": "b6aee5b",
+  "definition": "FUN-00 implementation and section 11 validation; SRS 14/14-1 release gates remain separate",
+  "reason": "FUN-00 implementation, source review, bundles and iOS Release build are complete. Earlier Release scenes and SQLite isolation were observed, then short-tap ordering, interruptible-expression priority and comparison orientation were corrected. The Mac is now locked; latest post-fix visual/input/art/performance evidence is blocked and is not promoted from older captures.",
+  "sourceBaseline": "55c03eccdc1d21d36d720f105cf982597c63c494",
+  "sourceCheckpoint": "55c03ec",
+  "currentFunReport": "FUN-FIRST-REPORT.md",
+  "funApproval": "USER_REVIEW_PENDING",
+  "finalCharacterApproval": "USER_REVIEW_PENDING",
   "currentGapMatrixDocument": "MVP-GAP-MATRIX.md",
   "routingStatus": "ROUTING_UNVERIFIED",
   "effectiveModels": null,
@@ -19,12 +22,21 @@
     "luna": "arucon_luna_worker / requested gpt-5.6-luna: validation documentation",
     "spark": "not invoked; support not established",
     "note": "Role requests do not prove backend model IDs; no metadata exposed.",
-    "currentRun": {
+    "physicalReadinessRun": {
       "root": "requested Astra physical readiness, native build and integration",
       "explorer": "physical_readiness_audit / arucon_explorer / requested GPT-5.6 Terra",
       "builder": "physical_preflight_tools / arucon_builder / requested GPT-5.6 Sol",
       "reviewer": "physical_readiness_review / arucon_reviewer / requested GPT-5.6 Terra high",
       "luna": "physical_validation_docs / arucon_luna_worker / requested GPT-5.6 Luna",
+      "effective": "ROUTING_UNVERIFIED"
+    },
+    "currentRun": {
+      "root": "requested Astra orchestration, integration, runtime evidence and checkpoint",
+      "explorers": ["fun_input_explore", "fun_system_explore"],
+      "builders": ["fun_room_implementation", "fun_reaction_system", "fun_art_candidates", "fun_resume_app", "fun_resume_reactions", "fun_resume_renderer"],
+      "reviewers": ["fun_independent_review (interrupted)", "fun_resume_review"],
+      "lunaWorkers": ["fun_life_content", "fun_report_docs"],
+      "requestedModels": {"explorer": "gpt-5.6-terra", "builder": "gpt-5.6-sol", "reviewer": "gpt-5.6-terra", "luna": "gpt-5.6-luna"},
       "effective": "ROUTING_UNVERIFIED"
     },
     "checkpointRunB6aee5b": {
@@ -51,12 +63,12 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "PHYSICAL_VALIDATION_PREPARATION_COMPLETE_RUNTIME_BLOCKED_ENV",
+    "independentLocalEngineering": "FUN_IMPLEMENTED_FINAL_RUNTIME_BLOCKED_HOST_LOCKED",
     "productMvp": "NOT_COMPLETE",
     "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
     "androidReleaseCompile": "PASS_X86_64",
     "widgetRuntimeQa": "iOS_OBSERVED_WIDGET_IMAGE_TIME_TAP_RETURN; Windows Android observation historical",
-    "iosCurrentRuntime": "PASS_OBSERVED_RELEASE_INPUT_RENDER_WIDGET_STORAGE"
+    "iosCurrentRuntime": "PARTIAL_FUN_RELEASE_OBSERVATIONS_POST_FIX_MATRIX_BLOCKED_HOST_LOCKED"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -143,7 +155,7 @@
     "hostLock": "RESOLVED",
     "evidence": "mobile/evidence/ios-release-c0719ea"
   },
-  "lastValidation": {
+  "checkpointValidation55c03ec": {
     "scope": "Physical-device preparation on macOS; no Simulator/emulator repetition",
     "baseline": "b6aee5b",
     "iosDeviceInventory": "SUCCESS_ZERO_TARGETS",
@@ -179,6 +191,31 @@
     "evidence": "mobile/evidence/physical-b6aee5b",
     "measurementProtocol": "mobile/docs/PHYSICAL-VALIDATION.md"
   },
+  "lastValidation": {
+    "scope": "FUN-00 on macOS; source and runtime evidence separated",
+    "evidence": "mobile/evidence/fun-00",
+    "report": "FUN-FIRST-REPORT.md",
+    "mobileTests": { "passed": 319, "total": 319, "failed": 0, "skipped": 0, "exit": 0, "log": "checkpoint-tests.log", "note": "Final source including geometry-based camera verification; unused experiment excluded" },
+    "lint": "PASS_EXIT_0",
+    "typecheck": "PASS_EXIT_0",
+    "reactionContent": "PASS_27_REACHABLE_DEFINITIONS",
+    "candidateGeneration": "PASS_DETERMINISTIC_ORIGINAL_HASH_PRESERVED",
+    "iosCng": "PASS_23_OF_23",
+    "workflow": "PASS_38_OF_38",
+    "androidJsBundle": "PASS",
+    "iosJsBundle": "PASS",
+    "iosSimulatorReleaseBuild": "PASS_EXIT_0",
+    "iosSimulatorInstallAndLaunch": "PASS_METRO_OFF",
+    "observedBeforeFinalInputAndCameraFixes": ["journal close/reopen and floor movement", "automatic-toilet no-target feedback", "petting dialogue", "ball choice wait and rest follow-up", "all 12 normal SQLite tables unchanged across evaluation"],
+    "latestPostFixVisualMatrix": "BLOCKED_HOST_LOCKED",
+    "latestMotionQuality": "NOT_APPROVED",
+    "engineeringPerformance": { "scope": "intermediate Release software profile timing proxies, not displayed FPS or physical latency", "submittedAggregateHz": 30.125, "jsRafP95Ms": 16.68, "inputSamples": 1, "inputBudget": "INSUFFICIENT_DATA", "profile": "0.75 DPR Lambert 33ms exact Apple Software Renderer only" },
+    "androidNativeRuntimeThisRun": "NOT_RUN_BLOCKED_ENV",
+    "physicalDevice": "NOT_RUN",
+    "healthReads": "OFF",
+    "independentReview": "PASS_SOURCE_WITH_RUNTIME_LIMITS",
+    "remaining": ["Unlock Mac for current-bundle input/dialogue/candidate/motion captures", "Latest input sample budget and displayed-frame validation", "Physical-device touch/thermal/battery and Android runtime", "Four evolved-form runtime assets", "User fun and final-art review"]
+  },
   "environment": {
     "host": "macOS 15.6",
     "node": "26.7.0",
@@ -187,7 +224,7 @@
     "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
-    "softwareEmulator": "iOS Simulator Apple Software Renderer fallback resolved in final Release; CPU sample 46.4%; benchmark/FPS unapproved"
+    "softwareEmulator": "FUN-00 exact Apple Software Renderer candidate: 0.75 DPR/Lambert/33ms; latest visual acceptance BLOCKED_HOST_LOCKED; historical CPU46.4 not reused"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",

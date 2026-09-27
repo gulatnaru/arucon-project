@@ -2,7 +2,19 @@ export type RoomRendererConfig = {
   msaaSamples: number;
   contextAntialias: boolean;
   maxPixelRatio: number;
-  roomMaterial: 'standard' | 'lambert';
+  roomMaterial: 'standard' | 'lambert' | 'basic';
+  petMaterial: 'source' | 'lambert';
+};
+
+export type RoomRendererProfileId =
+  | 'automatic'
+  | 'software_legacy_333'
+  | 'software_low_resolution';
+
+export type ResolvedRoomRendererProfile = RoomRendererConfig & {
+  id: RoomRendererProfileId;
+  /** Minimum time between submitted Expo GL frames. Simulation stays on RAF. */
+  submissionIntervalMs: number;
 };
 
 export type RoomRendererIdentity = {
@@ -19,6 +31,7 @@ const RELEASE_RENDERER: RoomRendererConfig = {
   contextAntialias: false,
   maxPixelRatio: 1.65,
   roomMaterial: 'lambert',
+  petMaterial: 'source',
 };
 
 /**
@@ -33,10 +46,44 @@ const DEVELOPMENT_RENDERER: RoomRendererConfig = {
   contextAntialias: false,
   maxPixelRatio: 1.65,
   roomMaterial: 'lambert',
+  petMaterial: 'source',
+};
+
+const SOFTWARE_LOW_RESOLUTION: RoomRendererConfig = {
+  msaaSamples: 0,
+  contextAntialias: false,
+  maxPixelRatio: 0.75,
+  roomMaterial: 'lambert',
+  petMaterial: 'lambert',
 };
 
 export function selectRoomRendererConfig(development: boolean): RoomRendererConfig {
   return development ? DEVELOPMENT_RENDERER : RELEASE_RENDERER;
+}
+
+/**
+ * Engineering comparison profiles. These are reversible local diagnostics, not
+ * release quality specifications. The legacy profile preserves the observed
+ * 333 ms submission cap; the candidate reduces fragment work and targets a
+ * 33 ms submission cadence without changing animation or game time.
+ */
+export function resolveRoomRendererProfile(
+  requested: RoomRendererProfileId,
+  development: boolean,
+  platform: string,
+  identity?: RoomRendererIdentity,
+): ResolvedRoomRendererProfile {
+  const softwareRenderer = isAppleSoftwareRenderer(platform, identity);
+  if (requested === 'automatic' && softwareRenderer) {
+    return { id: 'software_low_resolution', ...SOFTWARE_LOW_RESOLUTION, submissionIntervalMs: 33 };
+  }
+  if (requested === 'software_legacy_333') {
+    return { id: requested, ...selectRoomRendererConfig(development), submissionIntervalMs: softwareRenderer ? 333 : 0 };
+  }
+  if (requested === 'software_low_resolution') {
+    return { id: requested, ...SOFTWARE_LOW_RESOLUTION, submissionIntervalMs: softwareRenderer ? 33 : 0 };
+  }
+  return { id: requested, ...selectRoomRendererConfig(development), submissionIntervalMs: 0 };
 }
 
 export function roomRenderSurfaceScale(devicePixelRatio: number, maxPixelRatio: number): number {
@@ -52,8 +99,12 @@ export function roomFrameSubmissionIntervalMs(
   platform: string,
   identity?: RoomRendererIdentity,
 ): number {
+  return resolveRoomRendererProfile('automatic', false, platform, identity).submissionIntervalMs;
+}
+
+export function isAppleSoftwareRenderer(platform: string, identity?: RoomRendererIdentity): boolean {
   const appleSoftwareRenderer = identity?.renderer === 'Apple Software Renderer' &&
     identity.vendor === 'Apple Inc.' &&
     identity.version.startsWith('OpenGL ES 3.0 APPLE-');
-  return platform === 'ios' && appleSoftwareRenderer ? 333 : 0;
+  return platform === 'ios' && appleSoftwareRenderer;
 }

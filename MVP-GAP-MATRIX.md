@@ -1,6 +1,10 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## Current physical gate — 2026-09-26 / baseline `b6aee5b`
+## CURRENT FUN-00 STATUS — 2026-09-27
+
+`BLOCKED_WITH_CHECKPOINT`: Mac locked during latest CUA; async unlock pending. Latest source/build checks are 319/319, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. Final fixed Release post-fix visual/angle/motion comparison remains pending. Android runtime and physical runtime are `NOT_RUN`; four evolved assets remain missing; fun/art `USER_REVIEW_PENDING`. See [FUN-FIRST-REPORT](FUN-FIRST-REPORT.md).
+
+## Historical physical gate — 2026-09-26 / baseline `b6aee5b`
 
 Physical gate is `BLOCKED_ENV`: iOS has no observed USB device (`devicectl` devices=[]; `xctrace` only Mac/Simulators), zero signing identities/profiles, and only unsigned iphoneos compile evidence (`BUILD SUCCEEDED`). Android physical device count is **UNKNOWN** because adb/SDK are absent and wireless discovery was not verified. All physical runtime, motion, input-to-photon, FPS, thermal and battery validation is **NOT_RUN**. iOS CNG `23/23` is PASS only for generation. Evidence is `mobile/evidence/physical-b6aee5b/`; read-only readiness tooling and the physical runbook are implemented, with final source checks in the current run report. These preparations close no physical runtime or performance gate. Health OFF; DEC31 performance budget OPEN.
 
@@ -61,6 +65,7 @@ Expo55.0.31/RN0.83.10/React19.2.0으로 정렬해 macOS15.6/Xcode26.3에서 nati
 | V09 | 동의/정책·접근 통제 | HARD_STOP_EXTERNAL | fake scope/철회·privacy allowlist 검사. 법적 정책과 실제 backend 접근 검증 필요. |
 | V10 | 실제 환경/명령/증거 | PARTIAL_DEVICE_VALIDATION | Current iOS focused82/82, scene25/25 separate, lint/typecheck/CNG27/27/workflow38/38, Release compile/install/launch and GLB/cache/storage PASS; Release 입력 차단은 해소됐으며 물리 기기/FPS 수용은 남음. Windows Android evidence is historical. |
 | V11 | 차단 결함·인간 출시 판단 | HARD_STOP_EXTERNAL | 독립 로컬 코드 QA와 외부/실기기 미검증 구분. 최종 출시 판단은 EXT-RELEASE. |
+
 
 ## 종료 판단
 

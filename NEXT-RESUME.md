@@ -1,6 +1,10 @@
 # Next resume — fresh macOS iOS validation
 
-## Current physical run — 2026-09-26 / baseline `b6aee5b`
+## CURRENT FUN-00 STATUS — 2026-09-27
+
+`BLOCKED_WITH_CHECKPOINT`: latest CUA reports “Mac is locked”; async unlock has no response. Latest checks are 319/319, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. Resume with installed “아루콘 개발 셸” → synthetic tool → `SOURCE_SYNTHETIC` reaction/art route: panel/touch/clean, personality/ball choices, growth, 3 bodies × 4 angles, relaunch. Do not treat prior videos as latest PASS. See [FUN-FIRST-REPORT](FUN-FIRST-REPORT.md).
+
+## Historical physical run — 2026-09-26 / baseline `b6aee5b`
 
 Physical validation is `BLOCKED_ENV`. `devicectl` succeeded with no connected iOS devices; `xctrace` saw only the Mac and Simulators; USB iPhone, signing identity, and provisioning profiles were unavailable. iOS CNG `23/23` passed and unsigned iphoneos Release compile exited 0, but install/physical execution is not PASS. Android physical count is **UNKNOWN** because adb/SDK are absent and wireless discovery was not verified. All physical runtime/motion/input-to-photon/FPS/thermal/battery checks are **NOT_RUN**. Evidence: `mobile/evidence/physical-b6aee5b/readiness.json`, `ios-generation.json`, `iphoneos-unsigned-build.log`. Readiness tooling and the measurement runbook are now present; consult the current report for final source checks. Health OFF; DEC31 remains OPEN.
 

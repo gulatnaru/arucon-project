@@ -1,6 +1,10 @@
 # 외부 승인·환경 대기열 — fresh iOS validation
 
-## Current physical-device gate — 2026-09-26 / baseline `b6aee5b`
+## CURRENT FUN-00 STATUS — 2026-09-27
+
+`BLOCKED_WITH_CHECKPOINT`: latest CUA says the Mac is locked and async unlock has not returned. Latest verification is 319/319, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. No external action was performed. Resume installed simulator app “아루콘 개발 셸” through `SOURCE_SYNTHETIC` reaction/art comparison when unlocked; fun/art remains `USER_REVIEW_PENDING`.
+
+## Historical physical-device gate — 2026-09-26 / baseline `b6aee5b`
 
 - 상태: iOS와 Android 모두 `BLOCKED_ENV`. iOS `devicectl` devices=[]이고 `xctrace`는 Mac/Simulator만 관찰했으며 USB iPhone은 없음. signing identity 0, provisioning profile 0. iOS CNG `23/23`와 unsigned iphoneos Release compile(`BUILD SUCCEEDED`)은 설치·실기기 실행 PASS가 아니다.
 - Android adb/SDK가 없어 실기기 수는 **UNKNOWN**이며 0으로 추정하지 않는다. wireless discovery도 확인하지 않았다. 모든 physical runtime/motion/input-to-photon/FPS/thermal/battery는 `NOT_RUN`이다. Health OFF, DEC31 numeric budget OPEN.
@@ -60,6 +64,7 @@ Historical pre-unlock baseline `5da0048`: iOS Release compile/install/launch and
 ## 재개 규칙
 
 승인된 여섯 방향은 재승인을 묻지 않고 이어 구현한다. 위 항목 중 준비된 가지부터 구현→영향 테스트→독립 reviewer→수정→재검증한다. 승인·실행 없는 외부/기기 gate를 PASS로 바꾸지 않는다. 최종 기준은 SRS14/14-1 전체다.
+
 
 ## EXT-GIT-AUTH — feature checkpoint publication
 

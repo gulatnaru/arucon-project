@@ -1,24 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, AppState, type AppStateStatus, PixelRatio, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { AccessibilityInfo, AppState, type AppStateStatus, PixelRatio, Platform, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { GLView, type ExpoWebGLRenderingContext } from 'expo-gl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RoomController } from './RoomController';
 import type { ProjectedHits } from './projectedHits';
 import { shouldResumeRoomOnContext } from './lifecycle';
-import { roomRenderSurfaceScale, selectRoomRendererConfig } from './rendererConfig';
+import { roomRenderSurfaceScale, resolveRoomRendererProfile } from './rendererConfig';
 import type { RoomProps } from './types';
+import { PetGestureSession } from './interactionLifecycle';
 
 export type { RoomProps } from './types';
-
-const RENDERER_CONFIG = selectRoomRendererConfig(__DEV__);
-const RENDER_SURFACE_SCALE = roomRenderSurfaceScale(PixelRatio.get(), RENDERER_CONFIG.maxPixelRatio);
-const RENDER_SURFACE_PERCENT = `${RENDER_SURFACE_SCALE * 100}%` as `${number}%`;
 
 export function AruconRoom(props: RoomProps) {
   const insets = useSafeAreaInsets();
   const controller = useRef<RoomController | null>(null);
   const latest = useRef(props);
-  const touchAccepted = useRef(false);
+  const petGesture = useRef(new PetGestureSession());
   const [size, setSize] = useState({ width: 1, height: 1 });
   const sizeRef = useRef(size);
   const [hits, setHits] = useState<ProjectedHits | null>(null);
@@ -26,6 +23,13 @@ export function AruconRoom(props: RoomProps) {
   const [systemReduced, setSystemReduced] = useState(false);
   const topLimit = insets.top + 74;
   const bottomLimit = size.height - insets.bottom - 94;
+  const rendererProfileId = props.rendererProfileId ?? 'automatic';
+  const requestedRendererProfile = useRef(rendererProfileId);
+  const [effectiveRendererProfileId, setEffectiveRendererProfileId] = useState(rendererProfileId);
+  const effectiveRendererProfile = useRef(rendererProfileId);
+  const rendererConfig = resolveRoomRendererProfile(effectiveRendererProfileId, __DEV__, Platform.OS);
+  const renderSurfaceScale = roomRenderSurfaceScale(PixelRatio.get(), rendererConfig.maxPixelRatio);
+  const renderSurfacePercent = `${renderSurfaceScale * 100}%` as `${number}%`;
 
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -39,7 +43,14 @@ export function AruconRoom(props: RoomProps) {
     if (controller.current) return;
     try {
       const currentSize = sizeRef.current;
-      const room = new RoomController(gl, currentSize.width, currentSize.height, setHits, setError);
+      const room = new RoomController(gl, currentSize.width, currentSize.height, setHits, setError, effectiveRendererProfileId);
+      const resolvedProfileId = room.resolvedRendererProfile().id;
+      if (rendererProfileId === 'automatic' && resolvedProfileId !== effectiveRendererProfileId) {
+        room.dispose();
+        effectiveRendererProfile.current = resolvedProfileId;
+        setEffectiveRendererProfileId(resolvedProfileId);
+        return;
+      }
       controller.current = room;
       room.setPresentation({ ...latest.current, reducedMotion: systemReduced || latest.current.reducedMotion });
       void room.loadPet();
@@ -47,13 +58,38 @@ export function AruconRoom(props: RoomProps) {
     } catch (cause) {
       setError(`방을 열지 못했어요: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
-  }, [systemReduced]);
+  }, [effectiveRendererProfileId, rendererProfileId, systemReduced]);
+
+  useEffect(() => {
+    if (requestedRendererProfile.current === rendererProfileId) return;
+    requestedRendererProfile.current = rendererProfileId;
+    if (effectiveRendererProfile.current === rendererProfileId) return;
+    controller.current?.dispose();
+    controller.current = null;
+    effectiveRendererProfile.current = rendererProfileId;
+    setEffectiveRendererProfileId(rendererProfileId);
+  }, [rendererProfileId]);
 
   useEffect(() => { latest.current = props; }, [props]);
   useEffect(() => { controller.current?.resize(size.width, size.height); }, [size.width, size.height]);
   useEffect(() => {
     controller.current?.setPresentation({ ...latest.current, reducedMotion: systemReduced || latest.current.reducedMotion });
-  }, [props.formId, props.personality, props.sleeping, props.reducedMotion, props.tableInstalled, props.toiletInstalled, props.ballVisible, props.cushionVisible, props.mealCue, systemReduced]);
+  }, [
+    props.formId,
+    props.personality,
+    props.sleeping,
+    props.reducedMotion,
+    props.tableInstalled,
+    props.toiletInstalled,
+    props.ballVisible,
+    props.cushionVisible,
+    props.mealCue,
+    props.interactionEnabled,
+    props.characterCandidateId,
+    props.comparisonCameraAngle,
+    props.reactionPresentation,
+    systemReduced,
+  ]);
 
   useEffect(() => {
     let mounted = true;
@@ -70,15 +106,28 @@ export function AruconRoom(props: RoomProps) {
     return () => subscription.remove();
   }, []);
 
-  useEffect(() => () => { controller.current?.dispose(); controller.current = null; }, []);
+  useEffect(() => () => {
+    petGesture.current.cancel();
+    controller.current?.cancelPet();
+    controller.current?.dispose();
+    controller.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (props.interactionEnabled ?? true) return;
+    petGesture.current.cancel();
+    controller.current?.cancelPet();
+  }, [props.interactionEnabled]);
 
   const onFloor = (x: number, y: number) => {
+    if (!(latest.current.interactionEnabled ?? true)) return;
     const room = controller.current;
     if (!room) return;
     const floor = room.screenToFloor(x, y);
     if (!floor) return;
     const target = room.moveTo(floor);
     if (target) {
+      latest.current.onInteractionIntent?.('move');
       latest.current.onMove?.(target);
       latest.current.onStatus?.('아루콘이 바닥을 따라 걸어가요.');
     }
@@ -93,12 +142,13 @@ export function AruconRoom(props: RoomProps) {
     <View style={styles.root} onLayout={onLayout}>
       <View pointerEvents="none" style={styles.renderSurface}>
         <GLView
+          key={effectiveRendererProfileId}
           style={{
-            width: RENDER_SURFACE_PERCENT,
-            height: RENDER_SURFACE_PERCENT,
-            transform: [{ scale: 1 / RENDER_SURFACE_SCALE }],
+            width: renderSurfacePercent,
+            height: renderSurfacePercent,
+            transform: [{ scale: 1 / renderSurfaceScale }],
           }}
-          msaaSamples={RENDERER_CONFIG.msaaSamples}
+          msaaSamples={rendererConfig.msaaSamples}
           onContextCreate={onContextCreate}
         />
       </View>
@@ -121,7 +171,13 @@ export function AruconRoom(props: RoomProps) {
             accessibilityRole="button"
             accessibilityLabel={{ table: '식탁', cushion: '쿠션', toilet: '화장실', ball: '공' }[name]}
             style={[styles.furnitureHit, { left: point.x - 26, top: point.y - 26 }]}
-            onPress={() => { if (name === 'ball') controller.current?.playBall(); latest.current.onFurnitureHit?.(name); }}
+            onPress={() => {
+              const room = controller.current;
+              const accepted = name === 'ball' ? room?.playBall() : room?.canStartReactionCue();
+              if (!accepted) return;
+              latest.current.onInteractionIntent?.('furniture');
+              latest.current.onFurnitureHit?.(name);
+            }}
           />
         );
       })}
@@ -131,11 +187,44 @@ export function AruconRoom(props: RoomProps) {
           accessibilityRole="button"
           accessibilityLabel="아루콘 쓰다듬기"
           style={[styles.petHit, { left: hits!.pet.x - 37, top: hits!.pet.y - 43 }]}
-          onPressIn={() => { touchAccepted.current = !!controller.current?.beginPet(); }}
-          onPressOut={() => { controller.current?.endPet(); }}
+          onTouchStart={(event) => {
+            if (event.nativeEvent.touches.length <= 1) return;
+            petGesture.current.cancel();
+            controller.current?.cancelPet();
+          }}
+          onTouchCancel={() => {
+            petGesture.current.cancel();
+            controller.current?.cancelPet();
+          }}
+          onPressIn={(event) => {
+            const room = controller.current;
+            const startedAtMs = performance.now();
+            const result = petGesture.current.begin(
+              event.nativeEvent.identifier,
+              event.nativeEvent.touches.length,
+              () => !!room?.beginPet(startedAtMs),
+            );
+            if (result === 'started') latest.current.onInteractionIntent?.('pet');
+            if (result === 'rejected') latest.current.onStatus?.('지금 하던 행동이 끝나면 쓰다듬을 수 있어요.');
+          }}
+          onPressOut={(event) => {
+            const result = petGesture.current.end(event.nativeEvent.identifier);
+            if (result === 'ended') controller.current?.endPet();
+          }}
           onPress={() => {
-            if (!touchAccepted.current) return;
-            touchAccepted.current = false;
+            const activationStartedAtMs = performance.now();
+            if (!(latest.current.interactionEnabled ?? true)) return;
+            const room = controller.current;
+            const activation = petGesture.current.activate();
+            if (activation === 'ignored') return;
+            if (activation === 'committed_active') room?.endPet();
+            if (activation === 'accessible_activation') {
+              if (!room?.beginAccessiblePet(activationStartedAtMs)) {
+                latest.current.onStatus?.('지금 하던 행동이 끝나면 쓰다듬을 수 있어요.');
+                return;
+              }
+              latest.current.onInteractionIntent?.('pet');
+            }
             latest.current.onPetTouch?.();
             latest.current.onStatus?.('아루콘이 손길에 반응했어요.');
           }}

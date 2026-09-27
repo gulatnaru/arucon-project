@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, AppState, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as SQLite from 'expo-sqlite';
+import { File, Paths } from 'expo-file-system';
 import { AruconRoom } from './src/scene/AruconRoom';
 import { DevOnboardingScreen } from './src/onboarding/DevOnboardingScreen';
 import type { DevPetPreview } from './src/onboarding/devOnboarding';
@@ -26,16 +27,47 @@ import { LifeRoomControls, type LifeRoomAction } from './src/presentation/LifeRo
 import { ApprovedFixturePanel, type ApprovedFixtureAction } from './src/presentation/ApprovedFixturePanel';
 import { ApprovedStatusPanel } from './src/presentation/ApprovedStatusPanel';
 import {
-  approvedSyntheticSleepFixture, drainLocalSyntheticSync, journalEventText, ownedRoomAffordances, syncStatusText, utcTimestampText,
+  FunEvaluationPanel,
+  type EvaluationScenario,
+  type FunEvaluationState,
+} from './src/presentation/FunEvaluationPanel';
+import {
+  approvedSyntheticSleepFixture, drainLocalSyntheticSync, ownedRoomAffordances, syncStatusText, utcTimestampText,
 } from './src/presentation/approvedPresentation';
+import { JournalPanel } from './src/presentation/JournalPanel';
+import { ReactionOverlay } from './src/presentation/ReactionOverlay';
+import { cleanAvailability, cleanAvailabilityText, cleanSuccessText } from './src/presentation/cleanPresentation';
+import {
+  confirmedGrowthReactionCue,
+  splitReactionCommands,
+  type ReactionDialogueView,
+} from './src/presentation/reactionPresentation';
+import { ReactionRuntime, type ReactionMemoryWriter } from './src/presentation/reactionRuntime';
+import {
+  createGrowthComparisonFixture,
+  emptyReactionMemory,
+  type PresentationCommand,
+  type ReactionEvidence,
+  type ReactionMemorySnapshot,
+  type ReactionTrigger,
+} from './src/reactions';
+import { APPROVED_GROWTH_POLICY, projectGrowth } from './src/progression/projection';
+import { openReactionFixtureMemoryRepository, openReactionMemoryRepository } from './src/storage/reactionMemory';
+import type { RoomPerformanceSummary } from './src/scene/performanceProbe';
+import type { RoomRendererProfileId } from './src/scene/rendererConfig';
 
 const PET_ID = 'dev-local-pet-1';
 const PREVIEW_ACCOUNT_ID = 'dev-preview-account';
 const PREVIEW_DEVICE_ID = 'dev-preview-device';
+const EVALUATION_PET_ID = 'fun00-fixture-pet';
+const EVALUATION_FIXTURE_ID = 'fun00_evaluation';
 const LOCAL_WIDGET = new FailClosedNativeWidgetAdapter(approvedLocalExpoNativeWidgetBridge, true);
 
 type AppMealCuePolicy = { mode: MealCue['mode']; atMs?: () => number | null };
 type AppTaskResult = PetState | ApprovedActivityReceipt | void;
+type AppGrowthCue = Extract<ReactionEvidence, { kind: 'committed_growth' }>;
+type RoomReactionCommand = Exclude<PresentationCommand, { type: 'show_dialogue' }>;
+type RoomReactionBatch = Readonly<{ token: string; commands: readonly RoomReactionCommand[] }>;
 
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -77,6 +109,7 @@ function AppContent() {
   const [journal, setJournal] = useState<JournalEntry[] | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [mealCue, setMealCue] = useState<MealCue | null>(null);
+  const [growthCue, setGrowthCue] = useState<AppGrowthCue | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [runtimeBadge, setRuntimeBadge] = useState('로컬 미리보기 · 건강 연결 꺼짐');
   const [migrationNotice, setMigrationNotice] = useState('로컬 저장 상태 확인 중');
@@ -86,6 +119,11 @@ function AppContent() {
   const [widgetText, setWidgetText] = useState('위젯 마지막 확인 시각 확인 중');
   const [ownedItems, setOwnedItems] = useState<readonly string[]>([]);
   const [writerMode, setWriterMode] = useState<'active_writer' | 'read_only_fenced'>('active_writer');
+  const [rendererProfileId, setRendererProfileId] = useState<RoomRendererProfileId>('automatic');
+  const [reactionDialogue, setReactionDialogue] = useState<ReactionDialogueView | null>(null);
+  const [reactionPresentation, setReactionPresentation] = useState<RoomReactionBatch | undefined>();
+  const [reduceDialogue, setReduceDialogue] = useState(false);
+  const [evaluation, setEvaluation] = useState<FunEvaluationState | null>(null);
   const databaseRef = useRef<SQLite.SQLiteDatabase | null>(null);
   const connectionRef = useRef<SqlConnection | null>(null);
   const serviceRef = useRef<ApprovedMvpService | null>(null);
@@ -98,6 +136,53 @@ function AppContent() {
   const bootingRef = useRef(false);
   const clockRef = useRef(0);
   const sequenceRef = useRef(0);
+  const performanceSummaryRef = useRef<RoomPerformanceSummary | null>(null);
+  const reactionRuntimeRef = useRef<ReactionRuntime | null>(null);
+  const reactionRuntimeGenerationRef = useRef(0);
+  const reactionBatchSequenceRef = useRef(0);
+  const mealReactionTokenRef = useRef<string | null>(null);
+  const growthReactionTokenRef = useRef<string | null>(null);
+  const growthMealTokenRef = useRef<string | null>(null);
+
+  const createReactionRuntime = useCallback((memory: ReactionMemorySnapshot, writer?: ReactionMemoryWriter) => new ReactionRuntime({
+      memory,
+      writer,
+      onCommands: (commands, session) => {
+        const batch = splitReactionCommands(commands);
+        if (batch.visualCommands.length) {
+          setReactionPresentation({
+            token: `${session.id}:${++reactionBatchSequenceRef.current}`,
+            commands: batch.visualCommands,
+          });
+        }
+        if (batch.dialogue !== undefined) setReactionDialogue(batch.dialogue);
+      },
+      onSelection: dispatched => {
+        if (memory.source !== 'fixture') return;
+        const explanation = dispatched.selection.explanation;
+        const text = `선택 ${explanation.selectedId} · 후보 ${explanation.eligible.length}/${explanation.considered}` +
+          `${explanation.usedRepeatOverride ? ' · 반복 제한 대안 없음' : ''}` +
+          `${explanation.usedSafeFallback ? ' · 안전 기본 반응' : ''}`;
+        setPreview(current => current?.startsWith('합성 성장 비교') ? `${current}\n${text}` : text);
+      },
+      onMemoryError: error => {
+        setNotice(`반응 기억을 저장하지 못했어요. 게임 진행은 유지됩니다. (${errorText(error)})`);
+      },
+    }), []);
+
+  const installReactionRuntime = useCallback(async (petId: string) => {
+    const generation = ++reactionRuntimeGenerationRef.current;
+    reactionRuntimeRef.current?.dispose();
+    let writer: Awaited<ReturnType<typeof openReactionMemoryRepository>> | undefined;
+    let memory = emptyReactionMemory(petId);
+    try {
+      writer = await openReactionMemoryRepository();
+      memory = await writer.load(petId);
+    } catch (error) {
+      setNotice(`반응 기억을 열지 못해 이번 화면에서만 이어가요. 게임 저장은 유지됩니다. (${errorText(error)})`);
+    }
+    if (generation === reactionRuntimeGenerationRef.current) reactionRuntimeRef.current = createReactionRuntime(memory, writer);
+  }, [createReactionRuntime]);
 
   const publish = useCallback((state: PetState) => {
     if (!petRef.current || state.revision >= petRef.current.revision) {
@@ -144,7 +229,16 @@ function AppContent() {
           const entries = await serviceRef.current.readJournal();
           const policy: MealCuePolicy = { mode: cue.mode, atMs: cue.atMs?.() };
           const confirmed = confirmedMealCue(beforeExp, state.totalExpUnits, entries, policy, PET_ID);
-          if (confirmed) setMealCue(confirmed);
+          if (confirmed) {
+            setMealCue(confirmed);
+            const growth = confirmedGrowthReactionCue(
+              confirmed.token, state.lastSimulatedAtMs, beforeExp, state.totalExpUnits,
+            );
+            if (growth) {
+              growthMealTokenRef.current = confirmed.token;
+              setGrowthCue(growth);
+            }
+          }
         } catch { /* A visual cue must never turn a committed meal into a failed command. */ }
       }
       if (serviceRef.current) await refreshReadModels(serviceRef.current, state?.lastSimulatedAtMs ?? serviceTime());
@@ -229,6 +323,7 @@ function AppContent() {
         setPhase('onboarding');
       } else {
         const service = await installApprovedRuntime(connection, existing, true);
+        await installReactionRuntime(existing.petId);
         publish(await service.currentState());
         const now = monotonicDevTime(Date.now(), clockRef.current, existing.lastSimulatedAtMs);
         try {
@@ -251,12 +346,17 @@ function AppContent() {
     } finally {
       bootingRef.current = false;
     }
-  }, [installApprovedRuntime, publish, refreshReadModels]);
+  }, [installApprovedRuntime, installReactionRuntime, publish, refreshReadModels]);
 
   useEffect(() => {
     const timer = setTimeout(() => { void initialize(); }, 0);
     return () => clearTimeout(timer);
   }, [initialize]);
+
+  useEffect(() => () => {
+    reactionRuntimeRef.current?.dispose();
+    reactionRuntimeRef.current = null;
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -271,6 +371,7 @@ function AppContent() {
       if (next === previous) return;
       const wasActive = previous === 'active';
       previous = next;
+      if (next !== 'active') reactionRuntimeRef.current?.cancel('background');
       const service = serviceRef.current;
       if (!service) return;
       const eventWallMs = Date.now();
@@ -295,24 +396,150 @@ function AppContent() {
     const state = initialPet(PET_ID, result.givenName, 'reserved', createdAtMs, APPROVED_GAME_CONFIG);
     void runTask(async () => {
       const service = await installApprovedRuntime(connection, state, false);
+      await installReactionRuntime(state.petId);
       await service.beginGameDay(utcFixtureDay(createdAtMs), createdAtMs);
       const current = await service.currentState();
       setPhase('room');
       setNotice('SOURCE_SYNTHETIC 로컬 미리보기를 만들었어요. 실제 가입이나 보호자 확인이 아닙니다.');
       return current;
     });
-  }, [installApprovedRuntime, runTask, serviceTime]);
+  }, [installApprovedRuntime, installReactionRuntime, runTask, serviceTime]);
 
   const retry = useCallback(() => {
     if (phase === 'load_error') { void initialize(); return; }
     if (retryRef.current) void runTask(retryRef.current);
   }, [initialize, phase, runTask]);
 
+  const startLiveReaction = useCallback((
+    trigger: ReactionTrigger,
+    options: Readonly<{
+      evidence?: ReactionEvidence;
+      touchTarget?: 'head' | 'body' | 'unknown';
+      sleeping?: boolean;
+      growthStage?: ReturnType<typeof projectGrowth>['stage'];
+    }> = {},
+  ) => {
+    const runtime = reactionRuntimeRef.current;
+    const state = petRef.current;
+    if (!runtime || !state || (!evaluation && (journal !== null || fixtureVisible))) return;
+    const room = ownedRoomAffordances(ownedItems);
+    const affordances = evaluation ? ['table' as const, 'toilet' as const, 'ball' as const, 'cushion' as const] : [
+      ...(state.tableInstalled ? ['table' as const] : []),
+      ...(state.toiletInstalled ? ['toilet' as const] : []),
+      ...(room.ballVisible ? ['ball' as const] : []),
+      ...(room.cushionVisible ? ['cushion' as const] : []),
+    ];
+    runtime.start({
+      petId: evaluation ? EVALUATION_PET_ID : state.petId,
+      displayName: evaluation ? '아루콘' : `${state.givenName}콘`,
+      trigger,
+      personality: evaluation?.personality ?? (state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved'),
+      growthStage: options.growthStage ?? projectGrowth(state.totalExpUnits, APPROVED_GROWTH_POLICY).stage,
+      source: evaluation ? 'fixture' : 'live',
+      domainState: {
+        sleeping: options.sleeping ?? evaluation?.sleeping ?? state.sleeping,
+        hibernating: evaluation ? false : state.hibernating,
+        condition: state.condition === 'well' ? 'well' : 'needs_care',
+        cleanliness: options.evidence?.kind === 'clean_result' && options.evidence.result === 'cleaned'
+          ? 'needs_cleanup' : state.poopCount > 0 ? 'needs_cleanup' : 'clean',
+      },
+      affordances,
+      touchTarget: options.touchTarget,
+      evidence: options.evidence,
+    });
+  }, [evaluation, fixtureVisible, journal, ownedItems]);
+
+  useEffect(() => {
+    if (!mealCue || mealReactionTokenRef.current === mealCue.token) return;
+    if (growthMealTokenRef.current === mealCue.token || growthCue?.eventId === mealCue.token) return;
+    mealReactionTokenRef.current = mealCue.token;
+    startLiveReaction('meal_committed', {
+      evidence: { kind: 'committed_meal', eventId: mealCue.token, committedAtMs: serviceTime(), mode: mealCue.mode },
+    });
+  }, [growthCue, mealCue, serviceTime, startLiveReaction]);
+
+  useEffect(() => {
+    if (!growthCue || growthReactionTokenRef.current === growthCue.eventId) return;
+    growthReactionTokenRef.current = growthCue.eventId;
+    startLiveReaction('growth_committed', { evidence: growthCue, growthStage: growthCue.after.stage });
+  }, [growthCue, startLiveReaction]);
+
+  const clearReactionPresentation = useCallback(() => {
+    setReactionDialogue(null);
+    setReactionPresentation({
+      token: `clear:${++reactionBatchSequenceRef.current}`,
+      commands: [{ type: 'clear_presentation' }],
+    });
+  }, []);
+
+  const enterEvaluationMode = useCallback(async () => {
+    const generation = ++reactionRuntimeGenerationRef.current;
+    reactionRuntimeRef.current?.dispose();
+    clearReactionPresentation();
+    setFixtureVisible(false);
+    setPreview(null);
+    setEvaluation({ personality: 'reserved', candidateId: 'original', cameraAngle: 'front', sleeping: false });
+    let writer: Awaited<ReturnType<typeof openReactionFixtureMemoryRepository>> | undefined;
+    let memory = emptyReactionMemory(EVALUATION_PET_ID, 'fixture');
+    try {
+      writer = await openReactionFixtureMemoryRepository(EVALUATION_FIXTURE_ID);
+      memory = await writer.load(EVALUATION_PET_ID);
+    } catch (error) {
+      setNotice(`합성 비교 기억을 열지 못해 이번 화면에서만 이어가요. (${errorText(error)})`);
+    }
+    if (generation === reactionRuntimeGenerationRef.current) reactionRuntimeRef.current = createReactionRuntime(memory, writer);
+  }, [clearReactionPresentation, createReactionRuntime]);
+
+  const leaveEvaluationMode = useCallback(() => {
+    reactionRuntimeRef.current?.dispose();
+    reactionRuntimeRef.current = null;
+    clearReactionPresentation();
+    setEvaluation(null);
+    setNotice('합성 비교를 종료하고 기존형 기본 방으로 돌아왔어요.');
+    const petId = petRef.current?.petId;
+    if (petId) void installReactionRuntime(petId);
+  }, [clearReactionPresentation, installReactionRuntime]);
+
+  const runEvaluationScenario = useCallback((scenario: EvaluationScenario) => {
+    if (!evaluation) return;
+    if (scenario !== 'growth_before_after') setPreview(null);
+    if (scenario === 'sleep') {
+      const sleeping = !evaluation.sleeping;
+      setEvaluation({ ...evaluation, sleeping });
+      startLiveReaction(sleeping ? 'sleep' : 'wake', { sleeping });
+      return;
+    }
+    if (scenario === 'growth_before_after') {
+      const firstBand = APPROVED_GROWTH_POLICY.bands[0];
+      const afterExpUnits = firstBand.expPerLevel * APPROVED_GROWTH_POLICY.expScale *
+        (firstBand.toLevel - firstBand.fromLevel + 1);
+      const fixture = createGrowthComparisonFixture({
+        petId: EVALUATION_PET_ID,
+        personality: evaluation.personality,
+        domainState: { sleeping: false, hibernating: false, condition: 'well', cleanliness: 'clean' },
+        affordances: ['ball', 'cushion', 'table', 'toilet'],
+      }, { fixtureId: EVALUATION_FIXTURE_ID, beforeExpUnits: afterExpUnits - 1, afterExpUnits });
+      const evidence = fixture.context.evidence;
+      setPreview(`${fixture.label} · Lv.${evidence?.kind === 'synthetic_growth_fixture' ? evidence.before.level : 1} → Lv.${evidence?.kind === 'synthetic_growth_fixture' ? evidence.after.level : 2}`);
+      startLiveReaction('growth_committed', { evidence, growthStage: fixture.context.growthStage });
+      return;
+    }
+    if (scenario.startsWith('clean_')) {
+      const result = scenario === 'clean_auto' ? 'auto_toilet' : scenario === 'clean_success' ? 'cleaned' : 'nothing_to_clean';
+      startLiveReaction('clean', { evidence: { kind: 'clean_result', result } });
+      return;
+    }
+    if (scenario === 'petting' || scenario === 'ball' || scenario === 'rest') {
+      startLiveReaction(scenario, scenario === 'petting' ? { touchTarget: 'head' } : undefined);
+    }
+  }, [evaluation, startLiveReaction]);
+
   const doLifeAction = useCallback((action: LifeRoomAction) => {
     const service = serviceRef.current;
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
     if (action === 'journal') {
+      reactionRuntimeRef.current?.cancel('scene_change');
       void runTask(async () => { setJournal(await service.readJournal()); setPreview(null); });
       return;
     }
@@ -324,10 +551,29 @@ function AppContent() {
       case 'feed': void runTask(async () => { await begin(); return service.feedDirect(now, id); }, { mode: 'direct' }); break;
       case 'toggle_auto': void runTask(async () => { await begin(); return service.setAutoFeed(now, id, !state.autoFeedOptIn); }, { mode: 'auto', atMs: () => now }); break;
       case 'sleep_or_wake': void runTask(async () => { await begin(); return state.sleeping ? service.wake(now, id) : service.sleep(now, id); }, { mode: 'auto', atMs: () => now }); break;
-      case 'clean': void runTask(async () => { await begin(); return service.clean(now, id); }); break;
-      case 'touch': void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); }); break;
+      case 'clean': {
+        const availability = cleanAvailability(state);
+        if (availability.kind !== 'cleanable') {
+          setFailure(null);
+          setNotice(cleanAvailabilityText(availability));
+          startLiveReaction('clean', { evidence: { kind: 'clean_result', result: availability.kind === 'auto_managed' ? 'auto_toilet' : 'nothing_to_clean' } });
+          return;
+        }
+        void runTask(async () => {
+          await begin();
+          const cleaned = await service.clean(now, id);
+          setNotice(cleanSuccessText(availability.removed));
+          startLiveReaction('clean', { evidence: { kind: 'clean_result', result: 'cleaned' } });
+          return cleaned;
+        });
+        break;
+      }
+      case 'touch':
+        startLiveReaction('petting', { touchTarget: 'unknown' });
+        void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); });
+        break;
     }
-  }, [actionId, runTask, serviceTime]);
+  }, [actionId, runTask, serviceTime, startLiveReaction]);
 
   const doShopPurchase = useCallback((service: ApprovedMvpService, state: PetState, itemId: string) => {
     const quote = service.quoteCoinItem(itemId, state.coin);
@@ -348,6 +594,34 @@ function AppContent() {
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
     const now = serviceTime();
+    if (action === 'evaluation_mode') {
+      void enterEvaluationMode();
+      return;
+    }
+    if (action === 'renderer_legacy_333' || action === 'renderer_low_resolution' || action === 'renderer_automatic') {
+      const profile: RoomRendererProfileId = action === 'renderer_legacy_333' ? 'software_legacy_333'
+        : action === 'renderer_low_resolution' ? 'software_low_resolution' : 'automatic';
+      performanceSummaryRef.current = null;
+      setRendererProfileId(profile);
+      setFixtureVisible(false);
+      setNotice(`렌더 비교 프로필: ${profile} · 게임 시간과 모션 속도는 그대로예요.`);
+      return;
+    }
+    if (action === 'performance_export') {
+      const summary = performanceSummaryRef.current;
+      if (!summary) {
+        setNotice('성능 표본이 아직 없어요. 방을 잠시 움직인 뒤 다시 저장해 주세요.');
+        return;
+      }
+      try {
+        const file = new File(Paths.cache, 'arucon-fun01-performance-summary.json');
+        file.write(JSON.stringify(summary, null, 2));
+        setNotice('FUN-01 성능 JSON을 로컬 캐시에 저장했어요. 합성 도구에서 다시 내보낼 수 있어요.');
+      } catch (error) {
+        setFailure(`성능 JSON 저장 실패: ${errorText(error)}`);
+      }
+      return;
+    }
     if (action === 'synthetic_walk') {
       const prepare = retryStableSyntheticWalk(() => service.currentState(), now);
       let cueAtMs: number | null = null;
@@ -421,7 +695,7 @@ function AppContent() {
         return service.currentState();
       });
     }
-  }, [actionId, doShopPurchase, runTask, serviceTime]);
+  }, [actionId, doShopPurchase, enterEvaluationMode, runTask, serviceTime]);
 
   if (phase === 'loading') return <View style={styles.center}><Text>로컬 방을 여는 중…</Text></View>;
   if (phase === 'load_error') return <View style={styles.center}>
@@ -441,29 +715,44 @@ function AppContent() {
   return <View style={styles.root}>
     <View style={StyleSheet.absoluteFill}>
       <AruconRoom
+        key={rendererProfileId}
         formId={pet.formId}
         mealCue={mealCue ?? undefined}
-        personality={pet.personalityProfileId === 'expressive' ? 'expressive' : 'reserved'}
-        sleeping={pet.sleeping || pet.hibernating}
+        personality={evaluation?.personality ?? (pet.personalityProfileId === 'expressive' ? 'expressive' : 'reserved')}
+        sleeping={evaluation?.sleeping ?? (pet.sleeping || pet.hibernating)}
         reducedMotion={reducedMotion}
         tableInstalled={pet.tableInstalled}
         toiletInstalled={pet.toiletInstalled}
-        ballVisible={roomAffordances.ballVisible}
-        cushionVisible={roomAffordances.cushionVisible}
-        onPetTouch={() => doLifeAction('touch')}
+        ballVisible={evaluation ? true : roomAffordances.ballVisible}
+        cushionVisible={evaluation ? true : roomAffordances.cushionVisible}
+        characterCandidateId={evaluation?.candidateId ?? 'original'}
+        comparisonCameraAngle={evaluation?.cameraAngle}
+        rendererProfileId={rendererProfileId}
+        interactionEnabled={journal === null && !fixtureVisible}
+        reactionPresentation={reactionPresentation}
+        onPerformanceSummary={summary => { performanceSummaryRef.current = summary; }}
+        onInteractionIntent={() => reactionRuntimeRef.current?.cancel('superseded')}
+        onPetTouch={() => evaluation ? startLiveReaction('petting', { touchTarget: 'unknown' }) : doLifeAction('touch')}
         onFurnitureHit={name => {
+          if (evaluation) {
+            if (name === 'ball') startLiveReaction('ball');
+            else if (name === 'cushion') startLiveReaction('rest');
+            else setNotice('합성 비교에서는 가구 상태만 표시해요. 게임 저장은 바뀌지 않아요.');
+            return;
+          }
           if (name === 'table') setNotice('식탁은 코인 상점 구매 후 자동급식을 설정할 수 있어요.');
           else if (name === 'cushion') {
-            if (roomAffordances.cushionVisible) doLifeAction('sleep_or_wake');
+            if (roomAffordances.cushionVisible) startLiveReaction('rest');
             else setNotice('쿠션은 코인 상점에서 소유한 뒤 사용할 수 있어요.');
           }
           else if (name === 'toilet') setNotice('기본 화장실이 청결을 도와줘요. 유지비는 없어요.');
-          else setNotice(roomAffordances.ballVisible ? '공과 무료로 놀았어요. 보상은 추가되지 않아요.' : '공은 코인 상점에서 소유한 뒤 사용할 수 있어요.');
+          else if (roomAffordances.ballVisible) startLiveReaction('ball');
+          else setNotice('공은 코인 상점에서 소유한 뒤 사용할 수 있어요.');
         }}
         onStatus={setNotice}
       />
     </View>
-    <View style={[styles.top, { top: insets.top + 8 }]}>
+    {!evaluation && <View style={[styles.top, { top: insets.top + 8 }]}>
       <ApprovedStatusPanel
         name={`${pet.givenName}콘`}
         badge={runtimeBadge}
@@ -479,22 +768,47 @@ function AppContent() {
         accessibilityLabel="합성 도구 열기"
         accessibilityState={{ expanded: fixtureVisible }}
         style={styles.fixtureToggle}
-        onPress={() => setFixtureVisible(true)}
+        onPress={() => {
+          reactionRuntimeRef.current?.cancel('scene_change');
+          setJournal(null);
+          setFixtureVisible(true);
+        }}
       >
         <Text style={styles.badgeText}>합성 도구</Text>
       </Pressable>
+    </View>}
+    <View pointerEvents="box-none" style={[styles.reactionLayer, { bottom: insets.bottom + (evaluation ? 276 : 142) }]}>
+      <ReactionOverlay
+        view={reactionDialogue}
+        onChoice={choiceId => reactionRuntimeRef.current?.choose(choiceId)}
+        onClose={() => reactionRuntimeRef.current?.cancel('user')}
+        reduceDialogue={reduceDialogue}
+        onToggleReduceDialogue={() => setReduceDialogue(value => !value)}
+      />
     </View>
-    <View style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
+    {!evaluation && <View style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
       {!!notice && <Text style={styles.notice}>{notice}</Text>}
       {failure && <View style={styles.errorBox}>
         <Text>저장 중 오류: {failure}</Text>
         <Pressable accessibilityRole="button" onPress={retry}><Text>같은 요청 다시 시도</Text></Pressable>
       </View>}
       {busy && <Text style={styles.notice}>로컬 저장 중…</Text>}
-      {journal && <ScrollView style={styles.preview}><Text>생활 기록</Text>{journal.map(entry => <Text key={entry.id}>{journalEventText(entry.event)}</Text>)}</ScrollView>}
       {preview && <ScrollView style={styles.preview}><Text>{preview}</Text></ScrollView>}
       <LifeRoomControls state={pet} onAction={doLifeAction} />
-    </View>
+    </View>}
+    {evaluation && <View style={[styles.evaluation, { bottom: insets.bottom + 8 }]}>
+      {preview && <Text style={styles.evaluationPreview}>{preview}</Text>}
+      <FunEvaluationPanel
+        state={evaluation}
+        onState={next => {
+          reactionRuntimeRef.current?.cancel('scene_change');
+          clearReactionPresentation();
+          setEvaluation(next);
+        }}
+        onScenario={runEvaluationScenario}
+        onClose={leaveEvaluationMode}
+      />
+    </View>}
     <Modal
       animationType="slide"
       onRequestClose={() => setFixtureVisible(false)}
@@ -527,6 +841,12 @@ function AppContent() {
         </View>
       </View>
     </Modal>
+    <JournalPanel
+      entries={journal}
+      onClose={() => setJournal(null)}
+      topInset={insets.top}
+      bottomInset={insets.bottom}
+    />
   </View>;
 }
 
@@ -545,6 +865,9 @@ const styles = StyleSheet.create({
   fixtureToggle: { minHeight: 52, justifyContent: 'center', backgroundColor: '#fff9edee', paddingHorizontal: 10, borderRadius: 12 },
   badgeText: { fontSize: 12, fontWeight: '700', color: '#604638' },
   bottom: { position: 'absolute', left: 8, right: 8, gap: 6 },
+  reactionLayer: { position: 'absolute', left: 8, right: 8 },
+  evaluation: { position: 'absolute', left: 8, right: 8, gap: 5 },
+  evaluationPreview: { alignSelf: 'center', borderRadius: 8, padding: 6, backgroundColor: '#fff9edee', color: '#274d40' },
   notice: { alignSelf: 'center', backgroundColor: '#fff9eddd', padding: 6, borderRadius: 8, color: '#604638' },
   preview: { maxHeight: 110, backgroundColor: '#fff9ed', borderRadius: 12, padding: 10 },
   fixtureBackdrop: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 12, backgroundColor: '#251c1788' },

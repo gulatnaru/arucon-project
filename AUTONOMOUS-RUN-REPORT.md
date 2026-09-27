@@ -1,6 +1,10 @@
 # iOS validation history and Release input resume
 
-## Current physical-device gate — 2026-09-26 / baseline `b6aee5b`
+## CURRENT FUN-00 STATUS — 2026-09-27
+
+`BLOCKED_WITH_CHECKPOINT`: Mac is locked during latest CUA; async unlock has no response. Source implementation is complete; unused frame-marker draft remains only in ignored evidence. Latest checks: 319/319 no failures/skips, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. Latest fixed Release visual/motion matrix is pending unlock; prior videos are not upgraded. Fun/art `USER_REVIEW_PENDING`; Android runtime and physical runtime `NOT_RUN`. See [FUN-FIRST-REPORT](FUN-FIRST-REPORT.md).
+
+## Historical physical-device gate — 2026-09-26 / baseline `b6aee5b`
 
 Fresh physical readiness is blocked by the host environment. `devicectl` succeeded but reported zero connected iOS devices; `xctrace` saw only the Mac and Simulators. No USB iPhone was observed. Code-signing identities and provisioning profiles are both zero. macOS 15.6, Xcode 26.3, iPhoneOS SDK 26.2. iOS CNG `23/23` passed and an unsigned iphoneos Release build with `CODE_SIGNING_ALLOWED=NO` exited 0 (`BUILD SUCCEEDED`), but this is compile evidence only; install and physical execution are **not PASS**. Evidence: `mobile/evidence/physical-b6aee5b/ios-generation.json`, `iphoneos-unsigned-build.log`.
 

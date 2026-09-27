@@ -3,6 +3,7 @@
 제품 기준은 `docs/arucon-SRS.md` v1.9다. 2026-09-19 사용자 승인 여섯 MVP 기본 정책과 가역 config/ADR 위임을 적용한다. 역할 운영은 **ENG-03 멀티모델 자율 개발**을 유지한다. 공유 파일에는 모든 모델에게 필요한 제품 사실, 완료 조건, 권한 경계만 둔다. 모델별 행동 지시는 `.codex/agents/*.toml`에 둔다.
 
 ## 안내판
+- FUN-00 개편: `tasks/FUN-00-overhaul.md`, `docs/fun-first-plan.md` — 기존 저장/정책/원본을 보존한 플레이 개편. 체형 두 후보 제작은 허용하며 최종 재미·아트는 USER_REVIEW_PENDING이다.
 - 자율 개발 시작: `tasks/AUTO-00-orchestrate.md`
 - 모델 라우팅: `docs/model-routing.md`
 - 제품 동작/승인 상태: 관련 SRS FR + `docs/decisions.md`의 관련 DEC
