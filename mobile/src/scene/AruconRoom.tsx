@@ -104,7 +104,10 @@ export function AruconRoom(props: RoomProps) {
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state: AppStateStatus) => {
       if (state === 'active') controller.current?.resume();
-      else controller.current?.pause();
+      else {
+        petGesture.current.cancel();
+        controller.current?.pause();
+      }
     });
     return () => subscription.remove();
   }, []);
