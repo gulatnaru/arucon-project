@@ -32,7 +32,7 @@ presenting -> awaiting_choice -> follow_up -> completed
      +--------------+---------------+-> cancelled
 ```
 
-줄은 `minReadMs`와 장면의 `minVisibleMs` 중 긴 시간 전에는 진행되지 않는다. 현재 콘텐츠 기본값은 1.4초다. 공놀이 선택지는 `timeoutMs: null`이라 자동으로 넘어가지 않는다. 사용자가 선택하거나 명시적으로 닫을 때까지 유지하며 background·화면 전환·대체 장면에서는 `cancelReactionSession`이 `clear_presentation`과 취소 결과를 반환한다. 선택한 `같이 놀기`와 `옆에서 쉬기`는 서로 다른 후속 클립으로 이어진다.
+줄은 `minReadMs`와 장면의 `minVisibleMs` 중 긴 시간 전에는 진행되지 않는다. 현재 콘텐츠 기본값은 2.6초다. 선택지는 `timeoutMs: null`이라 자동으로 넘어가지 않는다. 사용자가 선택하거나 명시적으로 닫을 때까지 유지하며 background·화면 전환·대체 장면에서는 `cancelReactionSession`이 `clear_presentation`과 취소 결과를 반환한다. 서로 다른 선택은 해당 후속 클립으로 이어진다. 말풍선은 실제 펫 root의 화면 위치를 따라가고, 측정한 UI 경계 안에 배치한다.
 
 반응 명령은 clip, hold pose, 시선, 순간 감정, 대사 표시, 표시 정리만 포함한다. 완료·취소 콜백은 경제 명령을 포함하지 않는다.
 
@@ -40,7 +40,7 @@ presenting -> awaiting_choice -> follow_up -> completed
 
 상황 조건은 trigger, live/fixture 출처, 두 표현 프로필, 성장 단계, 가구 affordance, 수면·동면, 컨디션·청결, 접촉 위치, 확정 증거를 사용한다. 조건을 통과한 뒤 우선순위가 높은 후보를 고르고, 반응 ID cooldown과 의미 장면 family window로 반복을 줄인다. 모든 적절한 후보가 최근 사용되었으면 후보 중 하나를 선택해 반응 자체가 사라지지 않게 한다.
 
-현재 카탈로그는 27개 정의를 포함한다.
+현재 카탈로그는 33개 정의를 포함한다. 정상 petting 입력은 최근 가족/동작을 피하며, 반복 규칙을 모두 소진했을 때도 가장 오래된 적합 가족을 선택한다. 이는 무반응이나 경제 차등을 만들지 않는다.
 
 - `petting`, `rest`, `greeting`: reserved/expressive 각각 두 개의 의미 장면 계열과 서로 다른 실제 클립
 - `ball`: 성격별 장면, reserved의 선택형 후속 공놀이/휴식

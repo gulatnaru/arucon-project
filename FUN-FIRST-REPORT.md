@@ -1,6 +1,47 @@
 # FUN-00 fun-first current report
 
-## Current state — 2026-09-27 (latest)
+## 현재 결과 — 2026-09-28 ASTRA_DIRECT
+
+**BLOCKED** — 보고된 기본 결함은 직접 수정했고 정상 플레이 증거를 확보했다. 마지막 앱 전환 포인터 정리 후의 최종 재확인 도중 Mac 잠금이 확인되어, 이 남은 항목은 `BLOCKED_HOST_LOCKED`다. 재미·최종 캐릭터 만족도는 `USER_REVIEW_PENDING`이다.
+
+### 운영과 검증 대상
+
+- 기존 에이전트는 시작 시 모두 완료 상태였다. 새 서브에이전트 생성 0회, 병렬 작성 없음. 설계·구현·디버깅·화면 조작·검토를 직접 수행했다. 검토 방식은 **SELF_REVIEW**이며 이번 독립 리뷰는 없다.
+- 프로젝트의 `.codex/config.toml`에서 subagents를 비활성화했다. 과거 역할 파일과 결정 이력, 제품 테스트 기대값, 보안 권한은 보존했고 사용자 전역 설정은 변경하지 않았다.
+- 출발 소스 `39767d7`; 정상 전체 흐름 검증 소스 `a4b3fad`; 최종 소스 `69bd2ae180c5f5222e7d0a4577b58e8e2265272c`.
+- macOS 15.6 / Xcode 26.3 / iPhone 16e iOS 26.3 **Simulator**, Expo SDK 55, Release 내장 번들. Metro로 장면을 주입하지 않았다.
+- 최종 설치/DerivedData 번들 SHA-256 모두 `8c41466a5c7505bef57ce4d36db29a71ec59b2970a536d19900a5e5a776be73b`.
+
+### 사용자 보고별 수정과 실제 확인
+
+| 보고 | 직접 수정 | 관찰/증거 |
+|---|---|---|
+| 화면 겹침·잘림 | 실제 상·하단 조작부 높이를 측정하고, 말풍선을 움직이는 펫 위치에 고정·경계 안 배치. 선택지/긴 글은 스크롤 가능. 비교 종료의 남은 합성 성장 표시 제거 | 기본 portrait에서 방/펫/말풍선/조작부 가림 없음, 기록 닫기와 비교 종료 후 복원 관찰 |
+| 대화 중 몸·표정·입력 멈춤 | Apple Software Renderer에서 morph를 동일 가중합의 CPU 경로로 처리하고 Expo `flushEXP`로 오래된 GL 명령 누적을 제한. SDK 내부 파일 수정 없음. 실제 animated root로 히트/말풍선 추적 | 대화 대기→선택→몸/표정 반응→종료→다시 이동 관찰. 모델/모션 속도·원본 GLB 유지 |
+| 두 문장 반복 | 최근 가족/동작을 피하고 cooldown 소진 시 가장 오래된 상황 적합 가족을 선택. 정상 교감에 기대기/눈맞춤/곁에 있기 선택 장면 연결 | 개발 재생 없이 정상 버튼 반복에서 “보고 있었어”, “여기 기대 있을게”, “손이 있던 곳”, “거긴 괜찮네”, “조금만 더 있다 가” 및 후속 선택을 관찰 |
+| 쓰다듬기 버튼 저장 깜빡임 | 교감 저장은 quiet 표시로 처리. 실제 저장 실패/재시도 경로 유지 | 정상 버튼에서 저장 문구 대신 몸 반응·말풍선이 이어짐. 경제 값 동일 |
+| 직접 눌러도 안내 문구만 | 텍스트 성공 알림 제거, 버튼과 직접 터치 모두 표정/몸 spring pulse를 재생하고 사용자를 향해 반응 | 직접 누름/드래그 해제에서도 몸 변형·복원과 다음 장면을 관찰 |
+
+### 실제 실행과 한계
+
+- 같은 Release `a4b3fad`에서 기록 열기/닫기 → 버튼·펫 직접 교감 → 정상 입력으로 열린 대화 선택/종료 → 이동 → Home → 앱 아이콘 복귀 → 다시 교감을 연속 확인했다.
+- 최종 `69bd2ae`에서도 기록/직접 입력/여러 반응/선택 후 행동을 확인했다. 마지막 Home/복귀 재확인은 화면 조작 연결 오류 뒤 Mac 잠금이 확인되어 완료하지 못했다. 이전 빌드의 관찰을 이 항목의 PASS로 옮기지 않는다.
+- 정상 속도 원본 영상: `mobile/evidence/astra-direct/10-verified-normal-flow.mp4` (a4b3fad 전체 흐름), `12-accepted-normal-sequence.mp4` (69bd2ae 잠금 전 부분 흐름). `03`/`04`는 앞선 정상 입력 관찰이다. 영상 속도를 변경하거나 개발 메뉴 장면 재생으로 기본 결함을 통과시키지 않았다.
+- 3개 체형 정면과 도톰형 측면/3/4 방향, 합성 성장 말풍선은 8eefbc3에서 수행한 별도 보조 비교다 (`06`~`09` PNG와 화면 관찰). 원본과 두 후보 파일은 변경하지 않았다. 전체 아트/모션 매트릭스나 사용자 만족도 통과를 뜻하지 않는다.
+- 정상 조작·재실행 전후 먹이 0, 코인 15, EXP units 25,125,000, 식사 원장 3행, 형태/성격 동일; SQLite integrity OK. 실제 건강정보 읽기 OFF.
+
+### 자동 검사와 성능
+
+- 최종 소스: 전체 **324/324**, lint/typecheck PASS, 양 플랫폼 JS bundle PASS, iOS Release build/install/launch PASS. iOS CNG **23/23**, 운영 규칙 검사 **40/40**. 운영 모드 검사만 사용자 지시에 맞춰 바꾸고 기존 제품 테스트 기대값은 완화하지 않았다.
+- CPU morph 검사는 합성 기준식과 원본/두 후보의 실제 애니메이션 가중합을 대조했다. 실패했던 콘텐츠 동작 다양성 검사도 실제 다른 동작을 선택하도록 고쳐 통과시켰다.
+- 8eefbc3의 정상 입력 8회: 다음 RAF 프록시 p95 **16.50ms**, GL 대기 포함 다음 제출 프록시 p95 **43.83ms**. RAF p95 **36.37ms**, 표본 최대 **44.11ms**, >500ms 표본 0. 약 10초 제출 221표본, **22.07Hz 프록시**. 이후 변경은 비교 표시 정리와 background 포인터 취소이며 렌더 계산은 같다. 기존 예산 유지. 이는 실제 화면 FPS·touch-to-photon·실기기 성능이 아니다.
+- 소프트웨어 프로필은 0.75 DPR/Lambert 화질 절충이 남는다. 실제 Android 실행, 물리기기 지연/발열/배터리, 모든 글자 크기·기기, 전 장면·최종 아트 평가는 이번 관찰 범위 밖이다.
+
+### 바로 실행 / 다음 작업
+
+Mac 잠금 해제 후 `open -a Simulator`와 `xcrun simctl launch booted com.arucon.dev`로 현재 설치된 Release를 실행한다. 우선 일반 방에서 기록·교감·선택·이동·Home/복귀를 확인한다. 체형/성장 보조 비교는 `합성 도구 → 반응/아트 비교`에서 따로 본다. 남은 작업은 최신 빌드의 앱 전환 재확인과 사용자 평가이며, 이미 끝난 구현을 다시 만들지 않는다. Git 최종 해시는 최종 응답과 ignored `mobile/evidence/astra-direct/git-audit.json`에 기록한다.
+
+## 이전 실행 — 2026-09-27
 
 Status is `BLOCKED_WITH_CHECKPOINT`: CUA reported a locked Mac during the final post-fix inspection. Independent implementation and source gates are complete. An unconnected frame-marker experiment is kept only in ignored local evidence; no speculative CPU morph optimization was shipped. Fun/art remains `USER_REVIEW_PENDING`.
 

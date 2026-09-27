@@ -1,6 +1,10 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## CURRENT FUN-00 STATUS — 2026-09-27
+## 현재 품질 복구 범위 — 2026-09-28
+
+ASTRA_DIRECT / SELF_REVIEW. 보고된 말풍선 겹침·저장 깜빡임·반응 반복·텍스트뿐인 교감·소프트웨어 렌더 누적을 직접 수정했다. 정상 흐름을 같은 a4b3fad Release에서 관찰했고, 최종69bd2ae의 마지막 앱 전환 재확인은 `BLOCKED_HOST_LOCKED`다. 현재 종료 상태는 `BLOCKED`, 재미·최종 아트는 USER_REVIEW_PENDING. 자동 검사는 324/324, lint/typecheck, 양 플랫폼 JS bundle, iOS Release, CNG23/23, 운영40/40 PASS. 이 결과는 전체 SRS 출시 완료나 실제 기기 성능 통과가 아니다. [보고된 결함별 증거](FUN-FIRST-REPORT.md)와 아래의 과거 §14/14-1 이력을 구분한다.
+
+## Historical FUN-00 status — 2026-09-27
 
 `BLOCKED_WITH_CHECKPOINT`: Mac locked during latest CUA; async unlock pending. Latest source/build checks are 319/319, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. Final fixed Release post-fix visual/angle/motion comparison remains pending. Android runtime and physical runtime are `NOT_RUN`; four evolved assets remain missing; fun/art `USER_REVIEW_PENDING`. See [FUN-FIRST-REPORT](FUN-FIRST-REPORT.md).
 

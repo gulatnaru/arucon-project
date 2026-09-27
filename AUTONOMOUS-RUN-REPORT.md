@@ -1,6 +1,12 @@
 # iOS validation history and Release input resume
 
-## CURRENT FUN-00 STATUS — 2026-09-27
+## 현재 ASTRA_DIRECT 결과 — 2026-09-28
+
+`BLOCKED` (최종 앱 전환 재확인 중 Mac 잠금). 새 에이전트 0회, 기존 에이전트는 모두 종료 상태였으며 직접 구현·정상 입력 검증·SELF_REVIEW를 수행했다. 소스 `a4b3fad`의 같은 Release에서 기록/직접·버튼 교감/선택·종료/이동/Home·복귀를 연속 관찰했다. 최종 `69bd2ae`는 터치 포인터 background 정리까지 포함하고, 기록·교감·선택은 관찰했으나 마지막 앱 전환은 잠금으로 보류다. 이전 결과를 최신 미실행 항목의 PASS로 옮기지 않는다.
+
+전체 324/324, lint/typecheck, 양 플랫폼 JS bundle, iOS Release build/install/launch, CNG 23/23, 운영 검사 40/40 통과. 기존 제품 기대값·경제/저장/원본 아트·건강 OFF·외부 권한은 유지했다. 소프트웨어 GL CPU morph/queue barrier, 펫 근처 말풍선과 측정 경계, 정상 반복 장면, quiet 교감 저장, 합성 표시 종료 정리를 반영했다. 이번 검토는 독립 리뷰가 아니다. 상세 원인·빌드 해시·영상·프록시 한계는 [FUN-FIRST-REPORT.md](FUN-FIRST-REPORT.md)에 있다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
+
+## Historical FUN-00 status — 2026-09-27
 
 `BLOCKED_WITH_CHECKPOINT`: Mac is locked during latest CUA; async unlock has no response. Source implementation is complete; unused frame-marker draft remains only in ignored evidence. Latest checks: 319/319 no failures/skips, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. Latest fixed Release visual/motion matrix is pending unlock; prior videos are not upgraded. Fun/art `USER_REVIEW_PENDING`; Android runtime and physical runtime `NOT_RUN`. See [FUN-FIRST-REPORT](FUN-FIRST-REPORT.md).
 

@@ -1,6 +1,10 @@
 # 외부 승인·환경 대기열 — fresh iOS validation
 
-## CURRENT FUN-00 STATUS — 2026-09-27
+## 현재 품질 복구 차단 — 2026-09-28
+
+운영은 ASTRA_DIRECT이며 신규 제품 결정은 필요하지 않았다. 남은 즉시 조치는 Mac 잠금 해제 후 최종69bd2ae Release의 정상 앱 전환·복귀를 직접 확인하는 것이다. 코드/자동검사/빌드·앞선 정상 플레이 증거는 보존되어 있으며 현재 `BLOCKED`로 기록한다. 보안 설정 변경이나 잠금 우회는 하지 않았다. 직접 검토는 SELF_REVIEW이고 재미·최종 캐릭터 선택은 USER_REVIEW_PENDING이다. 실제 건강/법률/실계정/결제·출시 및 실기기 경계는 아래 이력대로 유지한다.
+
+## Historical FUN-00 status — 2026-09-27
 
 `BLOCKED_WITH_CHECKPOINT`: latest CUA says the Mac is locked and async unlock has not returned. Latest verification is 319/319, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. No external action was performed. Resume installed simulator app “아루콘 개발 셸” through `SOURCE_SYNTHETIC` reaction/art comparison when unlocked; fun/art remains `USER_REVIEW_PENDING`.
 

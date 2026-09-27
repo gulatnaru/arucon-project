@@ -1,6 +1,12 @@
 # Next resume — fresh macOS iOS validation
 
-## CURRENT FUN-00 STATUS — 2026-09-27
+## 현재 재개 지점 — ASTRA_DIRECT / 2026-09-28
+
+`BLOCKED`: Mac 잠금으로 마지막 앱 전환 재확인이 남았다. 현재 검증 소스는 `69bd2ae`, 최종 Git 해시는 현재 HEAD와 최종 응답에서 확인한다. 새 서브에이전트를 만들지 않고 직접 이어간다. 과거 분업 지시는 이번 범위에 적용하지 않으며 자체 검토는 SELF_REVIEW다.
+
+구현을 다시 만들지 말고 현재 설치된 iOS Release에서 정상 기록 열기/닫기→펫·버튼 교감→선택/종료→이동→Home/앱 복귀를 마무리한다. a4b3fad에서 같은 빌드의 전체 정상 흐름은 관찰했고, 69bd2ae의 기록·교감·선택은 확인했다. `open -a Simulator` 및 `xcrun simctl launch booted com.arucon.dev`로 재개할 수 있다. 개발 재생만으로 통과하지 않는다. 324/324·lint/typecheck·양 플랫폼 번들·Release·CNG23·운영40 통과 기록은 `mobile/evidence/astra-direct/`에 있다. [현재 보고서](FUN-FIRST-REPORT.md)를 먼저 읽고, 최신 최종 화면 검사 전 READY로 올리지 않는다. 재미·아트는 USER_REVIEW_PENDING.
+
+## Historical FUN-00 status — 2026-09-27
 
 `BLOCKED_WITH_CHECKPOINT`: latest CUA reports “Mac is locked”; async unlock has no response. Latest checks are 319/319, lint/typecheck PASS, iOS/Android bundles PASS, iOS Release build/install/launch Metro OFF, CNG 23/23, workflow 38/38. Resume with installed “아루콘 개발 셸” → synthetic tool → `SOURCE_SYNTHETIC` reaction/art route: panel/touch/clean, personality/ball choices, growth, 3 bodies × 4 angles, relaunch. Do not treat prior videos as latest PASS. See [FUN-FIRST-REPORT](FUN-FIRST-REPORT.md).
 

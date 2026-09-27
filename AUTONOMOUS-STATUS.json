@@ -1,20 +1,32 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-09-27",
+  "runDate": "2026-09-28",
   "timezone": "Asia/Seoul",
-  "status": "BLOCKED_WITH_CHECKPOINT",
+  "status": "BLOCKED",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "FUN-00 implementation and section 11 validation; SRS 14/14-1 release gates remain separate",
-  "reason": "FUN-00 implementation, source review, bundles and iOS Release build are complete. Earlier Release scenes and SQLite isolation were observed, then short-tap ordering, interruptible-expression priority and comparison orientation were corrected. The Mac is now locked; latest post-fix visual/input/art/performance evidence is blocked and is not promoted from older captures.",
-  "sourceBaseline": "55c03eccdc1d21d36d720f105cf982597c63c494",
-  "sourceCheckpoint": "55c03ec",
+  "reason": "Astra directly repaired and observed the reported interaction/layout problems. A complete normal-input sequence was verified on Release a4b3fad. Final source 69bd2ae adds background pointer cleanup; its record/petting/choice checks were observed but the last background/foreground confirmation was interrupted by a locked Mac. Preserve this environment block without promoting older observations.",
+  "sourceBaseline": "39767d76ede8b9afbc72a15bfe5d3d699dda0967",
+  "sourceCheckpoint": "69bd2ae",
+  "operationMode": "ASTRA_DIRECT",
   "currentFunReport": "FUN-FIRST-REPORT.md",
   "funApproval": "USER_REVIEW_PENDING",
   "finalCharacterApproval": "USER_REVIEW_PENDING",
   "currentGapMatrixDocument": "MVP-GAP-MATRIX.md",
-  "routingStatus": "ROUTING_UNVERIFIED",
+  "routingStatus": "NO_SUBAGENTS_DIRECT_MODE",
   "effectiveModels": null,
   "routing": {
+    "mode": "ASTRA_DIRECT",
+    "newSubagents": 0,
+    "handoff": "All existing agents were completed at start; no parallel writers",
+    "configuredRootModel": "gpt-6-astra",
+    "effectiveRootModel": "UNVERIFIED_METADATA_UNAVAILABLE",
+    "projectAgentsEnabled": false,
+    "globalSettingsChanged": false,
+    "review": "SELF_REVIEW",
+    "independentReview": "NOT_PERFORMED_THIS_RUN"
+  },
+  "historicalRouting": {
     "root": "requested Astra orchestration/integration/Hard Stop decisions",
     "builder": "arucon_builder / requested gpt-5.6-sol",
     "exploration": "arucon_explorer / requested Terra",
@@ -63,12 +75,12 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "FUN_IMPLEMENTED_FINAL_RUNTIME_BLOCKED_HOST_LOCKED",
+    "independentLocalEngineering": "DIRECT_REPAIRS_IMPLEMENTED_FINAL_APP_SWITCH_CHECK_BLOCKED_HOST_LOCKED",
     "productMvp": "NOT_COMPLETE",
     "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
     "androidReleaseCompile": "PASS_X86_64",
     "widgetRuntimeQa": "iOS_OBSERVED_WIDGET_IMAGE_TIME_TAP_RETURN; Windows Android observation historical",
-    "iosCurrentRuntime": "PARTIAL_FUN_RELEASE_OBSERVATIONS_POST_FIX_MATRIX_BLOCKED_HOST_LOCKED"
+    "iosCurrentRuntime": "PASS_NORMAL_SEQUENCE_A4B3FAD_PARTIAL_FINAL_69BD2AE_HOST_LOCKED"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -191,7 +203,7 @@
     "evidence": "mobile/evidence/physical-b6aee5b",
     "measurementProtocol": "mobile/docs/PHYSICAL-VALIDATION.md"
   },
-  "lastValidation": {
+  "checkpointValidation39767d7": {
     "scope": "FUN-00 on macOS; source and runtime evidence separated",
     "evidence": "mobile/evidence/fun-00",
     "report": "FUN-FIRST-REPORT.md",
@@ -216,6 +228,32 @@
     "independentReview": "PASS_SOURCE_WITH_RUNTIME_LIMITS",
     "remaining": ["Unlock Mac for current-bundle input/dialogue/candidate/motion captures", "Latest input sample budget and displayed-frame validation", "Physical-device touch/thermal/battery and Android runtime", "Four evolved-form runtime assets", "User fun and final-art review"]
   },
+  "lastValidation": {
+    "scope": "Astra direct quality repair; normal-input runtime checks and SELF_REVIEW",
+    "sourceCommit": "69bd2ae180c5f5222e7d0a4577b58e8e2265272c",
+    "completeNormalSequenceSource": "a4b3faddcd4246b01e830457e80c6dbf81aa52b8",
+    "bundleSha256": "8c41466a5c7505bef57ce4d36db29a71ec59b2970a536d19900a5e5a776be73b",
+    "evidence": "mobile/evidence/astra-direct",
+    "mobileTests": {"passed": 324, "total": 324, "failed": 0, "skipped": 0, "exit": 0, "log": "verified-tests.log"},
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "reactionDefinitions": 33,
+    "iosCng": "PASS_23_OF_23",
+    "workflow": "PASS_40_OF_40_DIRECT_MODE_CHECKS",
+    "androidJsBundle": "PASS",
+    "iosJsBundle": "PASS",
+    "iosSimulatorReleaseBuildInstallLaunch": "PASS",
+    "normalInputObservations": ["record open/close", "toolbar and direct pet reaction", "multiple context-appropriate lines", "choice and follow-up body/face", "dialogue close and movement", "Home/app-icon foreground return on a4b3fad"],
+    "finalAppSwitchConfirmation": "BLOCKED_HOST_LOCKED_ON_69BD2AE",
+    "normalResourceAndRestartPreservation": "PASS_FOOD0_COIN15_EXP25125000_MEALS3_FORM_PERSONALITY_UNCHANGED_INTEGRITY_OK",
+    "performance": {"source": "8eefbc3", "inputSamples": 8, "inputToRafP95Ms": 16.50, "inputToSubmissionP95Ms": 43.83, "rafP95Ms": 36.37, "rafMaxMs": 44.11, "submissionProxyHz": 22.07, "notice": "timing proxies with software GL queue barrier; not visible FPS or physical input-to-photon"},
+    "review": "SELF_REVIEW",
+    "independentReview": "NOT_PERFORMED_THIS_RUN",
+    "physicalDevice": "NOT_RUN",
+    "androidRuntime": "NOT_RUN_THIS_ENVIRONMENT",
+    "healthReads": "OFF",
+    "userFunAndFinalArt": "USER_REVIEW_PENDING"
+  },
   "environment": {
     "host": "macOS 15.6",
     "node": "26.7.0",
@@ -224,7 +262,7 @@
     "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
-    "softwareEmulator": "FUN-00 exact Apple Software Renderer candidate: 0.75 DPR/Lambert/33ms; latest visual acceptance BLOCKED_HOST_LOCKED; historical CPU46.4 not reused"
+    "softwareEmulator": "Exact Apple Software Renderer: CPU morph equivalence + flushEXP bounded queue, 0.75 DPR/Lambert/33ms; current source's final app-switch check blocked by host lock; no physical-performance claim"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",

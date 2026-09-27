@@ -21,7 +21,7 @@
 
 ## 도달성·미리보기
 
-`cd mobile && node --import tsx scripts/check-reaction-content.ts`는 27개 정의를 각각 실제 선택기에 넣어 목표 ID가 선택되는지 검사한다. 두 표현 프로필의 petting/rest/greeting 두 계열, 성장 stage 잠금과 live/fixture 출처, 청소 세 결과, 공 affordance, 수면 중 조용한 휴식도 함께 검사한다. 구조 validator 통과만으로 도달 가능하다고 판정하지 않는다.
+`cd mobile && node --import tsx scripts/check-reaction-content.ts`는 33개 정의를 각각 실제 선택기에 넣어 목표 ID가 선택되는지 검사한다. 두 표현 프로필의 petting에는 기대기/눈맞춤/곁에 있기 선택 장면을 추가했다. 정상 반복 입력의 여러 가족 도달, 성장 stage 잠금과 live/fixture 출처, 청소 세 결과, 공 affordance, 수면 중 조용한 휴식도 함께 검사한다. 구조 validator 통과만으로 실제 플레이 통과를 주장하지 않는다.
 
 `node --import tsx scripts/check-reaction-content.ts --preview=<reactionId>`는 해당 정의에 맞는 합성 상황을 만들고 실제 preview API가 낸 세션과 첫 명령을 JSON으로 출력한다. 앱의 개발 미리보기는 `previewReaction({ context, recent, preferredReactionId, nowMs })`로 특정 장면과 최근 이력을 지정할 수 있다. 새 장면은 지원 중인 clip과 데이터 계약만 사용하면 선택 엔진 수정 없이 catalog 항목 추가로 미리볼 수 있다.
 
