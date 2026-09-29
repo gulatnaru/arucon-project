@@ -2,7 +2,7 @@
 
 ## 현재 재개 지점 — LIFE-01 / 2026-09-30
 
-**PARTIAL_WITH_BLOCKERS**. [LIFE-01 원문](tasks/LIFE-01-autonomous-growth-resume.md)과 [보고서의 현재 LIFE-01 절](LIFE-00-REPORT.md)을 먼저 읽는다. ASTRA_DIRECT, 새 subagent 없이 직접 구현/검증하며 SELF_REVIEW다. 현재 HEAD/dirty를 확인하고 과거 SHA로 reset하지 않는다.
+**PARTIAL_WITH_BLOCKERS**. 최신 수정 코드 체크포인트는 **`6eb1c91`**, 그 뒤 문서 인계 commit은 앱 소스를 바꾸지 않는다. [LIFE-01 원문](tasks/LIFE-01-autonomous-growth-resume.md)과 [보고서의 현재 LIFE-01 절](LIFE-00-REPORT.md)을 먼저 읽는다. ASTRA_DIRECT, 새 subagent 없이 직접 구현/검증하며 SELF_REVIEW다. 현재 HEAD/dirty를 확인하고 과거 SHA로 reset하지 않는다.
 
 이번 실행은 Mac이 열린 상태에서 실제 화면을 확인했다. 1464db2에서 일반 방3분 이상 자율 생활, 교감, 자동 Lv5→6, 실제 피코 진화를 관찰했다. 거친 확대 렌더를 1.5 DPR의 vertex-lit software 경로로 수정해 중간 일반 방에서 약60Hz 제출 proxy를 측정했다. 피코 귀 분리도 발견하여 base/morph 연결부와 식사 연출/토큰을 수정했다. **이후 Mac이 다시 잠겨 최신 시각/입력 재검증이 남았다.** 이전 영상으로 최신 PASS를 만들지 않는다.
 

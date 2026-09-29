@@ -51,7 +51,7 @@
 ### 빌드와 증거
 
 - 시작 HEAD `c79f158`, 중간 코드 체크포인트 `1464db2`.
-- 최신 수정 코드: **PENDING_LIFE01_REPAIR_CHECKPOINT**. 문서 인계 commit은 앱 소스와 별도로 식별한다.
+- 최신 수정 코드: **`6eb1c91`**. 문서 인계 commit은 앱 소스와 별도로 식별한다.
 - 최신 설치/DerivedData `main.jsbundle` SHA256 일치: `148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d`.
 - 중간 관찰 빌드 SHA256: `65beda2960417d4608104f4ded5183d6c888d2544acbfe195f9512501a89f3ce`.
 - macOS15.6 / Xcode26.3 / Expo55 / iPhone16e iOS26.3 / Release / 390×844pt / content size large. 접근성 초대형 글자와 다른 화면 크기는 미검증. 실제 건강 읽기 OFF.

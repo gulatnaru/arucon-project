@@ -7,7 +7,7 @@
   "definition": "LIFE-01 screen recovery and autonomous life/growth, preserving approved domain rules and external boundaries",
   "reason": "Mac was initially accessible. General-room autonomous life, touch, auto level-up and Piko evolution were observed on 1464db2. A detached-ear defect was found and repaired; the Mac locked again before latest visual/input revalidation. Latest compile, data restore and automatic checks are separate from those intermediate observations.",
   "sourceBaseline": "c79f15872c44e8a987065e6240211a96e77bff7c",
-  "sourceCheckpoint": "PENDING_LIFE01_REPAIR_CHECKPOINT",
+  "sourceCheckpoint": "6eb1c91",
   "currentLivingReport": "LIFE-00-REPORT.md",
   "life01": {
     "authoritativeCurrentResult": true,
