@@ -5,46 +5,73 @@
   "status": "PARTIAL_WITH_BLOCKERS",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "LIFE-01 screen recovery and autonomous life/growth, preserving approved domain rules and external boundaries",
-  "reason": "Mac was initially accessible. General-room autonomous life, touch, auto level-up and Piko evolution were observed on 1464db2. A detached-ear defect was found and repaired; the Mac locked again before latest visual/input revalidation. Latest compile, data restore and automatic checks are separate from those intermediate observations.",
-  "sourceBaseline": "c79f15872c44e8a987065e6240211a96e77bff7c",
-  "sourceCheckpoint": "6eb1c91",
+  "reason": "Latest Simulator autonomous life, actual automatic growth/evolution and repaired meal visuals were observed. During the final evidence audit, a specific Piko stretch observation was still missing; CUA then reported Mac locked. That required follow-up is blocked, not a PASS. Recording-on RAF proxy also failed one fixed-budget window.",
+  "sourceBaseline": "110421baae9ba8c708cc56cb64d40395accd2fc2",
+  "sourceCheckpoint": "70cab57",
   "currentLivingReport": "LIFE-00-REPORT.md",
   "life01": {
     "authoritativeCurrentResult": true,
     "task": "tasks/LIFE-01-autonomous-growth-resume.md",
-    "observedIntermediateCode": "1464db2",
-    "observedIntermediateBundle": "65beda2960417d4608104f4ded5183d6c888d2544acbfe195f9512501a89f3ce",
-    "latestBundleSha256": "148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d",
-    "tests": { "passed": 348, "total": 348, "skipped": 0 },
+    "sourceCheckpoint": "70cab57",
+    "latestBundleSha256": "784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b",
+    "scope": "iOS Simulator completed observations retained; required Piko stretch follow-up blocked by host lock",
+    "tests": {
+      "passed": 350,
+      "total": 350,
+      "skipped": 0
+    },
     "lint": "PASS",
     "typecheck": "PASS",
     "iosBundle": "PASS",
     "androidBundle": "PASS",
-    "iosReleaseCompileInstallLaunch": "PASS_PROCESS_START_ONLY",
+    "iosReleaseCompileInstallLaunch": "PASS_WITH_ACTUAL_SIMULATOR_INPUT",
     "iosCng": "23/23 PASS",
     "workflow": "40/40 PASS",
-    "intermediateObservations": ["ordinary room without ball: more than 3 minutes without input", "drowsy/stretch/look and optional touch", "automatic meal level 5 to 6", "automatic meal level 15 to 16 and Piko model transition"],
-    "latestVisualAndInput": "BLOCKED_HOST_LOCKED",
+    "latestVisualAndInput": "PASS_COMPLETED_OBSERVATIONS_WITH_PIKO_STRETCH_BLOCKED",
+    "ordinaryRoom": "C: >3 minutes no input, look/seat/company/drowsy/stretch; normal saved name and resources preserved",
+    "automaticGrowth": "C: separate level5->6 and level15->16 -> Piko/Mongle/Mallu/Mono through actual meal service",
+    "sleepComparison": "B: actual meals 15 EXP vs 18.75 EXP; unchanged economy regression passed in C",
+    "toiletAndLargeText": "B: clipping repaired, actual toilet/auto-clean and dynamic maximum font tested; unchanged paths in C",
+    "mealCancellation": "B: perform->cancel 742ms, later life resumes and no stale growth",
+    "recordingOnProxy": {
+      "samples": 5,
+      "inputSubmissionP95Ms": 56.17,
+      "rafP95Ms": 34.31,
+      "rafGate": "FAIL",
+      "submittedRateHz": 46.31
+    },
+    "recordingOffProxy": {
+      "samples": 5,
+      "inputSubmissionP95Ms": 44.47,
+      "rafP95Ms": 29.07,
+      "rafGate": "PASS",
+      "submittedRateHz": 52.92
+    },
+    "performanceVerdict": "LIMITED_MIXED_PROXY_RESULTS; no visible FPS or physical latency claim",
     "nativeHitches": "BLOCKED_ENV_UNSUPPORTED_SIMULATOR_PLATFORM",
-    "inputLatency": "INSUFFICIENT_DATA_NOT_PASS",
-    "latestMotionPerformance": "NOT_RUN_AFTER_FINAL_ASSET_REPAIR",
-    "otherNativeEvolutionFormsSleepToilet": "NOT_RUN",
-    "androidNativeEnvironment": "BLOCKED_ENV_NO_ADB_OR_CONFIGURED_SDK",
-    "restoredGrowthData": "PASS_READ_ONLY_COMPARISON",
-    "widgetIsolation": "PASS_GENERAL_PET_RETAINED",
-    "androidRuntime": "NOT_RUN_THIS_CHANGE",
     "physicalDevice": "NOT_RUN_THIS_CHANGE",
+    "androidRuntime": "NOT_RUN_THIS_CHANGE_ADB_UNAVAILABLE",
+    "restoredGrowthData": "C:24 pets x7 fields, differences0",
+    "widgetOpen": "display observed; tap-open not verified in this run",
     "newSubagents": 0,
     "review": "SELF_REVIEW",
     "effectiveModel": "ROUTING_UNVERIFIED",
     "funAndArt": "USER_REVIEW_PENDING",
-    "evidence": "evidence/life-01",
-    "nextAction": "Unlock Mac and inspect latest restored Piko ear attachment during movement/petting before continuing same-build autonomous growth validation"
+    "evidence": "evidence/life-01-resume-2026-09-30",
+    "latestVideo": "39-latest-continuous-play.mp4",
+    "videoDurationSeconds": 931.9883333333,
+    "nextAction": "Unlock Mac, inspect actual Piko stretch/ear attachment on source70cab57; do not repeat completed suites or reset saved profiles",
+    "hostReLocked": true,
+    "pikoStretch": "BLOCKED_HOST_LOCKED_ACTUAL_MOTION_NOT_CONFIRMED"
   },
   "life00": {
     "authoritativeCurrentResult": false,
     "priorSectionsScope": "Historical FUN/native results; not evidence for the new LIFE build",
-    "tests": { "passed": 336, "total": 336, "skipped": 0 },
+    "tests": {
+      "passed": 336,
+      "total": 336,
+      "skipped": 0
+    },
     "lint": "PASS",
     "typecheck": "PASS",
     "iosBundle": "PASS",
@@ -102,11 +129,32 @@
     },
     "currentRun": {
       "root": "requested Astra orchestration, integration, runtime evidence and checkpoint",
-      "explorers": ["fun_input_explore", "fun_system_explore"],
-      "builders": ["fun_room_implementation", "fun_reaction_system", "fun_art_candidates", "fun_resume_app", "fun_resume_reactions", "fun_resume_renderer"],
-      "reviewers": ["fun_independent_review (interrupted)", "fun_resume_review"],
-      "lunaWorkers": ["fun_life_content", "fun_report_docs"],
-      "requestedModels": {"explorer": "gpt-5.6-terra", "builder": "gpt-5.6-sol", "reviewer": "gpt-5.6-terra", "luna": "gpt-5.6-luna"},
+      "explorers": [
+        "fun_input_explore",
+        "fun_system_explore"
+      ],
+      "builders": [
+        "fun_room_implementation",
+        "fun_reaction_system",
+        "fun_art_candidates",
+        "fun_resume_app",
+        "fun_resume_reactions",
+        "fun_resume_renderer"
+      ],
+      "reviewers": [
+        "fun_independent_review (interrupted)",
+        "fun_resume_review"
+      ],
+      "lunaWorkers": [
+        "fun_life_content",
+        "fun_report_docs"
+      ],
+      "requestedModels": {
+        "explorer": "gpt-5.6-terra",
+        "builder": "gpt-5.6-sol",
+        "reviewer": "gpt-5.6-terra",
+        "luna": "gpt-5.6-luna"
+      },
       "effective": "ROUTING_UNVERIFIED"
     },
     "checkpointRunB6aee5b": {
@@ -118,8 +166,14 @@
     },
     "checkpointRunC0719ea": {
       "root": "requested Astra integration/native verification",
-      "explorer": ["ios_current_cng_audit / Terra", "ios_widget_runtime_audit / Terra"],
-      "builder": ["ios_checker_scope_fix / Sol", "ios_widget_asset_fix / Sol"],
+      "explorer": [
+        "ios_current_cng_audit / Terra",
+        "ios_widget_runtime_audit / Terra"
+      ],
+      "builder": [
+        "ios_checker_scope_fix / Sol",
+        "ios_widget_asset_fix / Sol"
+      ],
       "reviewer": "ios_final_review / Terra High",
       "luna": "ios_validation_docs / Luna",
       "effective": "ROUTING_UNVERIFIED"
@@ -133,12 +187,13 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "DIRECT_REPAIRS_IMPLEMENTED_FINAL_APP_SWITCH_CHECK_BLOCKED_HOST_LOCKED",
+    "independentLocalEngineering": "REPAIRS_IMPLEMENTED_PIKO_STRETCH_FOLLOWUP_BLOCKED_HOST_LOCKED",
     "productMvp": "NOT_COMPLETE",
-    "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
-    "androidReleaseCompile": "PASS_X86_64",
-    "widgetRuntimeQa": "iOS_OBSERVED_WIDGET_IMAGE_TIME_TAP_RETURN; Windows Android observation historical",
-    "iosCurrentRuntime": "PASS_NORMAL_SEQUENCE_A4B3FAD_PARTIAL_FINAL_69BD2AE_HOST_LOCKED"
+    "androidRuntime": "NOT_RUN_THIS_SCOPE",
+    "androidReleaseCompile": "NOT_RUN_THIS_SCOPE",
+    "widgetRuntimeQa": "DISPLAY_OBSERVED_TAP_OPEN_NOT_VERIFIED_THIS_RUN",
+    "iosCurrentRuntime": "PASS_OBSERVED_FUNCTIONAL_SCOPE_ON_70CAB57",
+    "performance": "MIXED_RECORDING_ON_OFF_PROXY_RESULTS; not physical/visible-FPS approval"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -178,11 +233,31 @@
       "skipped": 0,
       "exit": 0
     },
-    "sceneFinalTargeted": {"tests": 25, "pass": 25, "fail": 0, "exit": 0, "note": "separate targeted result; not added to 82; 77/20 are intermediate"},
+    "sceneFinalTargeted": {
+      "tests": 25,
+      "pass": 25,
+      "fail": 0,
+      "exit": 0,
+      "note": "separate targeted result; not added to 82; 77/20 are intermediate"
+    },
     "lint": "PASS",
     "typecheck": "PASS",
-    "cngChecker": {"tests": 27, "pass": 27, "fail": 0, "exit": 0},
-    "freshWorkflow": {"tests": 38, "pass": 38, "fail": 0, "exit": 0, "python": "3.12.14", "executable": "/Users/heung/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3", "provenance": "mobile/evidence/ios-5da0048/workflow-provenance.json", "note": "system Python tomllib failure was resolved without installation"},
+    "cngChecker": {
+      "tests": 27,
+      "pass": 27,
+      "fail": 0,
+      "exit": 0
+    },
+    "freshWorkflow": {
+      "tests": 38,
+      "pass": 38,
+      "fail": 0,
+      "exit": 0,
+      "python": "3.12.14",
+      "executable": "/Users/heung/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "provenance": "mobile/evidence/ios-5da0048/workflow-provenance.json",
+      "note": "system Python tomllib failure was resolved without installation"
+    },
     "debugCompile": "PASS_SOURCE_DEBUG_NATIVE_BUILD_EXIT0",
     "releaseCompile": "PASS_XCODEBUILD_RELEASE_FINAL_EXIT0_INSTALL_LAUNCH_OBSERVED",
     "mainJsBundle": "3.4MB",
@@ -235,7 +310,11 @@
     "androidSdk": "NOT_FOUND_IN_CHECKED_LOCATIONS",
     "androidPhysicalDeviceCount": null,
     "usbPhoneObservation": "NONE_OBSERVED; Android wireless inventory unavailable",
-    "iosNativeGeneration": { "passed": 23, "total": 23, "exit": 0 },
+    "iosNativeGeneration": {
+      "passed": 23,
+      "total": 23,
+      "exit": 0
+    },
     "iosUnsignedDeviceTargetReleaseCompile": {
       "status": "PASS_BUILD_ONLY",
       "exit": 0,
@@ -252,11 +331,24 @@
     "physicalThermalAndBattery": "NOT_RUN",
     "numericPerformanceBudget": "DEC-31_OPEN",
     "healthReads": "OFF",
-    "readinessTests": { "passed": 6, "total": 6, "exit": 0 },
+    "readinessTests": {
+      "passed": 6,
+      "total": 6,
+      "exit": 0
+    },
     "targetedLint": "PASS_EXIT_0",
     "typecheck": "PASS_EXIT_0_AFTER_CALLBACK_TYPE_FIX",
-    "workflow": { "passed": 38, "total": 38, "exit": 0 },
-    "reviewSourceSuiteBeforeFinalToolingFixes": { "passed": 269, "total": 269, "exit": 0, "note": "npm test expanded the full source test glob; not physical or Simulator runtime validation" },
+    "workflow": {
+      "passed": 38,
+      "total": 38,
+      "exit": 0
+    },
+    "reviewSourceSuiteBeforeFinalToolingFixes": {
+      "passed": 269,
+      "total": 269,
+      "exit": 0,
+      "note": "npm test expanded the full source test glob; not physical or Simulator runtime validation"
+    },
     "independentReview": "PASS_SOURCE_AFTER_FIXES_PHYSICAL_RUNTIME_NOT_RUN",
     "evidence": "mobile/evidence/physical-b6aee5b",
     "measurementProtocol": "mobile/docs/PHYSICAL-VALIDATION.md"
@@ -265,7 +357,15 @@
     "scope": "FUN-00 on macOS; source and runtime evidence separated",
     "evidence": "mobile/evidence/fun-00",
     "report": "FUN-FIRST-REPORT.md",
-    "mobileTests": { "passed": 319, "total": 319, "failed": 0, "skipped": 0, "exit": 0, "log": "checkpoint-tests.log", "note": "Final source including geometry-based camera verification; unused experiment excluded" },
+    "mobileTests": {
+      "passed": 319,
+      "total": 319,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0,
+      "log": "checkpoint-tests.log",
+      "note": "Final source including geometry-based camera verification; unused experiment excluded"
+    },
     "lint": "PASS_EXIT_0",
     "typecheck": "PASS_EXIT_0",
     "reactionContent": "PASS_27_REACHABLE_DEFINITIONS",
@@ -276,41 +376,57 @@
     "iosJsBundle": "PASS",
     "iosSimulatorReleaseBuild": "PASS_EXIT_0",
     "iosSimulatorInstallAndLaunch": "PASS_METRO_OFF",
-    "observedBeforeFinalInputAndCameraFixes": ["journal close/reopen and floor movement", "automatic-toilet no-target feedback", "petting dialogue", "ball choice wait and rest follow-up", "all 12 normal SQLite tables unchanged across evaluation"],
+    "observedBeforeFinalInputAndCameraFixes": [
+      "journal close/reopen and floor movement",
+      "automatic-toilet no-target feedback",
+      "petting dialogue",
+      "ball choice wait and rest follow-up",
+      "all 12 normal SQLite tables unchanged across evaluation"
+    ],
     "latestPostFixVisualMatrix": "BLOCKED_HOST_LOCKED",
     "latestMotionQuality": "NOT_APPROVED",
-    "engineeringPerformance": { "scope": "intermediate Release software profile timing proxies, not displayed FPS or physical latency", "submittedAggregateHz": 30.125, "jsRafP95Ms": 16.68, "inputSamples": 1, "inputBudget": "INSUFFICIENT_DATA", "profile": "0.75 DPR Lambert 33ms exact Apple Software Renderer only" },
+    "engineeringPerformance": {
+      "scope": "intermediate Release software profile timing proxies, not displayed FPS or physical latency",
+      "submittedAggregateHz": 30.125,
+      "jsRafP95Ms": 16.68,
+      "inputSamples": 1,
+      "inputBudget": "INSUFFICIENT_DATA",
+      "profile": "0.75 DPR Lambert 33ms exact Apple Software Renderer only"
+    },
     "androidNativeRuntimeThisRun": "NOT_RUN_BLOCKED_ENV",
     "physicalDevice": "NOT_RUN",
     "healthReads": "OFF",
     "independentReview": "PASS_SOURCE_WITH_RUNTIME_LIMITS",
-    "remaining": ["Unlock Mac for current-bundle input/dialogue/candidate/motion captures", "Latest input sample budget and displayed-frame validation", "Physical-device touch/thermal/battery and Android runtime", "Four evolved-form runtime assets", "User fun and final-art review"]
+    "remaining": [
+      "Unlock Mac for current-bundle input/dialogue/candidate/motion captures",
+      "Latest input sample budget and displayed-frame validation",
+      "Physical-device touch/thermal/battery and Android runtime",
+      "Four evolved-form runtime assets",
+      "User fun and final-art review"
+    ]
   },
   "lastValidation": {
-    "scope": "Astra direct quality repair; normal-input runtime checks and SELF_REVIEW",
-    "sourceCommit": "69bd2ae180c5f5222e7d0a4577b58e8e2265272c",
-    "completeNormalSequenceSource": "a4b3faddcd4246b01e830457e80c6dbf81aa52b8",
-    "bundleSha256": "8c41466a5c7505bef57ce4d36db29a71ec59b2970a536d19900a5e5a776be73b",
-    "evidence": "mobile/evidence/astra-direct",
-    "mobileTests": {"passed": 324, "total": 324, "failed": 0, "skipped": 0, "exit": 0, "log": "verified-tests.log"},
+    "scope": "LIFE-01 unlock revalidation; ASTRA_DIRECT / SELF_REVIEW",
+    "sourceCommit": "70cab57",
+    "bundleSha256": "784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b",
+    "mobileTests": {
+      "passed": 350,
+      "total": 350,
+      "skipped": 0
+    },
     "lint": "PASS",
     "typecheck": "PASS",
-    "reactionDefinitions": 33,
-    "iosCng": "PASS_23_OF_23",
-    "workflow": "PASS_40_OF_40_DIRECT_MODE_CHECKS",
-    "androidJsBundle": "PASS",
+    "iosCng": "23/23 PASS",
+    "workflow": "40/40 PASS",
     "iosJsBundle": "PASS",
-    "iosSimulatorReleaseBuildInstallLaunch": "PASS",
-    "normalInputObservations": ["record open/close", "toolbar and direct pet reaction", "multiple context-appropriate lines", "choice and follow-up body/face", "dialogue close and movement", "Home/app-icon foreground return on a4b3fad"],
-    "finalAppSwitchConfirmation": "BLOCKED_HOST_LOCKED_ON_69BD2AE",
-    "normalResourceAndRestartPreservation": "PASS_FOOD0_COIN15_EXP25125000_MEALS3_FORM_PERSONALITY_UNCHANGED_INTEGRITY_OK",
-    "performance": {"source": "8eefbc3", "inputSamples": 8, "inputToRafP95Ms": 16.50, "inputToSubmissionP95Ms": 43.83, "rafP95Ms": 36.37, "rafMaxMs": 44.11, "submissionProxyHz": 22.07, "notice": "timing proxies with software GL queue barrier; not visible FPS or physical input-to-photon"},
-    "review": "SELF_REVIEW",
-    "independentReview": "NOT_PERFORMED_THIS_RUN",
+    "androidJsBundle": "PASS",
+    "iosSimulatorReleaseBuildInstallLaunch": "PASS_ACTUAL_INPUT",
+    "performance": "See life01 recordingOnProxy/recordingOffProxy; failed window preserved",
     "physicalDevice": "NOT_RUN",
-    "androidRuntime": "NOT_RUN_THIS_ENVIRONMENT",
     "healthReads": "OFF",
-    "userFunAndFinalArt": "USER_REVIEW_PENDING"
+    "userFunAndFinalArt": "USER_REVIEW_PENDING",
+    "evidence": "evidence/life-01-resume-2026-09-30/",
+    "remainingRuntimeCheck": "Piko stretch actual observation blocked when Mac relocked"
   },
   "environment": {
     "host": "macOS 15.6",
@@ -320,7 +436,12 @@
     "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
-    "softwareEmulator": "Exact Apple Software Renderer: CPU morph equivalence + flushEXP bounded queue, 0.75 DPR/Lambert/33ms; current source's final app-switch check blocked by host lock; no physical-performance claim"
+    "softwareEmulator": "software_balanced, 1.5 DPR, vertex-lit material, sparse CPU morph, public flushEXP queue barrier; no fixed frame cap",
+    "hostLocked": true,
+    "iosRuntime": "26.3",
+    "xcode": "26.3",
+    "configuration": "Release",
+    "contentSize": "large restored after maximum accessibility size test"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
@@ -703,12 +824,11 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "sourceCheckpoint": "c0719ea",
-    "sourceCommitPerformed": false,
-    "pushPerformed": false,
-    "pushStatus": "PENDING_AUTHORIZED_FEATURE_CHECKPOINT",
-    "verificationEvidence": "mobile/evidence/ios-release-c0719ea/git-audit.json",
-    "publicationRecordScope": "Prepared before its own checkpoint; final hashes and clean status are recorded in the ignored audit and final response."
+    "sourceCheckpoint": "70cab57",
+    "sourceCommitPerformed": true,
+    "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
+    "verificationEvidence": "evidence/life-01-resume-2026-09-30/git-audit.json",
+    "publicationRecordScope": "Prepared before documentation checkpoint. Final local/tracking/live-origin hashes and clean status are recorded in the ignored audit and final response."
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -776,7 +896,7 @@
       }
     }
   },
-  "evidenceDirectory": "mobile/evidence/ios-release-c0719ea/",
+  "evidenceDirectory": "evidence/life-01-resume-2026-09-30/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -792,5 +912,125 @@
     "summary": "DECISION-SUMMARY.md",
     "recommendationsActivated": true,
     "note": "Six product default bundles explicitly approved after 34ab069; external residuals grouped by authority, not claimed completed."
+  },
+  "life01LockedHandoff": {
+    "authoritativeCurrentResult": false,
+    "task": "tasks/LIFE-01-autonomous-growth-resume.md",
+    "observedIntermediateCode": "1464db2",
+    "observedIntermediateBundle": "65beda2960417d4608104f4ded5183d6c888d2544acbfe195f9512501a89f3ce",
+    "latestBundleSha256": "148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d",
+    "tests": {
+      "passed": 348,
+      "total": 348,
+      "skipped": 0
+    },
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "iosBundle": "PASS",
+    "androidBundle": "PASS",
+    "iosReleaseCompileInstallLaunch": "PASS_PROCESS_START_ONLY",
+    "iosCng": "23/23 PASS",
+    "workflow": "40/40 PASS",
+    "intermediateObservations": [
+      "ordinary room without ball: more than 3 minutes without input",
+      "drowsy/stretch/look and optional touch",
+      "automatic meal level 5 to 6",
+      "automatic meal level 15 to 16 and Piko model transition"
+    ],
+    "latestVisualAndInput": "BLOCKED_HOST_LOCKED",
+    "nativeHitches": "BLOCKED_ENV_UNSUPPORTED_SIMULATOR_PLATFORM",
+    "inputLatency": "INSUFFICIENT_DATA_NOT_PASS",
+    "latestMotionPerformance": "NOT_RUN_AFTER_FINAL_ASSET_REPAIR",
+    "otherNativeEvolutionFormsSleepToilet": "NOT_RUN",
+    "androidNativeEnvironment": "BLOCKED_ENV_NO_ADB_OR_CONFIGURED_SDK",
+    "restoredGrowthData": "PASS_READ_ONLY_COMPARISON",
+    "widgetIsolation": "PASS_GENERAL_PET_RETAINED",
+    "androidRuntime": "NOT_RUN_THIS_CHANGE",
+    "physicalDevice": "NOT_RUN_THIS_CHANGE",
+    "newSubagents": 0,
+    "review": "SELF_REVIEW",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "funAndArt": "USER_REVIEW_PENDING",
+    "evidence": "evidence/life-01",
+    "nextAction": "Unlock Mac and inspect latest restored Piko ear attachment during movement/petting before continuing same-build autonomous growth validation"
+  },
+  "historicalPreLife01UnlockSummary": {
+    "completion": {
+      "independentLocalEngineering": "DIRECT_REPAIRS_IMPLEMENTED_FINAL_APP_SWITCH_CHECK_BLOCKED_HOST_LOCKED",
+      "productMvp": "NOT_COMPLETE",
+      "androidRuntime": "NOT_RUN_THIS_SCOPE; historical Windows observation preserved",
+      "androidReleaseCompile": "PASS_X86_64",
+      "widgetRuntimeQa": "iOS_OBSERVED_WIDGET_IMAGE_TIME_TAP_RETURN; Windows Android observation historical",
+      "iosCurrentRuntime": "PASS_NORMAL_SEQUENCE_A4B3FAD_PARTIAL_FINAL_69BD2AE_HOST_LOCKED"
+    },
+    "lastValidation": {
+      "scope": "Astra direct quality repair; normal-input runtime checks and SELF_REVIEW",
+      "sourceCommit": "69bd2ae180c5f5222e7d0a4577b58e8e2265272c",
+      "completeNormalSequenceSource": "a4b3faddcd4246b01e830457e80c6dbf81aa52b8",
+      "bundleSha256": "8c41466a5c7505bef57ce4d36db29a71ec59b2970a536d19900a5e5a776be73b",
+      "evidence": "mobile/evidence/astra-direct",
+      "mobileTests": {
+        "passed": 324,
+        "total": 324,
+        "failed": 0,
+        "skipped": 0,
+        "exit": 0,
+        "log": "verified-tests.log"
+      },
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "reactionDefinitions": 33,
+      "iosCng": "PASS_23_OF_23",
+      "workflow": "PASS_40_OF_40_DIRECT_MODE_CHECKS",
+      "androidJsBundle": "PASS",
+      "iosJsBundle": "PASS",
+      "iosSimulatorReleaseBuildInstallLaunch": "PASS",
+      "normalInputObservations": [
+        "record open/close",
+        "toolbar and direct pet reaction",
+        "multiple context-appropriate lines",
+        "choice and follow-up body/face",
+        "dialogue close and movement",
+        "Home/app-icon foreground return on a4b3fad"
+      ],
+      "finalAppSwitchConfirmation": "BLOCKED_HOST_LOCKED_ON_69BD2AE",
+      "normalResourceAndRestartPreservation": "PASS_FOOD0_COIN15_EXP25125000_MEALS3_FORM_PERSONALITY_UNCHANGED_INTEGRITY_OK",
+      "performance": {
+        "source": "8eefbc3",
+        "inputSamples": 8,
+        "inputToRafP95Ms": 16.5,
+        "inputToSubmissionP95Ms": 43.83,
+        "rafP95Ms": 36.37,
+        "rafMaxMs": 44.11,
+        "submissionProxyHz": 22.07,
+        "notice": "timing proxies with software GL queue barrier; not visible FPS or physical input-to-photon"
+      },
+      "review": "SELF_REVIEW",
+      "independentReview": "NOT_PERFORMED_THIS_RUN",
+      "physicalDevice": "NOT_RUN",
+      "androidRuntime": "NOT_RUN_THIS_ENVIRONMENT",
+      "healthReads": "OFF",
+      "userFunAndFinalArt": "USER_REVIEW_PENDING"
+    },
+    "environment": {
+      "host": "macOS 15.6",
+      "node": "26.7.0",
+      "npm": "11.19.0",
+      "androidToolchain": "CURRENT_MAC_ADB_AND_SDK_MISSING; historical Windows toolchain recorded separately",
+      "androidAvd": "preserved historical Windows AVD",
+      "healthAccess": "OFF",
+      "hostGpu": "Apple Software Renderer",
+      "softwareEmulator": "Exact Apple Software Renderer: CPU morph equivalence + flushEXP bounded queue, 0.75 DPR/Lambert/33ms; current source's final app-switch check blocked by host lock; no physical-performance claim"
+    },
+    "git": {
+      "branch": "feature/arucon-mobile-autonomous",
+      "sourceCheckpoint": "c0719ea",
+      "sourceCommitPerformed": false,
+      "pushPerformed": false,
+      "pushStatus": "PENDING_AUTHORIZED_FEATURE_CHECKPOINT",
+      "verificationEvidence": "mobile/evidence/ios-release-c0719ea/git-audit.json",
+      "publicationRecordScope": "Prepared before its own checkpoint; final hashes and clean status are recorded in the ignored audit and final response."
+    },
+    "evidenceDirectory": "mobile/evidence/ios-release-c0719ea/"
   }
 }

@@ -1,6 +1,13 @@
 # iOS validation history and Release input resume
 
-## 현재 LIFE-01 결과 — 2026-09-30
+## 현재 LIFE-01 결과 — 2026-09-30 잠금 해제 재검증
+
+**PARTIAL_WITH_BLOCKERS** — 피코 기지개 추가 실제 확인 중 Mac 재잠금. 소스70cab57, 최신 설치/DerivedData 번들 `784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b`. 일반 방 무입력 생활, 별도 자동Lv5→6, 7일 합성 이력을 통한 자동Lv15→16 네 진화, 피코 귀·접촉, 실제 먹이→입, 앱 재실행24개 저장 보존을 확인했다. 큰 글자 재측정, 시설 위치/회전 좌표, 실제 morph 입 anchor를 직접 고쳤다. 정책·원본·DB 보존.
+
+새350/350·lint/typecheck·양 플랫폼 bundle·iOS Release compile/install/launch·CNG23/23 PASS. latest 정상 속도 무편집 영상15분31.99초. [상세 결과/빌드별 증거](LIFE-00-REPORT.md). 녹화ON RAF p9534.31ms는기준FAIL, OFF29.07ms는PASS이며 실제 GPU 표시/물리 지연/발열/배터리/Android native 최신 검증은 미실행이다. 평균 제출률로 실패를 덮지 않았다. ASTRA_DIRECT, 새 subagent0, SELF_REVIEW, effective model ROUTING_UNVERIFIED, 재미·최종 아트 USER_REVIEW_PENDING. 건강 OFF, main/merge/deploy 없음.
+
+## Historical LIFE-01 결과 — 2026-09-30 재잠금 인계
+
 
 **PARTIAL_WITH_BLOCKERS**. Mac 접근을 새로 확인하고 실제 일반 방/체험을 실행했다. 중간 `1464db2`에서 무입력 자율 생활, 짧은 교감, 자동 식사 Lv5→6, 활동 합성 이력에 따른 실제 피코 진화를 관찰했다. 저해상도 확대/픽셀 조명 비용을 분리해 software profile을 개선했다. 중간 일반 방 제출 proxy59.99Hz/RAF p9516.75ms이며 실제 표시 FPS 또는 입력 지연 PASS가 아니다.
 

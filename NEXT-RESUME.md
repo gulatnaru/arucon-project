@@ -1,6 +1,17 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 재개 지점 — LIFE-01 / 2026-09-30
+## 현재 재개 지점 — LIFE-01 / 2026-09-30 검증 재개 완료
+
+**PARTIAL_WITH_BLOCKERS** — 마지막 피코 기지개 확인 시 Mac이 다시 잠김. 소스 checkpoint **70cab57**, 이후 보고서 commit은 앱 코드를 바꾸지 않는다. 현재 HEAD/dirty를 확인하고 reset하지 않는다. ASTRA_DIRECT/SELF_REVIEW, 새 subagent0, 재미·최종 아트 USER_REVIEW_PENDING.
+
+설치 Release 번들 `784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b`. `open -a Simulator`, `xcrun simctl launch booted com.arucon.dev`. Metro 불필요. 일반 Sim 방으로 남겨두었다. 공/식탁/먹이 없이도 자율 생활한다. 메뉴→설정의 자동 성장 새 체험은 Lv5→6, 네 이력 진화 새 체험은 별도7일 합성 이력+Lv15→16 경계다. 기존 일반 저장과 이전 피코 run은 보존했다.
+
+최신350/350·lint/typecheck·양 플랫폼 bundle·iOS Release build/install/launch·CNG23/23. 실제 네 진화/식사 입 연결, 피코 귀/눌림, 일반 방3분과24개 저장 복원을 확인했다. 같은 실행에서 큰 글자 잘림·화장실 화면 잘림·실제 입 위치 불일치를 직접 고쳤다. 증거와 빌드별 범위는 [현재 보고서](LIFE-00-REPORT.md). 최신 정상 속도 무편집 영상 `evidence/life-01-resume-2026-09-30/39-latest-continuous-play.mp4` 15분31.99초.
+
+성능 전체 PASS가 아니다. 최신 녹화ON RAF p95 34.31ms는33.34ms 기준FAIL, OFF29.07ms는PASS; 입력→제출 p9556.17/44.47ms. 실제 화면FPS/물리 터치/발열/배터리 미검증. Android native 최신 수정, physical, 이번 위젯 탭 진입도 별도 미확인이다. 다음 한 작업은 **Mac 잠금 해제 후 피코 기지개 중 귀 부착을 실제로 확인**하는 것이다. CUA가 Mac locked를 실제 반환했고 `52-host-relocked.json`에 기록했다. 현재 일반 Sim 방이며, 필요하면 설정→활동 이력·진화 새 체험에서 실제 자동 진화한 피코를 관찰한다. 이전 피코 run이나 DB를 초기화하지 않는다. 완료한 전체 검증을 다시 반복하거나 새 개편을 시작하지 않는다. 건강 OFF, 외부 권한 불변, feature 일반 checkpoint/push만 허용.
+
+## Historical LIFE-01 재잠금 인계 — 2026-09-30
+
 
 **PARTIAL_WITH_BLOCKERS**. 최신 수정 코드 체크포인트는 **`6eb1c91`**, 그 뒤 문서 인계 commit은 앱 소스를 바꾸지 않는다. [LIFE-01 원문](tasks/LIFE-01-autonomous-growth-resume.md)과 [보고서의 현재 LIFE-01 절](LIFE-00-REPORT.md)을 먼저 읽는다. ASTRA_DIRECT, 새 subagent 없이 직접 구현/검증하며 SELF_REVIEW다. 현재 HEAD/dirty를 확인하고 과거 SHA로 reset하지 않는다.
 

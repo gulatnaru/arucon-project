@@ -1,6 +1,73 @@
 # LIFE-00/01 생활 개편 검증 기록
 
-## 현재 LIFE-01 결과 — 2026-09-29~30
+## 현재 LIFE-01 검증 재개 — 2026-09-30
+
+**PARTIAL_WITH_BLOCKERS — 최신 시각 검증 대부분 완료, 피코 기지개 추가 확인 차단** · ASTRA_DIRECT · SELF_REVIEW · 재미/최종 아트 **USER_REVIEW_PENDING**. 성능은 아래의 녹화 ON/OFF 차이와 계측 한계를 포함한 제한 판정이며 출시/MVP 전체 완료가 아니다.
+
+마지막 증거 대조에서 **피코 기지개 중 귀 연결의 실제 영상 확인이 충분하지 않아** 추가 조작을 시작했으나 CUA가 다시 `The Mac is locked`를 반환했다. `52-host-relocked.json`에 실제 실패를 기록했고 보안 우회를 하지 않았다. `51-piko-stretch-and-cancel.mp4`는 이 중단 시도이며 통과 증거가 아니다. 잠금 해제 후 이 한 항목부터 이어간다. 따라서 READY로 승격하지 않는다.
+
+### 이번에 실제로 확인한 생활
+
+일반 `Sim` 방은 먹이0·식탁/공 없음 상태에서 사용자가 놀아주지 않아도 살피기, 기지개, 곁에 앉기, 꾸벅임, 자리 선택을 이어갔다. 짧은 손길에는 몸 눌림과 서로 다른 말풍선이 나왔고 다시 생활로 돌아갔다. 이름·코인15·EXP25.125·먹이0을 보존했으며 일반 방에 체험 자원을 지급하지 않았다.
+
+**자동 Lv.5→6 성장**과 **7일 합성 이력을 갖춘 자동 Lv.15→16→1차 진화**를 별도 petId에서 시험했다. 피코·몽글·말루·모노 모두 실제 식사 서비스와 진화 결정표를 통과해 전용 모델로 바뀌었다. 강제 아트 선택기는 사용하지 않았다. 말루의 솔직한 성격, 다른 사례의 새침한 성격을 보존했다. 식사 뒤 새 자세/성장 안내가 연결되며, 표현·교감으로 EXP를 만들지 않는다.
+
+### 발견한 결함과 직접 수정
+
+1. **실행 중 큰 글자 전환 시 이름/하단 글자 잘림**: `useWindowDimensions().fontScale` 변경 때 텍스트 UI만 재측정한다. 방·GL 컨트롤러·저장은 재생성하지 않는다. 최대 접근성 글자, 기록 닫기/재접촉을 실제 확인하고 `large`로 복원했다.
+2. **화장실 이용 중 왼쪽 화면 밖으로 잘림**: 시설/장애물/가림막을 같은 위치로 옮기고, 회전된 부모의 좌표를 역변환해 시설 진입 위치를 맞췄다. 쿠션 진입도 같은 좌표 오류를 보정했다. 수정 영상에서 시설 진입→가림→나오기 전체가 화면 안에 있다. 자동 청결과 경제 정산은 그대로다.
+3. **식사 먹이가 몸 뒤에 가리고 실제 입과 맞지 않음**: 그릇 옆으로 접근하며, GLB `Mouth`의 base/morph 중심을 한 번 준비해 현재 변형/크기/회전에 맞는 입 위치로 먹이가 이동한다. 매 프레임 전체 geometry를 탐색하지 않는다. 최신 설치본에서 네 형태의 그릇→먹이→입 이동을 실제로 관찰했다.
+
+기존 귀 고정 수리는 보존했다. 시작 시 저장된 피코를 초기화하지 않고 정면/측면/뒷면·보행·접촉·복원을 확인했다. 최신 설치본에서도 피코의 귀와 몸이 함께 변형됐다. 원본/초안 GLB, DB schema, 경제·성장·진화 조건은 변경하지 않았다.
+
+### 빌드 식별 — 서로 다른 증거를 합치지 않음
+
+- 시작 HEAD `110421b`, feature 브랜치 clean. 앱 소스는 `6eb1c91`과 같고 HEAD까지 차이는 인계 문서3개였다.
+- 시작 설치 번들 `148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d`.
+- 글자/시설 수정 번들 **B** `d9b584d13c48f399e144160e3849f64f6fc34a93b7fcbc134258d1d98b03c89b`.
+- 입 좌표/식사 접근까지 수정한 최신 번들 **C** `784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b`. 설치 앱과 DerivedData 해시 동일. 검증 소스 checkpoint **`70cab57`**. 빌드 당시 diff/new-file 해시는 로컬 `latest-source-identity.json`에 보존했다. 이후 보고서 commit은 앱 소스를 바꾸지 않는다.
+- macOS15.6 / Xcode26.3 / Expo55 / iPhone16e iOS26.3 / **Release**, 390×844pt, 1170×2532px. Metro를 사용하지 않았다.
+
+### 검증 범위와 증거
+
+모든 파일은 `evidence/life-01-resume-2026-09-30/`에 있다. 대형 영상·DB·trace·빌드는 Git/외부 업로드에서 제외한다.
+
+| 항목 | 실제 실행 결과/범위 |
+|---|---|
+| 저장된 피코와 귀 | 시작 설치본 및 C의 실제 앞/뒤/측면 이동·접촉 확인. **기지개 실제 확인은 BLOCKED_HOST_LOCKED**. `01-current-piko-continuous.mp4`, `39-latest-continuous-play.mp4` |
+| 일반 방 자율 생활 | **C 3분 이상 무입력**, look/seat/company/drowsy/stretch 완료·직접 접촉/다양한 발화. `45-latest-general-arucon-life-trace.json`, 최신 영상 |
+| 자동 Lv.5→6 | **C 실제 자동 섭취/성장/입 연결**. 별도 진화 시험과 구분. `46-latest-before-restart-states.json`, 최신 영상 약14분50초 |
+| 네 계열 실제 진화 | **C 실제 자동 식사/모델 전환 확인**, `40`~`43` 상태 스냅샷·최신 영상. 모두 EXP3,764.999999, 한 번 섭취. 이전 run 보존 |
+| 수면 비교 | B의 격리 실제 섭취: 무기록×1=15 EXP / 합성 보너스×1.25=18.75 EXP. `24-toilet-before-states.json`. C에서는 계산/저장 코드 불변·전체 회귀 |
+| 식사 취소 | B에서 실제 meal perform 후742ms에 cancel, 이후 inspect/touch/solo 진행, 낡은 growth 없음. `28-real-meal-cancel-arucon-life-trace.json`. 앞선 늦은 취소 시도는 PASS에서 제외 |
+| 화장실/자동 청결 | B의 실제 시간 경계→시설 이용→복귀, poop0 유지. 영상 `18`의 약614~617초 및 `35-final-frames/`. C의 시설 코드는 동일 |
+| 큰 글자/기록/대화 닫기 | B의 최대 접근성 글자 읽기·닫기·재접촉 PASS. `19-large-font-fixed.png`. `large` 복원. C의 UI 코드는 동일 |
+| 앱 전환/복귀/재실행 | B 실제 Home→앱 아이콘 복귀, 낡은 대사 폐기. **C 24개 저장×7필드 재실행 차이0** (`48-latest-restart-comparison.json`), 실제 성장한 앱 복원 |
+| 동작 줄이기 | B의 on 이동/접촉 확인 후 off 복원. 일반 모드 성능을 대신하지 않음 |
+| 최신 자동 검사 | **350/350 PASS**, fail/skip0 (`latest-tests.log`), lint/typecheck PASS. 기존348을 복사하지 않음 |
+| 네이티브 | C iOS Release `BUILD SUCCEEDED`, 설치/launch/해시 대조 PASS (`37-mouth-build.log`, `38-latest-installed-sha.json`) |
+| JS export / CNG | C iOS/Android export PASS (`latest-*-bundle.log`), iOS CNG23/23 PASS. Android native 실행 결과가 아님 |
+| 운영 문서 검사 | 40/40 PASS (`latest-workflow.log`), 자동 생성된 과거 보고 파일은 stage하지 않음 |
+
+최신 연속 영상 **`39-latest-continuous-play.mp4` 15분31.99초**, 정상 속도·무편집이다. C의 네 실제 진화, 식사 먹이 이동, 피코 접촉/뒷면 이동, 일반 방 무입력3분, Lv.5→6, 재실행을 포함한다. `50-latest-video-timeline.json`의 완료 시각 기준으로 피코식사 약77초, 몽글202초, 말루297초, 모노375초, 별도 Lv.6식사891초다. 프레임은 `50-latest-frames/`에 있다. 이전 `01`(10분2.64초)과 B `18`(28분34.92초)은 각 빌드의 결함 발견/영향 검사 증거이며 C의 통과 영상으로 바꾸어 부르지 않는다.
+
+### 성능과 미실행 경계
+
+B 일반 방에서 정상 UI 접촉5개 표본: 입력→제출 proxy p95 **39.06ms**, RAF p95 **20.53ms**/max46.69ms, 제출57.24Hz/4.19초 창, 500ms초과 RAF gap0. morph p95 8.83ms / draw0.78ms / queue drain13.82ms. `21-final-general-arucon-fun01-performance-summary.json`의 결과이며 **GPU 표시 FPS·물리 touch-to-photon·장시간 전체 구간 계측이 아니다**. C에 이 숫자를 복사하지 않는다.
+
+**C 새 측정**: 녹화 ON(`45`) 입력5개 p95 **56.17ms**, 제출46.31Hz, RAF p95 **34.31ms — 33.34ms 기준 FAIL**, max80.52ms. 녹화 OFF(`49`) 동일 일반 방/Release에서 입력5개 p95 **44.47ms**, 제출52.92Hz, RAF p95 **29.07ms PASS**, max67.74ms; morph p957.34ms / draw1.13ms / queue drain23.98ms. 후자는4.53초 프레임 창·60초 입력 창이다. 당시 다른 빌드 작업은 없었고 Simulator/WindowServer/녹화가 주요 호스트 부하였다. 녹화를 끈 뒤 개선됐지만 단일 비교로 녹화만 원인이라고 단정하지 않는다. **성능 전체 PASS/안정적 실제60fps라고 보고하지 않는다.** 고정 기준은 유지했고 실패 창도 보존했다. 추가 효과 삭제나 reduced motion 강제 적용은 하지 않았다.
+
+현재 Simulator에서 지원되지 않는 Animation Hitches/실제 표시 FPS·물리 지연/발열·배터리와 iPhone/Android 실기기는 **NOT_RUN/BLOCKED_ENV**다. Android native/runtime는 이 Mac의 adb/SDK 부재로 이번 실행 미검증이다. 홈 위젯 표시를 관찰했지만 이번 탭으로 앱 진입은 확인되지 않았고, 앱 아이콘 복귀만 확인했다. 이를 위젯 진입 PASS로 쓰지 않는다. 새로운 OS/보안 설정·건강 읽기·외부 계정·결제·배포는 수행하지 않았다.
+
+새 subagent **0**, 요청 역할 Astra 직접 개발, effective model **ROUTING_UNVERIFIED**. SELF_REVIEW를 독립 리뷰로 기록하지 않는다. 출시/MVP 전체 완료와 본 iOS 검토판 준비를 구분한다.
+
+### 바로 실행 / 남은 범위
+
+`open -a Simulator` 후 `xcrun simctl launch booted com.arucon.dev`. 현재 일반 `Sim` 방을 열어 두었다. 그대로 관찰하거나 짧게 쓰다듬는다. 메뉴→설정→자동 식사·성장 새 체험은 Lv.6, 각 이력·진화 새 체험은 Lv.16의 별도 시험이다. 설정의 수면 두 사례도 각각 새 격리 저장이다. 시작 때 선택돼 있던 피코 run과 일반 DB는 삭제하지 않았다.
+
+남은 범위: **잠금 해제 후 피코 기지개 실제 확인**, C에서의 추가 식사 취소 표본(기존 B 취소는 확인됨), 물리 iPhone/Android·실제 표시 FPS/터치 지연/발열/배터리, Android native 최신 수정 검증, 녹화 부하가 있는 장시간 성능 안정성, 이번 홈 위젯 탭 진입 재확인. 새 놀이/아트 개편은 시작하지 않았다. 재미·최종 캐릭터 승인, 법률/실건강/실계정/결제/출시 승인도 부여하지 않았다.
+
+## Historical LIFE-01 결과 — 2026-09-29~30 (재잠금 인계)
 
 **PARTIAL_WITH_BLOCKERS** · ASTRA_DIRECT · SELF_REVIEW. 재미/최종 아트 **USER_REVIEW_PENDING**.
 

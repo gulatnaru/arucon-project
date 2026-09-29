@@ -1,6 +1,25 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 LIFE-01 회귀 범위 — 2026-09-30
+## 현재 LIFE-01 회귀 범위 — 2026-09-30 검증 재개
+
+**PARTIAL_WITH_BLOCKERS — 피코 기지개 추가 실제 확인 중 호스트 재잠금**. SRS 출시/MVP 전체 게이트는 미완료다. 소스70cab57, 설치 번들784428d…, [빌드별 상세 증거](LIFE-00-REPORT.md).
+
+| 구분 | 현재 판정 |
+|---|---|
+| 승인 경제/저장/성장 회귀 | PASS: 새350/350, 정책·DB schema 유지 |
+| 일반 방 자율 생활 | PASS_SIMULATOR: 최신3분 무입력, 5계열·접촉·복귀; 이름/재화 보존 |
+| 자동 성장/진화 | PASS_SIMULATOR: 별도Lv5→6, 별도Lv15→16 네 전용 형태, 실제 섭취 경로 |
+| 귀/식사/글자/시설 잘림 | 실제 재현→직접 수정→Release 재검증. 최신 입 좌표·네 형태 식사 확인. 피코 기지개 귀 부착은 BLOCKED_HOST_LOCKED |
+| 수면/화장실/취소 | B 실제15/18.75 EXP, 자동 청결, meal742ms cancel 확인. C에서 해당 정책/취소 코드 불변·회귀 통과 |
+| 복원 | 최신24개 저장×7필드 차이0, 실제 앱 재실행 |
+| 성능 | MIXED_PROXY: 녹화ON RAF p9534.31 FAIL / OFF29.07 PASS. 실제 표시FPS/물리 입력은 NOT_RUN |
+| iOS/Android | iOS Release 실제 실행 PASS; 양 플랫폼 bundle PASS; Android native 최신 수정/physical NOT_RUN |
+| 외부/출시/아트 | 기존 법률·실건강·실계정·실결제·출시 경계 유지. 재미/최종 아트 USER_REVIEW_PENDING |
+
+이하 표는 과거 각 checkpoint의 결과이며 최신 PASS로 재사용하지 않는다.
+
+## Historical LIFE-01 재잠금 범위 — 2026-09-30
+
 
 **PARTIAL_WITH_BLOCKERS**. 현재 기준은 [LIFE-01](tasks/LIFE-01-autonomous-growth-resume.md)의 화면 복구·자율 생활·성장 실제 경로다. [현재 상세 판정](LIFE-00-REPORT.md)을 따른다. 중간1464db2에서 일반 방3분 이상 무입력과 짧은 교감, 자동 Lv5→6 및 피코 진화를 실제로 확인했고 귀 분리 결함도 기록했다. 최신 코드에서 이를 수정했으나 Mac 재잠금으로 같은 빌드의 재검증이 남았다.
 

@@ -29,8 +29,9 @@
 - Software GL의 292×633 확대 문제를 확인했다. 585×1266에서 Lambert 유지 시 제출 proxy 약9.9Hz로 실패했다. 고정 조명·sRGB 계산을 vertex shader로 옮긴 color-only 프로필은 같은 표면에서 약60Hz proxy/RAF p95 16.68ms/queue drain p95 6.19ms였다. 이것은 물리 표시 FPS나 터치 지연 측정이 아니다. 일반 하드웨어 material은 유지하고 Expo 내부는 패치하지 않는다.
 - CPU morph의 0 delta/변하지 않은 attribute 갱신을 건너뛴다. 원본과 초안8개 자산의 morph 방정식 회귀를 유지한다. GLB geometry·얼굴·모션을 제거하지 않는다. vertex 조명은 픽셀 조명의 보간과 약간 다를 수 있어 실제 전후 화면도 비교한다.
 - 성능 frame window10초, 정상 입력 수집 window60초를 명시한다. 기준100ms/30Hz를 낮추지 않는다. 입력 수치는 JS handler→RAF/queue 제출 proxy이며 OS 입력 전달·GPU presentation·physical touch-to-photon은 별도다.
-- 실제 진화에서 확인한 귀 분리는 각 귀 연결부의 base/모프 중심을 몸의 변형에 맞춰 수정했다(attachmentVersion1). 원본과 v2 비교 자산은 byte 단위로 보존한다. 최신 실제 화면 검증은 Mac 재잠금으로 보류다.
+- 실제 진화에서 확인한 귀 분리는 각 귀 연결부의 base/모프 중심을 몸의 변형에 맞춰 수정했다(attachmentVersion1). 원본과 v2 비교 자산은 byte 단위로 보존한다. 2026-09-30 잠금 해제 재개에서 실제 피코의 보행/눌림/복원과 네 형태의 실제 진화를 확인했다. 빌드별 범위는 LIFE-00-REPORT를 따른다.
 - 식사 접근점/그릇 좌표를 공유하고, 확정된 식사 연출에만 먹이 한 입을 표시한다. 성장 반응은 해당 meal token에 묶어 취소/리플레이/다음 식사와 혼동하지 않는다. 일반 청결 안내도 하나의 living actor를 사용하고 이전 반응 엔진은 비교 모드에만 둔다.
+- 70cab57: 식사는 그릇 옆에서 수행해 먹이 이동이 가려지지 않게 한다. 입의 base/morph 중심을 로드 시 캐시하고 현재 weight/world transform으로 먹이 도착점을 구한다. 시설 진입은 회전된 부모 좌표로 변환하며 화장실 위치/장애물/가림막을 공유한다. Dynamic Type 변경은 텍스트 UI만 재측정하고 방 컨트롤러는 유지한다. 경제/성격/시간 정책 변경이 아니다.
 
 아래 LIFE-00 초기 설계는 이력이며 충돌하는 표현 타이밍/체험 범위는 이 절을 따른다.
 
