@@ -31,19 +31,19 @@ test('performance probe uses injected time and reports fixed premeasurement budg
   assert.equal(summary.inputToNextSubmissionProxy.p95Ms, 50);
   assert.equal(summary.inputToNextSubmissionProxy.status, 'pass');
   assert.equal(summary.jsRafInterval.p95Ms, 50);
-  assert.equal(summary.jsRafInterval.status, 'pass');
+  assert.equal(summary.jsRafInterval.status, 'fail', 'LIFE-00 30 Hz floor rejects historical 20 Hz samples');
   assert.equal(summary.continuousUiLockRafGapProxy.status, 'pass');
   assert.equal(summary.submittedFrames.aggregateRateHz, 20);
-  assert.equal(summary.submittedFrames.status, 'pass');
+  assert.equal(summary.submittedFrames.status, 'fail');
   assert.deepEqual(summary.renderWorkload, {
     surfaceWidth: 195, surfaceHeight: 422, calls: 5, triangles: 1_200, points: 0, lines: 0,
   });
   assert.match(summary.proxyNotice, /proxies/);
   assert.deepEqual(JSON.parse(JSON.stringify(summary)).budgets, {
     inputFeedbackP95Ms: 100,
-    jsRafIntervalP95Ms: 50,
+    jsRafIntervalP95Ms: 33.34,
     continuousUiLockMaxMs: 500,
-    submittedFrameRateAimFps: 20,
+    submittedFrameRateAimFps: 30,
   });
 });
 

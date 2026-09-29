@@ -47,7 +47,7 @@ function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
-function parseGlb(bytes) {
+export function parseGlb(bytes) {
   if (bytes.readUInt32LE(0) !== GLB_MAGIC) throw new Error('Source is not a GLB');
   if (bytes.readUInt32LE(4) !== 2) throw new Error('Only glTF 2.0 is supported');
   if (bytes.readUInt32LE(8) !== bytes.length) throw new Error('GLB length header is invalid');
@@ -261,8 +261,8 @@ function vectorBounds(values) {
   };
 }
 
-function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec) {
-  const transform = transformForMesh(nodeName, spec);
+function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec, transformFactory) {
+  const transform = transformFactory(nodeName, spec);
   for (const primitive of mesh.primitives) {
     const sourcePositions = readVec3Accessor(json, sourceBin, primitive.attributes.POSITION);
     const sourceNormals = readVec3Accessor(json, sourceBin, primitive.attributes.NORMAL);
@@ -290,12 +290,12 @@ function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec) {
   }
 }
 
-function generateCandidate(parsed, spec) {
+export function generateCandidate(parsed, spec, transformFactory = transformForMesh) {
   const json = cloneJson(parsed.json);
   const bin = Buffer.from(parsed.bin);
   json.nodes.forEach((node) => {
     if (node.mesh === undefined) return;
-    deformMesh(json, parsed.bin, bin, json.meshes[node.mesh], node.name, spec);
+    deformMesh(json, parsed.bin, bin, json.meshes[node.mesh], node.name, spec, transformFactory);
   });
   json.asset.extras = {
     ...(json.asset.extras ?? {}),
@@ -311,7 +311,7 @@ function generateCandidate(parsed, spec) {
   return { bytes: encodeGlb(json, bin), json, bin };
 }
 
-function findMeshBounds(json, bin, nodeName) {
+export function findMeshBounds(json, bin, nodeName) {
   const node = json.nodes.find((candidate) => candidate.name === nodeName);
   if (!node || node.mesh === undefined) throw new Error(`Missing node ${nodeName}`);
   const positions = json.meshes[node.mesh].primitives.flatMap((primitive) =>
@@ -398,4 +398,4 @@ async function main() {
   );
 }
 
-await main();
+if (process.argv[1] && resolve(process.argv[1]) === scriptPath) await main();

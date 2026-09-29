@@ -1,6 +1,12 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 품질 복구 범위 — 2026-09-28
+## 현재 LIFE-00 회귀 범위 — 2026-09-29
+
+**PARTIAL_WITH_BLOCKERS**. LIFE-00가 FUN 관련 UX/행동/대사/아트 범위를 갱신해 실제 플레이 게이트를 재오픈했다. [L01~L22 전체 표](LIFE-00-REPORT.md#l01l22--소스-검사와-실제-실행-분리)가 현재 개편의 판정이다. 자동336/336·lint/typecheck·양 플랫폼 bundle·iOS Release/install/launch·CNG23/23·운영40/40 PASS. CUA의 Mac locked 때문에 새 화면/입력/모션/성능은 BLOCKED/NOT_RUN이다. 기존 SRS 경제/저장 회귀는 유지하지만 과거 Simulator/Android 검증을 새 화면에 재사용하지 않는다.
+
+아기v3와 1차4형태는 이제 별도 편집 가능 초안 GLB가 소스에 연결되어 있다. 아래 과거 기록의 “4형태 자산 없음”은 이 소스 상태를 설명하지 않으며 **실제 렌더·최종 아트 승인은 여전히 미완료**다. 성능 목표는 LIFE-00의 30fps 최소 개발 목표로 갱신했고 과거20/22Hz proxy로 통과하지 않는다. 실기기·법률·실건강·실계정/결제·출시 경계는 기존 상태를 유지한다.
+
+## Historical 품질 복구 범위 — 2026-09-28
 
 ASTRA_DIRECT / SELF_REVIEW. 보고된 말풍선 겹침·저장 깜빡임·반응 반복·텍스트뿐인 교감·소프트웨어 렌더 누적을 직접 수정했다. 정상 흐름을 같은 a4b3fad Release에서 관찰했고, 최종69bd2ae의 마지막 앱 전환 재확인은 `BLOCKED_HOST_LOCKED`다. 현재 종료 상태는 `BLOCKED`, 재미·최종 아트는 USER_REVIEW_PENDING. 자동 검사는 324/324, lint/typecheck, 양 플랫폼 JS bundle, iOS Release, CNG23/23, 운영40/40 PASS. 이 결과는 전체 SRS 출시 완료나 실제 기기 성능 통과가 아니다. [보고된 결함별 증거](FUN-FIRST-REPORT.md)와 아래의 과거 §14/14-1 이력을 구분한다.
 

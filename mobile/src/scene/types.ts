@@ -4,11 +4,21 @@ import type { RoomPerformanceSummary } from './performanceProbe';
 import type { RoomRendererProfileId } from './rendererConfig';
 import type { CharacterCandidateId } from './characterCandidates';
 import type { ComparisonCameraAngle, RoomPresentationBatch } from './presentationBridge';
+import type { LifeCommand, LifeEvent, LifeScene } from '../living/life';
 
 export type { ComparisonCameraAngle, RoomPresentationBatch, RoomVisualCommand } from './presentationBridge';
 
 /** APP-01 presentation port. Callbacks do not award resources or advance game time. */
 export type RoomProps = {
+  livingEnabled?: boolean;
+  lifeCommand?: LifeCommand;
+  ballPlayInput?: boolean;
+  onLifeEvent?: (event: LifeEvent) => void;
+  lifePreference?: LifeScene;
+  growthStage?: number | 'final';
+  poopCount?: number;
+  hungry?: boolean;
+  onCleanup?: () => void;
   formId?: FormId;
   personality?: 'reserved' | 'expressive';
   sleeping?: boolean;

@@ -1,6 +1,16 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 재개 지점 — ASTRA_DIRECT / 2026-09-28
+## 현재 재개 지점 — LIFE-00 / 2026-09-29
+
+**PARTIAL_WITH_BLOCKERS**. [사용자 원문](tasks/LIFE-00-living-pet-overhaul.md), [현재 보고서](LIFE-00-REPORT.md), [구현 계약](docs/living-pet-design.md)을 읽고 현재 HEAD를 확인한다. ASTRA_DIRECT, 새 subagent 없이 직접 이어간다. 원문 저장/push는 `e7af01f`로 완료했다. 그 이후 생활/공놀이/까꿍/몸짓/기억/성장/격리 체험/초안 자산/UI 변경을 보존한다.
+
+다음 한 작업은 **Mac 잠금 해제 후 설치된 Release에서 대표 플레이 §3의 정상 입력을 확인하는 것**이다. `open -a Simulator`, `xcrun simctl launch booted com.arucon.dev`. 메뉴 → 별도 생활 체험 → 공 제안/굴리기 → 펫 누름·놓기 → 쿠션 → 기록 닫기 → 다시 이동. 현재 설치 번들 SHA는 `c2a26400cc88b76e8e0ef648caca8435104794ad95a5c1ccb485fcbf21fa3938`, iPhone 16e/iOS26.3/Release, content size large. Metro 불필요; 8081의 Java를 Metro로 오인해 종료하지 않는다.
+
+이번 336/336·lint/typecheck·양 플랫폼 bundle·iOS Release compile/install/launch·CNG23/23·운영40/40 결과는 자동/빌드 범위다. **새 빌드의 실제 화면/입력/모션은 모두 미검증**이며 과거 영상으로 대체하지 않는다. 잠금으로 CUA 사용 불가, 보안 설정 우회 금지. 실제 피드백 없이 부드러움/재미/최종 아트를 승인하지 않는다. 기본 결함을 먼저 확인/수정하고 정상 속도 8~10분 영상, L01~L22, 성장/화장실 격리 장면, 두 성격/5형태/30fps 목표를 검증한다. 물리 기기는 별도 NOT_RUN. 건강정보/실결제 OFF.
+
+일반 저장은 `arucon-dev.db`, 별도 체험은 `arucon-life-experience.db`다. 체험은 같은 게임 서비스로 식사/구매하며 재진입 때 재지급하지 않는다. 일반 DB를 삭제하거나 fixture로 덮어쓰지 않는다. 로그·개인 DB 백업·번들/빌드는 `evidence/life-00/2026-09-29/` 제외 폴더에 있다.
+
+## Historical resume — ASTRA_DIRECT / 2026-09-28
 
 `BLOCKED`: Mac 잠금으로 마지막 앱 전환 재확인이 남았다. 현재 검증 소스는 `69bd2ae`, 최종 Git 해시는 현재 HEAD와 최종 응답에서 확인한다. 새 서브에이전트를 만들지 않고 직접 이어간다. 과거 분업 지시는 이번 범위에 적용하지 않으며 자체 검토는 SELF_REVIEW다.
 

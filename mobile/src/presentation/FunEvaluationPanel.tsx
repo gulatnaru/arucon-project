@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { CharacterCandidateId } from '../scene/characterCandidates';
+import { CharacterFormCatalog, type FormId } from '../domain/model';
 
 export type EvaluationCameraAngle = 'front' | 'side' | 'back' | 'three_quarter';
 export type EvaluationScenario =
@@ -11,12 +12,12 @@ export type FunEvaluationState = Readonly<{
   candidateId: CharacterCandidateId;
   cameraAngle: EvaluationCameraAngle;
   sleeping: boolean;
+  formId?: FormId;
 }>;
 
 const CANDIDATES: readonly { id: CharacterCandidateId; label: string }[] = [
   { id: 'original', label: '기존형' },
-  { id: 'moderate', label: '볼륨+' },
-  { id: 'plump', label: '도톰형' },
+  { id: 'baby_v3', label: '모찌 v3 초안' },
 ];
 const ANGLES: readonly { id: EvaluationCameraAngle; label: string }[] = [
   { id: 'front', label: '정면' }, { id: 'side', label: '측면' },
@@ -53,6 +54,10 @@ export function FunEvaluationPanel({ state, onState, onScenario, onClose }: {
         key={candidate.id} accessibilityRole="button" accessibilityState={{ selected: state.candidateId === candidate.id }}
         onPress={() => onState({ ...state, candidateId: candidate.id })} style={choice(state.candidateId === candidate.id)}
       ><Text>{candidate.label}</Text></Pressable>)}
+      {(Object.keys(CharacterFormCatalog) as FormId[]).map(formId => <Pressable key={formId} accessibilityRole="button"
+        onPress={() => onState({ ...state, formId })} style={choice((state.formId ?? 'arucon') === formId)}>
+        <Text>{CharacterFormCatalog[formId].displayName} 초안</Text>
+      </Pressable>)}
       {ANGLES.map(angle => <Pressable
         key={angle.id} accessibilityRole="button" accessibilityState={{ selected: state.cameraAngle === angle.id }}
         onPress={() => onState({ ...state, cameraAngle: angle.id })} style={choice(state.cameraAngle === angle.id)}

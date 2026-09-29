@@ -25,7 +25,7 @@ test('journal is an explicit modal with close, backdrop dismissal and Android ba
   assert.match(panel, /<Modal[\s\S]*?onRequestClose=\{onClose\}/u);
   assert.match(panel, /testID="journal-backdrop"[\s\S]*?onPress=\{onClose\}/u);
   assert.match(panel, /testID="journal-close"[\s\S]*?onPress=\{onClose\}/u);
-  assert.match(app, /interactionEnabled=\{journal === null && !fixtureVisible\}/u);
+  assert.match(app, /interactionEnabled=\{journal === null && !fixtureVisible && menu === null\}/u);
   assert.doesNotMatch(app, /journal && <ScrollView/u);
 });
 
@@ -35,9 +35,11 @@ test('synthetic evaluation stays explicit, isolated and wires reversible art com
   assert.match(fixturePanel, /SOURCE_SYNTHETIC · 반응\/아트 비교/u);
   assert.match(app, /openReactionFixtureMemoryRepository\(EVALUATION_FIXTURE_ID\)/u);
   assert.match(app, /emptyReactionMemory\(EVALUATION_PET_ID, 'fixture'\)/u);
-  assert.match(app, /characterCandidateId=\{evaluation\?\.candidateId \?\? 'original'\}/u);
+  // LIFE-00 §11 authorizes a review candidate, preserving original in comparison.
+  assert.match(app, /characterCandidateId=\{evaluation\?\.candidateId \?\? 'baby_v3'\}/u);
   assert.match(app, /comparisonCameraAngle=\{evaluation\?\.cameraAngle\}/u);
   assert.doesNotMatch(app, /comparisonCameraAngle=\{evaluation\?\.cameraAngle\s*\?\?/u);
-  assert.match(app, /onInteractionIntent=\{\(\) => reactionRuntimeRef\.current\?\.cancel\('superseded'\)\}/u);
-  assert.match(app, /\{!evaluation && <View[\s\S]*?<LifeRoomControls/u);
+  assert.match(app, /onInteractionIntent=\{intent => \{ reactionRuntimeRef\.current\?\.cancel\('superseded'\); cancelLifeBubble\(\); if \(intent !== 'furniture'\) setGame\(null\); \}\}/u);
+  assert.match(app, /\['play', 'food', 'decor'\]/u);
+  assert.match(app, /\['놀기', '먹이', '꾸미기'\]/u);
 });

@@ -1,6 +1,12 @@
 # iOS validation history and Release input resume
 
-## 현재 ASTRA_DIRECT 결과 — 2026-09-28
+## 현재 LIFE-00 결과 — 2026-09-29
+
+**PARTIAL_WITH_BLOCKERS**, 재미/최종 아트 USER_REVIEW_PENDING. ASTRA_DIRECT로 생활 의도·실제 공 이동/앞발·3놀이·기억/선호·성장 표현·격리 체험·작은 말풍선/방 UI·아기v3와 4형태 초안을 연결했다. 기존 경제/저장/원본·건강 OFF·외부 권한 경계 유지. 자체 검토는 SELF_REVIEW, 새 subagent 0, effective model은 ROUTING_UNVERIFIED.
+
+현재 실행: 테스트336/336, lint/typecheck, 양 플랫폼 JS bundle, iOS Release exit0, Simulator install/launch, iOS CNG23/23, 운영40/40 PASS. 번들 SHA `c2a26400cc88b76e8e0ef648caca8435104794ad95a5c1ccb485fcbf21fa3938`는 설치 앱과 일치한다. CUA는 Mac locked로 차단되었고 이번 L01~L22 실제 화면·입력·연속 영상·성능은 NOT_RUN/BLOCKED다. 이전 관찰을 최신 PASS로 쓰지 않는다. [LIFE-00 전체 판정/실행법/다음 작업](LIFE-00-REPORT.md).
+
+## Historical ASTRA_DIRECT 결과 — 2026-09-28
 
 `BLOCKED` (최종 앱 전환 재확인 중 Mac 잠금). 새 에이전트 0회, 기존 에이전트는 모두 종료 상태였으며 직접 구현·정상 입력 검증·SELF_REVIEW를 수행했다. 소스 `a4b3fad`의 같은 Release에서 기록/직접·버튼 교감/선택·종료/이동/Home·복귀를 연속 관찰했다. 최종 `69bd2ae`는 터치 포인터 background 정리까지 포함하고, 기록·교감·선택은 관찰했으나 마지막 앱 전환은 잠금으로 보류다. 이전 결과를 최신 미실행 항목의 PASS로 옮기지 않는다.
 

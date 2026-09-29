@@ -1,10 +1,12 @@
 import type { RoomRendererProfileId } from './rendererConfig';
 
+// LIFE-00 §13 replaces the earlier 20 Hz engineering target with a 30 Hz floor.
+// The legacy export name remains compatible with saved FUN tooling; old results do not pass this gate.
 export const FUN01_PERFORMANCE_BUDGET = Object.freeze({
   inputFeedbackP95Ms: 100,
-  jsRafIntervalP95Ms: 50,
+  jsRafIntervalP95Ms: 33.34,
   continuousUiLockMaxMs: 500,
-  submittedFrameRateAimFps: 20,
+  submittedFrameRateAimFps: 30,
 });
 
 export const FUN01_MIN_BUDGET_SAMPLES = 5;
@@ -25,6 +27,8 @@ export type RoomPerformanceSummary = {
   capturedAtMs: number;
   profileId: RoomRendererProfileId;
   proxyNotice: string;
+  phaseCost: Record<'morph' | 'draw' | 'queueDrain', MetricSummary>;
+  budgetSource: 'LIFE-00-13';
   budgets: typeof FUN01_PERFORMANCE_BUDGET;
   inputSamplesBySource: Readonly<Record<RoomInputSource, number>>;
   inputHandlerDuration: MetricSummary;
@@ -104,6 +108,7 @@ function thresholdStatus(value: number | null, maximum: number, count: number): 
 }
 
 export class RoomPerformanceProbe {
+  private readonly phaseCost = { morph: new RingBuffer<TimedSample>(240), draw: new RingBuffer<TimedSample>(240), queueDrain: new RingBuffer<TimedSample>(240) };
   private readonly inputHandlerDurationMs: RingBuffer<TimedSample>;
   private readonly inputSources: RingBuffer<Readonly<{ source: RoomInputSource; atMs: number }>>;
   private readonly inputToNextRafMs: RingBuffer<TimedSample>;
@@ -136,6 +141,10 @@ export class RoomPerformanceProbe {
   }
 
   startInput(): number { return this.now(); }
+
+  recordPhase(phase: keyof RoomPerformanceSummary['phaseCost'], durationMs: number) {
+    if (Number.isFinite(durationMs) && durationMs >= 0) this.phaseCost[phase].push({ value: durationMs, atMs: this.now() });
+  }
 
   recordInputHandled(startedAtMs: number, source: RoomInputSource = 'touch') {
     const handledAtMs = this.now();
@@ -186,6 +195,7 @@ export class RoomPerformanceProbe {
   }
 
   resetWindow() {
+    for (const buffer of Object.values(this.phaseCost)) buffer.clear();
     this.inputHandlerDurationMs.clear();
     this.inputSources.clear();
     this.inputToNextRafMs.clear();
@@ -229,6 +239,9 @@ export class RoomPerformanceProbe {
       schemaVersion: 2,
       capturedAtMs,
       profileId: this.profileId,
+      budgetSource: 'LIFE-00-13',
+      phaseCost: { morph: summarize(this.windowValues(this.phaseCost.morph, capturedAtMs)),
+        draw: summarize(this.windowValues(this.phaseCost.draw, capturedAtMs)), queueDrain: summarize(this.windowValues(this.phaseCost.queueDrain, capturedAtMs)) },
       proxyNotice: 'input-to-RAF, input-to-endFrameEXP and RAF-gap values are timing proxies; they do not measure touch-to-photon latency, native-thread lock or visible FPS',
       budgets: FUN01_PERFORMANCE_BUDGET,
       inputSamplesBySource,

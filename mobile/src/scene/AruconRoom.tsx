@@ -91,6 +91,13 @@ export function AruconRoom(props: RoomProps) {
     props.characterCandidateId,
     props.comparisonCameraAngle,
     props.reactionPresentation,
+    props.lifeCommand,
+    props.livingEnabled,
+    props.onLifeEvent,
+    props.lifePreference,
+    props.growthStage,
+    props.poopCount,
+    props.hungry,
     systemReduced,
   ]);
 
@@ -131,11 +138,14 @@ export function AruconRoom(props: RoomProps) {
     if (!room) return;
     const floor = room.screenToFloor(x, y);
     if (!floor) return;
+    if (latest.current.ballPlayInput) {
+      room.runLife({ token: `roll:${performance.now()}`, kind: 'roll', target: floor });
+      return;
+    }
     const target = room.moveTo(floor);
     if (target) {
       latest.current.onInteractionIntent?.('move');
       latest.current.onMove?.(target);
-      latest.current.onStatus?.('아루콘이 바닥을 따라 걸어가요.');
     }
   };
 
@@ -179,7 +189,7 @@ export function AruconRoom(props: RoomProps) {
             style={[styles.furnitureHit, { left: point.x - 26, top: point.y - 26 }]}
             onPress={() => {
               const room = controller.current;
-              const accepted = name === 'ball' ? room?.playBall() : room?.canStartReactionCue();
+              const accepted = name === 'ball' && !latest.current.livingEnabled ? room?.playBall() : room?.canStartReactionCue();
               if (!accepted) return;
               latest.current.onInteractionIntent?.('furniture');
               latest.current.onFurnitureHit?.(name);
@@ -236,6 +246,9 @@ export function AruconRoom(props: RoomProps) {
           }}
         />
       )}
+      {!!props.poopCount && hits?.cleanup?.visible && <Pressable accessibilityRole="button" accessibilityLabel="남아 있는 배설물 치우기"
+        style={[styles.furnitureHit, { left: hits.cleanup.x - 26, top: hits.cleanup.y - 26 }]}
+        onPress={() => { if (latest.current.interactionEnabled ?? true) latest.current.onCleanup?.(); }} />}
       {!!props.reactionBubble && hits?.pet.visible && bubble.maxHeight > 0 && <View
         pointerEvents="box-none"
         style={{ position: 'absolute', left: bubble.left, top: bubble.top, width: bubble.width, maxHeight: bubble.maxHeight }}

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, AppState, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, AppState, KeyboardAvoidingView, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as SQLite from 'expo-sqlite';
 import { File, Paths } from 'expo-file-system';
@@ -14,16 +14,22 @@ import type { JournalEntry } from './src/application/devLifeService';
 import { confirmedMealCue, type MealCue, type MealCuePolicy } from './src/application/mealCue';
 import { DevInputRejected, monotonicDevTime, retryStableSyntheticWalk, utcFixtureDay } from './src/application/devClock';
 import { APPROVED_GAME_CONFIG } from './src/domain/config';
+import { APPROVED_MVP_POLICY } from './src/config/approvedMvpPolicy';
 import { DomainActionRejected } from './src/domain/engine';
 import { initialPet, type PetState } from './src/domain/model';
 import { LocalPetStore, expoSqliteConnection, type SqlConnection } from './src/storage/sqlite';
-import { openAruconDatabase } from './src/storage/appDatabase';
+import { openAruconDatabase, readExperienceProfile, saveExperienceProfile, type RoomProfile } from './src/storage/appDatabase';
 import type { SyncStatusViewModel } from './src/sync/status';
 import { ReadOnlyWriterError, WriterRegistrationRequiredError } from './src/sync/writeGuard';
 import { approvedLocalExpoNativeWidgetBridge } from './src/native/aruconWidgetModule';
 import { FailClosedNativeWidgetAdapter } from './src/native/widget';
 import { formPresentationText, selectFormPresentation } from './src/scene/formPresentation';
-import { LifeRoomControls, type LifeRoomAction } from './src/presentation/LifeRoomControls';
+import { type LifeRoomAction } from './src/presentation/LifeRoomControls';
+import { EXPERIENCE, prepareExperience, experiencePetId } from './src/living/experience';
+import { chooseLifeLine, emptyLifeMemory, rememberLifeCompletion, lifePreference, LIFE_SCENE_NAMES, type LifeMemory } from './src/living/content';
+import { LifeMemoryStore } from './src/living/memory';
+import type { LifeCommand, LifeEvent, LifeInput, LifeScene } from './src/living/life';
+import { committedToiletScene } from './src/living/committedLife';
 import { ApprovedFixturePanel, type ApprovedFixtureAction } from './src/presentation/ApprovedFixturePanel';
 import { ApprovedStatusPanel } from './src/presentation/ApprovedStatusPanel';
 import {
@@ -98,12 +104,15 @@ function growthSummary(view: Awaited<ReturnType<ApprovedMvpService['readGrowthVi
   return `성장 Lv.${projection.level} · 단계 ${projection.stage} · ${formPresentationText(formPresentation)} · 성별 ${sex}`;
 }
 
-function AppContent() {
+function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (value: RoomProfile) => void }) {
+  const experience = profile !== 'original';
+  const petId = experience ? experiencePetId(profile) : PET_ID;
   const insets = useSafeAreaInsets();
   const [phase, setPhase] = useState<'loading' | 'onboarding' | 'room' | 'load_error'>('loading');
   const [pet, setPet] = useState<PetState | null>(null);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [memoryWarning, setMemoryWarning] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [fixtureVisible, setFixtureVisible] = useState(false);
   const [journal, setJournal] = useState<JournalEntry[] | null>(null);
@@ -127,6 +136,18 @@ function AppContent() {
   const [reactionPresentation, setReactionPresentation] = useState<RoomReactionBatch | undefined>();
   const [reduceDialogue, setReduceDialogue] = useState(false);
   const [evaluation, setEvaluation] = useState<FunEvaluationState | null>(null);
+  const [menu, setMenu] = useState<'menu' | 'play' | 'food' | 'decor' | 'settings' | 'details' | null>(null);
+  const [experienceName, setExperienceName] = useState('');
+  const [experiencePersonality, setExperiencePersonality] = useState<'reserved' | 'expressive'>('reserved');
+  const [lifeCommand, setLifeCommand] = useState<LifeCommand>();
+  const [lifeDialogue, setLifeDialogue] = useState<ReactionDialogueView | null>(null);
+  const [game, setGame] = useState<'ball' | 'peek' | 'gesture' | null>(null);
+  const lifeMemoryRef = useRef<LifeMemory>(emptyLifeMemory(petId));
+  const lifeStoreRef = useRef<LifeMemoryStore | null>(null);
+  const bubbleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingGrowthRef = useRef(false);
+  const lifeTraceRef = useRef<unknown[]>([]);
+  const autoSpeechAfterRef = useRef(0);
   const databaseRef = useRef<SQLite.SQLiteDatabase | null>(null);
   const connectionRef = useRef<SqlConnection | null>(null);
   const serviceRef = useRef<ApprovedMvpService | null>(null);
@@ -146,6 +167,51 @@ function AppContent() {
   const mealReactionTokenRef = useRef<string | null>(null);
   const growthReactionTokenRef = useRef<string | null>(null);
   const growthMealTokenRef = useRef<string | null>(null);
+
+  const cancelLifeBubble = useCallback(() => {
+    if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
+    bubbleTimerRef.current = null;
+    setLifeDialogue(null);
+  }, []);
+  const lifeInput = useCallback((kind: LifeInput, replay = false) => {
+    cancelLifeBubble();
+    setLifeCommand({ kind, replay, token: `life:${Date.now()}:${++sequenceRef.current}` });
+  }, [cancelLifeBubble]);
+  const persistLife = useCallback(() => {
+    void lifeStoreRef.current?.save(lifeMemoryRef.current).then(() => setMemoryWarning(null)).catch(() => {
+      setMemoryWarning('최근 놀이 기억을 저장하지 못했어요. 게임 저장과 교감은 계속할 수 있어요.');
+    });
+  }, []);
+  const showLifeLine = useCallback((scene: LifeScene, automatic: boolean, replay = false) => {
+    const state = petRef.current;
+    if (!state) return;
+    if (reduceDialogue && automatic && scene !== 'offer') return;
+    if (automatic && Date.now() < autoSpeechAfterRef.current) return;
+    const memory = replay ? { ...lifeMemoryRef.current } : lifeMemoryRef.current;
+    const chosen = chooseLifeLine(memory, scene, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', Date.now(), automatic);
+    if (!chosen) return;
+    lifeTraceRef.current = [...lifeTraceRef.current, { scene, lineId: chosen.id, eligible: chosen.eligible, excludedRecent: chosen.excludedRecent, automatic, replay, kind: 'shown', atMs: Date.now() }].slice(-64);
+    cancelLifeBubble();
+    const hasCushion = ownedRoomAffordances(ownedItems).cushionVisible;
+    setLifeDialogue({ text: chosen.text, choices: scene === 'offer' ? [{ id: 'roll', label: '굴려 주기' }, { id: hasCushion ? 'rest' : 'company', label: '같이 쉬기' }] : [] });
+    bubbleTimerRef.current = setTimeout(cancelLifeBubble, scene === 'offer' ? 18_000 : Math.max(3500, chosen.text.length * 180));
+    if (!replay) persistLife();
+  }, [cancelLifeBubble, ownedItems, persistLife, reduceDialogue]);
+  const onLifeEvent = useCallback((event: LifeEvent) => {
+    lifeTraceRef.current = [...lifeTraceRef.current, { ...event, atMs: Date.now() }].slice(-64);
+    if (event.phase === 'perform' && event.scene !== 'offer') showLifeLine(event.scene, event.automatic, event.replay);
+    if (event.phase === 'waiting') showLifeLine(event.scene, event.automatic, event.replay);
+    if (event.phase === 'complete') {
+      if (!event.replay) { rememberLifeCompletion(lifeMemoryRef.current, event.scene, Date.now()); persistLife(); }
+      if (event.scene === 'meal') setMealCue(null);
+      if (!event.replay && event.scene === 'meal' && pendingGrowthRef.current) { pendingGrowthRef.current = false; lifeInput('growth'); }
+    }
+    if (event.phase === 'cancel') { cancelLifeBubble(); if (event.scene === 'meal') setMealCue(null); }
+  }, [cancelLifeBubble, lifeInput, persistLife, showLifeLine]);
+  const openMenu = useCallback((next: typeof menu) => {
+    reactionRuntimeRef.current?.cancel('scene_change');
+    lifeInput('cancel'); setGame(null); setMenu(next);
+  }, [lifeInput]);
 
   const createReactionRuntime = useCallback((memory: ReactionMemorySnapshot, writer?: ReactionMemoryWriter) => new ReactionRuntime({
       memory,
@@ -207,7 +273,7 @@ function AppContent() {
     ]);
     setOwnedItems(ownership);
     setGrowthText(`${growthSummary(growth)} · 소유 ${ownership.length}개`);
-    const widgetPublish = await LOCAL_WIDGET.publish(widget);
+    const widgetPublish = experience ? 'unsupported' : await LOCAL_WIDGET.publish(widget);
     const publishText = widgetPublish === 'requested' ? 'OS 새로고침 요청됨' : widgetPublish === 'deferred' ? 'OS 새로고침 지연됨'
       : widgetPublish === 'unsupported' ? '현재 빌드에서 위젯 모듈 없음' : '위젯 저장/요청 오류';
     setWidgetText(`위젯 마지막 확인 ${utcTimestampText(widget.updatedAtMs)} · ${publishText} · OS 실시간 상태 아님`);
@@ -215,23 +281,28 @@ function AppContent() {
       setSyncStatus(status);
       setWriterMode(status.writerAccess);
     }
-  }, []);
+  }, [experience]);
 
-  const runTask = useCallback(async (task: () => Promise<AppTaskResult>, cue?: AppMealCuePolicy, quiet = false) => {
+  const runTask = useCallback(async (task: () => Promise<AppTaskResult>, cue?: AppMealCuePolicy, quiet = false, allowLifeProjection = true) => {
     if (busyRef.current) return;
     setNotice('');
     busyRef.current = true;
     if (!quiet) setBusy(true);
     try {
+      const beforeState = petRef.current;
       const beforeExp = petRef.current?.totalExpUnits ?? 0;
       const result = await task();
       const state = resultState(result);
       if (state) publish(state);
+      if (allowLifeProjection && state && beforeState && AppState.currentState === 'active') {
+        const toiletToken = committedToiletScene(beforeState, state);
+        if (toiletToken) setLifeCommand({ token: toiletToken, kind: 'toilet' });
+      }
       if (state && cue && state.totalExpUnits > beforeExp && serviceRef.current) {
         try {
           const entries = await serviceRef.current.readJournal();
           const policy: MealCuePolicy = { mode: cue.mode, atMs: cue.atMs?.() };
-          const confirmed = confirmedMealCue(beforeExp, state.totalExpUnits, entries, policy, PET_ID);
+          const confirmed = confirmedMealCue(beforeExp, state.totalExpUnits, entries, policy, petId);
           if (confirmed) {
             setMealCue(confirmed);
             const growth = confirmedGrowthReactionCue(
@@ -244,7 +315,7 @@ function AppContent() {
           }
         } catch { /* A visual cue must never turn a committed meal into a failed command. */ }
       }
-      if (serviceRef.current) await refreshReadModels(serviceRef.current, state?.lastSimulatedAtMs ?? serviceTime());
+      if (serviceRef.current && !quiet) await refreshReadModels(serviceRef.current, state?.lastSimulatedAtMs ?? serviceTime());
       retryRef.current = null;
       setFailure(null);
     } catch (error) {
@@ -274,18 +345,34 @@ function AppContent() {
         setTimeout(() => { void runTaskRef.current(next); }, 0);
       }
     }
-  }, [publish, refreshReadModels, serviceTime]);
+  }, [petId, publish, refreshReadModels, serviceTime]);
 
-  useEffect(() => { runTaskRef.current = runTask; }, [runTask]);
+  useEffect(() => { runTaskRef.current = task => runTask(task, undefined, false, false); }, [runTask]);
+
+  useEffect(() => {
+    if (phase !== 'room') return;
+    const timer = setInterval(() => {
+      const service = serviceRef.current;
+      if (AppState.currentState !== 'active' || !service || busyRef.current || retryRef.current) return;
+      const at = serviceTime();
+      void runTask(async () => (await service.advanceTo(at)), { mode: 'auto', atMs: () => at }, true);
+    }, 30_000);
+    return () => clearInterval(timer);
+  }, [phase, runTask, serviceTime]);
 
   const runLifecycle = useCallback((task: () => Promise<AppTaskResult>) => {
     if (busyRef.current) pendingLifecycleRef.current = task;
-    else void runTask(task);
+    else void runTask(task, undefined, false, false);
   }, [runTask]);
 
   const installApprovedRuntime = useCallback(async (
     connection: SqlConnection, state: PetState, migration: boolean,
   ): Promise<ApprovedMvpService> => {
+    if (experience) {
+      const service = await prepareExperience(connection, state.givenName, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', state.lastSimulatedAtMs, profile);
+      serviceRef.current = service;
+      return service;
+    }
     const controller = await createLocalSyntheticSyncController({
       db: connection, state, accountId: PREVIEW_ACCOUNT_ID, deviceId: PREVIEW_DEVICE_ID,
       nowMs: () => monotonicDevTime(Date.now(), clockRef.current, petRef.current?.lastSimulatedAtMs ?? state.lastSimulatedAtMs),
@@ -299,7 +386,7 @@ function AppContent() {
       ? '기존 로컬 저장을 유지하고 합성 writer 등록과 현재 로컬 게임 규칙을 확인했어요.'
       : '새 로컬 저장과 합성 writer 등록을 원자적으로 만들었어요.');
     const service = await ApprovedMvpService.initialize(connection, {
-      petId: PET_ID,
+      petId,
       givenName: state.givenName,
       personalityProfileId: state.personalityProfileId,
       createdAtMs: state.lastSimulatedAtMs,
@@ -309,19 +396,22 @@ function AppContent() {
     serviceRef.current = service;
     setRuntimeBadge(service.status.badge);
     return service;
-  }, []);
+  }, [experience, petId, profile]);
 
   const initialize = useCallback(async () => {
     if (bootingRef.current) return;
     bootingRef.current = true;
     setPhase('loading');
     try {
-      if (!databaseRef.current) databaseRef.current = await openAruconDatabase();
+      if (!databaseRef.current) databaseRef.current = await openAruconDatabase(experience ? EXPERIENCE.database : 'arucon-dev.db');
       if (!connectionRef.current) connectionRef.current = expoSqliteConnection(databaseRef.current);
       const connection = connectionRef.current;
       const store = new LocalPetStore(connection, APPROVED_GAME_CONFIG);
       await store.migrate();
-      const existing = await store.loadPet(PET_ID);
+      const existing = await store.loadPet(petId);
+      const memoryStore = new LifeMemoryStore(connection, petId);
+      try { lifeMemoryRef.current = await memoryStore.load(); lifeStoreRef.current = memoryStore; }
+      catch { setMemoryWarning('생활 기억을 읽지 못해 원본을 보존했어요. 이번 교감은 화면에서만 이어집니다.'); }
       if (!existing) {
         setPhase('onboarding');
       } else {
@@ -349,7 +439,7 @@ function AppContent() {
     } finally {
       bootingRef.current = false;
     }
-  }, [installApprovedRuntime, installReactionRuntime, publish, refreshReadModels]);
+  }, [experience, petId, installApprovedRuntime, installReactionRuntime, publish, refreshReadModels]);
 
   useEffect(() => {
     const timer = setTimeout(() => { void initialize(); }, 0);
@@ -357,6 +447,7 @@ function AppContent() {
   }, [initialize]);
 
   useEffect(() => () => {
+    if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
     reactionRuntimeRef.current?.dispose();
     reactionRuntimeRef.current = null;
   }, []);
@@ -374,7 +465,7 @@ function AppContent() {
       if (next === previous) return;
       const wasActive = previous === 'active';
       previous = next;
-      if (next !== 'active') reactionRuntimeRef.current?.cancel('background');
+      if (next !== 'active') { reactionRuntimeRef.current?.cancel('background'); cancelLifeBubble(); setGame(null); }
       const service = serviceRef.current;
       if (!service) return;
       const eventWallMs = Date.now();
@@ -390,23 +481,23 @@ function AppContent() {
       else runLifecycle(task);
     });
     return () => subscription.remove();
-  }, [runLifecycle]);
+  }, [cancelLifeBubble, runLifecycle]);
 
-  const startDevPet = useCallback((result: DevPetPreview) => {
+  const startDevPet = useCallback((result: Pick<DevPetPreview, 'givenName'>) => {
     const connection = connectionRef.current;
     if (!connection || retryRef.current) return;
     const createdAtMs = serviceTime();
-    const state = initialPet(PET_ID, result.givenName, 'reserved', createdAtMs, APPROVED_GAME_CONFIG);
+    const state = initialPet(petId, result.givenName, experience ? experiencePersonality : 'reserved', createdAtMs, APPROVED_GAME_CONFIG);
     void runTask(async () => {
       const service = await installApprovedRuntime(connection, state, false);
       await installReactionRuntime(state.petId);
       await service.beginGameDay(utcFixtureDay(createdAtMs), createdAtMs);
       const current = await service.currentState();
       setPhase('room');
-      setNotice('SOURCE_SYNTHETIC 로컬 미리보기를 만들었어요. 실제 가입이나 보호자 확인이 아닙니다.');
+      setNotice('체험 모드 — 실제 걸음·수면은 연결하지 않았어요.');
       return current;
     });
-  }, [installApprovedRuntime, installReactionRuntime, runTask, serviceTime]);
+  }, [experience, experiencePersonality, petId, installApprovedRuntime, installReactionRuntime, runTask, serviceTime]);
 
   const retry = useCallback(() => {
     if (phase === 'load_error') { void initialize(); return; }
@@ -434,7 +525,7 @@ function AppContent() {
     ];
     runtime.start({
       petId: evaluation ? EVALUATION_PET_ID : state.petId,
-      displayName: evaluation ? '아루콘' : `${state.givenName}콘`,
+      displayName: evaluation ? '아루콘' : state.givenName,
       trigger,
       personality: evaluation?.personality ?? (state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved'),
       growthStage: options.growthStage ?? projectGrowth(state.totalExpUnits, APPROVED_GROWTH_POLICY).stage,
@@ -456,16 +547,18 @@ function AppContent() {
     if (!mealCue || mealReactionTokenRef.current === mealCue.token) return;
     if (growthMealTokenRef.current === mealCue.token || growthCue?.eventId === mealCue.token) return;
     mealReactionTokenRef.current = mealCue.token;
+    if (!evaluation) return;
     startLiveReaction('meal_committed', {
       evidence: { kind: 'committed_meal', eventId: mealCue.token, committedAtMs: serviceTime(), mode: mealCue.mode },
     });
-  }, [growthCue, mealCue, serviceTime, startLiveReaction]);
+  }, [evaluation, growthCue, mealCue, serviceTime, startLiveReaction]);
 
   useEffect(() => {
     if (!growthCue || growthReactionTokenRef.current === growthCue.eventId) return;
     growthReactionTokenRef.current = growthCue.eventId;
+    if (!evaluation) { pendingGrowthRef.current = true; return; }
     startLiveReaction('growth_committed', { evidence: growthCue, growthStage: growthCue.after.stage });
-  }, [growthCue, startLiveReaction]);
+  }, [evaluation, growthCue, startLiveReaction]);
 
   const clearReactionPresentation = useCallback(() => {
     setReactionDialogue(null);
@@ -543,6 +636,7 @@ function AppContent() {
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
     if (action === 'journal') {
+      lifeInput('cancel'); setGame(null); setMenu(null);
       reactionRuntimeRef.current?.cancel('scene_change');
       void runTask(async () => { setJournal(await service.readJournal()); setPreview(null); });
       return;
@@ -567,17 +661,19 @@ function AppContent() {
           await begin();
           const cleaned = await service.clean(now, id);
           setNotice(cleanSuccessText(availability.removed));
-          startLiveReaction('clean', { evidence: { kind: 'clean_result', result: 'cleaned' } });
+          if (evaluation) startLiveReaction('clean', { evidence: { kind: 'clean_result', result: 'cleaned' } });
+          else lifeInput('release');
           return cleaned;
         });
         break;
       }
       case 'touch':
-        startLiveReaction('petting', { touchTarget });
+        if (evaluation) startLiveReaction('petting', { touchTarget });
+        else lifeInput('touch');
         void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); }, undefined, true);
         break;
     }
-  }, [actionId, runTask, serviceTime, startLiveReaction]);
+  }, [actionId, evaluation, lifeInput, runTask, serviceTime, startLiveReaction]);
 
   const doShopPurchase = useCallback((service: ApprovedMvpService, state: PetState, itemId: string) => {
     const quote = service.quoteCoinItem(itemId, state.coin);
@@ -603,6 +699,7 @@ function AppContent() {
       return;
     }
     if (action === 'renderer_legacy_333' || action === 'renderer_low_resolution' || action === 'renderer_automatic') {
+      lifeInput('cancel');
       const profile: RoomRendererProfileId = action === 'renderer_legacy_333' ? 'software_legacy_333'
         : action === 'renderer_low_resolution' ? 'software_low_resolution' : 'automatic';
       performanceSummaryRef.current = null;
@@ -620,6 +717,7 @@ function AppContent() {
       try {
         const file = new File(Paths.cache, 'arucon-fun01-performance-summary.json');
         file.write(JSON.stringify(summary, null, 2));
+        new File(Paths.cache, 'arucon-life-trace.json').write(JSON.stringify({ schemaVersion: 1, events: lifeTraceRef.current }, null, 2));
         setNotice('FUN-01 성능 JSON을 로컬 캐시에 저장했어요. 합성 도구에서 다시 내보낼 수 있어요.');
       } catch (error) {
         setFailure(`성능 JSON 저장 실패: ${errorText(error)}`);
@@ -699,7 +797,7 @@ function AppContent() {
         return service.currentState();
       });
     }
-  }, [actionId, doShopPurchase, enterEvaluationMode, runTask, serviceTime]);
+  }, [actionId, doShopPurchase, enterEvaluationMode, lifeInput, runTask, serviceTime]);
 
   if (phase === 'loading') return <View style={styles.center}><Text>로컬 방을 여는 중…</Text></View>;
   if (phase === 'load_error') return <View style={styles.center}>
@@ -708,7 +806,17 @@ function AppContent() {
     <Pressable accessibilityRole="button" style={styles.retryButton} onPress={retry}><Text>다시 시도</Text></Pressable>
   </View>;
   if (phase === 'onboarding') return <View style={[styles.onboarding, { paddingTop: insets.top + 20 }]}>
-    <DevOnboardingScreen onPreview={startDevPet} />
+    {experience ? <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 24, gap: 18 }}>
+      <Text style={styles.fixtureTitle}>작은 친구를 만나 볼까요?</Text>
+      <Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 체험용 먹이와 공·쿠션·화장실이 있는 별도 방이에요. 기존 방은 보존됩니다.</Text>
+      <TextInput accessibilityLabel="체험 펫 이름" placeholder="이름 (비워 두면 아루콘)" maxLength={20} value={experienceName} onChangeText={setExperienceName} style={styles.nameInput} />
+      <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => setExperiencePersonality(value => value === 'reserved' ? 'expressive' : 'reserved')}><Text>성격: {experiencePersonality === 'reserved' ? '새침하지만 다정한 아이' : '솔직하게 반기는 아이'}</Text></Pressable>
+      <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => startDevPet({ givenName: experienceName.trim() || '아루콘' })}><Text>함께 지내기</Text></Pressable>
+      {profile === 'growth' && <Text>성장 직전의 별도 체험입니다. 먹이 주기로 실제 섭취·성장 경로를 확인해요.</Text>}
+      {profile === 'toilet' && <Text>배설 사건이 가까운 별도 체험입니다. 처음 만든 뒤 약 20~30초 안에 실제 정산 경로를 지나갑니다. 일반 방의 시간은 바꾸지 않아요.</Text>}
+      {profile === 'cleanup' && <Text>예전 잔여 배설물 1개가 있는 별도 청소 체험입니다. 화장실의 자동 청결 정책은 유지됩니다.</Text>}
+      <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => onProfile('original')}><Text>기존 방으로</Text></Pressable>
+    </ScrollView></KeyboardAvoidingView> : <DevOnboardingScreen onPreview={startDevPet} />}
     {busy && <Text>합성 로컬 펫을 만드는 중…</Text>}
     {failure && <View style={styles.errorBox}><Text>{failure}</Text><Pressable accessibilityRole="button" onPress={retry}><Text>같은 요청 다시 시도</Text></Pressable></View>}
   </View>;
@@ -720,7 +828,7 @@ function AppContent() {
     <View style={StyleSheet.absoluteFill}>
       <AruconRoom
         key={rendererProfileId}
-        formId={pet.formId}
+        formId={evaluation?.formId ?? pet.formId}
         mealCue={mealCue ?? undefined}
         personality={evaluation?.personality ?? (pet.personalityProfileId === 'expressive' ? 'expressive' : 'reserved')}
         sleeping={evaluation?.sleeping ?? (pet.sleeping || pet.hibernating)}
@@ -729,22 +837,35 @@ function AppContent() {
         toiletInstalled={pet.toiletInstalled}
         ballVisible={evaluation ? true : roomAffordances.ballVisible}
         cushionVisible={evaluation ? true : roomAffordances.cushionVisible}
-        characterCandidateId={evaluation?.candidateId ?? 'original'}
+        characterCandidateId={evaluation?.candidateId ?? 'baby_v3'}
         comparisonCameraAngle={evaluation?.cameraAngle}
         rendererProfileId={rendererProfileId}
-        interactionEnabled={journal === null && !fixtureVisible}
+        interactionEnabled={journal === null && !fixtureVisible && menu === null}
+        livingEnabled={!evaluation}
+        lifeCommand={lifeCommand}
+        onLifeEvent={onLifeEvent}
+        lifePreference={lifePreference(lifeMemoryRef.current)}
+        growthStage={projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage}
+        poopCount={pet.poopCount}
+        hungry={pet.food > 0 && pet.hunger >= APPROVED_GAME_CONFIG.proposal.mealHungerThreshold}
+        onCleanup={() => doLifeAction('clean')}
+        ballPlayInput={game === 'ball'}
         topOcclusion={insets.top + (evaluation ? 8 : topHeight + 16)}
         bottomOcclusion={insets.bottom + (evaluation ? evaluationHeight : controlsHeight) + 16}
-        reactionBubble={reactionDialogue ? <ReactionOverlay
-          view={reactionDialogue}
-          onChoice={choiceId => reactionRuntimeRef.current?.choose(choiceId)}
-          onClose={() => reactionRuntimeRef.current?.cancel('user')}
-          reduceDialogue={reduceDialogue}
+        reactionBubble={(evaluation ? reactionDialogue : lifeDialogue) ? <ReactionOverlay
+          view={evaluation ? reactionDialogue : lifeDialogue}
+          onChoice={choiceId => {
+            autoSpeechAfterRef.current = Date.now() + 25_000;
+            if (evaluation) reactionRuntimeRef.current?.choose(choiceId);
+            else { setGame(choiceId === 'roll' ? 'ball' : null); lifeInput(choiceId === 'roll' ? 'roll' : choiceId === 'rest' ? 'rest' : 'company'); }
+          }}
+          onClose={() => { autoSpeechAfterRef.current = Date.now() + 25_000; reactionRuntimeRef.current?.cancel('user'); cancelLifeBubble(); }}
+          reduceDialogue={evaluation ? reduceDialogue : false}
           onToggleReduceDialogue={() => setReduceDialogue(value => !value)}
         /> : null}
         reactionPresentation={reactionPresentation}
         onPerformanceSummary={summary => { performanceSummaryRef.current = summary; }}
-        onInteractionIntent={() => reactionRuntimeRef.current?.cancel('superseded')}
+        onInteractionIntent={intent => { reactionRuntimeRef.current?.cancel('superseded'); cancelLifeBubble(); if (intent !== 'furniture') setGame(null); }}
         onPetTouch={target => evaluation ? startLiveReaction('petting', { touchTarget: target }) : doLifeAction('touch', target)}
         onFurnitureHit={name => {
           if (evaluation) {
@@ -753,53 +874,93 @@ function AppContent() {
             else setNotice('합성 비교에서는 가구 상태만 표시해요. 게임 저장은 바뀌지 않아요.');
             return;
           }
-          if (name === 'table') setNotice('식탁은 코인 상점 구매 후 자동급식을 설정할 수 있어요.');
+          if (name === 'table') openMenu('food');
           else if (name === 'cushion') {
-            if (roomAffordances.cushionVisible) startLiveReaction('rest');
+            if (roomAffordances.cushionVisible) { setGame(null); lifeInput('rest'); }
             else setNotice('쿠션은 코인 상점에서 소유한 뒤 사용할 수 있어요.');
           }
           else if (name === 'toilet') setNotice('기본 화장실이 청결을 도와줘요. 유지비는 없어요.');
-          else if (roomAffordances.ballVisible) startLiveReaction('ball');
+          else if (roomAffordances.ballVisible) { setGame('ball'); lifeInput('ball'); }
           else setNotice('공은 코인 상점에서 소유한 뒤 사용할 수 있어요.');
         }}
         onStatus={setNotice}
       />
     </View>
     {!evaluation && <View onLayout={event => setTopHeight(event.nativeEvent.layout.height)} style={[styles.top, { top: insets.top + 8 }]}>
-      <ApprovedStatusPanel
-        name={`${pet.givenName}콘`}
-        badge={runtimeBadge}
-        migrationNotice={migrationNotice}
-        syncText={syncStatus ? syncStatusText(syncStatus) : '동기화 상태 확인 중'}
-        syncRuntimeNotice={syncRuntimeNotice}
-        growthText={growthText}
-        widgetText={widgetText}
-        writerMode={writerMode}
-      />
+      <Text style={styles.petName}>{pet.givenName}</Text>
+      <Text accessibilityLabel={experience ? '격리 체험 방' : '실제 건강 연결 꺼짐'} style={styles.trialBadge}>체험</Text>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="합성 도구 열기"
-        accessibilityState={{ expanded: fixtureVisible }}
+        accessibilityLabel="메뉴 열기"
+        accessibilityState={{ expanded: menu !== null }}
         style={styles.fixtureToggle}
         onPress={() => {
-          reactionRuntimeRef.current?.cancel('scene_change');
-          setJournal(null);
-          setFixtureVisible(true);
+          openMenu('menu');
         }}
       >
-        <Text style={styles.badgeText}>합성 도구</Text>
+        <Text style={styles.badgeText}>☰</Text>
       </Pressable>
     </View>}
     {!evaluation && <View onLayout={event => setControlsHeight(event.nativeEvent.layout.height)} style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
       {!!notice && <Text style={styles.notice}>{notice}</Text>}
+      {memoryWarning && <Text accessibilityRole="alert" style={styles.notice}>{memoryWarning}</Text>}
       {failure && <View style={styles.errorBox}>
         <Text>저장 중 오류: {failure}</Text>
         <Pressable accessibilityRole="button" onPress={retry}><Text>같은 요청 다시 시도</Text></Pressable>
       </View>}
-      {busy && <Text style={styles.notice}>로컬 저장 중…</Text>}
-      {preview && <ScrollView style={styles.preview}><Text>{preview}</Text></ScrollView>}
-      <LifeRoomControls state={pet} onAction={doLifeAction} />
+      {game && <View style={styles.gameControls}>
+        {game === 'ball' && <Text style={styles.gameHint}>바닥을 눌러 공을 굴려 주세요</Text>}
+        {game === 'peek' && <><Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => lifeInput('left')}><Text>왼쪽 까꿍</Text></Pressable><Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => lifeInput('right')}><Text>오른쪽 까꿍</Text></Pressable></>}
+        {game === 'gesture' && <><Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => lifeInput('high_five')}><Text>하이파이브</Text></Pressable><Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => lifeInput('tilt')}><Text>갸우뚱</Text></Pressable></>}
+        <Pressable accessibilityRole="button" accessibilityLabel="놀이 마치기" style={styles.menuItem} onPress={() => { setGame(null); lifeInput('cancel'); }}><Text>그만 놀기</Text></Pressable>
+      </View>}
+      <View style={styles.mainActions}>{(['play', 'food', 'decor'] as const).map((key, i) => <Pressable key={key} accessibilityRole="button" style={styles.mainAction} onPress={() => openMenu(key)}><Text style={styles.mainActionText}>{['놀기', '먹이', '꾸미기'][i]}</Text></Pressable>)}</View>
     </View>}
+    <Modal visible={menu !== null} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
+      <View style={[styles.fixtureBackdrop, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 }]}>
+        <View accessibilityViewIsModal style={styles.fixtureSheet}>
+          <View style={styles.fixtureHeader}><Text style={[styles.fixtureTitle, { flex: 1 }]}>{menu === 'menu' ? '우리 방' : menu === 'play' ? '함께 놀기' : menu === 'food' ? '식사' : menu === 'decor' ? '방 꾸미기' : menu === 'settings' ? '설정' : '우리 아이'}</Text>
+            <Pressable accessibilityRole="button" accessibilityLabel="패널 닫기" style={styles.menuItem} onPress={() => setMenu(null)}><Text>닫기</Text></Pressable></View>
+          <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 12 }}>
+            {menu === 'menu' && <>
+              <Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요.</Text>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => doLifeAction('journal')}><Text>함께한 기록</Text></Pressable>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => setMenu('details')}><Text>우리 아이</Text></Pressable>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => setMenu('settings')}><Text>설정</Text></Pressable>
+              <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => onProfile(experience ? 'original' : 'normal')}><Text>{experience ? '기존 방으로 돌아가기' : '별도 생활 체험 시작 / 이어 하기'}</Text></Pressable>
+            </>}
+            {menu === 'play' && <>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('touch'); }}><Text>쓰다듬기</Text></Pressable>
+              {(['ball', 'peek', 'gesture'] as const).map((key, index) => <Pressable key={key} accessibilityRole="button" disabled={key === 'ball' && !roomAffordances.ballVisible} style={styles.menuItem} onPress={() => { setMenu(null); setGame(key); lifeInput(key === 'ball' ? 'offer' : key); }}><Text>{['공 굴려주기', '손가락 까꿍', '자세 따라 하기'][index]}{key === 'ball' && !roomAffordances.ballVisible ? ' · 공이 필요해요' : ''}</Text></Pressable>)}
+              {roomAffordances.cushionVisible && <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); lifeInput('rest'); }}><Text>함께 쉬기</Text></Pressable>}
+            </>}
+            {menu === 'food' && <>
+              <Text>{experience ? '체험용 ' : ''}먹이 {pet.food}개 · {pet.sleeping ? '쉬는 중' : '깨어 있어요'}</Text>
+              <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('feed'); }}><Text>먹이 주기</Text></Pressable>
+              <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => doLifeAction('toggle_auto')}><Text>식탁 자동급식 {pet.autoFeedOptIn ? '켜짐' : '꺼짐'}</Text></Pressable>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('sleep_or_wake'); }}><Text>{pet.sleeping ? '깨우기' : '잠자기'}</Text></Pressable>
+            </>}
+            {menu === 'decor' && <><Text>{experience ? '체험용 ' : ''}코인 {pet.coin} · 기본 화장실은 늘 사용할 수 있어요.</Text>
+              {(['ball', 'cushion', 'table'] as const).map((id, i) => <Pressable key={id} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { if (serviceRef.current) doShopPurchase(serviceRef.current, pet, id); }}><Text>{['공', '쿠션', '식탁'][i]} · {APPROVED_MVP_POLICY.shop.items.find(item => item.id === id)?.coinPrice}코인</Text></Pressable>)}
+            </>}
+            {menu === 'settings' && <>
+              <Pressable accessibilityRole="switch" accessibilityState={{ checked: reducedMotion }} style={styles.menuItem} onPress={() => setReducedMotion(value => !value)}><Text>동작 줄이기 {reducedMotion ? '켜짐' : '꺼짐'}</Text></Pressable>
+              <Pressable accessibilityRole="switch" accessibilityState={{ checked: reduceDialogue }} style={styles.menuItem} onPress={() => setReduceDialogue(value => !value)}><Text>자동 말걸기 줄이기 {reduceDialogue ? '켜짐' : '꺼짐'}</Text></Pressable>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); setFixtureVisible(true); }}><Text>체험 도구와 빌드 진단</Text></Pressable>
+              <Text>실제 건강정보 연결 OFF · 실결제 OFF</Text>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('clean'); }}><Text>청결 확인 / 남은 것 치우기</Text></Pressable>
+              <Text>아래는 일반 방과 분리된 저장이에요. 처음 만들 때만 체험 상태가 준비됩니다.</Text>
+              {(['normal', 'expressive', 'growth', 'toilet', 'cleanup'] as const).map((value, i) => <Pressable key={value} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => onProfile(value)}><Text>{['기본 생활 체험', '솔직한 성격 체험', '성장 직전 체험', '화장실 생활 체험', '잔여 청소 체험'][i]}</Text></Pressable>)}
+            </>}
+            {menu === 'details' && <><Text>{growthText}</Text><Text>{pet.personalityProfileId === 'expressive' ? '솔직하게 마음을 표현하는 아이' : '새침하지만 다정하게 다가오는 아이'}</Text><Text>먹이를 먹으며 자라고, 함께한 놀이는 최근 기억으로 남아요. 첫 성장 단계를 지나면 몸짓 놀이에서 두 앞발로 응답해요.</Text>
+              {!!lifeMemoryRef.current.completed.length && <Text>함께한 작은 장면 · 다시 보기는 보상과 기억을 추가하지 않아요.</Text>}
+              {[...new Set(lifeMemoryRef.current.completed.map(x => x.scene))].slice(-6).map(scene => <Pressable key={scene} accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); setNotice('추억 다시 보기 · 보상과 기억은 추가하지 않아요.'); lifeInput(scene, true); }}><Text>{LIFE_SCENE_NAMES[scene]}</Text></Pressable>)}
+            </>}
+            {!!notice && <Text>{notice}</Text>}{failure && <Text accessibilityRole="alert">저장 오류: {failure}</Text>}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
     {evaluation && <View onLayout={event => setEvaluationHeight(event.nativeEvent.layout.height)} style={[styles.evaluation, { bottom: insets.bottom + 8 }]}>
       {preview && <Text style={styles.evaluationPreview}>{preview}</Text>}
       <FunEvaluationPanel
@@ -840,6 +1001,10 @@ function AppContent() {
             contentContainerStyle={styles.fixtureContent}
             showsVerticalScrollIndicator
           >
+            <ApprovedStatusPanel name={pet.givenName} badge={runtimeBadge} migrationNotice={migrationNotice}
+              syncText={syncStatus ? syncStatusText(syncStatus) : '로컬 체험'} syncRuntimeNotice={syncRuntimeNotice}
+              growthText={growthText} widgetText={widgetText} writerMode={writerMode} />
+            {preview && <Text>{preview}</Text>}
             <ApprovedFixturePanel onAction={doApprovedAction} />
           </ScrollView>
         </View>
@@ -855,14 +1020,34 @@ function AppContent() {
 }
 
 export default function App() {
+  const [profile, setProfile] = useState<RoomProfile>('original');
+  const [ready, setReady] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  useEffect(() => {
+    void readExperienceProfile().then(setProfile).catch(() => setProfileError('방 선택을 읽지 못해 기존 방을 열었어요.')).finally(() => setReady(true));
+  }, []);
+  const changeProfile = useCallback((next: RoomProfile) => {
+    void saveExperienceProfile(next).then(() => { setProfileError(null); setProfile(next); })
+      .catch(() => setProfileError('방 선택을 저장하지 못했어요. 현재 방은 유지됩니다.'));
+  }, []);
   return <SafeAreaProvider>
     <StatusBar barStyle="dark-content" backgroundColor="#f2ebdc" />
-    <AppContent />
+    {ready && <AppContent key={profile} profile={profile} onProfile={changeProfile} />}
+    {profileError && <View style={styles.errorBox}><Text accessibilityRole="alert">{profileError}</Text></View>}
   </SafeAreaProvider>;
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#f2ebdc' },
+  nameInput: { minHeight: 48, borderRadius: 14, padding: 12, backgroundColor: '#fff9ed', color: '#51392b' },
+  petName: { flex: 1, fontSize: 21, fontWeight: '700', color: '#51392b', paddingTop: 10 },
+  trialBadge: { fontSize: 11, color: '#46695b', paddingTop: 16 },
+  mainActions: { flexDirection: 'row', gap: 12, justifyContent: 'center' },
+  mainAction: { flex: 1, maxWidth: 130, minHeight: 52, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#fff9edea' },
+  mainActionText: { fontSize: 16, color: '#604638', fontWeight: '600' },
+  menuItem: { minHeight: 46, padding: 12, justifyContent: 'center', borderRadius: 14, backgroundColor: '#eadfce' },
+  gameControls: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  gameHint: { color: '#604638', backgroundColor: '#fff9ed', borderRadius: 10, padding: 8 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 12, backgroundColor: '#f2ebdc' },
   onboarding: { flex: 1, backgroundColor: '#f2ebdc' },
   top: { position: 'absolute', left: 12, right: 12, flexDirection: 'row', alignItems: 'flex-start', gap: 6 },

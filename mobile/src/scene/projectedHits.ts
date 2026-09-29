@@ -1,5 +1,5 @@
 export type HitName = 'pet' | 'table' | 'cushion' | 'toilet' | 'ball';
-export type ProjectedHits = Record<HitName, { x: number; y: number; visible: boolean }>;
+export type ProjectedHits = Record<HitName, { x: number; y: number; visible: boolean }> & { cleanup?: { x: number; y: number; visible: boolean } };
 
 const HIT_NAMES: readonly HitName[] = ['pet', 'table', 'cushion', 'toilet', 'ball'];
 
@@ -22,7 +22,9 @@ export function projectedHitsEqual(
   next: ProjectedHits,
   tolerancePx = 0.5,
 ): boolean {
-  return HIT_NAMES.every((name) => {
+  const cleanupSame = !previous.cleanup && !next.cleanup || !!previous.cleanup && !!next.cleanup &&
+    previous.cleanup.visible === next.cleanup.visible && Math.abs(previous.cleanup.x - next.cleanup.x) <= tolerancePx && Math.abs(previous.cleanup.y - next.cleanup.y) <= tolerancePx;
+  return cleanupSame && HIT_NAMES.every((name) => {
     const before = previous[name];
     const after = next[name];
     return before.visible === after.visible
