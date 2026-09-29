@@ -7,7 +7,7 @@
   "definition": "LIFE-00 living-pet overhaul with L01-L22 same-build normal-input evidence; SRS release gates remain separate",
   "reason": "Living scenes, isolated profiles, memory, compact UI and draft assets are connected and automatically checked. Current Release compiles/installs/launches, but CUA reports Mac locked. No current visual, motion, normal-input or 8-10 minute video PASS is claimed.",
   "sourceBaseline": "e7af01fcd01a52ae5607b96f002ae7f5159e2dec",
-  "sourceCheckpoint": "PENDING_LIFE00_CHECKPOINT",
+  "sourceCheckpoint": "22f8249",
   "currentLivingReport": "LIFE-00-REPORT.md",
   "life00": {
     "authoritativeCurrentResult": true,

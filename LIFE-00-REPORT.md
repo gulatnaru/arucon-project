@@ -46,7 +46,7 @@ xcrun simctl launch booted com.arucon.dev
 
 ### 빌드 식별과 증거 위치
 
-- 작업 기준: `e7af01f`(LIFE-00 원문) 이후 코드 체크포인트. 정확한 소스 commit은 후속 Git 기록에서 확인한다.
+- 작업 기준: `e7af01f`(LIFE-00 원문), 검증한 코드 commit **`22f8249`**. 이후 보고서 해시 기록 commit은 앱 소스를 바꾸지 않는다.
 - macOS 15.6 (24G84), Xcode 26.3 (17C529), Expo SDK55, iOS 26.3, iPhone 16e `2170BD93-715C-482E-AD9C-DD7479970003`.
 - Simulator 화면 1170×2532px / 390×844pt, content size `large` 확인. 작은 화면·접근성 큰 글자 실조작은 NOT_RUN.
 - Release bundle SHA256: `c2a26400cc88b76e8e0ef648caca8435104794ad95a5c1ccb485fcbf21fa3938`. DerivedData와 설치 앱의 해시가 동일하다. CFBundleVersion 1. 초기 설치 해시 fe6c19ad는 중간 빌드이며 현재 검증용 설치본이 아니다.

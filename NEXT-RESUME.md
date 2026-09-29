@@ -2,7 +2,7 @@
 
 ## 현재 재개 지점 — LIFE-00 / 2026-09-29
 
-**PARTIAL_WITH_BLOCKERS**. [사용자 원문](tasks/LIFE-00-living-pet-overhaul.md), [현재 보고서](LIFE-00-REPORT.md), [구현 계약](docs/living-pet-design.md)을 읽고 현재 HEAD를 확인한다. ASTRA_DIRECT, 새 subagent 없이 직접 이어간다. 원문 저장/push는 `e7af01f`로 완료했다. 그 이후 생활/공놀이/까꿍/몸짓/기억/성장/격리 체험/초안 자산/UI 변경을 보존한다.
+**PARTIAL_WITH_BLOCKERS**. [사용자 원문](tasks/LIFE-00-living-pet-overhaul.md), [현재 보고서](LIFE-00-REPORT.md), [구현 계약](docs/living-pet-design.md)을 읽고 현재 HEAD를 확인한다. ASTRA_DIRECT, 새 subagent 없이 직접 이어간다. 원문 저장/push는 `e7af01f`, 검증한 코드 체크포인트는 **`22f8249`**다. 이후 보고서 commit은 앱 소스를 바꾸지 않는다. 생활/공놀이/까꿍/몸짓/기억/성장/격리 체험/초안 자산/UI 변경을 보존한다.
 
 다음 한 작업은 **Mac 잠금 해제 후 설치된 Release에서 대표 플레이 §3의 정상 입력을 확인하는 것**이다. `open -a Simulator`, `xcrun simctl launch booted com.arucon.dev`. 메뉴 → 별도 생활 체험 → 공 제안/굴리기 → 펫 누름·놓기 → 쿠션 → 기록 닫기 → 다시 이동. 현재 설치 번들 SHA는 `c2a26400cc88b76e8e0ef648caca8435104794ad95a5c1ccb485fcbf21fa3938`, iPhone 16e/iOS26.3/Release, content size large. Metro 불필요; 8081의 Java를 Metro로 오인해 종료하지 않는다.
 
