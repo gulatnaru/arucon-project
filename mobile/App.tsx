@@ -25,11 +25,12 @@ import { approvedLocalExpoNativeWidgetBridge } from './src/native/aruconWidgetMo
 import { FailClosedNativeWidgetAdapter } from './src/native/widget';
 import { formPresentationText, selectFormPresentation } from './src/scene/formPresentation';
 import { type LifeRoomAction } from './src/presentation/LifeRoomControls';
-import { EXPERIENCE, prepareExperience, experiencePetId } from './src/living/experience';
+import { EXPERIENCE, EXPERIENCE_SCENARIOS, prepareExperience, experiencePetId, parseExperienceProfile, type ExperienceScenario } from './src/living/experience';
 import { chooseLifeLine, emptyLifeMemory, rememberLifeCompletion, lifePreference, LIFE_SCENE_NAMES, type LifeMemory } from './src/living/content';
 import { LifeMemoryStore } from './src/living/memory';
 import type { LifeCommand, LifeEvent, LifeInput, LifeScene } from './src/living/life';
 import { committedToiletScene } from './src/living/committedLife';
+import { growthExpression } from './src/living/growthExpression';
 import { ApprovedFixturePanel, type ApprovedFixtureAction } from './src/presentation/ApprovedFixturePanel';
 import { ApprovedStatusPanel } from './src/presentation/ApprovedStatusPanel';
 import {
@@ -101,18 +102,24 @@ function growthSummary(view: Awaited<ReturnType<ApprovedMvpService['readGrowthVi
   const form = view.form?.formId ?? view.state.formId;
   const sex = view.sex ?? '미정';
   const formPresentation = selectFormPresentation(form);
-  return `성장 Lv.${projection.level} · 단계 ${projection.stage} · ${formPresentationText(formPresentation)} · 성별 ${sex}`;
+  const exp = (view.state.totalExpUnits / APPROVED_GROWTH_POLICY.expScale).toLocaleString('ko-KR', { maximumFractionDigits: 6 });
+  return `성장 Lv.${projection.level} · EXP ${exp} · 수면 보너스 ×${view.state.sleepGrowthMultiplier} · ${formPresentationText(formPresentation)} · 성별 ${sex}`;
 }
 
 function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (value: RoomProfile) => void }) {
   const experience = profile !== 'original';
-  const petId = experience ? experiencePetId(profile) : PET_ID;
+  const selected = parseExperienceProfile(profile);
+  const scenario = selected?.scenario ?? 'normal';
+  const runKey = selected?.runKey;
+  const petId = experience ? experiencePetId(scenario, runKey) : PET_ID;
   const insets = useSafeAreaInsets();
   const [phase, setPhase] = useState<'loading' | 'onboarding' | 'room' | 'load_error'>('loading');
   const [pet, setPet] = useState<PetState | null>(null);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [memoryWarning, setMemoryWarning] = useState<string | null>(null);
+  const [growthWarning, setGrowthWarning] = useState<string | null>(null);
+  const [growthNotice, setGrowthNotice] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [fixtureVisible, setFixtureVisible] = useState(false);
   const [journal, setJournal] = useState<JournalEntry[] | null>(null);
@@ -188,7 +195,8 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     if (reduceDialogue && automatic && scene !== 'offer') return;
     if (automatic && Date.now() < autoSpeechAfterRef.current) return;
     const memory = replay ? { ...lifeMemoryRef.current } : lifeMemoryRef.current;
-    const chosen = chooseLifeLine(memory, scene, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', Date.now(), automatic);
+    const chosen = chooseLifeLine(memory, scene, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', Date.now(), automatic, Math.random, undefined,
+      state.food <= 0 ? 'no_food' : !state.tableInstalled ? 'no_table' : !state.autoFeedOptIn ? 'manual' : 'ready');
     if (!chosen) return;
     lifeTraceRef.current = [...lifeTraceRef.current, { scene, lineId: chosen.id, eligible: chosen.eligible, excludedRecent: chosen.excludedRecent, automatic, replay, kind: 'shown', atMs: Date.now() }].slice(-64);
     cancelLifeBubble();
@@ -292,16 +300,29 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       const beforeState = petRef.current;
       const beforeExp = petRef.current?.totalExpUnits ?? 0;
       const result = await task();
-      const state = resultState(result);
+      let state = resultState(result);
+      if (state && beforeState && state.petId === beforeState.petId && state.totalExpUnits > beforeExp && serviceRef.current) {
+        try {
+          state = (await serviceRef.current.resolveEligibleGrowth(Math.random)).state;
+          setGrowthWarning(null);
+        } catch { setGrowthWarning('식사는 저장됐지만 성장 결과를 확인하지 못했어요. 다시 확인할 수 있어요.'); }
+        const before = projectGrowth(beforeExp, APPROVED_GROWTH_POLICY);
+        const after = projectGrowth(state.totalExpUnits, APPROVED_GROWTH_POLICY);
+        if (before.level !== after.level || beforeState?.formId !== state.formId) {
+          const shape = beforeState?.formId !== state.formId ? ` · ${selectFormPresentation(state.formId).displayName}의 새 모습` : '';
+          setGrowthNotice(`Lv.${before.level} → Lv.${after.level}${shape}`);
+        } else setGrowthNotice(`식사로 +${((state.totalExpUnits - beforeExp) / APPROVED_GROWTH_POLICY.expScale).toLocaleString('ko-KR', { maximumFractionDigits: 6 })} EXP · Lv.${after.level}`);
+      }
       if (state) publish(state);
       if (allowLifeProjection && state && beforeState && AppState.currentState === 'active') {
         const toiletToken = committedToiletScene(beforeState, state);
         if (toiletToken) setLifeCommand({ token: toiletToken, kind: 'toilet' });
       }
-      if (state && cue && state.totalExpUnits > beforeExp && serviceRef.current) {
+      if (allowLifeProjection && state && beforeState && state.petId === beforeState.petId && state.totalExpUnits > beforeExp && serviceRef.current) {
         try {
           const entries = await serviceRef.current.readJournal();
-          const policy: MealCuePolicy = { mode: cue.mode, atMs: cue.atMs?.() };
+          const policy: MealCuePolicy = { mode: cue?.mode ?? 'auto', atMs: cue?.atMs?.() ?? state.lastSimulatedAtMs,
+            sinceMs: beforeState?.lastSimulatedAtMs };
           const confirmed = confirmedMealCue(beforeExp, state.totalExpUnits, entries, policy, petId);
           if (confirmed) {
             setMealCue(confirmed);
@@ -315,7 +336,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
           }
         } catch { /* A visual cue must never turn a committed meal into a failed command. */ }
       }
-      if (serviceRef.current && !quiet) await refreshReadModels(serviceRef.current, state?.lastSimulatedAtMs ?? serviceTime());
+      if (serviceRef.current && (!quiet || (state && state.totalExpUnits > beforeExp))) await refreshReadModels(serviceRef.current, state?.lastSimulatedAtMs ?? serviceTime());
       retryRef.current = null;
       setFailure(null);
     } catch (error) {
@@ -369,7 +390,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     connection: SqlConnection, state: PetState, migration: boolean,
   ): Promise<ApprovedMvpService> => {
     if (experience) {
-      const service = await prepareExperience(connection, state.givenName, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', state.lastSimulatedAtMs, profile);
+      const service = await prepareExperience(connection, state.givenName, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', state.lastSimulatedAtMs, scenario, runKey);
       serviceRef.current = service;
       return service;
     }
@@ -396,7 +417,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     serviceRef.current = service;
     setRuntimeBadge(service.status.badge);
     return service;
-  }, [experience, petId, profile]);
+  }, [experience, petId, runKey, scenario]);
 
   const initialize = useCallback(async () => {
     if (bootingRef.current) return;
@@ -423,7 +444,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
           await service.beginGameDay(utcFixtureDay(now), now);
           const receipt = await service.returnToForeground(now);
           publish(receipt.state);
-          setNotice(receipt.notice);
+          if (receipt.status === 'withheld_partial') setNotice(receipt.notice);
+          try { publish((await service.resolveEligibleGrowth(Math.random)).state); }
+          catch { setGrowthWarning('저장된 성장 결과를 확인하지 못했어요. 게임 기록은 유지됩니다.'); }
         } catch (error) {
           if (!(error instanceof ReadOnlyWriterError)) throw error;
           setNotice(error.message);
@@ -492,7 +515,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       const service = await installApprovedRuntime(connection, state, false);
       await installReactionRuntime(state.petId);
       await service.beginGameDay(utcFixtureDay(createdAtMs), createdAtMs);
-      const current = await service.currentState();
+      const current = (await service.resolveEligibleGrowth(Math.random)).state;
       setPhase('room');
       setNotice('체험 모드 — 실제 걸음·수면은 연결하지 않았어요.');
       return current;
@@ -809,6 +832,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     {experience ? <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 24, gap: 18 }}>
       <Text style={styles.fixtureTitle}>작은 친구를 만나 볼까요?</Text>
       <Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 체험용 먹이와 공·쿠션·화장실이 있는 별도 방이에요. 기존 방은 보존됩니다.</Text>
+      {(scenario === 'auto_growth' || scenario.startsWith('evolution_') || scenario.startsWith('sleep_')) && <Text>이 경계 체험은 자동급식에 동의한 식탁과 합성 활동으로 얻은 먹이를 준비합니다. 약 20~30초 관찰하면 정상 시간·식사 서비스로 성장합니다. 진화 체험의 7일 이력도 합성이며 일반 방에 넣지 않습니다.</Text>}
       <TextInput accessibilityLabel="체험 펫 이름" placeholder="이름 (비워 두면 아루콘)" maxLength={20} value={experienceName} onChangeText={setExperienceName} style={styles.nameInput} />
       <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => setExperiencePersonality(value => value === 'reserved' ? 'expressive' : 'reserved')}><Text>성격: {experiencePersonality === 'reserved' ? '새침하지만 다정한 아이' : '솔직하게 반기는 아이'}</Text></Pressable>
       <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => startDevPet({ givenName: experienceName.trim() || '아루콘' })}><Text>함께 지내기</Text></Pressable>
@@ -847,7 +871,8 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         lifePreference={lifePreference(lifeMemoryRef.current)}
         growthStage={projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage}
         poopCount={pet.poopCount}
-        hungry={pet.food > 0 && pet.hunger >= APPROVED_GAME_CONFIG.proposal.mealHungerThreshold}
+        hungry={pet.hunger >= APPROVED_GAME_CONFIG.proposal.mealHungerThreshold}
+        mealAvailability={pet.food <= 0 ? 'no_food' : !pet.tableInstalled ? 'no_table' : !pet.autoFeedOptIn ? 'manual' : 'ready'}
         onCleanup={() => doLifeAction('clean')}
         ballPlayInput={game === 'ball'}
         topOcclusion={insets.top + (evaluation ? 8 : topHeight + 16)}
@@ -904,6 +929,11 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     {!evaluation && <View onLayout={event => setControlsHeight(event.nativeEvent.layout.height)} style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
       {!!notice && <Text style={styles.notice}>{notice}</Text>}
       {memoryWarning && <Text accessibilityRole="alert" style={styles.notice}>{memoryWarning}</Text>}
+      {growthWarning && <View style={styles.errorBox}><Text accessibilityRole="alert">{growthWarning}</Text><Pressable accessibilityRole="button" onPress={() => {
+        const service = serviceRef.current; if (!service) return;
+        void runTask(async () => { const view = await service.resolveEligibleGrowth(Math.random); setGrowthWarning(null); return view.state; });
+      }}><Text>성장 결과 다시 확인</Text></Pressable></View>}
+      {growthNotice && <Pressable accessibilityRole="button" style={styles.notice} onPress={() => { setGrowthNotice(null); openMenu('details'); }}><Text>새로운 성장 · {growthNotice} · 보기</Text></Pressable>}
       {failure && <View style={styles.errorBox}>
         <Text>저장 중 오류: {failure}</Text>
         <Pressable accessibilityRole="button" onPress={retry}><Text>같은 요청 다시 시도</Text></Pressable>
@@ -950,9 +980,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
               <Text>실제 건강정보 연결 OFF · 실결제 OFF</Text>
               <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('clean'); }}><Text>청결 확인 / 남은 것 치우기</Text></Pressable>
               <Text>아래는 일반 방과 분리된 저장이에요. 처음 만들 때만 체험 상태가 준비됩니다.</Text>
-              {(['normal', 'expressive', 'growth', 'toilet', 'cleanup'] as const).map((value, i) => <Pressable key={value} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => onProfile(value)}><Text>{['기본 생활 체험', '솔직한 성격 체험', '성장 직전 체험', '화장실 생활 체험', '잔여 청소 체험'][i]}</Text></Pressable>)}
+              {(Object.keys(EXPERIENCE_SCENARIOS) as ExperienceScenario[]).map(value => <Pressable key={value} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => onProfile(value === 'auto_growth' || value.startsWith('evolution_') || value.startsWith('sleep_') ? `${value}#${Date.now()}` : value)}><Text>{EXPERIENCE_SCENARIOS[value]}</Text></Pressable>)}
             </>}
-            {menu === 'details' && <><Text>{growthText}</Text><Text>{pet.personalityProfileId === 'expressive' ? '솔직하게 마음을 표현하는 아이' : '새침하지만 다정하게 다가오는 아이'}</Text><Text>먹이를 먹으며 자라고, 함께한 놀이는 최근 기억으로 남아요. 첫 성장 단계를 지나면 몸짓 놀이에서 두 앞발로 응답해요.</Text>
+            {menu === 'details' && <><Text>{growthText}</Text><Text>{pet.personalityProfileId === 'expressive' ? '솔직하게 마음을 표현하는 아이' : '새침하지만 다정하게 다가오는 아이'}</Text><Text>{growthExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage).description}</Text><Text>{growthExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage).next}</Text>
               {!!lifeMemoryRef.current.completed.length && <Text>함께한 작은 장면 · 다시 보기는 보상과 기억을 추가하지 않아요.</Text>}
               {[...new Set(lifeMemoryRef.current.completed.map(x => x.scene))].slice(-6).map(scene => <Pressable key={scene} accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); setNotice('추억 다시 보기 · 보상과 기억은 추가하지 않아요.'); lifeInput(scene, true); }}><Text>{LIFE_SCENE_NAMES[scene]}</Text></Pressable>)}
             </>}

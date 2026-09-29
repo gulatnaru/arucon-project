@@ -11,6 +11,7 @@ export const FUN01_PERFORMANCE_BUDGET = Object.freeze({
 
 export const FUN01_MIN_BUDGET_SAMPLES = 5;
 export const FUN01_MEASUREMENT_WINDOW_MS = 10_000;
+export const INPUT_MEASUREMENT_WINDOW_MS = 60_000;
 
 export type PerformanceBudgetStatus = 'pass' | 'fail' | 'insufficient_data';
 export type RoomInputSource = 'touch' | 'accessibility';
@@ -29,6 +30,7 @@ export type RoomPerformanceSummary = {
   proxyNotice: string;
   phaseCost: Record<'morph' | 'draw' | 'queueDrain', MetricSummary>;
   budgetSource: 'LIFE-00-13';
+  inputMeasurementWindowMs: number;
   budgets: typeof FUN01_PERFORMANCE_BUDGET;
   inputSamplesBySource: Readonly<Record<RoomInputSource, number>>;
   inputHandlerDuration: MetricSummary;
@@ -206,16 +208,16 @@ export class RoomPerformanceProbe {
     this.resetRafClock();
   }
 
-  private windowValues(buffer: RingBuffer<TimedSample>, capturedAtMs: number): readonly number[] {
-    const earliest = capturedAtMs - FUN01_MEASUREMENT_WINDOW_MS;
+  private windowValues(buffer: RingBuffer<TimedSample>, capturedAtMs: number, windowMs = FUN01_MEASUREMENT_WINDOW_MS): readonly number[] {
+    const earliest = capturedAtMs - windowMs;
     return buffer.values().filter(sample => sample.atMs >= earliest && sample.atMs <= capturedAtMs).map(sample => sample.value);
   }
 
   snapshot(): RoomPerformanceSummary {
     const capturedAtMs = this.now();
-    const handler = summarize(this.windowValues(this.inputHandlerDurationMs, capturedAtMs));
-    const inputRaf = summarize(this.windowValues(this.inputToNextRafMs, capturedAtMs));
-    const inputSubmission = summarize(this.windowValues(this.inputToNextSubmissionMs, capturedAtMs));
+    const handler = summarize(this.windowValues(this.inputHandlerDurationMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
+    const inputRaf = summarize(this.windowValues(this.inputToNextRafMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
+    const inputSubmission = summarize(this.windowValues(this.inputToNextSubmissionMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
     const rafValues = this.windowValues(this.rafIntervalsMs, capturedAtMs);
     const raf = summarize(rafValues);
     const submissionValues = this.windowValues(this.submissionIntervalsMs, capturedAtMs);
@@ -224,7 +226,7 @@ export class RoomPerformanceProbe {
     const windowSubmissionTimestamps = this.submissionTimestampsMs.values()
       .filter(timestamp => timestamp >= earliest && timestamp <= capturedAtMs);
     const inputSamplesBySource = this.inputSources.values()
-      .filter(sample => sample.atMs >= earliest && sample.atMs <= capturedAtMs)
+      .filter(sample => sample.atMs >= capturedAtMs - INPUT_MEASUREMENT_WINDOW_MS && sample.atMs <= capturedAtMs)
       .reduce<Record<RoomInputSource, number>>((counts, sample) => {
         counts[sample.source]++;
         return counts;
@@ -240,6 +242,7 @@ export class RoomPerformanceProbe {
       capturedAtMs,
       profileId: this.profileId,
       budgetSource: 'LIFE-00-13',
+      inputMeasurementWindowMs: INPUT_MEASUREMENT_WINDOW_MS,
       phaseCost: { morph: summarize(this.windowValues(this.phaseCost.morph, capturedAtMs)),
         draw: summarize(this.windowValues(this.phaseCost.draw, capturedAtMs)), queueDrain: summarize(this.windowValues(this.phaseCost.queueDrain, capturedAtMs)) },
       proxyNotice: 'input-to-RAF, input-to-endFrameEXP and RAF-gap values are timing proxies; they do not measure touch-to-photon latency, native-thread lock or visible FPS',

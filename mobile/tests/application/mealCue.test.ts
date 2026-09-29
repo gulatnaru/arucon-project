@@ -19,3 +19,10 @@ test('only confirmed new EXP and the current meal event generate a room cue', ()
   assert.equal(confirmedMealCue(0, 15, [auto], { mode: 'auto', atMs: 200 }, 'pet'), null);
   assert.equal(confirmedMealCue(0, 15, [], { mode: 'direct' }, 'pet'), null);
 });
+
+test('foreground auto meal inside a polling interval is shown once without replaying older or foreign meals', () => {
+  assert.deepEqual(confirmedMealCue(0, 15, [auto], { mode: 'auto', sinceMs: 90, atMs: 120 }, 'pet'), { token: auto.id, mode: 'auto' });
+  assert.equal(confirmedMealCue(15, 15, [auto], { mode: 'auto', sinceMs: 90, atMs: 120 }, 'pet'), null);
+  assert.equal(confirmedMealCue(0, 15, [auto], { mode: 'auto', sinceMs: 101, atMs: 120 }, 'pet'), null);
+  assert.equal(confirmedMealCue(0, 15, [auto], { mode: 'auto', sinceMs: 90, atMs: 120 }, 'another-pet'), null);
+});

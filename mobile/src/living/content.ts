@@ -2,6 +2,13 @@ import type { LifeScene } from './life';
 import { LIFE } from './life';
 
 type Lines = Readonly<{ reserved: readonly string[]; expressive: readonly string[] }>;
+export type MealAvailability = 'ready' | 'no_food' | 'no_table' | 'manual';
+const HUNGER_LINES: Record<MealAvailability, Lines> = {
+  ready: { reserved: ['그릇 쪽에 가 볼까.', '조금 먹어도 되겠네.'], expressive: ['밥 먹으러 갈래.', '그릇 앞에 앉아야지.'] },
+  no_food: { reserved: ['먹이는 준비되면 먹을게.', '지금은 먹이가 없네.'], expressive: ['먹이가 생기면 먹자.', '밥은 준비되면 먹을게.'] },
+  no_table: { reserved: ['여기서 한 입 먹을까?', '그릇 대신 여기서 먹어도 돼.'], expressive: ['손으로 한 입 줄래?', '여기 앉아서 먹을래.'] },
+  manual: { reserved: ['밥 먹을까?', '그릇 앞에서 잠깐 쉴게.'], expressive: ['한 입 먹고 싶어.', '밥 주면 여기서 먹을게.'] },
+};
 /** Each category is reached from a performed living intent, never a diagnostic-only line picker. */
 export const LIFE_LINES: Readonly<Record<LifeScene, Lines>> = {
   hungry: { reserved: ['그릇 쪽에 가 볼까.', '조금 먹어도 되겠네.'], expressive: ['간식 먹고 싶어.', '그릇 앞에서 기다릴게.'] },
@@ -30,11 +37,12 @@ export type LifeMemory = { schemaVersion: 1; petId: string; shown: { id: string;
 export const emptyLifeMemory = (petId: string): LifeMemory => ({ schemaVersion: 1, petId, shown: [], completed: [], lastAutomaticAtMs: 0 });
 
 export function chooseLifeLine(memory: LifeMemory, scene: LifeScene, personality: 'reserved' | 'expressive', atMs: number,
-  automatic: boolean, random = Math.random, catalog = LIFE_LINES): { text: string; id: string; eligible: string[]; excludedRecent: string[] } | null {
+  automatic: boolean, random = Math.random, catalog = LIFE_LINES, need?: MealAvailability): { text: string; id: string; eligible: string[]; excludedRecent: string[] } | null {
   if (automatic && atMs >= memory.lastAutomaticAtMs && atMs - memory.lastAutomaticAtMs < LIFE.speechGapMs) return null;
   // Quiet observation deliberately includes wordless stretches, looks and pauses.
-  if (automatic && scene !== 'offer' && random() < .65) return null;
-  const candidates = catalog[scene][personality].map((text, index) => ({ text, id: `${scene}:${personality}:${index}` }));
+  if (automatic && scene !== 'offer' && scene !== 'hungry' && random() < .65) return null;
+  const lines = scene === 'hungry' && need ? HUNGER_LINES[need] : catalog[scene];
+  const candidates = lines[personality].map((text, index) => ({ text, id: `${scene}:${scene === 'hungry' && need ? `${need}:` : ''}${personality}:${index}` }));
   if (scene === 'offer' && memory.completed.some(x => x.scene === 'ball' && atMs >= x.atMs && atMs - x.atMs < 3_600_000)) {
     candidates.push({ text: personality === 'reserved' ? '아까 그거, 한 번 더?' : '아까 공놀이 또 하자!', id: `offer:${personality}:remember` });
   }

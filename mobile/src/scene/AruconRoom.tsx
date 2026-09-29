@@ -98,6 +98,7 @@ export function AruconRoom(props: RoomProps) {
     props.growthStage,
     props.poopCount,
     props.hungry,
+    props.mealAvailability,
     systemReduced,
   ]);
 

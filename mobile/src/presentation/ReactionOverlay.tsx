@@ -13,13 +13,11 @@ export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = fals
     return null;
   }
   return <View accessibilityLiveRegion="polite" style={styles.bubble} testID="reaction-dialogue">
-    <View style={styles.heading}>
-      <Pressable accessibilityRole="button" accessibilityLabel="대화 닫기" hitSlop={8} onPress={onClose} style={{ minWidth: 40, minHeight: 36, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={styles.close}>×</Text>
-      </Pressable>
-    </View>
+    <Pressable accessibilityRole="button" accessibilityLabel="대화 닫기" onPress={onClose} style={styles.dismiss}>
+      <Text style={styles.close}>×</Text>
+    </Pressable>
     <ScrollView style={styles.message} contentContainerStyle={styles.messageContent} bounces={false}>
-      <Text style={styles.text}>{view.text}</Text>
+      <Text style={[styles.text, { paddingRight: 30 }]}>{view.text}</Text>
       {!!view.choices.length && <View style={styles.choices}>
       {view.choices.map(choice => <Pressable
         key={choice.id}
@@ -35,7 +33,8 @@ export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = fals
 }
 
 const styles = StyleSheet.create({
-  bubble: { width: '100%', flexShrink: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8, gap: 4, backgroundColor: '#fff9ed' },
+  bubble: { width: '100%', minHeight: 46, flexShrink: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#fff9ed' },
+  dismiss: { position: 'absolute', right: 0, top: 0, width: 44, height: 44, zIndex: 2, alignItems: 'center', justifyContent: 'center' },
   reduced: { alignSelf: 'center', minHeight: 38, justifyContent: 'center', borderRadius: 12, paddingHorizontal: 12, backgroundColor: '#fff9edcc' },
   reducedText: { color: '#715443', fontSize: 12, fontWeight: '800' },
   heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', minHeight: 36 },

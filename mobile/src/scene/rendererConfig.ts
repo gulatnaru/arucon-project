@@ -2,13 +2,14 @@ export type RoomRendererConfig = {
   msaaSamples: number;
   contextAntialias: boolean;
   maxPixelRatio: number;
-  roomMaterial: 'standard' | 'lambert' | 'basic';
-  petMaterial: 'source' | 'lambert';
+  roomMaterial: 'standard' | 'lambert' | 'basic' | 'vertex_lit';
+  petMaterial: 'source' | 'lambert' | 'vertex_lit';
 };
 
 export type RoomRendererProfileId =
   | 'automatic'
   | 'software_legacy_333'
+  | 'software_balanced'
   | 'software_low_resolution';
 
 export type ResolvedRoomRendererProfile = RoomRendererConfig & {
@@ -75,8 +76,9 @@ export function resolveRoomRendererProfile(
 ): ResolvedRoomRendererProfile {
   const softwareRenderer = isAppleSoftwareRenderer(platform, identity);
   if (requested === 'automatic' && softwareRenderer) {
-    return { id: 'software_low_resolution', ...SOFTWARE_LOW_RESOLUTION, submissionIntervalMs: 33 };
+    return { id: 'software_balanced', ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', maxPixelRatio: 1.5, submissionIntervalMs: 0 };
   }
+  if (requested === 'software_balanced') return { id: requested, ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', maxPixelRatio: 1.5, submissionIntervalMs: 0 };
   if (requested === 'software_legacy_333') {
     return { id: requested, ...selectRoomRendererConfig(development), submissionIntervalMs: softwareRenderer ? 333 : 0 };
   }

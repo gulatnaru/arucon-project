@@ -34,7 +34,7 @@ export function JournalPanel({ entries, onClose, topInset, bottomInset }: Journa
         </View>
         <ScrollView accessibilityLabel="생활 기록 목록" contentContainerStyle={styles.content}>
           {entries?.length
-            ? entries.map(entry => <Text key={entry.id} style={styles.entry}>{journalEventText(entry.event)}</Text>)
+            ? [...entries].reverse().map(entry => <Text key={entry.id} style={styles.entry}>{journalEventText(entry.event)}</Text>)
             : <Text style={styles.empty}>아직 기록이 없어요.</Text>}
         </ScrollView>
       </View>

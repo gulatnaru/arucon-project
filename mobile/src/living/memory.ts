@@ -25,7 +25,7 @@ export class LifeMemoryStore {
   save(value: LifeMemory) {
     this.validate(value);
     const snapshot = JSON.stringify(value);
-    const work = this.tail.then(() => this.db.runAsync('INSERT INTO living_memory (pet_id, snapshot) VALUES (?, ?) ON CONFLICT(pet_id) DO UPDATE SET snapshot = excluded.snapshot', [this.petId, snapshot])).then(() => undefined);
+    const work = this.tail.then(() => this.db.withExclusiveTransactionAsync(tx => tx.runAsync('INSERT INTO living_memory (pet_id, snapshot) VALUES (?, ?) ON CONFLICT(pet_id) DO UPDATE SET snapshot = excluded.snapshot', [this.petId, snapshot]))).then(() => undefined);
     this.tail = work.catch(() => undefined);
     return work;
   }

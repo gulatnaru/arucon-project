@@ -18,6 +18,7 @@ export type RoomProps = {
   growthStage?: number | 'final';
   poopCount?: number;
   hungry?: boolean;
+  mealAvailability?: 'ready' | 'no_food' | 'no_table' | 'manual';
   onCleanup?: () => void;
   formId?: FormId;
   personality?: 'reserved' | 'expressive';

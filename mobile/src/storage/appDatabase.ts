@@ -1,6 +1,6 @@
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
-import type { ExperienceScenario } from '../living/experience';
-export type RoomProfile = 'original' | ExperienceScenario;
+import { parseExperienceProfile, type ExperienceScenario } from '../living/experience';
+export type RoomProfile = 'original' | ExperienceScenario | `${ExperienceScenario}#${number}`;
 
 const databases = new Map<string, Promise<SQLiteDatabase>>();
 
@@ -29,7 +29,7 @@ export async function readExperienceProfile(): Promise<RoomProfile> {
   const db = await profileDatabase();
   const row = await db.getFirstAsync<{ value: string }>("SELECT value FROM presentation_settings WHERE key = 'experience'");
   if (row?.value === 'yes') return 'normal';
-  return ['normal', 'expressive', 'growth', 'toilet', 'cleanup'].includes(row?.value ?? '') ? row!.value as RoomProfile : 'original';
+  return row && parseExperienceProfile(row.value) ? row.value as RoomProfile : 'original';
 }
 export async function saveExperienceProfile(profile: RoomProfile): Promise<void> {
   const db = await profileDatabase();

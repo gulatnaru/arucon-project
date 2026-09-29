@@ -36,8 +36,24 @@ for (const relative of [true, false]) test(`CPU morph matches GPU weighted sum (
   geometry.dispose(); (mesh.material as THREE.Material).dispose();
 });
 
-test('original and both candidate GLBs retain their animated morph equations on software GL', async () => {
-  for (const file of ['arucon_tsundere_motion.glb', 'character-candidates/arucon_v2_moderate.glb', 'character-candidates/arucon_v2_plump.glb']) {
+test('a zero-delta blink cannot re-upload unrelated body positions or normals', () => {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0,1,0,0,0,1,0], 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute([0,0,1,0,0,1,0,0,1], 3));
+  g.morphTargetsRelative = true;
+  g.morphAttributes.position = [new THREE.Float32BufferAttribute([0,.2,0,0,0,0,0,0,0], 3), new THREE.Float32BufferAttribute(Array(9).fill(0), 3)];
+  g.morphAttributes.normal = [new THREE.Float32BufferAttribute(Array(9).fill(0), 3), new THREE.Float32BufferAttribute(Array(9).fill(0), 3)];
+  const mesh = new THREE.Mesh(g); const root = new THREE.Group(); root.add(mesh); const bake = prepareCpuMorphs(root);
+  bake(); const p = g.getAttribute('position') as THREE.BufferAttribute, n = g.getAttribute('normal') as THREE.BufferAttribute;
+  const pVersion = p.version, nVersion = n.version;
+  mesh.morphTargetInfluences![1] = .9; bake();
+  assert.equal(p.version, pVersion); assert.equal(n.version, nVersion);
+  mesh.morphTargetInfluences![0] = .5; bake();
+  assert.ok(p.version > pVersion); assert.equal(n.version, nVersion); assert.ok(Math.abs(p.getY(0) - .1) < 1e-6);
+});
+
+test('original and living candidate GLBs retain their animated morph equations on software GL', async () => {
+  for (const file of ['arucon_tsundere_motion.glb', 'character-candidates/arucon_v2_moderate.glb', 'character-candidates/arucon_v2_plump.glb', 'living-characters/baby_v3.glb', 'living-characters/mallu.glb', 'living-characters/mono.glb', 'living-characters/piko.glb', 'living-characters/mongle.glb']) {
     const bytes = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../assets', file));
     const data = new Uint8Array(bytes.length); data.set(bytes);
     const gltf = await parseGlb(data.buffer);

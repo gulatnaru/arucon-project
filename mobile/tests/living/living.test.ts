@@ -11,6 +11,8 @@ import { APPROVED_GAME_CONFIG } from '../../src/domain/config';
 import { LocalPetStore } from '../../src/storage/sqlite';
 import { committedToiletScene } from '../../src/living/committedLife';
 import { projectGrowth, APPROVED_GROWTH_POLICY } from '../../src/progression/projection';
+import { confirmedMealCue } from '../../src/application/mealCue';
+import { growthExpression } from '../../src/living/growthExpression';
 
 class DB {
   native = new DatabaseSync(':memory:'); tail = Promise.resolve(); fail = '';
@@ -43,8 +45,8 @@ function actor(random = () => .4) {
   }
   return { life, world, events, step };
 }
-test('two minutes include purposeful nonmovement families and a finite unpressured offer', () => {
-  const a = actor(); a.step(120);
+test('LIFE-01 three-minute observation includes purposeful families and an optional finite offer', () => {
+  const a = actor(); a.step(180);
   assert.ok(new Set(a.events.filter(e => e.phase === 'perform').map(e => e.scene)).size >= 3);
   assert.ok(a.events.some(e => e.scene === 'offer' && e.phase === 'waiting'));
   assert.ok(a.events.some(e => e.scene === 'offer' && e.phase === 'complete'));
@@ -130,4 +132,52 @@ test('isolated toilet and growth fixtures use ordinary time/meal services; absen
   const beforeMeal = await growth.currentState(); const afterMeal = await growth.feedDirect(0, 'fixture-real-meal');
   assert.ok(projectGrowth(afterMeal.totalExpUnits, APPROVED_GROWTH_POLICY).stage > projectGrowth(beforeMeal.totalExpUnits, APPROVED_GROWTH_POLICY).stage);
   assert.equal((await toilet.currentState()).totalExpUnits, 0);
+});
+
+const origin = Date.parse('2026-09-29T12:00:00Z');
+test('synthetic activity -> earned food -> unattended threshold meal -> actual level and persistence, no manual play', async () => {
+  const db = new DB(); const service = await prepareExperience(db, '보리', 'reserved', origin, 'auto_growth', '1');
+  const before = await service.currentState(); assert.equal(before.food, 1); assert.equal(before.autoFeedOptIn, true);
+  assert.equal(projectGrowth(before.totalExpUnits, APPROVED_GROWTH_POLICY).level, 5);
+  const eaten = await service.advanceTo(origin + 30_000);
+  const view = await service.resolveEligibleGrowth(() => .3);
+  assert.equal(view.projection.level, 6); assert.equal(eaten.food, 0);
+  assert.equal(eaten.totalExpUnits - before.totalExpUnits, 15_000_000);
+  assert.ok(confirmedMealCue(before.totalExpUnits, eaten.totalExpUnits, await service.readJournal(), { mode: 'auto', sinceMs: origin, atMs: origin + 30_000 }, before.petId));
+  assert.equal((await service.deriveCareProfile()).interactionDays, 0);
+  const reload = await prepareExperience(db, '이름 변경 금지', 'expressive', origin + 30_000, 'auto_growth', '1');
+  const same = await reload.resolveEligibleGrowth(() => { throw Error('must not reroll'); });
+  assert.equal(same.state.givenName, '보리'); assert.equal(same.state.personalityProfileId, 'reserved');
+  assert.equal(same.state.totalExpUnits, eaten.totalExpUnits); assert.equal(same.sex, view.sex);
+});
+for (const form of ['piko', 'mongle', 'mallu', 'mono']) test(`real auto meal resolves ${form} from labeled synthetic care history and stays fixed after restart`, async () => {
+  const db = new DB(); const service = await prepareExperience(db, '아루콘', 'reserved', origin, `evolution_${form}`);
+  const before = await service.currentState(); assert.equal(before.formId, 'arucon');
+  assert.equal(projectGrowth(before.totalExpUnits, APPROVED_GROWTH_POLICY).level, 15);
+  await service.advanceTo(origin + 30_000); const grown = await service.resolveEligibleGrowth(() => .4);
+  assert.equal(grown.state.formId, form); assert.equal(grown.projection.level, 16);
+  const loaded = await prepareExperience(db, 'other', 'expressive', origin + 60_000, `evolution_${form}`);
+  const restored = await loaded.resolveEligibleGrowth(() => { throw Error('must not reroll'); });
+  assert.equal(restored.state.formId, form); assert.equal(restored.state.totalExpUnits, grown.state.totalExpUnits);
+  assert.equal(restored.state.personalityProfileId, 'reserved');
+});
+test('otherwise equal isolated no-data and synthetic sleep bonus cases consume through the same service', async () => {
+  const db = new DB(); const plain = await prepareExperience(db, '같은 아이', 'reserved', origin, 'sleep_plain');
+  const bonus = await prepareExperience(db, '같은 아이', 'reserved', origin, 'sleep_bonus');
+  const a = await plain.advanceTo(origin + 30_000), b = await bonus.advanceTo(origin + 30_000);
+  assert.equal(a.food, 0); assert.equal(b.food, 0);
+  assert.equal(a.totalExpUnits, 15_000_000); assert.equal(b.totalExpUnits, 18_750_000);
+  assert.equal(a.sleepGrowthMultiplier, 1); assert.equal(b.sleepGrowthMultiplier, 1.25);
+});
+test('hunger is one episode per need-state, does not require a ball and never becomes an economic interaction', () => {
+  const a = actor(); a.world.ball = false; a.world.cushion = false; a.world.hungry = true; a.world.mealAvailability = 'no_food';
+  a.step(180); assert.equal(a.events.filter(e => e.scene === 'hungry' && e.phase === 'perform').length, 1);
+  assert.ok(new Set(a.events.filter(e => e.phase === 'complete').map(e => e.scene)).size >= 3);
+  a.world.hungry = false; a.step(30); a.world.hungry = true; a.step(60);
+  assert.equal(a.events.filter(e => e.scene === 'hungry' && e.phase === 'perform').length, 2);
+});
+test('growth changes body presence and autonomous stretch/settle expressions without touching EXP policy', () => {
+  const baby = growthExpression(1), child = growthExpression(2), evolved = growthExpression(3);
+  assert.ok(child.scale > baby.scale && child.stretchLift > baby.stretchLift && child.settleLean > baby.settleLean);
+  assert.ok(evolved.scale > child.scale); assert.equal(growthExpression('final').maturity, 4);
 });

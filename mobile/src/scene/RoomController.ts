@@ -1,5 +1,6 @@
 import { Asset } from 'expo-asset';
 import { LivingPet, type LifeCommand, type LifeEvent, type LifeWorld } from '../living/life';
+import { growthExpression } from '../living/growthExpression';
 import { prepareCpuMorphs } from './cpuMorph';
 import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
@@ -24,6 +25,7 @@ import type { FloorPoint, RoomProps } from './types';
 import { RoomPerformanceProbe, type RoomPerformanceSummary } from './performanceProbe';
 import { canStartRoomInteraction, resolveRoomInteraction } from './interactionLifecycle';
 import { applyPetMaterialProfile } from './rendererMaterials';
+import { vertexLitMaterial } from './vertexLitMaterial';
 import { batchStaticRoom } from './staticRoomBatch';
 import {
   DEFAULT_CHARACTER_CANDIDATE_ID,
@@ -133,7 +135,9 @@ export class RoomController {
   private frontPaw?: THREE.Object3D;
   private leftPaw?: THREE.Object3D;
   private growthStage = 1;
+  private growthStyle = growthExpression(1);
   private hungry = false;
+  private mealAvailability: RoomProps['mealAvailability'] = 'ready';
   private cleanupProp?: THREE.Object3D;
   private toiletCurtain?: THREE.Object3D;
   private lifePreference?: RoomProps['lifePreference'];
@@ -156,7 +160,8 @@ export class RoomController {
     return { awake: !this.sleeping, enabled: this.interactionEnabled && this.modelReady && !this.comparisonMode,
       touching: this.touchHolding, moving: this.path.length > 0, committed: this.cueCommitted && this.cueRemaining > 0,
       ball: !!this.furniture.ball?.visible, cushion: !!this.furniture.cushion?.visible, toilet: !!this.furniture.toilet?.visible, table: !!this.furniture.table?.visible,
-      position: this.position, preference: this.lifePreference, personality: this.profile, hungry: this.hungry };
+      position: this.position, preference: this.lifePreference, personality: this.profile, hungry: this.hungry,
+      mealAvailability: this.mealAvailability, growthStage: this.growthStage };
   }
 
   runLife(command: LifeCommand) {
@@ -244,8 +249,11 @@ export class RoomController {
   setPresentation(props: RoomProps) {
     this.livingEnabled = !!props.livingEnabled;
     this.lifePreference = props.lifePreference;
-    this.growthStage = props.growthStage === 'final' ? 2 : props.growthStage ?? 1;
+    this.growthStage = props.growthStage === 'final' ? 4 : props.growthStage ?? 1;
+    this.growthStyle = growthExpression(this.growthStage);
+    this.loadedPet?.scale.setScalar(.62 * this.growthStyle.scale);
     this.hungry = !!props.hungry;
+    this.mealAvailability = props.mealAvailability ?? 'ready';
     if (props.poopCount && !this.cleanupProp) this.cleanupProp = this.addSphere(this.scene, 0xaa876b, [.22, .16, .22], [-.5, .12, 3.1]);
     if (this.cleanupProp) this.cleanupProp.visible = (props.poopCount ?? 0) > 0;
     if (props.lifeCommand?.token !== this.lastPropLifeToken) {
@@ -309,6 +317,7 @@ export class RoomController {
   }
 
   private material(color: number, roughness = 0.95) {
+    if (this.rendererConfig.roomMaterial === 'vertex_lit') return vertexLitMaterial(color);
     if (this.rendererConfig.roomMaterial === 'basic') return new THREE.MeshBasicMaterial({ color });
     if (this.rendererConfig.roomMaterial === 'lambert') return new THREE.MeshLambertMaterial({ color });
     return new THREE.MeshStandardMaterial({ color, roughness });
@@ -325,8 +334,9 @@ export class RoomController {
   }
 
   private createRoom() {
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xc9b49a, 2.4));
-    const sun = new THREE.DirectionalLight(0xfff3d9, 2.0);
+    const balancedLight = this.rendererConfig.id === 'software_balanced';
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xc9b49a, balancedLight ? 1.35 : 2.4));
+    const sun = new THREE.DirectionalLight(0xfff3d9, balancedLight ? 1.05 : 2.0);
     sun.position.set(-3, 9, 7); this.scene.add(sun);
     this.addBox(this.scene, 0xe9d8be, [18, 0.2, 22], [0, -0.12, 1]);
     this.addBox(this.scene, 0xf2eee2, [18, 7, 0.15], [0, 3.4, -5.1]);
@@ -396,9 +406,10 @@ export class RoomController {
       const loaded = retainLoadedModel(gltf.scene, this.disposed || generation !== this.petLoadGeneration);
       if (!loaded) return;
       applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial);
-      this.updateCpuMorphs = this.softwareRenderer && this.rendererConfig.id === 'software_low_resolution'
+      this.updateCpuMorphs = this.softwareRenderer && ['software_low_resolution', 'software_balanced'].includes(this.rendererConfig.id)
         ? prepareCpuMorphs(loaded) : null;
-      loaded.scale.setScalar(0.62);
+      loaded.scale.setScalar(0.62 * growthExpression(this.growthStage).scale);
+      const firstModel = !this.loadedPet;
       this.petOrientation.rotation.y = this.comparisonMode ? comparisonCameraYaw(this.comparisonCameraAngle) : 0;
       this.mixer?.stopAllAction();
       if (this.loadedPet) {
@@ -410,7 +421,7 @@ export class RoomController {
       this.modelReady = true;
       this.frontPaw = this.loadedPet?.getObjectByName('Foot_R_Front');
       this.leftPaw = this.loadedPet?.getObjectByName('Foot_L_Front');
-      if (this.livingEnabled) {
+      if (this.livingEnabled && firstModel) {
         const command = this.pendingLifeCommand ?? { token: 'arrival', kind: 'greeting' } as const;
         this.pendingLifeCommand = undefined; this.runLife(command);
       }
@@ -421,7 +432,7 @@ export class RoomController {
       this.clips.clear();
       for (const clip of gltf.animations) this.clips.set(clip.name, clip);
       if (this.presentationState.clip || this.presentationState.holdPose) this.applyPresentationState(true);
-      else this.selectClip(this.sleeping ? 'sleep' : `idle_${this.profile}`);
+      else this.selectClip(this.sleeping ? 'sleep' : this.life.pose?.scene === 'meal' ? 'eat' : `idle_${this.profile}`);
       if (this.pendingMealToken) {
         this.lastMealToken = this.pendingMealToken;
         this.pendingMealToken = undefined;
@@ -856,6 +867,7 @@ export class RoomController {
     const pose = this.life.pose;
     if (!pose) return;
     const p = pose.progress, wave = Math.sin(Math.PI * p), soft = this.reducedMotion ? .28 : 1;
+    const grown = this.growthStyle;
     const scale = this.profile === 'reserved' ? .75 : 1;
     if (!this.path.length) {
       const facing = pose.scene === 'look' ? pose.side * .8 : pose.scene === 'peek' ? pose.side * .65 : 0;
@@ -863,7 +875,12 @@ export class RoomController {
     }
     switch (pose.scene) {
       case 'stretch':
-        this.petOrientation.scale.set(1 - .06 * wave * soft, 1 + .13 * Math.sin(p * Math.PI * 2) * soft, 1 + .12 * wave * soft); break;
+        this.petOrientation.scale.set(1 - .06 * wave * soft, 1 + grown.stretchLift * Math.sin(p * Math.PI * 2) * soft, 1 + .12 * wave * soft);
+        if (grown.maturity >= 2) {
+          this.frontPaw?.position.set(0, .1 * Math.max(0, Math.sin(p * Math.PI * 2)) * soft, .09 * wave * soft);
+          this.leftPaw?.position.set(0, .1 * Math.max(0, Math.sin((p - .4) * Math.PI * 2)) * soft, .09 * wave * soft);
+        }
+        break;
       case 'rest':
         this.petOrientation.scale.set(1 + .08 * wave * soft, 1 - .18 * wave * soft, 1 + .08 * wave * soft);
         this.petOrientation.rotation.z = -.10 * wave * soft;
@@ -890,7 +907,7 @@ export class RoomController {
         this.petOrientation.rotation.z = .16 * Math.sin(p * Math.PI * 4) * wave * soft;
         this.petOrientation.position.x = .12 * wave * soft; break;
       case 'drowsy': this.petOrientation.rotation.x = .14 * wave * soft; break;
-      case 'hungry': this.petOrientation.rotation.y = .9; this.petOrientation.rotation.x = .09 * wave * soft; break;
+      case 'hungry': this.petOrientation.rotation.y = this.furniture.table?.visible ? .9 : 0; this.petOrientation.rotation.x = .09 * wave * soft; break;
       case 'seat':
         this.petOrientation.rotation.y = .35 * Math.sin(p * Math.PI * 2) * soft;
         this.petOrientation.scale.set(1 + .03 * wave, 1 - .08 * wave, 1 + .03 * wave); break;
@@ -906,11 +923,19 @@ export class RoomController {
         this.toiletCurtain.visible = p > .15 && p < .85;
         break;
       }
-      case 'greeting': case 'growth': this.petOrientation.position.y = .1 * wave * scale * soft; break;
+      case 'greeting': this.petOrientation.position.y = .1 * wave * scale * soft; break;
+      case 'growth':
+        this.petOrientation.position.y = .1 * wave * soft;
+        this.petOrientation.rotation.y = Math.sin(p * Math.PI * 2) * .42 * soft;
+        this.frontPaw?.position.set(0, .16 * wave * soft, .1 * wave * soft);
+        this.leftPaw?.position.set(0, .12 * wave * soft, .07 * wave * soft); break;
       case 'touch':
         this.petOrientation.scale.set(1 + .055 * wave * soft, 1 - .1 * wave * soft, 1 + .055 * wave * soft);
         this.petOrientation.rotation.z = -.09 * wave * scale * soft; break;
-      case 'company': case 'release': this.petOrientation.rotation.z = -.09 * wave * scale * soft; break;
+      case 'company': case 'release':
+        this.petOrientation.rotation.z = -grown.settleLean * wave * scale * soft;
+        if (grown.maturity >= 3) this.petOrientation.scale.y = 1 - .08 * wave * soft;
+        break;
     }
   }
 }

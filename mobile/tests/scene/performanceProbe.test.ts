@@ -95,6 +95,9 @@ test('budget status stays insufficient until the bounded window has enough sampl
   assert.equal(summary.submittedFrames.status, 'insufficient_data');
   now = 10_101;
   assert.equal(probe.snapshot().submittedFrames.windowFrameCount, 0);
+  assert.equal(probe.snapshot().inputToNextSubmissionProxy.count, 3, 'input window is explicitly sixty seconds for normal menu export');
+  now = 60_101;
+  assert.equal(probe.snapshot().inputToNextSubmissionProxy.count, 0);
   probe.resetWindow();
   assert.equal(probe.snapshot().jsRafInterval.count, 0);
 });

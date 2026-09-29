@@ -41,7 +41,7 @@ test('development and release renderer profiles share the measured bounded fragm
   assert.match(controller, /new THREE\.MeshLambertMaterial/u);
 });
 
-test('software renderer comparison profiles preserve the legacy baseline and expose the measured 33ms candidate', () => {
+test('LIFE-01 clarity profile preserves legacy comparisons and uses queue backpressure without a frame cap', () => {
   const softwareRenderer = {
     renderer: 'Apple Software Renderer',
     vendor: 'Apple Inc.',
@@ -52,13 +52,13 @@ test('software renderer comparison profiles preserve the legacy baseline and exp
     vendor: 'Apple Inc.',
     version: 'OpenGL ES 3.0 APPLE-23.0.2',
   };
-  assert.equal(roomFrameSubmissionIntervalMs('ios', softwareRenderer), 33);
+  assert.equal(roomFrameSubmissionIntervalMs('ios', softwareRenderer), 0);
   assert.equal(roomFrameSubmissionIntervalMs('ios', physicalRenderer), 0);
   assert.equal(roomFrameSubmissionIntervalMs('android', softwareRenderer), 0);
   assert.equal(roomFrameSubmissionIntervalMs('ios'), 0);
   assert.deepEqual(resolveRoomRendererProfile('automatic', false, 'ios', softwareRenderer), {
-    id: 'software_low_resolution', msaaSamples: 0, contextAntialias: false,
-    maxPixelRatio: 0.75, roomMaterial: 'lambert', petMaterial: 'lambert', submissionIntervalMs: 33,
+    id: 'software_balanced', msaaSamples: 0, contextAntialias: false,
+    maxPixelRatio: 1.5, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', submissionIntervalMs: 0,
   });
   assert.deepEqual(resolveRoomRendererProfile('software_legacy_333', true, 'ios', softwareRenderer), {
     id: 'software_legacy_333', msaaSamples: 0, contextAntialias: false,

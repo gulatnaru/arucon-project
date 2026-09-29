@@ -1,8 +1,8 @@
 import type { FloorPoint } from '../scene/types';
 
 /** Presentation seconds only; never passed to the domain simulation clock. */
-export const LIFE = Object.freeze({ idleMin: 6, idleSpread: 5, offerMin: 48, offerSpread: 28,
-  offerWait: 18, speechGapMs: 20_000, dialogueRest: 25, ballRadius: .22 });
+export const LIFE = Object.freeze({ idleMin: 8, idleSpread: 9, offerMin: 90, offerSpread: 60,
+  offerWait: 5, speechGapMs: 20_000, dialogueRest: 25, ballRadius: .22 });
 export type LifeScene = 'greeting' | 'look' | 'stretch' | 'inspect' | 'offer' | 'ball' | 'peek'
   | 'gesture' | 'rest' | 'drowsy' | 'meal' | 'toilet' | 'company' | 'mishap' | 'growth' | 'touch' | 'release' | 'hungry' | 'seat' | 'solo';
 export type LifeInput = LifeScene | 'cancel' | 'roll' | 'left' | 'right' | 'high_five' | 'tilt';
@@ -11,7 +11,7 @@ export type LifeEvent = Readonly<{ id: number; scene: LifeScene; phase: 'perform
 export type LifePose = Readonly<{ scene: LifeScene; progress: number; side: number }> | null;
 export type LifeWorld = { awake: boolean; enabled: boolean; touching: boolean; moving: boolean; committed: boolean;
   ball: boolean; cushion: boolean; toilet: boolean; table?: boolean; preference?: LifeScene;
-  personality?: 'reserved' | 'expressive'; hungry?: boolean; position: FloorPoint };
+  personality?: 'reserved' | 'expressive'; hungry?: boolean; mealAvailability?: string; growthStage?: number; position: FloorPoint };
 export type LifePorts = { navigate(target: FloorPoint): boolean; stop(): void; event(event: LifeEvent): void };
 type Intent = { id: number; scene: LifeScene; phase: 'approach' | 'perform' | 'waiting' | 'return'; elapsed: number; automatic: boolean; side: number; duration: number; parking: boolean; chased: boolean; replay: boolean };
 
@@ -27,6 +27,8 @@ export class LivingPet {
   private lastToken?: string;
   private rolled = false;
   private world?: LifeWorld;
+  private hungerEpisode: string | null = null;
+  private hungerShown = false;
   constructor(private readonly ports: LifePorts, private readonly random = Math.random) {
     this.offerIn = LIFE.offerMin + random() * LIFE.offerSpread;
   }
@@ -90,6 +92,8 @@ export class LivingPet {
   }
   update(dt: number, world: LifeWorld) {
     this.world = world;
+    const need = world.hungry ? world.mealAvailability ?? 'ready' : null;
+    if (need !== this.hungerEpisode) { this.hungerEpisode = need; this.hungerShown = false; }
     if (!world.awake || !world.enabled || world.touching || world.committed) {
       if (this.intent) this.cancel();
       return;
@@ -108,11 +112,14 @@ export class LivingPet {
       if (world.moving) { this.idle = Math.max(this.idle, 4); return; }
       this.idle -= dt;
       if (this.idle > 0) return;
-      const candidates: LifeScene[] = ['look', 'stretch', 'company', 'drowsy', 'seat', ...(world.ball ? ['inspect', 'mishap', 'solo'] as const : []), ...(world.cushion ? ['rest'] as const : []), ...(world.hungry ? ['hungry'] as const : [])];
+      const candidates: LifeScene[] = ['look', 'stretch', 'company', 'drowsy', 'seat', ...(world.ball ? ['inspect', 'mishap', 'solo'] as const : []), ...(world.cushion ? ['rest'] as const : [])];
       const fresh = candidates.filter(scene => !this.recent.slice(-3).includes(scene));
       const preference = world.preference === 'ball' ? 'inspect' : world.preference;
       if (preference && fresh.includes(preference)) fresh.push(preference);
-      const scene = world.ball && this.offerIn <= 0 ? 'offer' : fresh[Math.floor(this.random() * fresh.length)] ?? 'stretch';
+      if (world.personality === 'expressive' && fresh.includes('company')) fresh.push('company');
+      if ((world.growthStage ?? 1) >= 2 && fresh.includes('stretch')) fresh.push('stretch');
+      const scene = world.hungry && !this.hungerShown ? 'hungry' : world.ball && this.offerIn <= 0 ? 'offer' : fresh[Math.floor(this.random() * fresh.length)] ?? 'stretch';
+      if (scene === 'hungry') this.hungerShown = true;
       this.start(scene, true, this.random() > .5 ? 1 : -1);
       return;
     }
@@ -132,7 +139,7 @@ export class LivingPet {
     }
     if (intent.phase === 'waiting') {
       this.pose = { scene: 'inspect', progress: .6, side: intent.side };
-      if (intent.elapsed >= LIFE.offerWait) this.complete();
+      if (intent.elapsed >= LIFE.offerWait) { this.complete(); if (world.ball) this.start('solo', true); }
       return;
     }
     const progress = Math.min(1, intent.elapsed / intent.duration);

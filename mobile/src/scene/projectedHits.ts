@@ -5,7 +5,7 @@ const HIT_NAMES: readonly HitName[] = ['pet', 'table', 'cushion', 'toilet', 'bal
 
 /** Speech follows the pet while staying clear of measured controls/safe areas. */
 export function petBubbleBounds(pet: { x: number; y: number }, width: number, top: number, bottom: number, height: number) {
-  const bubbleWidth = Math.min(288, Math.max(120, width - 24));
+  const bubbleWidth = Math.min(230, Math.max(120, width - 24));
   const available = Math.max(0, bottom - top - 16);
   const boundedHeight = Math.min(height, available);
   const left = Math.max(12, Math.min(width - bubbleWidth - 12, pet.x - bubbleWidth / 2));
