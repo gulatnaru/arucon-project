@@ -50,7 +50,11 @@ const output = resolve(root, 'assets/living-characters');
 await mkdir(output, { recursive: true });
 const entries = [];
 for (const spec of specs) {
-  const model = generateCandidate(parsed, spec, transform);
+  const model = generateCandidate(parsed, { ...spec, attachmentVersion: 1 }, transform, (name, shape) =>
+    name.startsWith('Ear_') ? point => {
+      const anchored = body(point, shape);
+      return [anchored[0] * .88, anchored[1] - .025, anchored[2]];
+    } : undefined);
   const path = `${spec.id}.glb`;
   if (process.argv.includes('--check')) {
     const existing = await readFile(resolve(output, path));
@@ -59,7 +63,7 @@ for (const spec of specs) {
   entries.push({ ...spec, path, sha256: hash(model.bytes),
     geometry: Object.fromEntries(['Body', 'Horn', 'Ear_L', 'Ear_R', 'Foot_R_Front'].map(name => [name, findMeshBounds(model.json, model.bin, name)])) });
 }
-const manifest = `${JSON.stringify({ schemaVersion: 1, sourceSha256: sourceHash, originalPreserved: true,
+const manifest = `${JSON.stringify({ schemaVersion: 1, attachmentVersion: 1, sourceSha256: sourceHash, originalPreserved: true,
   approval: 'USER_REVIEW_PENDING', runtimeVisual: 'NOT_RUN', description: 'Editable nonlinear silhouette/ear drafts; shared source morph/animation contract.', entries }, null, 2)}\n`;
 if (process.argv.includes('--check')) {
   if (await readFile(resolve(output, 'manifest.json'), 'utf8') !== manifest) throw Error('Manifest differs');

@@ -1,6 +1,18 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 재개 지점 — LIFE-00 / 2026-09-29
+## 현재 재개 지점 — LIFE-01 / 2026-09-30
+
+**PARTIAL_WITH_BLOCKERS**. [LIFE-01 원문](tasks/LIFE-01-autonomous-growth-resume.md)과 [보고서의 현재 LIFE-01 절](LIFE-00-REPORT.md)을 먼저 읽는다. ASTRA_DIRECT, 새 subagent 없이 직접 구현/검증하며 SELF_REVIEW다. 현재 HEAD/dirty를 확인하고 과거 SHA로 reset하지 않는다.
+
+이번 실행은 Mac이 열린 상태에서 실제 화면을 확인했다. 1464db2에서 일반 방3분 이상 자율 생활, 교감, 자동 Lv5→6, 실제 피코 진화를 관찰했다. 거친 확대 렌더를 1.5 DPR의 vertex-lit software 경로로 수정해 중간 일반 방에서 약60Hz 제출 proxy를 측정했다. 피코 귀 분리도 발견하여 base/morph 연결부와 식사 연출/토큰을 수정했다. **이후 Mac이 다시 잠겨 최신 시각/입력 재검증이 남았다.** 이전 영상으로 최신 PASS를 만들지 않는다.
+
+다음 한 작업: **잠금 해제 → 현재 설치된 피코의 귀 연결/눌림/복원을 실제 화면에서 확인**. `open -a Simulator`, `xcrun simctl launch booted com.arucon.dev`. 최신 설치/빌드 번들 SHA `148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d`. 저장된 진화형을 초기화하지 않는다. 메뉴→설정의 새 경계 체험은 기존 run을 삭제하지 않고 새 runKey를 만든다.
+
+이어서 같은 빌드로 일반 방3분 관찰→손길1~2회→자동 식사/성장→4계열 실제 진화→수면 보너스/무기록 비교→화장실→기록/대화 닫기·앱 전환/재실행을 확인한다. 강제 아트 모델 선택은 실제 성장 경로를 대신하지 않는다. 최소5개 정상 입력 표본과 긴 멈춤을 수집하되 JS/submit proxy를 물리 표시 FPS/터치 지연으로 부르지 않는다. Instruments Animation Hitches는 현재 Simulator에서 unsupported였다.
+
+최신348/348·lint/typecheck·양 플랫폼 bundle·iOS Release compile/install/launch·CNG23/23·운영40/40은 자동/빌드 증거다. 실제 최신 모션·큰 글자·나머지 진화/수면/화장실 화면은 미완료. 보존된 영상 `evidence/life-01/21-autonomous-growth-continuous.mp4`는 1464db2의20분31.52초 무편집 중간 증거이며 귀 결함도 포함한다. 최신 통과 영상으로 재사용하지 않는다. 실제 건강 OFF, 재미/아트 USER_REVIEW_PENDING, Android/실기기 NOT_RUN. 정상 feature checkpoint/push만 허용; main/merge/force/deploy 금지.
+
+## Historical resume — LIFE-00 / 2026-09-29
 
 **PARTIAL_WITH_BLOCKERS**. [사용자 원문](tasks/LIFE-00-living-pet-overhaul.md), [현재 보고서](LIFE-00-REPORT.md), [구현 계약](docs/living-pet-design.md)을 읽고 현재 HEAD를 확인한다. ASTRA_DIRECT, 새 subagent 없이 직접 이어간다. 원문 저장/push는 `e7af01f`, 검증한 코드 체크포인트는 **`22f8249`**다. 이후 보고서 commit은 앱 소스를 바꾸지 않는다. 생활/공놀이/까꿍/몸짓/기억/성장/격리 체험/초안 자산/UI 변경을 보존한다.
 

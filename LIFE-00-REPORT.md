@@ -1,4 +1,74 @@
-# LIFE-00 개편 체크포인트
+# LIFE-00/01 생활 개편 검증 기록
+
+## 현재 LIFE-01 결과 — 2026-09-29~30
+
+**PARTIAL_WITH_BLOCKERS** · ASTRA_DIRECT · SELF_REVIEW. 재미/최종 아트 **USER_REVIEW_PENDING**.
+
+### 실제로 무엇을 확인했는가
+
+일반 방 `Sim`은 공이나 식탁 없이도 입력 없이 곁에 앉기, 꾸벅임, 기지개, 주변 살피기, 자리 고르기를 이어갔다. 3분 이상 무입력 구간 뒤 짧게 손을 대자 눌림과 말풍선이 나왔고 다시 이동했다. 일반 저장은 허기100/먹이0/식탁없음 상태였으며 이 상태를 위해 새 보상을 지급하지 않았다.
+
+격리 체험에서는 **먹이 버튼이나 미니게임 없이** 합성 활동으로 받은 먹이가 정상 허기 경계에서 자동 섭취되어 **Lv.5→6**이 됐다. 별도의 7일 합성 활동 이력 체험도 같은 서비스로 **Lv.15→16, 아루콘→피코**가 됐고, 실제 화면의 귀/실루엣이 전환됐다. 이후 재실행 데이터 비교에서 이름·성격·EXP·형태·먹이가 같았다. 일반 위젯은 `dev-local-pet-1`을 유지했다.
+
+**위 실제 관찰은 중간 코드 `1464db2`의 빌드 범위다.** 피코의 귀가 변형 중 몸과 떨어져 보이는 결함도 발견해 그대로 영상에 남겼다. 귀 연결부·식사 위치/먹이·취소 토큰·성장 패널을 추가 수정한 최신 빌드를 설치한 뒤 Mac이 다시 잠겼다. 따라서 최신 시각/입력, 나머지 진화 계열, 화장실, 수면 보너스 화면 비교는 완료로 올리지 않았다. 이전 잠금 보고를 복사한 것이 아니라 이번 실행 중 접근 가능→재잠금을 각각 확인했다.
+
+### 재현한 원인과 수정
+
+| 문제/누락 | 확인한 사실과 처리 |
+|---|---|
+| 거친 화면 | 기존 렌더 표면292×633을 1170×2532 화면에 확대. 585×1266으로 올리고 고정 조명/sRGB 계산을 소프트웨어 전용 vertex shader로 이동. 원본 geometry/얼굴/모션 유지, Expo 내부 패치 없음 |
+| 프레임 비용 | 낮은 해상도 약28.7Hz 제출 proxy → 높은 해상도 Lambert 약9.9Hz로 실패 → vertex 프로필 약60Hz. 무관한 morph/normal 갱신을 생략하고 원래 가중합 검사 유지 |
+| 말풍선 크기 | 큰 빈 닫기 행 제거, 폭230pt/닫기44pt로 축소. 실제 일반 방에서 읽기·교감·이동 확인 |
+| 자동 식사 연출 누락 | 식사 임계 시각이 30초 갱신 종료 시각과 달라도 구간 안의 실제 MealConsumed를 찾도록 수정 |
+| 진화가 진단 버튼에 묶임 | 새 실제 EXP 뒤 기존 승인 resolver를 일반 경로에서 호출. 저장된 판정은 재추첨하지 않음 |
+| 성장 체감 | 단계별 몸 크기·기지개/앞발 정돈·곁에 기대기·자세·실제 모델 선택을 연결. 계산 정책/보상은 변경하지 않음 |
+| 귀 분리 | 회전한 귀의 base/morph 연결부를 몸의 변형에 맞춰 고정. 5자산×5클립×5시각×2귀의 연결부 검사 PASS. **수정 후 실제 화면 재검증은 잠금으로 미완료** |
+| 식사/후속 동작 | 접근 목표와 그릇 위치를 공유하고 먹이 한 입이 입 쪽으로 이동하도록 연결. 시선 회전 중복을 정리하고 취소된 식사 토큰이 다음 성장 반응을 깨우지 않게 함. **최신 실행 화면은 미검증** |
+| 기억 저장 | 실제 화면에서 일시적 기억 저장 실패 안내를 확인. 경제 원장과 별도인 기억 쓰기도 기존 exclusive transaction/SQLite busy 재시도 경로 사용. 실패를 정상 저장으로 숨기지 않음 |
+
+현재 실제 허기/배설/수면/성장 값과 호출 경로는 [구현 계약의 LIFE-01 표](docs/living-pet-design.md)에 있다. 일반 주기를 단축하지 않았다. 경계 체험만 초기 상태를 임계값 가까이에 준비한다. 새 체험은 별도 runKey를 쓰며 이전 체험/일반 저장을 삭제하지 않는다. 자동 행동은 사용자 교감 일수로 기록하지 않는다.
+
+### 이번 실행 결과와 한계
+
+| 범위 | 실제 결과 |
+|---|---|
+| 최신 전체 테스트 | **348/348 PASS**, 실패/skip0 |
+| 최신 lint / typecheck | **PASS** |
+| 최신 iOS / Android JS bundle | **PASS** |
+| 최신 iOS Release compile / install / launch | **PASS**, xcodebuild exit0 / 프로세스 시작만 확인 |
+| CNG / 운영 정적 검사 | **23/23 / 40/40 PASS** |
+| 일반 방 무입력 생활 | **중간1464db2에서 실제 관찰**, trace와 영상 프레임 대조; 최신 자산 변경 후 재검증 대기 |
+| 자동 성장 / 피코 진화 | **중간1464db2 실제 경로 관찰**, 강제 모델 선택을 쓰지 않음 |
+| 네 진화 / 수면 혜택 비교 | 자동 검사 PASS; 실제 화면은 피코만 중간 관찰. 다른 3계열과 수면15/18.75 EXP 화면 비교 **NOT_RUN** |
+| 최신 저장 복원 | 데이터 비교 PASS: 자동 성장764999999 EXP/먹이0, 피코3764999999 EXP/먹이7, 이름·성격·형태 동일. UI 복원은 **BLOCKED_HOST_LOCKED** |
+| 성능 | 중간1464db2 일반 방 녹화 중 제출 proxy59.99Hz, RAF p9516.75ms/max17.24ms. **실제 표시 FPS/GPU 시간/물리 touch-to-photon 아님** |
+| 입력 지연 | 표본5개 미달로 **insufficient_data**, p95100ms 통과 주장 안 함 |
+| Instruments Animation Hitches | **BLOCKED_ENV**: “Hitches is not supported on this platform.” exit2. 관리자/보안 변경 안 함 |
+| 최신 화면·모션·큰 글자·화장실·앱 전환 | **BLOCKED_HOST_LOCKED / NOT_RUN**, 수정 전 결과로 대체하지 않음 |
+| Android native/runtime | **BLOCKED_ENV / NOT_RUN**: adb/ANDROID_HOME/ANDROID_SDK_ROOT와 기본 Mac SDK 경로를 찾지 못함. 시스템 설치하지 않음 |
+| physical device | **NOT_RUN_THIS_CHANGE** |
+
+### 빌드와 증거
+
+- 시작 HEAD `c79f158`, 중간 코드 체크포인트 `1464db2`.
+- 최신 수정 코드: **PENDING_LIFE01_REPAIR_CHECKPOINT**. 문서 인계 commit은 앱 소스와 별도로 식별한다.
+- 최신 설치/DerivedData `main.jsbundle` SHA256 일치: `148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d`.
+- 중간 관찰 빌드 SHA256: `65beda2960417d4608104f4ded5183d6c888d2544acbfe195f9512501a89f3ce`.
+- macOS15.6 / Xcode26.3 / Expo55 / iPhone16e iOS26.3 / Release / 390×844pt / content size large. 접근성 초대형 글자와 다른 화면 크기는 미검증. 실제 건강 읽기 OFF.
+- 로컬 폴더: `evidence/life-01/`. 화면 `01-before-trial.png`, `15-after-general.png`, `24-piko-before.png`, `25-piko-unanchored.png`.
+- 연속 영상 `21-autonomous-growth-continuous.mp4` **20분31.52초, 정상 속도/무편집**. 일반 생활·교감·자동 성장·피코 전환과 귀 결함을 포함한다. 최신 수정본의 통과 영상이 아니다. 탐색 영상 `16-graphics-normal-input-and-idle.mp4`도 별도 보존했다.
+- `23-general-trace.json`과 `21-general-frames/`의 37.5/56.6/68.7/132.8초 프레임은 곁에 앉기/꾸벅임/기지개/살피기 관찰을 대응한다. 정지 프레임만으로 FPS를 판정하지 않았다.
+- `25-grown-snapshots.json`↔`29-restored-snapshots.json` 비교 동일. `30-widget-projection.json`은 일반 펫의 6필드 투영 유지.
+- `final-tests.log`, `final-lint.log`, `final-typecheck.log`, `final-*-bundle.log`, `32-final-build.log`, `final-cng.json`, `final-workflow.log`. 실패한 중간 고해상도 Lambert/계측 결과도 삭제하지 않았다.
+- DB·사적 로그·trace·영상·번들·generated native 폴더는 Git/외부 업로드에서 제외한다.
+
+### 다음 한 작업과 실행법
+
+Mac 잠금을 해제하고 `open -a Simulator`, `xcrun simctl launch booted com.arucon.dev`로 **현재 저장된 피코의 귀 연결/눌림/복원부터** 확인한다. 현재 선택된 격리 저장을 초기화하지 않는다. 이후 최신 같은 빌드에서 일반 방3분 관찰 → 짧은 손길 → 자동 성장 새 체험 → 4계열 실제 진화 → 수면 보너스 비교 → 화장실 → 기록/대화 닫기·앱 전환/재실행을 검증한다. 메뉴→설정의 “새 체험”은 기존 것을 삭제하지 않고 새 run을 만든다.
+
+새 subagent **0**. 요청 root 역할 Astra, effective model **ROUTING_UNVERIFIED**. 구현·디버깅·앱 조작·검토는 직접 수행했으며 SELF_REVIEW를 독립 리뷰로 부르지 않는다. 최종 재미와 아트는 사용자 검토를 기다린다.
+
+## 이하 LIFE-00 체크포인트 이력 (현재 LIFE-01 판정 아님)
 
 2026-09-29 · **PARTIAL_WITH_BLOCKERS** · ASTRA_DIRECT / SELF_REVIEW.
 재미·최종 아트: **USER_REVIEW_PENDING**. 실제 플레이 품질: **확인 불가**.

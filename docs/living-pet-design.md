@@ -1,4 +1,38 @@
-# LIFE-00 생활 개편 — 구현 계약
+# LIFE-00/01 생활 개편 — 구현 계약
+
+## LIFE-01 현재 연결 (2026-09-30)
+
+실행 기준은 [LIFE-01](../tasks/LIFE-01-autonomous-growth-resume.md)이다. 놀이 수행을 자율 생활/성장의 전제 조건으로 두지 않는다. 일반 방과 체험은 같은 LivingPet·ApprovedMvpService·renderer를 사용한다.
+
+### 실제 적용되는 생활 규칙
+
+`App → ApprovedMvpService → APPROVED_GAME_CONFIG`가 읽는 값이다. 옛 `DEV_GAME_CONFIG`를 일반 방 기본값으로 쓰지 않는다. 승인 config의 `proposal` 필드 이름은 호환성을 위한 이름이며 현재 status는 APPROVED다.
+
+| 항목 | 현재 런타임 규칙 |
+|---|---|
+| 허기 | 0~100, 깨어 있을 때 시간당 +4, 식사 임계값 50, 식사당 -10 |
+| 자동급식 | 식탁 + opt-in + 먹이>0 + 깨어 있음 + 비동면 + 허기≥50; 임계 시각을 기존 settleUntil이 계산 |
+| EXP | 실제 섭취 1개 기준15 × 승인 수면/청결/상태/체력 계수, 1,000,000 정밀도; 직접/자동 동일 |
+| 활동 | 합성 provider로 현재 검증. 500걸음당 먹이1, 100걸음당 코인1, 달리기 가중1.5; 보유량 비회수 |
+| 배설 | 6시간 또는 섭취8개. 기본 화장실은 자동 청결; 게임 수면에도 배설 시계는 진행 |
+| 수면/회복 | 게임 수면 중 허기·시간성 체력 감소 정지. 4시간 이상 자격 + 해당 날짜 첫 회복; 장식 졸음은 별개 |
+| 동면 | 기존 미접속24시간 경계·동면 우선 정산 유지 |
+| 전경 갱신 | AppState active에서 실제 시간30초 간격. 표현 타이머가 재화/허기/배설 시간을 만들지 않음 |
+
+자동 식사가 갱신 구간 중간에 일어나도 `[before.lastSimulatedAtMs, after.lastSimulatedAtMs]`의 실제 MealConsumed를 찾아 연출한다. 새로운 EXP 뒤 승인 resolver를 정상 경로에서 호출하고, 이미 저장된 판정은 재추첨하지 않는다. 격리 초기값 자체는 새로운 성장 보상으로 안내하지 않는다.
+
+### 가역 표현·렌더 결정
+
+- 자율 휴식8~17초, 선택적 공 제안90~150초 이후 적격 시점, 기다림5초 뒤 혼자 놀이로 복귀. 무응답 페널티 없음. 허기는 필요 상태가 바뀔 때 한 번만 알리고, 먹이/식탁 없음도 사실에 맞게 표현한다.
+- 승인된 성장 단계는 몸 크기의 작은 변화, 길어진 기지개/앞발 정돈, 곁에 기대는 자세, 진화 모델에 연결한다. 성장/개성 계산이나 경제 계수는 변경하지 않는다.
+- 자동 식사/진화/수면 보너스 경계는 별도 `#runKey` petId를 만들어 이전 체험을 삭제하지 않는다. 선택된 run은 재실행 뒤 이어진다. 진화 7일 합성 이력은 명시된 fixture command로만 준비하며 일반 자율 행동을 사용자의 교감 이력으로 만들지 않는다.
+- Software GL의 292×633 확대 문제를 확인했다. 585×1266에서 Lambert 유지 시 제출 proxy 약9.9Hz로 실패했다. 고정 조명·sRGB 계산을 vertex shader로 옮긴 color-only 프로필은 같은 표면에서 약60Hz proxy/RAF p95 16.68ms/queue drain p95 6.19ms였다. 이것은 물리 표시 FPS나 터치 지연 측정이 아니다. 일반 하드웨어 material은 유지하고 Expo 내부는 패치하지 않는다.
+- CPU morph의 0 delta/변하지 않은 attribute 갱신을 건너뛴다. 원본과 초안8개 자산의 morph 방정식 회귀를 유지한다. GLB geometry·얼굴·모션을 제거하지 않는다. vertex 조명은 픽셀 조명의 보간과 약간 다를 수 있어 실제 전후 화면도 비교한다.
+- 성능 frame window10초, 정상 입력 수집 window60초를 명시한다. 기준100ms/30Hz를 낮추지 않는다. 입력 수치는 JS handler→RAF/queue 제출 proxy이며 OS 입력 전달·GPU presentation·physical touch-to-photon은 별도다.
+- 실제 진화에서 확인한 귀 분리는 각 귀 연결부의 base/모프 중심을 몸의 변형에 맞춰 수정했다(attachmentVersion1). 원본과 v2 비교 자산은 byte 단위로 보존한다. 최신 실제 화면 검증은 Mac 재잠금으로 보류다.
+- 식사 접근점/그릇 좌표를 공유하고, 확정된 식사 연출에만 먹이 한 입을 표시한다. 성장 반응은 해당 meal token에 묶어 취소/리플레이/다음 식사와 혼동하지 않는다. 일반 청결 안내도 하나의 living actor를 사용하고 이전 반응 엔진은 비교 모드에만 둔다.
+
+아래 LIFE-00 초기 설계는 이력이며 충돌하는 표현 타이밍/체험 범위는 이 절을 따른다.
 
 2026-09-29 · ASTRA_DIRECT · SELF_REVIEW · 재미/아트 USER_REVIEW_PENDING.
 기준: [사용자 원문](../tasks/LIFE-00-living-pet-overhaul.md). 실제 검증은 [LIFE-00-REPORT](../LIFE-00-REPORT.md).

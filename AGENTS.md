@@ -3,6 +3,7 @@
 제품 기준은 `docs/arucon-SRS.md` v1.9다. 2026-09-19 사용자 승인 여섯 MVP 기본 정책과 가역 config/ADR 위임을 적용한다. **2026-09-28 품질 복구·FUN 개편은 ASTRA_DIRECT 모드**다. Astra가 설계·구현·디버깅·실제 앱 검증을 직접 책임지고 새 서브에이전트를 생성하지 않는다. 과거 ENG-03 역할 설정과 결정 이력은 보존한다.
 
 ## 안내판
+- 현재 LIFE-01 재개: `tasks/LIFE-01-autonomous-growth-resume.md` — 화면 복구 후 자율 생활·성장·발견을 우선한다. LIFE-00의 수동 놀이 중심 대표 검증을 갱신하며 ASTRA_DIRECT/SELF_REVIEW를 유지한다.
 - 현재 LIFE-00 개편: `tasks/LIFE-00-living-pet-overhaul.md` — 2026-09-29 ASTRA_DIRECT 직접 구현·검증. FUN의 관련 UX/행동/아트 범위를 갱신한다. 새 서브에이전트 없이 진행하며 재미·최종 아트는 USER_REVIEW_PENDING이다.
 - FUN-00 개편: `tasks/FUN-00-overhaul.md`, `docs/fun-first-plan.md` — 기존 저장/정책/원본을 보존한 플레이 개편. 체형 두 후보 제작은 허용하며 최종 재미·아트는 USER_REVIEW_PENDING이다.
 - 자율 개발 시작: `tasks/AUTO-00-orchestrate.md`

@@ -1,4 +1,5 @@
 import type { FloorPoint } from '../scene/types';
+import { MEAL_APPROACH } from '../scene/navigation';
 
 /** Presentation seconds only; never passed to the domain simulation clock. */
 export const LIFE = Object.freeze({ idleMin: 8, idleSpread: 9, offerMin: 90, offerSpread: 60,
@@ -7,13 +8,13 @@ export type LifeScene = 'greeting' | 'look' | 'stretch' | 'inspect' | 'offer' | 
   | 'gesture' | 'rest' | 'drowsy' | 'meal' | 'toilet' | 'company' | 'mishap' | 'growth' | 'touch' | 'release' | 'hungry' | 'seat' | 'solo';
 export type LifeInput = LifeScene | 'cancel' | 'roll' | 'left' | 'right' | 'high_five' | 'tilt';
 export type LifeCommand = Readonly<{ token: string; kind: LifeInput; target?: FloorPoint; replay?: boolean }>;
-export type LifeEvent = Readonly<{ id: number; scene: LifeScene; phase: 'perform' | 'waiting' | 'complete' | 'cancel'; automatic: boolean; replay: boolean }>;
+export type LifeEvent = Readonly<{ id: number; scene: LifeScene; phase: 'perform' | 'waiting' | 'complete' | 'cancel'; automatic: boolean; replay: boolean; commandToken?: string }>;
 export type LifePose = Readonly<{ scene: LifeScene; progress: number; side: number }> | null;
 export type LifeWorld = { awake: boolean; enabled: boolean; touching: boolean; moving: boolean; committed: boolean;
   ball: boolean; cushion: boolean; toilet: boolean; table?: boolean; preference?: LifeScene;
   personality?: 'reserved' | 'expressive'; hungry?: boolean; mealAvailability?: string; growthStage?: number; position: FloorPoint };
 export type LifePorts = { navigate(target: FloorPoint): boolean; stop(): void; event(event: LifeEvent): void };
-type Intent = { id: number; scene: LifeScene; phase: 'approach' | 'perform' | 'waiting' | 'return'; elapsed: number; automatic: boolean; side: number; duration: number; parking: boolean; chased: boolean; replay: boolean };
+type Intent = { id: number; scene: LifeScene; phase: 'approach' | 'perform' | 'waiting' | 'return'; elapsed: number; automatic: boolean; side: number; duration: number; parking: boolean; chased: boolean; replay: boolean; commandToken?: string };
 
 /** One persistent actor. React redraws neither reseed it nor restart an intent. */
 export class LivingPet {
@@ -45,7 +46,7 @@ export class LivingPet {
       return this.start(command.kind === 'left' || command.kind === 'right' ? 'peek' : 'gesture', false,
         command.kind === 'left' || command.kind === 'tilt' ? -1 : 1);
     }
-    return this.start(command.kind, false, undefined, !!command.replay);
+    return this.start(command.kind, false, undefined, !!command.replay, command.token);
   }
   cancel() {
     if (this.intent) this.emit('cancel');
@@ -54,21 +55,21 @@ export class LivingPet {
     this.ports.stop();
   }
   private emit(phase: LifeEvent['phase']) {
-    if (this.intent) this.ports.event({ id: this.intent.id, scene: this.intent.scene, phase, automatic: this.intent.automatic, replay: this.intent.replay });
+    if (this.intent) this.ports.event({ id: this.intent.id, scene: this.intent.scene, phase, automatic: this.intent.automatic, replay: this.intent.replay, commandToken: this.intent.commandToken });
   }
-  private start(scene: LifeScene, automatic: boolean, side = this.random() > .5 ? 1 : -1, replay = false) {
+  private start(scene: LifeScene, automatic: boolean, side = this.random() > .5 ? 1 : -1, replay = false, commandToken?: string) {
     const world = this.world;
     if (!world || (['ball', 'inspect', 'offer', 'mishap', 'solo'].includes(scene) && !world.ball) || (scene === 'hungry' && !world.hungry) ||
       (scene === 'rest' && !world.cushion) || (scene === 'toilet' && !world.toilet)) return false;
     this.cancel();
-    this.intent = { id: ++this.sequence, scene, phase: 'perform', elapsed: 0, automatic, side, duration: 3.8, parking: scene === 'rest' && !automatic && world.ball, chased: false, replay };
+    this.intent = { id: ++this.sequence, scene, phase: 'perform', elapsed: 0, automatic, side, duration: 3.8, parking: scene === 'rest' && !automatic && world.ball, chased: false, replay, commandToken };
     this.rolled = false;
     let target: FloorPoint | null = null;
     if (['ball', 'inspect', 'offer', 'mishap', 'solo'].includes(scene)) target = { x: this.ball.x, z: this.ball.z - .72 };
     else if (scene === 'rest') target = this.intent.parking ? { x: this.ball.x, z: this.ball.z - .72 } : { x: -.9, z: .5 };
     else if (scene === 'toilet') target = { x: -1.25, z: -1.6 };
     else if (scene === 'company') target = { x: side * .5, z: world.personality === 'expressive' ? 4.3 : 3.7 };
-    else if (['meal', 'hungry'].includes(scene) && world.table) target = { x: 1.15, z: 1 };
+    else if (['meal', 'hungry'].includes(scene) && world.table) target = { ...MEAL_APPROACH };
     else if (scene === 'seat') target = { x: side * .65, z: side < 0 ? 2.7 : 3.5 };
     if (target && Math.hypot(world.position.x - target.x, world.position.z - target.z) > .1) {
       if (!this.ports.navigate(target)) { this.cancel(); return false; }

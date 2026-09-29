@@ -1,6 +1,22 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 LIFE-00 회귀 범위 — 2026-09-29
+## 현재 LIFE-01 회귀 범위 — 2026-09-30
+
+**PARTIAL_WITH_BLOCKERS**. 현재 기준은 [LIFE-01](tasks/LIFE-01-autonomous-growth-resume.md)의 화면 복구·자율 생활·성장 실제 경로다. [현재 상세 판정](LIFE-00-REPORT.md)을 따른다. 중간1464db2에서 일반 방3분 이상 무입력과 짧은 교감, 자동 Lv5→6 및 피코 진화를 실제로 확인했고 귀 분리 결함도 기록했다. 최신 코드에서 이를 수정했으나 Mac 재잠금으로 같은 빌드의 재검증이 남았다.
+
+| 구분 | 현재 상태 |
+|---|---|
+| 경제·허기·섭취·시간·진화 계산/저장 | 기존 승인 정책 유지, 최신 자동 검사348/348 PASS |
+| 자율 생활·자동 성장 연결 | 구현/자동 검사 PASS, 중간 실제 관찰. 최신 시각은 NEEDS_DEVICE_VALIDATION |
+| 화면·귀·식사/성장 연출 | 원인 재현/수정/빌드 완료. 최신 확인 BLOCKED_ENV (HOST_LOCKED) |
+| 네 진화·수면 보너스·화장실 경계 | 자동 검사 PASS. 중간 피코 외 실제 화면 NOT_RUN |
+| 네이티브 표시 성능 | 중간 약60Hz submit proxy. 입력 p95 표본 부족, native Hitches unsupported; 실제 표시/실기기 NOT_RUN |
+| 실행 환경 | iOS compile/install/launch PASS, Android JS bundle PASS. adb/설정된 SDK 없음으로 Android native/runtime BLOCKED_ENV, physical NOT_RUN |
+| 법률·실건강·실계정·실결제·출시 | 기존 외부 승인 경계 유지. 건강 읽기 OFF, 배포 없음 |
+
+최신 설치 번들 `148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d`. 재미·최종 아트 USER_REVIEW_PENDING. 기존 SRS §14/14-1의 출시 게이트를 이 결과로 통과시키지 않는다.
+
+## Historical LIFE-00 회귀 범위 — 2026-09-29
 
 **PARTIAL_WITH_BLOCKERS**. LIFE-00가 FUN 관련 UX/행동/대사/아트 범위를 갱신해 실제 플레이 게이트를 재오픈했다. [L01~L22 전체 표](LIFE-00-REPORT.md#l01l22--소스-검사와-실제-실행-분리)가 현재 개편의 판정이다. 자동336/336·lint/typecheck·양 플랫폼 bundle·iOS Release/install/launch·CNG23/23·운영40/40 PASS. CUA의 Mac locked 때문에 새 화면/입력/모션/성능은 BLOCKED/NOT_RUN이다. 기존 SRS 경제/저장 회귀는 유지하지만 과거 Simulator/Android 검증을 새 화면에 재사용하지 않는다.
 

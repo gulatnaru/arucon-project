@@ -1,6 +1,12 @@
 # iOS validation history and Release input resume
 
-## 현재 LIFE-00 결과 — 2026-09-29
+## 현재 LIFE-01 결과 — 2026-09-30
+
+**PARTIAL_WITH_BLOCKERS**. Mac 접근을 새로 확인하고 실제 일반 방/체험을 실행했다. 중간 `1464db2`에서 무입력 자율 생활, 짧은 교감, 자동 식사 Lv5→6, 활동 합성 이력에 따른 실제 피코 진화를 관찰했다. 저해상도 확대/픽셀 조명 비용을 분리해 software profile을 개선했다. 중간 일반 방 제출 proxy59.99Hz/RAF p9516.75ms이며 실제 표시 FPS 또는 입력 지연 PASS가 아니다.
+
+관찰 중 발견한 귀 분리, 식사 자리/먹이 연출, 취소된 성장 토큰, 내부 표기를 수정했다. 최신348/348·lint/typecheck·양 플랫폼 bundle·iOS Release compile/install/launch·CNG23/23·운영40/40 PASS. 설치/DerivedData 번들 `148bf6332654301ba6a666492eaf6ff323e016a9813ff303b3021c461991218d` 일치. 성장 데이터 복원과 일반 위젯 유지도 읽기 전용으로 확인했다. 다만 Mac이 재잠겨 최신 실제 화면/입력은 BLOCKED_HOST_LOCKED다. [전체 관찰/실패/수정/남은 검증](LIFE-00-REPORT.md). SELF_REVIEW, 새 subagent0, effective model ROUTING_UNVERIFIED. 재미/아트 USER_REVIEW_PENDING.
+
+## Historical LIFE-00 결과 — 2026-09-29
 
 **PARTIAL_WITH_BLOCKERS**, 재미/최종 아트 USER_REVIEW_PENDING. ASTRA_DIRECT로 생활 의도·실제 공 이동/앞발·3놀이·기억/선호·성장 표현·격리 체험·작은 말풍선/방 UI·아기v3와 4형태 초안을 연결했다. 기존 경제/저장/원본·건강 OFF·외부 권한 경계 유지. 자체 검토는 SELF_REVIEW, 새 subagent 0, effective model은 ROUTING_UNVERIFIED.
 

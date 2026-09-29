@@ -23,7 +23,7 @@ import type { SyncStatusViewModel } from './src/sync/status';
 import { ReadOnlyWriterError, WriterRegistrationRequiredError } from './src/sync/writeGuard';
 import { approvedLocalExpoNativeWidgetBridge } from './src/native/aruconWidgetModule';
 import { FailClosedNativeWidgetAdapter } from './src/native/widget';
-import { formPresentationText, selectFormPresentation } from './src/scene/formPresentation';
+import { selectFormPresentation } from './src/scene/formPresentation';
 import { type LifeRoomAction } from './src/presentation/LifeRoomControls';
 import { EXPERIENCE, EXPERIENCE_SCENARIOS, prepareExperience, experiencePetId, parseExperienceProfile, type ExperienceScenario } from './src/living/experience';
 import { chooseLifeLine, emptyLifeMemory, rememberLifeCompletion, lifePreference, LIFE_SCENE_NAMES, type LifeMemory } from './src/living/content';
@@ -100,10 +100,11 @@ function resultState(result: AppTaskResult): PetState | undefined {
 function growthSummary(view: Awaited<ReturnType<ApprovedMvpService['readGrowthView']>>): string {
   const { projection } = view;
   const form = view.form?.formId ?? view.state.formId;
-  const sex = view.sex ?? '미정';
+  const sex = view.sex === 'female' ? '암컷' : view.sex === 'male' ? '수컷' : '성장 중';
   const formPresentation = selectFormPresentation(form);
-  const exp = (view.state.totalExpUnits / APPROVED_GROWTH_POLICY.expScale).toLocaleString('ko-KR', { maximumFractionDigits: 6 });
-  return `성장 Lv.${projection.level} · EXP ${exp} · 수면 보너스 ×${view.state.sleepGrowthMultiplier} · ${formPresentationText(formPresentation)} · 성별 ${sex}`;
+  const exp = (view.state.totalExpUnits / APPROVED_GROWTH_POLICY.expScale).toLocaleString('ko-KR', { maximumFractionDigits: 2 });
+  const bonus = Math.round((view.state.sleepGrowthMultiplier - 1) * 1000) / 10;
+  return `Lv.${projection.level} · ${formPresentation.displayName} 모습 · ${sex}\n쌓인 성장 ${exp} EXP · 수면 보너스 +${bonus}%`;
 }
 
 function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (value: RoomProfile) => void }) {
@@ -152,7 +153,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   const lifeMemoryRef = useRef<LifeMemory>(emptyLifeMemory(petId));
   const lifeStoreRef = useRef<LifeMemoryStore | null>(null);
   const bubbleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingGrowthRef = useRef(false);
+  const pendingGrowthRef = useRef<string | null>(null);
   const lifeTraceRef = useRef<unknown[]>([]);
   const autoSpeechAfterRef = useRef(0);
   const databaseRef = useRef<SQLite.SQLiteDatabase | null>(null);
@@ -211,10 +212,16 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     if (event.phase === 'waiting') showLifeLine(event.scene, event.automatic, event.replay);
     if (event.phase === 'complete') {
       if (!event.replay) { rememberLifeCompletion(lifeMemoryRef.current, event.scene, Date.now()); persistLife(); }
-      if (event.scene === 'meal') setMealCue(null);
-      if (!event.replay && event.scene === 'meal' && pendingGrowthRef.current) { pendingGrowthRef.current = false; lifeInput('growth'); }
+      if (event.scene === 'meal') setMealCue(current => event.commandToken === `meal:${current?.token}` ? null : current);
+      if (!event.replay && event.scene === 'meal' && pendingGrowthRef.current === event.commandToken) { pendingGrowthRef.current = null; lifeInput('growth'); }
     }
-    if (event.phase === 'cancel') { cancelLifeBubble(); if (event.scene === 'meal') setMealCue(null); }
+    if (event.phase === 'cancel') {
+      cancelLifeBubble();
+      if (event.scene === 'meal') {
+        setMealCue(current => event.commandToken === `meal:${current?.token}` ? null : current);
+        if (pendingGrowthRef.current === event.commandToken) pendingGrowthRef.current = null;
+      }
+    }
   }, [cancelLifeBubble, lifeInput, persistLife, showLifeLine]);
   const openMenu = useCallback((next: typeof menu) => {
     reactionRuntimeRef.current?.cancel('scene_change');
@@ -280,7 +287,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       service.readOwnedItemKeys(),
     ]);
     setOwnedItems(ownership);
-    setGrowthText(`${growthSummary(growth)} · 소유 ${ownership.length}개`);
+    setGrowthText(growthSummary(growth));
     const widgetPublish = experience ? 'unsupported' : await LOCAL_WIDGET.publish(widget);
     const publishText = widgetPublish === 'requested' ? 'OS 새로고침 요청됨' : widgetPublish === 'deferred' ? 'OS 새로고침 지연됨'
       : widgetPublish === 'unsupported' ? '현재 빌드에서 위젯 모듈 없음' : '위젯 저장/요청 오류';
@@ -579,7 +586,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   useEffect(() => {
     if (!growthCue || growthReactionTokenRef.current === growthCue.eventId) return;
     growthReactionTokenRef.current = growthCue.eventId;
-    if (!evaluation) { pendingGrowthRef.current = true; return; }
+    if (!evaluation) { pendingGrowthRef.current = `meal:${growthCue.eventId}`; return; }
     startLiveReaction('growth_committed', { evidence: growthCue, growthStage: growthCue.after.stage });
   }, [evaluation, growthCue, startLiveReaction]);
 
@@ -677,7 +684,8 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         if (availability.kind !== 'cleanable') {
           setFailure(null);
           setNotice(cleanAvailabilityText(availability));
-          startLiveReaction('clean', { evidence: { kind: 'clean_result', result: availability.kind === 'auto_managed' ? 'auto_toilet' : 'nothing_to_clean' } });
+          if (evaluation) startLiveReaction('clean', { evidence: { kind: 'clean_result', result: availability.kind === 'auto_managed' ? 'auto_toilet' : 'nothing_to_clean' } });
+          else lifeInput('release');
           return;
         }
         void runTask(async () => {

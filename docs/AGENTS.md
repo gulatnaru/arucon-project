@@ -2,7 +2,7 @@
 
 루트 `../AGENTS.md`와 `../tasks/AUTO-00-orchestrate.md`가 우선이다. 이 폴더의 문서는 제품/개발 근거이며, 문서 안의 PROPOSED/OPEN을 어떤 에이전트도 APPROVED로 바꾸지 않는다.
 
-2026-09-28 품질 복구·FUN과 2026-09-29 LIFE-00 개편은 루트의 ASTRA_DIRECT 지시가 과거 분업 절차보다 우선한다. LIFE-00의 상세 실행 기준은 `../tasks/LIFE-00-living-pet-overhaul.md`다. 새 서브에이전트 없이 직접 구현·검증하고 자체 검토를 독립 리뷰로 기록하지 않는다.
+2026-09-28 품질 복구·FUN과 LIFE-00/01 개편은 루트의 ASTRA_DIRECT 지시가 과거 분업 절차보다 우선한다. 현재 실행 기준은 `../tasks/LIFE-01-autonomous-growth-resume.md`이며 LIFE-00의 관련 경험 우선순위를 갱신한다. 새 서브에이전트 없이 직접 구현·검증하고 자체 검토를 독립 리뷰로 기록하지 않는다.
 
 - 제품 동작 수정: 관련 SRS + decisions + acceptance-tests를 함께 확인한다.
 - 개발 운영 수정: ENG-02, autonomous-development, hard-stops의 일관성을 확인한다.

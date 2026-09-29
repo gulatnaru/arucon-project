@@ -181,3 +181,13 @@ test('growth changes body presence and autonomous stretch/settle expressions wit
   assert.ok(child.scale > baby.scale && child.stretchLift > baby.stretchLift && child.settleLean > baby.settleLean);
   assert.ok(evolved.scale > child.scale); assert.equal(growthExpression('final').maturity, 4);
 });
+
+test('cancelled meal completion cannot be confused with a later meal or album replay', () => {
+  const a = actor(); a.life.command({ token: 'meal:first', kind: 'meal' }, a.world); a.step(1);
+  a.life.cancel(); a.life.command({ token: 'meal:second', kind: 'meal' }, a.world); a.step(5);
+  assert.ok(a.events.some(e => e.commandToken === 'meal:first' && e.phase === 'cancel'));
+  assert.ok(!a.events.some(e => e.commandToken === 'meal:first' && e.phase === 'complete'));
+  assert.ok(a.events.some(e => e.commandToken === 'meal:second' && e.phase === 'complete'));
+  a.life.command({ token: 'album:meal', kind: 'meal', replay: true }, a.world); a.step(5);
+  assert.ok(a.events.some(e => e.commandToken === 'album:meal' && e.replay && e.phase === 'complete'));
+});

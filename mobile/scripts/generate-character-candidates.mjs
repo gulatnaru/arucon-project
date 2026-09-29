@@ -261,12 +261,26 @@ function vectorBounds(values) {
   };
 }
 
-function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec, transformFactory) {
+function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec, transformFactory, attachmentFactory) {
   const transform = transformFactory(nodeName, spec);
+  const attachment = attachmentFactory?.(nodeName, spec);
   for (const primitive of mesh.primitives) {
     const sourcePositions = readVec3Accessor(json, sourceBin, primitive.attributes.POSITION);
     const sourceNormals = readVec3Accessor(json, sourceBin, primitive.attributes.NORMAL);
-    const outputPositions = sourcePositions.map(transform);
+    const roots = sourcePositions.flatMap((point, index) => point[1] >= 1.70 && Math.abs(point[0]) <= .85 ? [index] : []);
+    const rootOffset = (source, shaped) => {
+      if (!attachment) return [0, 0, 0];
+      if (!roots.length) throw new Error(`Missing attachment vertices: ${nodeName}`);
+      const offset = [0, 0, 0];
+      for (const index of roots) {
+        const expected = attachment(source[index]);
+        for (let axis = 0; axis < 3; axis++) offset[axis] += (expected[axis] - shaped[index][axis]) / roots.length;
+      }
+      return offset;
+    };
+    const shapedPositions = sourcePositions.map(transform);
+    const baseOffset = rootOffset(sourcePositions, shapedPositions);
+    const outputPositions = attachment ? shapedPositions.map(point => add(point, baseOffset)) : shapedPositions;
     const outputNormals = sourceNormals.map((normal, index) => transformNormal(sourcePositions[index], normal, transform));
     writeVec3Accessor(json, outputBin, primitive.attributes.POSITION, outputPositions);
     writeVec3Accessor(json, outputBin, primitive.attributes.NORMAL, outputNormals);
@@ -276,10 +290,13 @@ function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec, transformF
       const sourceNormalDeltas = readVec3Accessor(json, sourceBin, target.NORMAL);
       const outputPositionDeltas = [];
       const outputNormalDeltas = [];
+      const morphedPositions = sourcePositions.map((point, index) => add(point, sourcePositionDeltas[index]));
+      const shapedMorphed = morphedPositions.map(transform);
+      const targetOffset = rootOffset(morphedPositions, shapedMorphed);
       for (let index = 0; index < sourcePositions.length; index += 1) {
         const sourceMorphedPosition = add(sourcePositions[index], sourcePositionDeltas[index]);
         const sourceMorphedNormal = normalize(add(sourceNormals[index], sourceNormalDeltas[index]));
-        const outputMorphedPosition = transform(sourceMorphedPosition);
+        const outputMorphedPosition = attachment ? add(shapedMorphed[index], targetOffset) : shapedMorphed[index];
         const outputMorphedNormal = transformNormal(sourceMorphedPosition, sourceMorphedNormal, transform);
         outputPositionDeltas.push(subtract(outputMorphedPosition, outputPositions[index]));
         outputNormalDeltas.push(subtract(outputMorphedNormal, outputNormals[index]));
@@ -290,12 +307,12 @@ function deformMesh(json, sourceBin, outputBin, mesh, nodeName, spec, transformF
   }
 }
 
-export function generateCandidate(parsed, spec, transformFactory = transformForMesh) {
+export function generateCandidate(parsed, spec, transformFactory = transformForMesh, attachmentFactory) {
   const json = cloneJson(parsed.json);
   const bin = Buffer.from(parsed.bin);
   json.nodes.forEach((node) => {
     if (node.mesh === undefined) return;
-    deformMesh(json, parsed.bin, bin, json.meshes[node.mesh], node.name, spec, transformFactory);
+    deformMesh(json, parsed.bin, bin, json.meshes[node.mesh], node.name, spec, transformFactory, attachmentFactory);
   });
   json.asset.extras = {
     ...(json.asset.extras ?? {}),

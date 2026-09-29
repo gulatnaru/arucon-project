@@ -1,6 +1,8 @@
 import type { FloorPoint } from './types';
 
 export const FLOOR = { x: [-9, 9] as const, z: [-4.8, 12] as const };
+export const MEAL_BOWL = Object.freeze({ x: 1.5, z: 1.2 });
+export const MEAL_APPROACH = Object.freeze({ x: 1.1, z: 1.8 });
 // Insets keep the 74 px pet target fully on a narrow 390 px screen.
 export const WALK = { x: [-2.2, 2.2] as const, z: [-3.65, 7.15] as const };
 const OBSTACLES = [

@@ -6,7 +6,7 @@ import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 import { Platform } from 'react-native';
 import * as THREE from 'three';
-import { FLOOR, nearestFree, route, type NavigationOptions } from './navigation';
+import { FLOOR, MEAL_BOWL, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
 import { readAssetBytes } from './assetBytes';
 import {
@@ -139,6 +139,8 @@ export class RoomController {
   private hungry = false;
   private mealAvailability: RoomProps['mealAvailability'] = 'ready';
   private cleanupProp?: THREE.Object3D;
+  private readonly feedingDish = new THREE.Group();
+  private foodBite?: THREE.Object3D;
   private toiletCurtain?: THREE.Object3D;
   private lifePreference?: RoomProps['lifePreference'];
   private onLifeEvent?: (event: LifeEvent) => void;
@@ -293,6 +295,7 @@ export class RoomController {
       this.selectClip(nextSleeping ? 'sleep' : `idle_${nextProfile}`);
     }
     this.furniture.table!.visible = props.tableInstalled ?? true;
+    this.feedingDish.visible = props.tableInstalled ?? true;
     this.furniture.toilet!.visible = props.toiletInstalled ?? false;
     this.furniture.ball!.visible = props.ballVisible ?? false;
     this.furniture.cushion!.visible = props.cushionVisible ?? false;
@@ -354,6 +357,11 @@ export class RoomController {
     this.addSphere(table, 0xcdac87, [0.72, 0.1, 0.52], [0, 0.44, 0]);
     this.addSphere(table, 0xf8eedb, [0.22, 0.07, 0.18], [-0.09, 0.54, -0.23]);
     this.scene.add(table); this.furniture.table = table;
+    this.feedingDish.position.set(MEAL_BOWL.x, .04, MEAL_BOWL.z);
+    this.addSphere(this.feedingDish, 0xf8eedb, [.24, .04, .21], [0, 0, 0]);
+    this.scene.add(this.feedingDish);
+    this.foodBite = this.addSphere(new THREE.Group(), 0xa87748, [.065, .05, .065], [0, 0, 0]);
+    this.foodBite.visible = false; this.scene.add(this.foodBite);
     const cushion = new THREE.Group(); cushion.position.set(-2.05, 0, 0.2);
     this.addSphere(cushion, 0xb1a0ba, [0.91, 0.14, 0.68], [0, 0.12, 0]);
     this.addSphere(cushion, 0xc9bad0, [0.85, 0.22, 0.63], [0, 0.25, 0]);
@@ -370,7 +378,7 @@ export class RoomController {
     const stripe = new THREE.Mesh(new THREE.TorusGeometry(.219, .012, 4, 20), this.material(0xf7dfb9));
     ball.add(stripe);
     this.scene.add(ball); this.furniture.ball = ball;
-    const staticObjects = [...this.scene.children.filter(node => node instanceof THREE.Mesh), plant];
+    const staticObjects = [...this.scene.children.filter(node => node instanceof THREE.Mesh && node !== this.foodBite), plant];
     const batch = batchStaticRoom(staticObjects, this.rendererConfig.roomMaterial);
     for (const object of staticObjects) { this.scene.remove(object); disposeSceneObject(object); }
     this.scene.add(batch);
@@ -436,7 +444,8 @@ export class RoomController {
       if (this.pendingMealToken) {
         this.lastMealToken = this.pendingMealToken;
         this.pendingMealToken = undefined;
-        this.playCue('eat', 1.2, true);
+        if (this.livingEnabled) this.runLife({ token: `meal:${this.lastMealToken}`, kind: 'meal' });
+        else this.playCue('eat', 1.2, true);
       }
       if (this.submissionIntervalMs === 0) this.publishProjection();
     } catch (error) {
@@ -763,7 +772,7 @@ export class RoomController {
     }
     if (this.touchHolding) this.touchTime += dt;
     this.petPulseRemaining = Math.max(0, this.petPulseRemaining - dt);
-    if (!this.comparisonMode && !this.path.length &&
+    if (!this.comparisonMode && !this.path.length && !(this.livingEnabled && this.life.pose) &&
         (this.touchHolding || this.petPulseRemaining > 0 || this.presentationState !== EMPTY_ROOM_PRESENTATION)) {
       const targetFacing = this.presentationState.gaze === 'aside' ? -0.22 : 0;
       this.facing += Math.atan2(Math.sin(targetFacing - this.facing), Math.cos(targetFacing - this.facing)) * (1 - Math.exp(-10 * dt));
@@ -864,14 +873,21 @@ export class RoomController {
     this.frontPaw?.position.set(0, 0, 0);
     this.leftPaw?.position.set(0, 0, 0);
     if (this.toiletCurtain) this.toiletCurtain.visible = false;
+    if (this.foodBite) this.foodBite.visible = false;
     const pose = this.life.pose;
     if (!pose) return;
     const p = pose.progress, wave = Math.sin(Math.PI * p), soft = this.reducedMotion ? .28 : 1;
     const grown = this.growthStyle;
     const scale = this.profile === 'reserved' ? .75 : 1;
     if (!this.path.length) {
-      const facing = pose.scene === 'look' ? pose.side * .8 : pose.scene === 'peek' ? pose.side * .65 : 0;
-      this.facing += (facing - this.facing) * .08; this.petAnchor.rotation.y = this.facing;
+      const atBowl = (pose.scene === 'meal' || pose.scene === 'hungry') && this.furniture.table?.visible;
+      const lookX = pose.side < 0 ? -2.8 : -.45;
+      const lookZ = pose.side < 0 ? -3.65 : -4.85;
+      const facing = atBowl ? Math.atan2(MEAL_BOWL.x - this.position.x, MEAL_BOWL.z - this.position.z)
+        : pose.scene === 'look' && p < .68 ? Math.atan2(lookX - this.position.x, lookZ - this.position.z)
+          : pose.scene === 'peek' ? pose.side * .65 : 0;
+      const turn = Math.atan2(Math.sin(facing - this.facing), Math.cos(facing - this.facing));
+      this.facing += turn * .08; this.petAnchor.rotation.y = this.facing;
     }
     switch (pose.scene) {
       case 'stretch':
@@ -907,13 +923,24 @@ export class RoomController {
         this.petOrientation.rotation.z = .16 * Math.sin(p * Math.PI * 4) * wave * soft;
         this.petOrientation.position.x = .12 * wave * soft; break;
       case 'drowsy': this.petOrientation.rotation.x = .14 * wave * soft; break;
-      case 'hungry': this.petOrientation.rotation.y = this.furniture.table?.visible ? .9 : 0; this.petOrientation.rotation.x = .09 * wave * soft; break;
+      case 'hungry': this.petOrientation.rotation.x = .09 * wave * soft; break;
       case 'seat':
         this.petOrientation.rotation.y = .35 * Math.sin(p * Math.PI * 2) * soft;
         this.petOrientation.scale.set(1 + .03 * wave, 1 - .08 * wave, 1 + .03 * wave); break;
       case 'meal':
-        this.petOrientation.rotation.y = this.furniture.table?.visible ? .85 : 0;
-        this.petOrientation.rotation.x = .06 * Math.sin(p * Math.PI * 10) * soft; break;
+        this.petOrientation.rotation.x = (.12 * wave + .025 * Math.sin(p * Math.PI * 10)) * soft;
+        if (this.foodBite && p < .8) {
+          const bite = Math.max(0, Math.min(1, (p - .2) / .55));
+          const source = this.furniture.table?.visible ? MEAL_BOWL : { x: this.position.x, z: this.position.z + .6 };
+          const mouthX = this.position.x + Math.sin(this.facing) * .40;
+          const mouthZ = this.position.z + Math.cos(this.facing) * .40;
+          this.foodBite.visible = true;
+          this.foodBite.position.set(source.x + (mouthX - source.x) * bite, .12 + .42 * bite + .10 * Math.sin(bite * Math.PI), source.z + (mouthZ - source.z) * bite);
+          const morsel = 1 - bite * .55;
+          this.foodBite.scale.set(.065 * morsel, .05 * morsel, .065 * morsel);
+          this.frontPaw?.position.set(0, .13 * Math.sin(bite * Math.PI) * soft, .08 * wave * soft);
+        }
+        break;
       case 'toilet': {
         if (!this.toiletCurtain) {
           this.toiletCurtain = this.addBox(this.scene, 0xc3cbb7, [1.15, .9, .08], [-2.6, .48, -1.15]);
