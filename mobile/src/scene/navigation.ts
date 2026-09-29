@@ -2,7 +2,15 @@ import type { FloorPoint } from './types';
 
 export const FLOOR = { x: [-9, 9] as const, z: [-4.8, 12] as const };
 export const MEAL_BOWL = Object.freeze({ x: 1.5, z: 1.2 });
-export const MEAL_APPROACH = Object.freeze({ x: 1.1, z: 1.8 });
+// Approach beside the floor bowl: the portrait camera can see both the mouth
+// and the morsel instead of the actor's back occluding the entire meal.
+export const MEAL_APPROACH = Object.freeze({ x: .4, z: 1.2 });
+// Keep the entire facility-use pose inside the portrait room, not just its approach point.
+export const TOILET_SPOT = Object.freeze({ x: -1.95, z: -1.62 });
+export function localDockOffset(position: FloorPoint, target: FloorPoint, facing: number, progress: number): FloorPoint {
+  const dx = (target.x - position.x) * progress, dz = (target.z - position.z) * progress;
+  return { x: dx * Math.cos(facing) - dz * Math.sin(facing), z: dx * Math.sin(facing) + dz * Math.cos(facing) };
+}
 // Insets keep the 74 px pet target fully on a narrow 390 px screen.
 export const WALK = { x: [-2.2, 2.2] as const, z: [-3.65, 7.15] as const };
 const OBSTACLES = [
@@ -19,7 +27,7 @@ function obstacles(options: NavigationOptions) {
   return [
     ...(options.tableInstalled ?? true ? [OBSTACLES[0]] : []),
     OBSTACLES[1], OBSTACLES[2],
-    ...(options.toiletInstalled ? [{ x: -2.6, z: -1.62, rx: 0.85, rz: 0.85 }] : []),
+    ...(options.toiletInstalled ? [{ ...TOILET_SPOT, rx: 0.85, rz: 0.85 }] : []),
   ];
 }
 

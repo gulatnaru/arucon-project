@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, AppState, KeyboardAvoidingView, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
+import { AccessibilityInfo, AppState, KeyboardAvoidingView, Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as SQLite from 'expo-sqlite';
 import { File, Paths } from 'expo-file-system';
@@ -114,6 +114,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   const runKey = selected?.runKey;
   const petId = experience ? experiencePetId(scenario, runKey) : PET_ID;
   const insets = useSafeAreaInsets();
+  const { fontScale } = useWindowDimensions();
   const [phase, setPhase] = useState<'loading' | 'onboarding' | 'room' | 'load_error'>('loading');
   const [pet, setPet] = useState<PetState | null>(null);
   const [busy, setBusy] = useState(false);
@@ -919,7 +920,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         onStatus={setNotice}
       />
     </View>
-    {!evaluation && <View onLayout={event => setTopHeight(event.nativeEvent.layout.height)} style={[styles.top, { top: insets.top + 8 }]}>
+    {/* Dynamic Type can update native glyphs before Fabric remeasures unchanged text.
+        Recreate only the text chrome; the room/controller and saved profile stay mounted. */}
+    {!evaluation && <View key={`top:${fontScale}`} onLayout={event => setTopHeight(event.nativeEvent.layout.height)} style={[styles.top, { top: insets.top + 8 }]}>
       <Text style={styles.petName}>{pet.givenName}</Text>
       <Text accessibilityLabel={experience ? '격리 체험 방' : '실제 건강 연결 꺼짐'} style={styles.trialBadge}>체험</Text>
       <Pressable
@@ -934,7 +937,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         <Text style={styles.badgeText}>☰</Text>
       </Pressable>
     </View>}
-    {!evaluation && <View onLayout={event => setControlsHeight(event.nativeEvent.layout.height)} style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
+    {!evaluation && <View key={`bottom:${fontScale}`} onLayout={event => setControlsHeight(event.nativeEvent.layout.height)} style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
       {!!notice && <Text style={styles.notice}>{notice}</Text>}
       {memoryWarning && <Text accessibilityRole="alert" style={styles.notice}>{memoryWarning}</Text>}
       {growthWarning && <View style={styles.errorBox}><Text accessibilityRole="alert">{growthWarning}</Text><Pressable accessibilityRole="button" onPress={() => {
@@ -956,7 +959,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     </View>}
     <Modal visible={menu !== null} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
       <View style={[styles.fixtureBackdrop, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 }]}>
-        <View accessibilityViewIsModal style={styles.fixtureSheet}>
+        <View key={`sheet:${fontScale}`} accessibilityViewIsModal style={styles.fixtureSheet}>
           <View style={styles.fixtureHeader}><Text style={[styles.fixtureTitle, { flex: 1 }]}>{menu === 'menu' ? '우리 방' : menu === 'play' ? '함께 놀기' : menu === 'food' ? '식사' : menu === 'decor' ? '방 꾸미기' : menu === 'settings' ? '설정' : '우리 아이'}</Text>
             <Pressable accessibilityRole="button" accessibilityLabel="패널 닫기" style={styles.menuItem} onPress={() => setMenu(null)}><Text>닫기</Text></Pressable></View>
           <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 12 }}>

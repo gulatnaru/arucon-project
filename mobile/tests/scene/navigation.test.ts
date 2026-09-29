@@ -1,8 +1,25 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { clearLine, isFree, nearestFree, route, WALK } from '../../src/scene/navigation';
+import * as THREE from 'three';
+import { clearLine, isFree, localDockOffset, nearestFree, route, TOILET_SPOT, WALK } from '../../src/scene/navigation';
 
 const start = { x: 0, z: 1.8 };
+
+test('facility docking lands on the same world location while the actor turns', () => {
+  const position = { x: -.95, z: -1.6 };
+  for (const target of [TOILET_SPOT, { x: -2.05, z: .2 }]) {
+    for (const facing of [-Math.PI, -1.4, 0, .8, Math.PI]) {
+      for (const progress of [0, .25, .7, 1]) {
+        const offset = localDockOffset(position, target, facing, progress);
+        const parent = new THREE.Object3D();
+        parent.position.set(position.x, 0, position.z); parent.rotation.y = facing;
+        const world = parent.localToWorld(new THREE.Vector3(offset.x, 0, offset.z));
+        assert.ok(Math.abs(world.x - THREE.MathUtils.lerp(position.x, target.x, progress)) < 1e-10);
+        assert.ok(Math.abs(world.z - THREE.MathUtils.lerp(position.z, target.z, progress)) < 1e-10);
+      }
+    }
+  }
+});
 
 test('visible floor in front, back, left and right can be a destination beyond the rug', () => {
   for (const requested of [

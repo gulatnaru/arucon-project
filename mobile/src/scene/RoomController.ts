@@ -2,11 +2,12 @@ import { Asset } from 'expo-asset';
 import { LivingPet, type LifeCommand, type LifeEvent, type LifeWorld } from '../living/life';
 import { growthExpression } from '../living/growthExpression';
 import { prepareCpuMorphs } from './cpuMorph';
+import { createMorphedAnchor } from './morphedAnchor';
 import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 import { Platform } from 'react-native';
 import * as THREE from 'three';
-import { FLOOR, MEAL_BOWL, nearestFree, route, type NavigationOptions } from './navigation';
+import { FLOOR, MEAL_BOWL, TOILET_SPOT, localDockOffset, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
 import { readAssetBytes } from './assetBytes';
 import {
@@ -142,6 +143,7 @@ export class RoomController {
   private readonly feedingDish = new THREE.Group();
   private foodBite?: THREE.Object3D;
   private toiletCurtain?: THREE.Object3D;
+  private mealMouth?: () => THREE.Vector3;
   private lifePreference?: RoomProps['lifePreference'];
   private onLifeEvent?: (event: LifeEvent) => void;
   private readonly life = new LivingPet({
@@ -370,7 +372,7 @@ export class RoomController {
     this.addBox(plant, 0xd5b69b, [0.48, 0.42, 0.48], [0, 0.23, 0]);
     for (let i = 0; i < 6; i++) this.addSphere(plant, 0x92a080, [0.13, 0.29, 0.08], [(i % 2 ? 1 : -1) * 0.22, 0.75 + i * 0.12, 0]);
     this.scene.add(plant);
-    const toilet = new THREE.Group(); toilet.position.set(-2.6, 0, -1.62);
+    const toilet = new THREE.Group(); toilet.position.set(TOILET_SPOT.x, 0, TOILET_SPOT.z);
     this.addSphere(toilet, 0x9fac96, [0.52, 0.52, 0.44], [0, 0.42, 0]);
     this.scene.add(toilet); this.furniture.toilet = toilet;
     const ball = new THREE.Group(); ball.position.set(1.35, 0.2, 3.1);
@@ -414,6 +416,8 @@ export class RoomController {
       const loaded = retainLoadedModel(gltf.scene, this.disposed || generation !== this.petLoadGeneration);
       if (!loaded) return;
       applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial);
+      const mouth = loaded.getObjectByName('Mouth');
+      this.mealMouth = mouth instanceof THREE.Mesh ? createMorphedAnchor(mouth) : undefined;
       this.updateCpuMorphs = this.softwareRenderer && ['software_low_resolution', 'software_balanced'].includes(this.rendererConfig.id)
         ? prepareCpuMorphs(loaded) : null;
       loaded.scale.setScalar(0.62 * growthExpression(this.growthStage).scale);
@@ -901,7 +905,8 @@ export class RoomController {
         this.petOrientation.scale.set(1 + .08 * wave * soft, 1 - .18 * wave * soft, 1 + .08 * wave * soft);
         this.petOrientation.rotation.z = -.10 * wave * soft;
         { const settle = Math.min(1, p / .22, (1 - p) / .18);
-          this.petOrientation.position.set((-2.05 - this.position.x) * settle, .24 * settle, (.2 - this.position.z) * settle); }
+          const offset = localDockOffset(this.position, { x: -2.05, z: .2 }, this.facing, settle);
+          this.petOrientation.position.set(offset.x, .24 * settle, offset.z); }
         break;
       case 'ball': case 'offer': case 'inspect': case 'solo':
         this.petOrientation.rotation.x = .15 * Math.sin(Math.PI * Math.min(1, p / .6)) * soft;
@@ -929,13 +934,12 @@ export class RoomController {
         this.petOrientation.scale.set(1 + .03 * wave, 1 - .08 * wave, 1 + .03 * wave); break;
       case 'meal':
         this.petOrientation.rotation.x = (.12 * wave + .025 * Math.sin(p * Math.PI * 10)) * soft;
-        if (this.foodBite && p < .8) {
+        if (this.foodBite && this.mealMouth && p < .8) {
           const bite = Math.max(0, Math.min(1, (p - .2) / .55));
           const source = this.furniture.table?.visible ? MEAL_BOWL : { x: this.position.x, z: this.position.z + .6 };
-          const mouthX = this.position.x + Math.sin(this.facing) * .40;
-          const mouthZ = this.position.z + Math.cos(this.facing) * .40;
+          const mouth = this.mealMouth();
           this.foodBite.visible = true;
-          this.foodBite.position.set(source.x + (mouthX - source.x) * bite, .12 + .42 * bite + .10 * Math.sin(bite * Math.PI), source.z + (mouthZ - source.z) * bite);
+          this.foodBite.position.set(source.x + (mouth.x - source.x) * bite, .12 + (mouth.y - .12) * bite + .10 * Math.sin(bite * Math.PI), source.z + (mouth.z - source.z) * bite);
           const morsel = 1 - bite * .55;
           this.foodBite.scale.set(.065 * morsel, .05 * morsel, .065 * morsel);
           this.frontPaw?.position.set(0, .13 * Math.sin(bite * Math.PI) * soft, .08 * wave * soft);
@@ -943,10 +947,11 @@ export class RoomController {
         break;
       case 'toilet': {
         if (!this.toiletCurtain) {
-          this.toiletCurtain = this.addBox(this.scene, 0xc3cbb7, [1.15, .9, .08], [-2.6, .48, -1.15]);
+          this.toiletCurtain = this.addBox(this.scene, 0xc3cbb7, [1.15, .9, .08], [TOILET_SPOT.x, .48, TOILET_SPOT.z + .47]);
         }
         const enter = Math.min(1, p / .25, (1 - p) / .2);
-        this.petOrientation.position.set((-2.6 - this.position.x) * enter, .08 * enter, (-1.62 - this.position.z) * enter);
+        const offset = localDockOffset(this.position, TOILET_SPOT, this.facing, enter);
+        this.petOrientation.position.set(offset.x, .08 * enter, offset.z);
         this.toiletCurtain.visible = p > .15 && p < .85;
         break;
       }
