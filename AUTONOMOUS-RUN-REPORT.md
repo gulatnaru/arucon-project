@@ -1,6 +1,12 @@
 # iOS validation history and Release input resume
 
-## 현재 LIFE-01 결과 — 2026-09-30 잠금 해제 재검증
+## 현재 LIFE-01 남은 검증 결과 — 2026-10-02
+
+**READY_FOR_AUTONOMOUS_LIFE_REVIEW — 현재 iOS Simulator 환경**. 소스6cf015c, 설치/빌드 SHA `6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7`. 현재Mac의 실제 접근부터 확인했다. 기존 저장피코의 일반 자율 기지개와 별도3뷰 자세, 최신meal623ms cancel→생활/접촉·정산1회, 실제 홈위젯 탭과snapshot 격리를 확인했다. 네 진화·전체 복원 재실행/새 개편은 하지 않았다.
+
+352/352·영향78/78·lint/typecheck·iOS Release·Android JS bundle·CNG23/23 PASS. 고정60초 ON→OFF, OFF→ON 네 구간: RAF p9517.24~26.65ms, 제출proxy56.40~59.50Hz, 입력8개씩 p9519.52~22.28ms, >500ms gap0. 예비/조작 연결 중단 구간은 PASS에서 제외해 보존. 실제 GPU 표시·물리 입력·실기기·발열/배터리는 NOT_RUN. [빌드별 범위와 영상/조건](LIFE-00-REPORT.md). ASTRA_DIRECT / SELF_REVIEW, 새 subagent0, effective model ROUTING_UNVERIFIED, 재미/최종아트 USER_REVIEW_PENDING. 건강 OFF.
+
+## Historical LIFE-01 결과 — 2026-09-30 잠금 해제 재검증
 
 **PARTIAL_WITH_BLOCKERS** — 피코 기지개 추가 실제 확인 중 Mac 재잠금. 소스70cab57, 최신 설치/DerivedData 번들 `784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b`. 일반 방 무입력 생활, 별도 자동Lv5→6, 7일 합성 이력을 통한 자동Lv15→16 네 진화, 피코 귀·접촉, 실제 먹이→입, 앱 재실행24개 저장 보존을 확인했다. 큰 글자 재측정, 시설 위치/회전 좌표, 실제 morph 입 anchor를 직접 고쳤다. 정책·원본·DB 보존.
 

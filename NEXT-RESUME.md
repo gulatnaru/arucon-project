@@ -1,6 +1,18 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 재개 지점 — LIFE-01 / 2026-09-30 검증 재개 완료
+## 현재 지점 — LIFE-01 남은 검증 완료 / 2026-10-02
+
+**READY_FOR_AUTONOMOUS_LIFE_REVIEW — 현재 iOS Simulator 환경**. 소스 **6cf015c**, 이후 보고서 commit은 앱 코드를 바꾸지 않는다. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0, effective model ROUTING_UNVERIFIED. 재미·최종 아트 USER_REVIEW_PENDING.
+
+최신 Release 설치/DerivedData SHA `6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7`. `open -a Simulator`, `xcrun simctl launch booted com.arucon.dev`. 현재 일반 Sim 방이며 Metro가 필요 없다. 기존 피코는 설정→체험 도구와 빌드 진단→저장된 피코 이어 보기로 연다. 새 피코/진화/저장 초기화를 하지 않았다.
+
+남아 있던 일반 자율 기지개와 개발용앞/옆/뒤 자세를 따로 확인했다. 최신 식사623ms cancel→후속생활/접촉, MealConsumed1회/15EXP, 실제 홈위젯 그림 탭→앱 진입과 일반snapshot 격리도 확인했다. 네 진화·자동 성장·복원 전체를 다시 실행하지 않았다.
+
+고정60초 ON→OFF, OFF→ON 네 구간에서 RAF p9517.24~26.65ms/제출56.40~59.50Hz proxy, 정상 입력8개씩 p9519.52~22.28ms, >500ms gap0. 모두 기존 gate 통과. 예비 표본 부족/도구 연결 중단 구간은 제외 사유와 함께 보존했다. 실제 GPU 표시FPS/물리 입력·발열·배터리·실기기는 NOT_RUN이다. 새352/352·영향78/78·lint/typecheck·Release·Android JS bundle·CNG23/23 PASS.
+
+[최신 상세 결과](LIFE-00-REPORT.md), 로컬 증거 `evidence/life-01-finish-2026-10-01/`. 이번 LIFE-01의 남은 Simulator 검증은 완료됐으며 재개 시 전체를 새로 시작하지 않는다. 다음은 사용자 제품 평가 또는 별도 허용된 실기기/GPU 검증이다. 건강OFF, feature 일반 checkpoint/push 범위 유지.
+
+## Historical 재개 지점 — 2026-09-30 검증 재개 완료
 
 **PARTIAL_WITH_BLOCKERS** — 마지막 피코 기지개 확인 시 Mac이 다시 잠김. 소스 checkpoint **70cab57**, 이후 보고서 commit은 앱 코드를 바꾸지 않는다. 현재 HEAD/dirty를 확인하고 reset하지 않는다. ASTRA_DIRECT/SELF_REVIEW, 새 subagent0, 재미·최종 아트 USER_REVIEW_PENDING.
 

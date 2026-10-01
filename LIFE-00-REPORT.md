@@ -1,6 +1,58 @@
 # LIFE-00/01 생활 개편 검증 기록
 
-## 현재 LIFE-01 검증 재개 — 2026-09-30
+## 현재 LIFE-01 남은 검증 완료 — 2026-10-02
+
+**READY_FOR_AUTONOMOUS_LIFE_REVIEW — 현재 iOS Simulator 검토 환경**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 재미·최종 아트 **USER_REVIEW_PENDING**. 실기기·실제 GPU 표시 FPS·물리 터치 지연은 **NOT_RUN**이다.
+
+### 기능·시각 검증
+
+기존 저장된 피코 `life-experience-v1:evolution_piko:1790722182371`을 읽어 이어갔다. 새 피코/진화 시험을 만들거나 저장을 초기화하지 않았다. 일반 자율 행동에서 기지개 시작→최대 늘어남/압축→복원을 관찰했고, 귀 분리·찢어짐은 보이지 않았다. 추가 개발용 자세 검사는 같은 renderer 변형을 0/25/50/75/100%로 잡아 정면·측면·후면에서 비교했다. **일반 자율 관찰은 정면 영상, 3방향 비교는 개발용 자세 검사**이며 서로의 증거를 대신하지 않는다. 자산/변형 수리는 필요하지 않았다.
+
+최신 설치본의 식사 연출은 시작 후 **623ms에 실제 cancel**이 기록됐다. 이후 rest→inspect→company→touch→release→offer/solo/stretch가 진행됐고, 취소된 meal의 growth 이벤트는 없었다. 섭취는 원장에서 **MealConsumed 1회 / 15 EXP**, 저장은 EXP764.999999·먹이0·섭취횟수1을 유지했다. 이번 사례 하나는 취소 경계 검증용이며 완료된 네 진화/저장 복원을 다시 시험한 것이 아니다.
+
+홈 위젯의 **펫 그림을 실제 탭**해 앱으로 들어갔다. 앱 아이콘은 누르지 않았다. 시작 C 설치본과 진단 수정 설치본 모두 확인했다. 피코/취소 체험 동안 App Group snapshot은 일반 `dev-local-pet-1`의 동일6필드였고, 체험 펫으로 덮어쓰지 않았다.
+
+### 60초 성능 반복 — 고정 기준 유지
+
+같은 Release·일반 `Sim` 방·`software_balanced`·585×1266 surface·16 draw calls·27,024 triangles·동작 줄이기 OFF에서 **ON→OFF, OFF→ON**으로 반복했다. 본 네 구간마다 정상 펫 입력8회 후 자율 생활을 관찰했다. 각 수집 deadline은60,000ms, 실제 첫/마지막 제출 span은59.972~59.985초였다. 타이머 종료 때 결과를 고정하므로 나중의 UI/파일 저장이 창을 옮기지 않는다.
+
+| 순서/녹화 | 프레임 수 | RAF p95 ms | 최대 RAF 간격 ms | 제출 Hz proxy | 입력→제출 p95 ms (N=8) | 고정 gate |
+|---|---:|---:|---:|---:|---:|---|
+| A ON | 3570 | 17.24 | 37.49 | 59.50 | 21.00 | PASS |
+| A OFF 재수집 | 3547 | 19.83 | 36.67 | 59.13 | 19.52 | PASS |
+| B OFF | 3394 | 26.42 | 69.39 | 56.57 | 20.90 | PASS |
+| B ON | 3384 | 26.65 | 78.50 | 56.40 | 22.28 | PASS |
+
+RAF p95≤33.34ms, 제출≥30Hz, 입력 proxy p95≤100ms, 500ms초과 RAF gap0을 유지했다. 예비 ON의 입력N4는 insufficient_data로, 첫 OFF의 도구 연결 갱신으로 시간 밖에 발생한 입력N0은 본 비교에서 제외했다. 파일은 삭제하지 않았다. 갱신된 조작 대상을 선택한 뒤 OFF 하나만 재수집했다. Mac 잠금/보안 설정을 우회하지 않았다.
+
+각 측정 전후를 포함해10초 간격8개의 `ps` 호스트 CPU 표본을 남겼다. 앱 평균 CPU는 ON-A69.42%, OFF-A71.08%, OFF-B91.46%, ON-B71.24%, WindowServer는31.79/23.75/44.12/44.65%였다. 측정 중 빌드 부하는 없었다. B 쌍에서는 morph p95가16.34~16.41ms, queue drain9.91~10.21ms로 A 쌍보다 컸다. 자율 장면·호스트 부하 차이가 있으므로 **녹화만 단일 원인이라고 단정하지 않는다**. 녹화 OFF에서도 기준 실패나 눈에 띄는 긴 정지는 재현되지 않아 renderer/모션을 줄이는 수정은 하지 않았다.
+
+위 값은 RAF·JS morph/draw·Expo 제출/queue와 handler 이후 입력의 **proxy**다. 실제 GPU 표시 FPS, OS 입력 전달을 포함한 물리 touch-to-photon, 실기기 발열/배터리 판정이 아니다. 과거4.53초 결과와 실패 창은 이하 이력에 그대로 보존했다.
+
+### 필요한 진단 수정과 새 자동 검사
+
+시작 HEAD `0aeb917`·clean, 앱 소스 `70cab57`, 설치 C SHA `784428d1ebc53c72fd0826c68a90406adbd226b42a508524982d1702da24b73b`를 확인했다. 기존 계측의240개 ring으로60초 전체를 보존할 수 없어 **명시적60초 수집기**를 추가했다. 평상시10초/240개 probe는 유지하고, 활성 수집만 최대120Hz×60초+1의 유한 버퍼를 사용하며 끝에 한 번 집계한다. 중단/초과는 incomplete status다. 초기 느린 프레임이 짧은 ring에서 사라지지 않는 검사도 추가했다.
+
+진단 메뉴의 저장된 피코 선택과 개발용 기지개 자세 샘플을 연결했다. 게임 서비스·시간·EXP·성격·자산·DB schema·건강 OFF는 그대로다. 이 진단 변경 때문에 **한 번의 Release 재빌드/설치**를 수행했다. 검증 소스 checkpoint **`6cf015c`**, 최신 설치/DerivedData SHA **`6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7`** 일치. source diff SHA는 `05-source.diff`/설치 기록에 있다.
+
+- 새 전체 테스트 **352/352**, 영향 scene/living **78/78**, lint/typecheck PASS.
+- iOS Release xcodebuild exit0, 실제 설치·화면·입력 PASS. iOS CNG23/23 PASS, Android JS bundle PASS. Android native/실기기 실행은 이번 범위에서 NOT_RUN.
+- 저장된 피코의 이름/형태/성격/EXP/먹이/코인은 개발용 자세 검사 전후 차이0. 불러올 때의 기존 부재 정산은 엔진이 정상 처리했으며 재지급/초기화하지 않았다. 일반 `Sim`의 이름·재화/EXP/먹이도 비교 전후 차이0.
+- effective model은 확인할 메타데이터가 없어 **ROUTING_UNVERIFIED**. 자체 검토를 독립 리뷰라고 부르지 않는다.
+
+### 증거와 바로 실행
+
+로컬 폴더 **`evidence/life-01-finish-2026-10-01/`**는 실행 시작일 이름을 유지한다. 기능 영상과 성능 영상/JSON을 따로 저장했고 외부 업로드/Git stage에서 제외했다.
+
+- `06-piko-natural-stretch.mp4` / `10-natural-stretch-frames/`: 일반 기지개 약59~64초, 최대 변형과 복원.
+- `11-piko-dev-pose.mp4`: 앞·옆·뒤 개발용0~100% 자세 검사. 최초 측면은 UI에 아래쪽이 가려 전신이 보이는 위치로 옮겨 다시 확인했다.
+- `13-latest-meal-cancel.mp4`, `15-meal-cancel-trace-arucon-life-trace.json`, `21-meal-once.json`: 최신 실제 취소·후속 생활·원장.
+- `02-widget-tap.mp4`, `19-widget-tap-current.mp4`, `08-widget-during-piko.json`↔`16-widget-after-trials.json`: 실제 위젯 탭/격리.
+- `18-performance-comparison.json`, 네 `*-capture.json`, `*-host.jsonl`, `22-host-comparison.json`: 60초 전체 및 호스트 조건. `ON_1`/`OFF_A_INVALID_INPUT`은 제외 사유와 함께 보존했다.
+
+`open -a Simulator` 후 `xcrun simctl launch booted com.arucon.dev`. 현재 일반 Sim 방이다. 기존 피코는 메뉴→설정→체험 도구와 빌드 진단→**저장된 피코 이어 보기**로 연다. 이번 LIFE-01의 짧은 남은 검증은 완료됐다. 다음은 사용자 재미/최종 아트 평가 또는 별도 허용된 실기기/GPU 검증이며 새 개편을 시작하지 않는다. 최종 branch/remote 해시는 Git audit와 최종 응답에서 확인한다.
+
+## Historical LIFE-01 검증 재개 — 2026-09-30
 
 **PARTIAL_WITH_BLOCKERS — 최신 시각 검증 대부분 완료, 피코 기지개 추가 확인 차단** · ASTRA_DIRECT · SELF_REVIEW · 재미/최종 아트 **USER_REVIEW_PENDING**. 성능은 아래의 녹화 ON/OFF 차이와 계측 한계를 포함한 제한 판정이며 출시/MVP 전체 완료가 아니다.
 

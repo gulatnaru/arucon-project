@@ -4,6 +4,8 @@
 
 실행 기준은 [LIFE-01](../tasks/LIFE-01-autonomous-growth-resume.md)이다. 놀이 수행을 자율 생활/성장의 전제 조건으로 두지 않는다. 일반 방과 체험은 같은 LivingPet·ApprovedMvpService·renderer를 사용한다.
 
+2026-10-02 남은 QA(`6cf015c`): 진단 메뉴의 저장된 피코 이어 보기는 기존 petId/runKey만 선택하며 새 상태를 만들지 않는다. 개발용 기지개0~100% 샘플은 같은 변형을 세 방향에서 볼 수 있게 하되 생활/보상/기억 사건을 발생시키지 않는다. 일반 자율 영상과 이 검사 결과는 따로 기록한다. 60초 성능 수집은 평상시 rolling probe와 별개의 유한 버퍼로 전체 구간을 모아 한 번 집계하며, 중단/표본 초과는 PASS가 아니다. 예산33.34ms/30Hz/100ms/500ms는 변경하지 않는다. 평상시 ring 자체를 크게 늘려 매초 집계 비용을 올리는 대안 대신 명시적 수집을 선택했다.
+
 ### 실제 적용되는 생활 규칙
 
 `App → ApprovedMvpService → APPROVED_GAME_CONFIG`가 읽는 값이다. 옛 `DEV_GAME_CONFIG`를 일반 방 기본값으로 쓰지 않는다. 승인 config의 `proposal` 필드 이름은 호환성을 위한 이름이며 현재 status는 APPROVED다.

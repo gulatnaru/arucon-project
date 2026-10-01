@@ -1,6 +1,20 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 LIFE-01 회귀 범위 — 2026-09-30 검증 재개
+## 현재 LIFE-01 검토 환경 판정 — 2026-10-02
+
+**READY_FOR_AUTONOMOUS_LIFE_REVIEW — iOS Simulator**. [최신 실제 증거](LIFE-00-REPORT.md), 소스6cf015c/설치6edaf991…. SRS 출시/MVP 전체 완료와 구분한다.
+
+| 범위 | 현재 상태 |
+|---|---|
+| 피코 기지개/귀 | PASS_SIMULATOR_VISUAL: 기존 저장의 일반 자율 기지개, 별도3방향 시작/변형/복원 QA; 분리/찢어짐 없음 |
+| 최신 식사 취소 | PASS:623ms cancel 후 생활·접촉, stale growth 없음, 실제 섭취1회/15EXP 보존 |
+| 홈 위젯 탭 | PASS_ACTUAL_WIDGET_TAP: 앱 아이콘과 구분, 체험 중 일반snapshot 유지 |
+| 성능 | PASS_PROXY:4×60초, 고정33.34ms/30Hz/100ms/500ms gate 유지. GPU 실제표시·물리 지연은 NOT_RUN |
+| 자동/빌드 | 새352/352·영향78/78·lint/typecheck·iOS Release·Android JS bundle·CNG23/23 PASS |
+| 기존 네 진화/성장/저장 | 완료 이력 유지, 수정 영향 없이 전체 재실행하지 않음 |
+| 실기기/출시/재미/아트 | 실기기/GPU/발열/배터리 NOT_RUN; 출시/법률/실건강/계정/결제 경계 유지, 재미/최종아트 USER_REVIEW_PENDING |
+
+## Historical LIFE-01 회귀 범위 — 2026-09-30 검증 재개
 
 **PARTIAL_WITH_BLOCKERS — 피코 기지개 추가 실제 확인 중 호스트 재잠금**. SRS 출시/MVP 전체 게이트는 미완료다. 소스70cab57, 설치 번들784428d…, [빌드별 상세 증거](LIFE-00-REPORT.md).
 
