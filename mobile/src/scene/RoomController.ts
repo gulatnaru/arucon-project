@@ -23,7 +23,7 @@ import { parseGlb } from './gltfRuntime';
 import { isAppleSoftwareRenderer, resolveRoomRendererProfile, type ResolvedRoomRendererProfile, type RoomRendererProfileId } from './rendererConfig';
 import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
 import type { FloorPoint, RoomProps } from './types';
-import { RoomPerformanceProbe, type RoomPerformanceSummary } from './performanceProbe';
+import { RoomPerformanceProbe, type RoomPerformanceCapture, type RoomPerformanceSummary } from './performanceProbe';
 import { canStartRoomInteraction, resolveRoomInteraction } from './interactionLifecycle';
 import { applyPetMaterialProfile } from './rendererMaterials';
 import { vertexLitMaterial } from './vertexLitMaterial';
@@ -83,6 +83,9 @@ export class RoomController {
   private readonly submissions: FrameSubmissionGate;
   private readonly performanceProbe: RoomPerformanceProbe;
   private onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
+  private onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
+  private lastPerformanceCaptureToken?: string;
+  private comparisonStretchProgress?: number;
   private lastPerformancePublishMs = 0;
   private mixer?: THREE.AnimationMixer;
   private loadedPet?: THREE.Object3D;
@@ -272,9 +275,16 @@ export class RoomController {
     this.formPresentation = nextFormPresentation;
     this.characterCandidateId = nextCandidateId;
     this.setComparisonView(props.comparisonCameraAngle);
+    this.comparisonStretchProgress = this.comparisonMode && props.comparisonStretchProgress !== undefined
+      ? Math.max(0, Math.min(1, props.comparisonStretchProgress)) : undefined;
     const nextProfile = props.personality ?? 'reserved';
     const nextSleeping = !!props.sleeping;
     this.onPerformanceSummary = props.onPerformanceSummary;
+    this.onPerformanceCapture = props.onPerformanceCapture;
+    if (props.performanceCaptureToken && props.performanceCaptureToken !== this.lastPerformanceCaptureToken) {
+      this.lastPerformanceCaptureToken = props.performanceCaptureToken;
+      this.performanceProbe.beginCapture();
+    }
     const nextInteractionEnabled = props.interactionEnabled ?? true;
     const wasReduced = this.reducedMotion;
     this.reducedMotion = !!props.reducedMotion;
@@ -802,7 +812,7 @@ export class RoomController {
     }
     this.mixer?.update(dt);
     this.applyMorphOverlay();
-    if (this.livingEnabled) this.applyLifePose();
+    if (this.livingEnabled || this.comparisonStretchProgress !== undefined) this.applyLifePose();
     const frameSubmitted = this.submissions.shouldSubmit(
       timestamp,
       this.modelReady || this.submissionIntervalMs === 0,
@@ -832,6 +842,8 @@ export class RoomController {
       this.lastProjection = now;
       this.publishProjection();
     }
+    const capture = this.performanceProbe.finishCaptureIfDue();
+    if (capture) this.onPerformanceCapture?.(capture);
     if (this.onPerformanceSummary && timestamp - this.lastPerformancePublishMs >= 1_000) {
       this.lastPerformancePublishMs = timestamp;
       this.onPerformanceSummary(this.performanceProbe.snapshot());
@@ -846,6 +858,8 @@ export class RoomController {
   }
 
   pause() {
+    const capture = this.performanceProbe.finishCaptureIfDue(true);
+    if (capture) this.onPerformanceCapture?.(capture);
     if (this.livingEnabled) this.life.cancel();
     this.cancelPet();
     if (this.presentationState !== EMPTY_ROOM_PRESENTATION) {
@@ -878,7 +892,8 @@ export class RoomController {
     this.leftPaw?.position.set(0, 0, 0);
     if (this.toiletCurtain) this.toiletCurtain.visible = false;
     if (this.foodBite) this.foodBite.visible = false;
-    const pose = this.life.pose;
+    const pose = this.comparisonStretchProgress === undefined ? this.life.pose
+      : { scene: 'stretch' as const, progress: this.comparisonStretchProgress, side: 1 };
     if (!pose) return;
     const p = pose.progress, wave = Math.sin(Math.PI * p), soft = this.reducedMotion ? .28 : 1;
     const grown = this.growthStyle;

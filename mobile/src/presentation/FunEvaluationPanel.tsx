@@ -13,6 +13,7 @@ export type FunEvaluationState = Readonly<{
   cameraAngle: EvaluationCameraAngle;
   sleeping: boolean;
   formId?: FormId;
+  stretchProgress?: number;
 }>;
 
 const CANDIDATES: readonly { id: CharacterCandidateId; label: string }[] = [
@@ -62,6 +63,14 @@ export function FunEvaluationPanel({ state, onState, onScenario, onClose }: {
         key={angle.id} accessibilityRole="button" accessibilityState={{ selected: state.cameraAngle === angle.id }}
         onPress={() => onState({ ...state, cameraAngle: angle.id })} style={choice(state.cameraAngle === angle.id)}
       ><Text>{angle.label}</Text></Pressable>)}
+    </View>
+    <Text style={styles.scope}>기지개 자세 검사 · 일반 자율 행동의 통과 증거와 별도</Text>
+    <View style={styles.row}>
+      {[0, .25, .5, .75, 1].map(progress => <Pressable key={progress} accessibilityRole="button"
+        onPress={() => onState({ ...state, stretchProgress: progress })} style={choice(state.stretchProgress === progress)}>
+        <Text>기지개 {progress * 100}%</Text>
+      </Pressable>)}
+      <Pressable accessibilityRole="button" onPress={() => onState({ ...state, stretchProgress: undefined })} style={styles.choice}><Text>자세 검사 해제</Text></Pressable>
     </View>
     <View style={styles.row}>
       {SCENARIOS.map(scenario => <Pressable key={scenario.id} accessibilityRole="button" onPress={() => onScenario(scenario.id)} style={styles.scenario}>

@@ -101,3 +101,40 @@ test('budget status stays insufficient until the bounded window has enough sampl
   probe.resetWindow();
   assert.equal(probe.snapshot().jsRafInterval.count, 0);
 });
+
+test('sixty-second capture retains early slow frames and seals before late export work', () => {
+  let now = 0;
+  const probe = new RoomPerformanceProbe('software_balanced', () => now);
+  probe.setSurfaceSize(585, 1266);
+  assert.equal(probe.beginCapture(), true);
+  assert.equal(probe.beginCapture(), false, 'repeated start cannot reset an active interval');
+  probe.recordRaf(now); probe.recordSubmission(now);
+  for (let i = 0; i < 5; i++) { now += 50; probe.recordInputHandled(now - 2); probe.recordRaf(now); probe.recordSubmission(now + 4); }
+  while (now < 60_000) {
+    now += now < 10_000 ? 50 : 16;
+    probe.recordRaf(now); probe.recordPhase('morph', 3); probe.recordSubmission(now);
+  }
+  now = 65_000; // Later UI/file export must not shift the fixed capture interval.
+  const capture = probe.finishCaptureIfDue()!;
+  assert.equal(capture.status, 'complete');
+  assert.equal(capture.startedAtMs, 0); assert.equal(capture.finishedAtMs, 60_000);
+  assert.equal(capture.summary.frameMeasurementWindowMs, 60_000);
+  assert.ok(capture.summary.jsRafInterval.count > 3_000);
+  assert.equal(capture.summary.jsRafInterval.p95Ms, 50, 'first ten slow seconds cannot disappear into a four-second ring');
+  assert.equal(capture.summary.jsRafInterval.status, 'fail');
+  assert.equal(capture.summary.inputToNextSubmissionProxy.count, 5);
+  assert.equal(capture.summary.phaseCost.morph.p95Ms, 3);
+  assert.ok(capture.summary.submittedFrames.windowDurationMs! > 59_900);
+  assert.equal(probe.finishCaptureIfDue(), null);
+});
+
+test('background interruption and sample overflow are explicit incomplete captures', () => {
+  let now = 0;
+  const probe = new RoomPerformanceProbe('software_balanced', () => now);
+  probe.beginCapture();
+  now = 20_000; probe.recordRaf(now); probe.recordSubmission(now);
+  assert.equal(probe.finishCaptureIfDue(true)?.status, 'interrupted');
+  probe.beginCapture(1_000);
+  for (let i = 0; i < 1_000; i++) { now++; probe.recordRaf(now); probe.recordSubmission(now); }
+  assert.equal(probe.finishCaptureIfDue()?.status, 'truncated', 'overflow cannot be reported as a full-interval capture');
+});

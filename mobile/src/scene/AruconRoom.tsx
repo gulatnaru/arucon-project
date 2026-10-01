@@ -90,6 +90,7 @@ export function AruconRoom(props: RoomProps) {
     props.interactionEnabled,
     props.characterCandidateId,
     props.comparisonCameraAngle,
+    props.comparisonStretchProgress,
     props.reactionPresentation,
     props.lifeCommand,
     props.livingEnabled,
@@ -99,6 +100,8 @@ export function AruconRoom(props: RoomProps) {
     props.poopCount,
     props.hungry,
     props.mealAvailability,
+    props.performanceCaptureToken,
+    props.onPerformanceCapture,
     systemReduced,
   ]);
 

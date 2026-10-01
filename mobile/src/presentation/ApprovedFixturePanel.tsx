@@ -5,7 +5,7 @@ export type ApprovedFixtureAction =
   | 'synthetic_walk' | 'synthetic_sleep_none' | 'synthetic_sleep_70'
   | 'growth_status' | 'resolve_growth' | 'shop_medicine' | 'shop_table'
   | 'shop_ball' | 'shop_cushion' | 'widget_snapshot' | 'sync_status' | 'sync_handoff'
-  | 'renderer_legacy_333' | 'renderer_low_resolution' | 'renderer_automatic' | 'performance_export'
+  | 'renderer_legacy_333' | 'renderer_low_resolution' | 'renderer_automatic' | 'performance_export' | 'performance_capture' | 'resume_saved_piko'
   | 'evaluation_mode';
 
 const ROWS: readonly { action: ApprovedFixtureAction; label: string }[] = [
@@ -26,6 +26,8 @@ const ROWS: readonly { action: ApprovedFixtureAction; label: string }[] = [
   { action: 'renderer_low_resolution', label: '렌더 비교 · low-resolution 후보' },
   { action: 'renderer_automatic', label: '렌더 비교 · 자동' },
   { action: 'performance_export', label: 'FUN-01 성능 JSON 저장' },
+  { action: 'performance_capture', label: '60초 성능 측정 시작' },
+  { action: 'resume_saved_piko', label: '저장된 피코 이어 보기' },
 ];
 
 export function ApprovedFixturePanel({ onAction }: { onAction: (action: ApprovedFixtureAction) => void }) {

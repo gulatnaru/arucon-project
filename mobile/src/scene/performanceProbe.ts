@@ -31,6 +31,7 @@ export type RoomPerformanceSummary = {
   phaseCost: Record<'morph' | 'draw' | 'queueDrain', MetricSummary>;
   budgetSource: 'LIFE-00-13';
   inputMeasurementWindowMs: number;
+  frameMeasurementWindowMs: number;
   budgets: typeof FUN01_PERFORMANCE_BUDGET;
   inputSamplesBySource: Readonly<Record<RoomInputSource, number>>;
   inputHandlerDuration: MetricSummary;
@@ -60,9 +61,19 @@ export type RoomPerformanceSummary = {
   };
 };
 
+export type RoomPerformanceCapture = Readonly<{
+  status: 'complete' | 'interrupted' | 'truncated';
+  startedAtMs: number;
+  finishedAtMs: number;
+  requestedDurationMs: number;
+  summary: RoomPerformanceSummary;
+}>;
+
 export class RingBuffer<T> {
   private readonly entries: T[] = [];
   private cursor = 0;
+  private overwritten = 0;
+  get droppedCount() { return this.overwritten; }
 
   constructor(readonly capacity: number) {
     if (!Number.isInteger(capacity) || capacity < 1) throw new Error('RingBuffer capacity must be a positive integer');
@@ -71,6 +82,7 @@ export class RingBuffer<T> {
   push(value: T) {
     if (this.entries.length < this.capacity) this.entries.push(value);
     else {
+      this.overwritten++;
       this.entries[this.cursor] = value;
       this.cursor = (this.cursor + 1) % this.capacity;
     }
@@ -84,6 +96,7 @@ export class RingBuffer<T> {
   clear() {
     this.entries.length = 0;
     this.cursor = 0;
+    this.overwritten = 0;
   }
 }
 
@@ -110,7 +123,8 @@ function thresholdStatus(value: number | null, maximum: number, count: number): 
 }
 
 export class RoomPerformanceProbe {
-  private readonly phaseCost = { morph: new RingBuffer<TimedSample>(240), draw: new RingBuffer<TimedSample>(240), queueDrain: new RingBuffer<TimedSample>(240) };
+  private readonly phaseCost: Record<'morph' | 'draw' | 'queueDrain', RingBuffer<TimedSample>>;
+  private capture?: { probe: RoomPerformanceProbe; start: number; end: number };
   private readonly inputHandlerDurationMs: RingBuffer<TimedSample>;
   private readonly inputSources: RingBuffer<Readonly<{ source: RoomInputSource; atMs: number }>>;
   private readonly inputToNextRafMs: RingBuffer<TimedSample>;
@@ -132,7 +146,9 @@ export class RoomPerformanceProbe {
     readonly profileId: RoomRendererProfileId,
     private readonly now: () => number = () => performance.now(),
     capacity = 240,
+    private readonly measurementWindowMs = FUN01_MEASUREMENT_WINDOW_MS,
   ) {
+    this.phaseCost = { morph: new RingBuffer(capacity), draw: new RingBuffer(capacity), queueDrain: new RingBuffer(capacity) };
     this.inputHandlerDurationMs = new RingBuffer(capacity);
     this.inputSources = new RingBuffer(capacity);
     this.inputToNextRafMs = new RingBuffer(capacity);
@@ -145,11 +161,13 @@ export class RoomPerformanceProbe {
   startInput(): number { return this.now(); }
 
   recordPhase(phase: keyof RoomPerformanceSummary['phaseCost'], durationMs: number) {
+    this.captureProbeAt(this.now())?.recordPhase(phase, durationMs);
     if (Number.isFinite(durationMs) && durationMs >= 0) this.phaseCost[phase].push({ value: durationMs, atMs: this.now() });
   }
 
   recordInputHandled(startedAtMs: number, source: RoomInputSource = 'touch') {
     const handledAtMs = this.now();
+    this.captureProbeAt(handledAtMs)?.recordInputHandled(startedAtMs, source);
     this.inputHandlerDurationMs.push({ value: Math.max(0, handledAtMs - startedAtMs), atMs: handledAtMs });
     this.inputSources.push({ source, atMs: handledAtMs });
     this.pendingRafInputsMs = [...this.pendingRafInputsMs.slice(-15), startedAtMs];
@@ -157,6 +175,7 @@ export class RoomPerformanceProbe {
   }
 
   recordRaf(timestampMs: number) {
+    this.captureProbeAt(timestampMs)?.recordRaf(timestampMs);
     for (const startedAtMs of this.pendingRafInputsMs) {
       this.inputToNextRafMs.push({ value: Math.max(0, timestampMs - startedAtMs), atMs: timestampMs });
     }
@@ -176,6 +195,7 @@ export class RoomPerformanceProbe {
   }
 
   recordSubmission(timestampMs: number) {
+    this.captureProbeAt(timestampMs)?.recordSubmission(timestampMs);
     for (const startedAtMs of this.pendingSubmissionInputsMs) {
       this.inputToNextSubmissionMs.push({ value: Math.max(0, timestampMs - startedAtMs), atMs: timestampMs });
     }
@@ -188,15 +208,18 @@ export class RoomPerformanceProbe {
   }
 
   setSurfaceSize(width: number, height: number) {
+    this.capture?.probe.setSurfaceSize(width, height);
     this.surfaceWidth = width;
     this.surfaceHeight = height;
   }
 
   recordRenderWorkload(workload: { calls: number; triangles: number; points: number; lines: number }) {
+    this.capture?.probe.recordRenderWorkload(workload);
     this.renderWorkload = { ...workload };
   }
 
   resetWindow() {
+    this.capture = undefined;
     for (const buffer of Object.values(this.phaseCost)) buffer.clear();
     this.inputHandlerDurationMs.clear();
     this.inputSources.clear();
@@ -208,13 +231,39 @@ export class RoomPerformanceProbe {
     this.resetRafClock();
   }
 
-  private windowValues(buffer: RingBuffer<TimedSample>, capturedAtMs: number, windowMs = FUN01_MEASUREMENT_WINDOW_MS): readonly number[] {
+  private captureProbeAt(atMs: number) {
+    return this.capture && atMs >= this.capture.start && atMs <= this.capture.end ? this.capture.probe : undefined;
+  }
+
+  /** Explicit local QA run; normal rolling probes retain their existing cost/capacity. */
+  beginCapture(durationMs = 60_000) {
+    if (!Number.isFinite(durationMs) || durationMs <= 0 || durationMs > 60_000) throw new Error('Capture duration must be within sixty seconds');
+    if (this.capture) return false;
+    const start = this.now();
+    const probe = new RoomPerformanceProbe(this.profileId, this.now, Math.ceil(durationMs / 1_000 * 120) + 1, durationMs);
+    probe.setSurfaceSize(this.surfaceWidth ?? 0, this.surfaceHeight ?? 0);
+    probe.renderWorkload = { ...this.renderWorkload };
+    this.capture = { probe, start, end: start + durationMs };
+    return true;
+  }
+
+  finishCaptureIfDue(interrupted = false): RoomPerformanceCapture | null {
+    const capture = this.capture;
+    if (!capture || (!interrupted && this.now() < capture.end)) return null;
+    this.capture = undefined;
+    const finishedAtMs = interrupted ? Math.min(this.now(), capture.end) : capture.end;
+    const truncated = [capture.probe.rafIntervalsMs, capture.probe.submissionTimestampsMs, ...Object.values(capture.probe.phaseCost)].some(buffer => buffer.droppedCount > 0);
+    return { status: interrupted ? 'interrupted' : truncated ? 'truncated' : 'complete',
+      startedAtMs: capture.start, finishedAtMs, requestedDurationMs: capture.end - capture.start,
+      summary: capture.probe.snapshot(finishedAtMs) };
+  }
+
+  private windowValues(buffer: RingBuffer<TimedSample>, capturedAtMs: number, windowMs = this.measurementWindowMs): readonly number[] {
     const earliest = capturedAtMs - windowMs;
     return buffer.values().filter(sample => sample.atMs >= earliest && sample.atMs <= capturedAtMs).map(sample => sample.value);
   }
 
-  snapshot(): RoomPerformanceSummary {
-    const capturedAtMs = this.now();
+  snapshot(capturedAtMs = this.now()): RoomPerformanceSummary {
     const handler = summarize(this.windowValues(this.inputHandlerDurationMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
     const inputRaf = summarize(this.windowValues(this.inputToNextRafMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
     const inputSubmission = summarize(this.windowValues(this.inputToNextSubmissionMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
@@ -222,7 +271,7 @@ export class RoomPerformanceProbe {
     const raf = summarize(rafValues);
     const submissionValues = this.windowValues(this.submissionIntervalsMs, capturedAtMs);
     const submissions = summarize(submissionValues);
-    const earliest = capturedAtMs - FUN01_MEASUREMENT_WINDOW_MS;
+    const earliest = capturedAtMs - this.measurementWindowMs;
     const windowSubmissionTimestamps = this.submissionTimestampsMs.values()
       .filter(timestamp => timestamp >= earliest && timestamp <= capturedAtMs);
     const inputSamplesBySource = this.inputSources.values()
@@ -243,6 +292,7 @@ export class RoomPerformanceProbe {
       profileId: this.profileId,
       budgetSource: 'LIFE-00-13',
       inputMeasurementWindowMs: INPUT_MEASUREMENT_WINDOW_MS,
+      frameMeasurementWindowMs: this.measurementWindowMs,
       phaseCost: { morph: summarize(this.windowValues(this.phaseCost.morph, capturedAtMs)),
         draw: summarize(this.windowValues(this.phaseCost.draw, capturedAtMs)), queueDrain: summarize(this.windowValues(this.phaseCost.queueDrain, capturedAtMs)) },
       proxyNotice: 'input-to-RAF, input-to-endFrameEXP and RAF-gap values are timing proxies; they do not measure touch-to-photon latency, native-thread lock or visible FPS',

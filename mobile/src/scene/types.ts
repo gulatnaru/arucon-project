@@ -1,6 +1,6 @@
 import type { FormId } from '../domain/model';
 import type { ReactNode } from 'react';
-import type { RoomPerformanceSummary } from './performanceProbe';
+import type { RoomPerformanceCapture, RoomPerformanceSummary } from './performanceProbe';
 import type { RoomRendererProfileId } from './rendererConfig';
 import type { CharacterCandidateId } from './characterCandidates';
 import type { ComparisonCameraAngle, RoomPresentationBatch } from './presentationBridge';
@@ -41,6 +41,8 @@ export type RoomProps = {
   characterCandidateId?: CharacterCandidateId;
   /** Comparison view rotates only the loaded character inside the unchanged room. */
   comparisonCameraAngle?: ComparisonCameraAngle;
+  /** QA-only held samples of the same stretch deformation; never a life/economy event. */
+  comparisonStretchProgress?: number;
   /** Visual reaction commands. A changed token is consumed exactly once. */
   reactionPresentation?: RoomPresentationBatch;
   /** Accepted direct input supersedes only interruptible reaction presentation. */
@@ -50,6 +52,8 @@ export type RoomProps = {
   onMove?: (target: { x: number; z: number }) => void;
   onStatus?: (message: string) => void;
   onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
+  performanceCaptureToken?: string;
+  onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
 };
 
 export type FloorPoint = { x: number; z: number };

@@ -60,7 +60,7 @@ import {
 } from './src/reactions';
 import { APPROVED_GROWTH_POLICY, projectGrowth } from './src/progression/projection';
 import { openReactionFixtureMemoryRepository, openReactionMemoryRepository } from './src/storage/reactionMemory';
-import type { RoomPerformanceSummary } from './src/scene/performanceProbe';
+import type { RoomPerformanceCapture, RoomPerformanceSummary } from './src/scene/performanceProbe';
 import type { RoomRendererProfileId } from './src/scene/rendererConfig';
 
 const PET_ID = 'dev-local-pet-1';
@@ -170,6 +170,14 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   const clockRef = useRef(0);
   const sequenceRef = useRef(0);
   const performanceSummaryRef = useRef<RoomPerformanceSummary | null>(null);
+  const [performanceCaptureToken, setPerformanceCaptureToken] = useState<string>();
+  const savePerformanceCapture = useCallback((capture: RoomPerformanceCapture) => {
+    try {
+      new File(Paths.cache, 'arucon-performance-capture.json').write(JSON.stringify(capture, null, 2));
+      new File(Paths.cache, 'arucon-life-trace.json').write(JSON.stringify({ schemaVersion: 1, events: lifeTraceRef.current }, null, 2));
+      if (capture.status !== 'complete') setFailure(`성능 측정이 ${capture.status === 'interrupted' ? '중단됐어요' : '표본 한도를 넘었어요'}. 결과 파일에서 범위를 확인해 주세요.`);
+    } catch (error) { setFailure(`성능 측정 저장 실패: ${errorText(error)}`); }
+  }, []);
   const reactionRuntimeRef = useRef<ReactionRuntime | null>(null);
   const reactionRuntimeGenerationRef = useRef(0);
   const reactionBatchSequenceRef = useRef(0);
@@ -726,6 +734,21 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
     const now = serviceTime();
+    if (action === 'performance_capture') {
+      setFixtureVisible(false); setNotice('');
+      setPerformanceCaptureToken(`capture:${Date.now()}:${++sequenceRef.current}`);
+      return;
+    }
+    if (action === 'resume_saved_piko') {
+      void openAruconDatabase(EXPERIENCE.database).then(db => db.getAllAsync<{ pet_id: string; state_json: string }>('SELECT pet_id,state_json FROM pet_snapshot ORDER BY rowid DESC')).then(rows => {
+        const saved = rows.find(row => row.pet_id.startsWith(`${EXPERIENCE.petId}:evolution_piko:`) && JSON.parse(row.state_json).formId === 'piko');
+        if (!saved) { setNotice('저장된 피코 체험이 없어요.'); return; }
+        const runKey = saved.pet_id.split(':').at(-1)!;
+        if (!parseExperienceProfile(`evolution_piko#${runKey}`)) throw new Error('Invalid saved Piko profile');
+        onProfile(`evolution_piko#${Number(runKey)}`);
+      }).catch(error => setFailure(`기존 피코를 열지 못했어요: ${errorText(error)}`));
+      return;
+    }
     if (action === 'evaluation_mode') {
       void enterEvaluationMode();
       return;
@@ -829,7 +852,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         return service.currentState();
       });
     }
-  }, [actionId, doShopPurchase, enterEvaluationMode, lifeInput, runTask, serviceTime]);
+  }, [actionId, doShopPurchase, enterEvaluationMode, lifeInput, onProfile, runTask, serviceTime]);
 
   if (phase === 'loading') return <View style={styles.center}><Text>로컬 방을 여는 중…</Text></View>;
   if (phase === 'load_error') return <View style={styles.center}>
@@ -872,6 +895,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         cushionVisible={evaluation ? true : roomAffordances.cushionVisible}
         characterCandidateId={evaluation?.candidateId ?? 'baby_v3'}
         comparisonCameraAngle={evaluation?.cameraAngle}
+        comparisonStretchProgress={evaluation?.stretchProgress}
         rendererProfileId={rendererProfileId}
         interactionEnabled={journal === null && !fixtureVisible && menu === null}
         livingEnabled={!evaluation}
@@ -899,6 +923,8 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         /> : null}
         reactionPresentation={reactionPresentation}
         onPerformanceSummary={summary => { performanceSummaryRef.current = summary; }}
+        performanceCaptureToken={performanceCaptureToken}
+        onPerformanceCapture={savePerformanceCapture}
         onInteractionIntent={intent => { reactionRuntimeRef.current?.cancel('superseded'); cancelLifeBubble(); if (intent !== 'furniture') setGame(null); }}
         onPetTouch={target => evaluation ? startLiveReaction('petting', { touchTarget: target }) : doLifeAction('touch', target)}
         onFurnitureHit={name => {
