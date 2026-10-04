@@ -44,6 +44,7 @@ import {
 import { JournalPanel } from './src/presentation/JournalPanel';
 import { ReactionOverlay } from './src/presentation/ReactionOverlay';
 import { cleanAvailability, cleanAvailabilityText, cleanSuccessText } from './src/presentation/cleanPresentation';
+import { projectPetRest } from './src/presentation/petRest';
 import {
   confirmedGrowthReactionCue,
   splitReactionCommands,
@@ -155,6 +156,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   const lifeStoreRef = useRef<LifeMemoryStore | null>(null);
   const bubbleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingGrowthRef = useRef<string | null>(null);
+  const lifeProjectionEpochRef = useRef(0);
   const lifeTraceRef = useRef<unknown[]>([]);
   const autoSpeechAfterRef = useRef(0);
   const databaseRef = useRef<SQLite.SQLiteDatabase | null>(null);
@@ -170,6 +172,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   const clockRef = useRef(0);
   const sequenceRef = useRef(0);
   const performanceSummaryRef = useRef<RoomPerformanceSummary | null>(null);
+  const restRuntimeRef = useRef<unknown[]>([]);
   const [performanceCaptureToken, setPerformanceCaptureToken] = useState<string>();
   const savePerformanceCapture = useCallback((capture: RoomPerformanceCapture) => {
     try {
@@ -190,7 +193,18 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     bubbleTimerRef.current = null;
     setLifeDialogue(null);
   }, []);
+  const clearRestPresentation = useCallback(() => {
+    lifeProjectionEpochRef.current++;
+    reactionRuntimeRef.current?.cancel('scene_change');
+    cancelLifeBubble(); setGame(null); setMealCue(null); setGrowthCue(null);
+    pendingGrowthRef.current = null; growthMealTokenRef.current = null;
+  }, [cancelLifeBubble]);
+
+  useEffect(() => {
+    if (pet?.sleeping || pet?.hibernating) clearRestPresentation();
+  }, [pet?.sleeping, pet?.hibernating, clearRestPresentation]);
   const lifeInput = useCallback((kind: LifeInput, replay = false) => {
+    if (kind === 'cancel') lifeProjectionEpochRef.current++;
     cancelLifeBubble();
     setLifeCommand({ kind, replay, token: `life:${Date.now()}:${++sequenceRef.current}` });
   }, [cancelLifeBubble]);
@@ -315,6 +329,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     try {
       const beforeState = petRef.current;
       const beforeExp = petRef.current?.totalExpUnits ?? 0;
+      const presentationEpoch = lifeProjectionEpochRef.current;
       const result = await task();
       let state = resultState(result);
       if (state && beforeState && state.petId === beforeState.petId && state.totalExpUnits > beforeExp && serviceRef.current) {
@@ -330,17 +345,19 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         } else setGrowthNotice(`식사로 +${((state.totalExpUnits - beforeExp) / APPROVED_GROWTH_POLICY.expScale).toLocaleString('ko-KR', { maximumFractionDigits: 6 })} EXP · Lv.${after.level}`);
       }
       if (state) publish(state);
-      if (allowLifeProjection && state && beforeState && AppState.currentState === 'active') {
+      const canProjectLife = () => allowLifeProjection && AppState.currentState === 'active' &&
+        presentationEpoch === lifeProjectionEpochRef.current && state && !projectPetRest(state).resting;
+      if (canProjectLife() && state && beforeState) {
         const toiletToken = committedToiletScene(beforeState, state);
         if (toiletToken) setLifeCommand({ token: toiletToken, kind: 'toilet' });
       }
-      if (allowLifeProjection && state && beforeState && state.petId === beforeState.petId && state.totalExpUnits > beforeExp && serviceRef.current) {
+      if (canProjectLife() && state && beforeState && state.petId === beforeState.petId && state.totalExpUnits > beforeExp && serviceRef.current) {
         try {
           const entries = await serviceRef.current.readJournal();
           const policy: MealCuePolicy = { mode: cue?.mode ?? 'auto', atMs: cue?.atMs?.() ?? state.lastSimulatedAtMs,
             sinceMs: beforeState?.lastSimulatedAtMs };
           const confirmed = confirmedMealCue(beforeExp, state.totalExpUnits, entries, policy, petId);
-          if (confirmed) {
+          if (confirmed && canProjectLife()) {
             setMealCue(confirmed);
             const growth = confirmedGrowthReactionCue(
               confirmed.token, state.lastSimulatedAtMs, beforeExp, state.totalExpUnits,
@@ -392,7 +409,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       const service = serviceRef.current;
       if (AppState.currentState !== 'active' || !service || busyRef.current || retryRef.current) return;
       const at = serviceTime();
-      void runTask(async () => (await service.advanceTo(at)), { mode: 'auto', atMs: () => at }, true);
+      void runTask(async () => (await service.advanceForeground(at)), { mode: 'auto', atMs: () => at }, true);
     }, 30_000);
     return () => clearInterval(timer);
   }, [phase, runTask, serviceTime]);
@@ -504,7 +521,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       if (next === previous) return;
       const wasActive = previous === 'active';
       previous = next;
-      if (next !== 'active') { reactionRuntimeRef.current?.cancel('background'); cancelLifeBubble(); setGame(null); }
+      if (next !== 'active') clearRestPresentation();
       const service = serviceRef.current;
       if (!service) return;
       const eventWallMs = Date.now();
@@ -520,7 +537,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       else runLifecycle(task);
     });
     return () => subscription.remove();
-  }, [cancelLifeBubble, runLifecycle]);
+  }, [clearRestPresentation, runLifecycle]);
 
   const startDevPet = useCallback((result: Pick<DevPetPreview, 'givenName'>) => {
     const connection = connectionRef.current;
@@ -683,11 +700,21 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     const now = serviceTime();
     const id = actionId(action);
     const gameDayId = utcFixtureDay(now).id;
-    const begin = () => service.beginGameDay(utcFixtureDay(now), now);
+    const begin = () => service.advanceForeground(now);
     switch (action) {
       case 'feed': void runTask(async () => { await begin(); return service.feedDirect(now, id); }, { mode: 'direct' }); break;
       case 'toggle_auto': void runTask(async () => { await begin(); return service.setAutoFeed(now, id, !state.autoFeedOptIn); }, { mode: 'auto', atMs: () => now }); break;
-      case 'sleep_or_wake': void runTask(async () => { await begin(); return state.sleeping ? service.wake(now, id) : service.sleep(now, id); }, { mode: 'auto', atMs: () => now }); break;
+      case 'sleep_or_wake': {
+        const rest = projectPetRest(state);
+        if (rest.action === 'return') {
+          // The foreground-return path settles absence and preserves intentional sleep.
+          void runTask(async () => (await service.returnToForeground(now)).state, undefined, false, false);
+        } else void runTask(async () => {
+          await begin();
+          return rest.action === 'wake' ? service.wake(now, id) : service.sleep(now, id);
+        }, { mode: 'auto', atMs: () => now });
+        break;
+      }
       case 'clean': {
         const availability = cleanAvailability(state);
         if (availability.kind !== 'cleanable') {
@@ -708,6 +735,10 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         break;
       }
       case 'touch':
+        if (!evaluation && projectPetRest(state).resting) {
+          setNotice(projectPetRest(state).hint ?? '먹이 메뉴에서 현재 휴식 상태를 확인해 주세요.');
+          return;
+        }
         if (evaluation) startLiveReaction('petting', { touchTarget });
         else lifeInput('touch');
         void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); }, undefined, true);
@@ -773,6 +804,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         const file = new File(Paths.cache, 'arucon-fun01-performance-summary.json');
         file.write(JSON.stringify(summary, null, 2));
         new File(Paths.cache, 'arucon-life-trace.json').write(JSON.stringify({ schemaVersion: 1, events: lifeTraceRef.current }, null, 2));
+        new File(Paths.cache, 'arucon-rest-runtime.json').write(JSON.stringify({ schemaVersion: 1, samples: restRuntimeRef.current }, null, 2));
         setNotice('FUN-01 성능 JSON을 로컬 캐시에 저장했어요. 합성 도구에서 다시 내보낼 수 있어요.');
       } catch (error) {
         setFailure(`성능 JSON 저장 실패: ${errorText(error)}`);
@@ -879,6 +911,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   if (!pet) return <View style={styles.center}><Text>펫 상태를 다시 읽는 중…</Text></View>;
 
   const roomAffordances = ownedRoomAffordances(ownedItems);
+  const petRest = projectPetRest(pet);
 
   return <View style={styles.root}>
     <View style={StyleSheet.absoluteFill}>
@@ -887,7 +920,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         formId={evaluation?.formId ?? pet.formId}
         mealCue={mealCue ?? undefined}
         personality={evaluation?.personality ?? (pet.personalityProfileId === 'expressive' ? 'expressive' : 'reserved')}
-        sleeping={evaluation?.sleeping ?? (pet.sleeping || pet.hibernating)}
+        restMode={evaluation ? (evaluation.sleeping ? 'sleeping' : 'awake') : petRest.mode}
         reducedMotion={reducedMotion}
         tableInstalled={pet.tableInstalled}
         toiletInstalled={pet.toiletInstalled}
@@ -923,6 +956,17 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         /> : null}
         reactionPresentation={reactionPresentation}
         onPerformanceSummary={summary => { performanceSummaryRef.current = summary; }}
+        onRuntimeSnapshot={room => {
+          restRuntimeRef.current = [...restRuntimeRef.current, { atMs: Date.now(), room,
+            app: { petId: pet.petId, sleeping: pet.sleeping, hibernating: pet.hibernating,
+              restMode: petRest.mode, lastSimulatedAtMs: pet.lastSimulatedAtMs, lastForegroundAtMs: pet.lastForegroundAtMs,
+              appState: AppState.currentState, menu, journalOpen: journal !== null,
+              diagnosticsOpen: fixtureVisible, evaluation: evaluation !== null,
+              mealToken: mealCue?.token, growthMealToken: growthMealTokenRef.current,
+              pendingGrowthToken: pendingGrowthRef.current, pendingLifecycle: pendingLifecycleRef.current !== null,
+              cancellationEpoch: lifeProjectionEpochRef.current,
+              commandBusy: busyRef.current, retryPending: retryRef.current !== null } }].slice(-24);
+        }}
         performanceCaptureToken={performanceCaptureToken}
         onPerformanceCapture={savePerformanceCapture}
         onInteractionIntent={intent => { reactionRuntimeRef.current?.cancel('superseded'); cancelLifeBubble(); if (intent !== 'furniture') setGame(null); }}
@@ -1002,10 +1046,11 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
               {roomAffordances.cushionVisible && <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); lifeInput('rest'); }}><Text>함께 쉬기</Text></Pressable>}
             </>}
             {menu === 'food' && <>
-              <Text>{experience ? '체험용 ' : ''}먹이 {pet.food}개 · {pet.sleeping ? '쉬는 중' : '깨어 있어요'}</Text>
+              <Text>{experience ? '체험용 ' : ''}먹이 {pet.food}개 · {petRest.label}</Text>
+              {petRest.hint && <Text>{petRest.hint}</Text>}
               <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('feed'); }}><Text>먹이 주기</Text></Pressable>
               <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => doLifeAction('toggle_auto')}><Text>식탁 자동급식 {pet.autoFeedOptIn ? '켜짐' : '꺼짐'}</Text></Pressable>
-              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('sleep_or_wake'); }}><Text>{pet.sleeping ? '깨우기' : '잠자기'}</Text></Pressable>
+              <Pressable accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('sleep_or_wake'); }}><Text>{petRest.actionLabel}</Text></Pressable>
             </>}
             {menu === 'decor' && <><Text>{experience ? '체험용 ' : ''}코인 {pet.coin} · 기본 화장실은 늘 사용할 수 있어요.</Text>
               {(['ball', 'cushion', 'table'] as const).map((id, i) => <Pressable key={id} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { if (serviceRef.current) doShopPurchase(serviceRef.current, pet, id); }}><Text>{['공', '쿠션', '식탁'][i]} · {APPROVED_MVP_POLICY.shop.items.find(item => item.id === id)?.coinPrice}코인</Text></Pressable>)}

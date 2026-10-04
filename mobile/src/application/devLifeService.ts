@@ -100,27 +100,37 @@ export class DevLifeService {
     return this.exclusive(() => this.settleUntil(toMs));
   }
 
-  /** Confirm continuous foreground use in safe slices, preserving auto-meal thresholds. */
+  /** Only the active app may confirm foreground time; background advanceTo stays capped. */
+  advanceForeground(toMs: number): Promise<PetState> {
+    return this.exclusive(() => this.settleForeground(toMs, 'foregroundTick'));
+  }
+
   leaveForeground(toMs: number): Promise<PetState> {
-    return this.exclusive(async () => {
-      assertTime(toMs);
-      let state = await this.currentState();
-      if (toMs < state.lastSimulatedAtMs) throw new Error('Service clock moved backward');
-      const halfWindow = Math.max(1, Math.floor(this.config.proposal.hibernateAfterMs / 2));
-      while (!state.hibernating && toMs >= state.lastForegroundAtMs + this.config.proposal.hibernateAfterMs) {
-        const checkpointAt = Math.max(state.lastSimulatedAtMs, state.lastForegroundAtMs + halfWindow);
-        state = await this.settleUntil(checkpointAt);
-        const transition = await this.commit({
-          type: 'foregroundExit', commandId: `foreground-exit:${this.petId}:${checkpointAt}`, toMs: checkpointAt,
-        });
-        state = transition.currentState;
-      }
-      state = await this.settleUntil(toMs);
+    return this.exclusive(() => this.settleForeground(toMs, 'foregroundExit'));
+  }
+
+  /** Confirm continuous foreground use in safe slices, preserving auto-meal thresholds. */
+  private async settleForeground(toMs: number, type: 'foregroundTick' | 'foregroundExit'): Promise<PetState> {
+    assertTime(toMs);
+    let state = await this.currentState();
+    if (toMs < state.lastSimulatedAtMs) throw new Error('Service clock moved backward');
+    // A saved hibernation needs the normal return service, never a heartbeat or wake.
+    if (state.hibernating) return this.settleUntil(toMs);
+    const prefix = type === 'foregroundTick' ? 'foreground-tick' : 'foreground-exit';
+    const halfWindow = Math.max(1, Math.floor(this.config.proposal.hibernateAfterMs / 2));
+    while (!state.hibernating && toMs >= state.lastForegroundAtMs + this.config.proposal.hibernateAfterMs) {
+      const checkpointAt = Math.max(state.lastSimulatedAtMs, state.lastForegroundAtMs + halfWindow);
+      state = await this.settleUntil(checkpointAt);
       const transition = await this.commit({
-        type: 'foregroundExit', commandId: `foreground-exit:${this.petId}:${toMs}`, toMs,
+        type, commandId: `${prefix}:${this.petId}:${checkpointAt}`, toMs: checkpointAt,
       });
-      return transition.currentState;
+      state = transition.currentState;
+    }
+    state = await this.settleUntil(toMs);
+    const transition = await this.commit({
+      type, commandId: `${prefix}:${this.petId}:${toMs}`, toMs,
     });
+    return transition.currentState;
   }
 
   private async applyActivity(activity: NormalizedActivity, nowMs: number): Promise<PetState> {

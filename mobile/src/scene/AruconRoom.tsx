@@ -81,6 +81,7 @@ export function AruconRoom(props: RoomProps) {
     props.formId,
     props.personality,
     props.sleeping,
+    props.restMode,
     props.reducedMotion,
     props.tableInstalled,
     props.toiletInstalled,
@@ -102,6 +103,7 @@ export function AruconRoom(props: RoomProps) {
     props.mealAvailability,
     props.performanceCaptureToken,
     props.onPerformanceCapture,
+    props.onRuntimeSnapshot,
     systemReduced,
   ]);
 

@@ -70,6 +70,7 @@ export type Command =
   | { type: 'setSleepGrowthMultiplier'; commandId: string; gameDay: GameDayWindow; recordDayId: string | null; policyVersion: string; multiplier: number; confirmation: 'neutral_reset' | 'valid_score' }
   | { type: 'applyEvolutionForm'; commandId: string; policyVersion: string; formId: Exclude<FormId, 'arucon'> }
   | { type: 'advance'; commandId: string; toMs: number }
+  | { type: 'foregroundTick'; commandId: string; toMs: number }
   | { type: 'foregroundExit'; commandId: string; toMs: number }
   | { type: 'foregroundReturn'; commandId: string; toMs: number };
 

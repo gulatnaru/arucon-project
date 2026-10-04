@@ -281,6 +281,7 @@ export function reducePet(input: PetState, command: Command, config: GameConfig)
       events.push({ type: 'EvolutionFormApplied', policyVersion: command.policyVersion, formId: command.formId });
       break;
     case 'advance': advance(state, command.toMs, config, events); break;
+    case 'foregroundTick':
     case 'foregroundExit': {
       wholeNonnegative(command.toMs, 'time');
       if (command.toMs < state.lastSimulatedAtMs) throw new Error('Clock moved backward');

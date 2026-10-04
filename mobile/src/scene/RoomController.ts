@@ -22,9 +22,10 @@ import { holdReducedPose } from './clipPresentation';
 import { parseGlb } from './gltfRuntime';
 import { isAppleSoftwareRenderer, resolveRoomRendererProfile, type ResolvedRoomRendererProfile, type RoomRendererProfileId } from './rendererConfig';
 import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
-import type { FloorPoint, RoomProps } from './types';
+import type { FloorPoint, RoomProps, RoomRuntimeSnapshot } from './types';
 import { RoomPerformanceProbe, type RoomPerformanceCapture, type RoomPerformanceSummary } from './performanceProbe';
 import { canStartRoomInteraction, resolveRoomInteraction } from './interactionLifecycle';
+import type { PetRestMode } from '../presentation/petRest';
 import { applyPetMaterialProfile } from './rendererMaterials';
 import { vertexLitMaterial } from './vertexLitMaterial';
 import { batchStaticRoom } from './staticRoomBatch';
@@ -84,6 +85,7 @@ export class RoomController {
   private readonly performanceProbe: RoomPerformanceProbe;
   private onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
   private onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
+  private onRuntimeSnapshot?: (snapshot: RoomRuntimeSnapshot) => void;
   private lastPerformanceCaptureToken?: string;
   private comparisonStretchProgress?: number;
   private lastPerformancePublishMs = 0;
@@ -118,6 +120,7 @@ export class RoomController {
   private presentationHoldRemaining = 0;
   private morphOverlay: readonly Readonly<{ influences: number[]; weights: readonly (readonly [number, number])[] }>[] = [];
   private sleeping = false;
+  private restMode: PetRestMode = 'awake';
   private interactionEnabled = true;
   private reducedMotion = false;
   private touchHolding = false;
@@ -278,9 +281,12 @@ export class RoomController {
     this.comparisonStretchProgress = this.comparisonMode && props.comparisonStretchProgress !== undefined
       ? Math.max(0, Math.min(1, props.comparisonStretchProgress)) : undefined;
     const nextProfile = props.personality ?? 'reserved';
-    const nextSleeping = !!props.sleeping;
+    const nextRestMode = props.restMode ?? (props.sleeping ? 'sleeping' : 'awake');
+    const nextSleeping = nextRestMode !== 'awake';
+    this.restMode = nextRestMode;
     this.onPerformanceSummary = props.onPerformanceSummary;
     this.onPerformanceCapture = props.onPerformanceCapture;
+    this.onRuntimeSnapshot = props.onRuntimeSnapshot;
     if (props.performanceCaptureToken && props.performanceCaptureToken !== this.lastPerformanceCaptureToken) {
       this.lastPerformanceCaptureToken = props.performanceCaptureToken;
       this.performanceProbe.beginCapture();
@@ -303,7 +309,7 @@ export class RoomController {
     }
     if (nextProfile !== this.profile || nextSleeping !== this.sleeping) {
       this.profile = nextProfile; this.sleeping = nextSleeping;
-      if (nextSleeping) { this.path = []; this.destination = null; this.targetRing.visible = false; }
+      this.clearTransientAction();
       this.selectClip(nextSleeping ? 'sleep' : `idle_${nextProfile}`);
     }
     this.furniture.table!.visible = props.tableInstalled ?? true;
@@ -313,7 +319,8 @@ export class RoomController {
     this.furniture.cushion!.visible = props.cushionVisible ?? false;
     this.navigationOptions = { tableInstalled: props.tableInstalled ?? true, toiletInstalled: !!props.toiletInstalled };
     if (props.mealCue && props.mealCue.token !== this.lastMealToken) {
-      if (!this.mixer) this.pendingMealToken = props.mealCue.token;
+      if (nextSleeping) this.lastMealToken = props.mealCue.token;
+      else if (!this.mixer) this.pendingMealToken = props.mealCue.token;
       else {
         this.lastMealToken = props.mealCue.token;
         if (this.livingEnabled) this.runLife({ token: `meal:${props.mealCue.token}`, kind: 'meal' });
@@ -327,6 +334,7 @@ export class RoomController {
       const command = this.pendingLifeCommand; this.pendingLifeCommand = undefined;
       this.runLife(command);
     }
+    this.onRuntimeSnapshot?.(this.runtimeSnapshot());
     this.submissions.markDirty();
     if (this.submissionIntervalMs === 0) this.publishProjection();
   }
@@ -638,6 +646,21 @@ export class RoomController {
     });
   }
 
+  private runtimeSnapshot(): RoomRuntimeSnapshot {
+    const interaction = this.currentInteraction();
+    return { restMode: this.restMode, sleeping: this.sleeping, interactionEnabled: this.interactionEnabled,
+      interaction, clip: this.activeAction?.getClip().name ?? null,
+      blockedBy: !this.frames.running ? 'background' : interaction === 'panel' ? 'panel'
+        : this.sleeping ? this.restMode as 'sleeping' | 'hibernating'
+          : interaction === 'committed_cue' ? 'committed_cue' : null,
+      paused: !this.frames.running, lifeIntent: this.life.diagnosticIntent,
+      lifePose: this.life.pose ? { ...this.life.pose } : null, position: { ...this.position },
+      destination: this.destination ? { ...this.destination } : null,
+      mealCue: { remaining: this.cueRemaining, committed: this.cueCommitted,
+        pendingToken: this.pendingMealToken, lastToken: this.lastMealToken },
+      pendingLifeToken: this.pendingLifeCommand?.token, lastLifeToken: this.lastPropLifeToken };
+  }
+
   private project(object: THREE.Object3D, elevation = 0) {
     object.getWorldPosition(this.projected);
     this.projected.y += elevation;
@@ -847,6 +870,7 @@ export class RoomController {
     if (this.onPerformanceSummary && timestamp - this.lastPerformancePublishMs >= 1_000) {
       this.lastPerformancePublishMs = timestamp;
       this.onPerformanceSummary(this.performanceProbe.snapshot());
+      this.onRuntimeSnapshot?.(this.runtimeSnapshot());
     }
     this.frames.schedule(this.tick);
   };
@@ -857,10 +881,21 @@ export class RoomController {
     this.clock.start(); this.frames.resume(this.tick);
   }
 
+  /** Cancels presentation only: a committed meal/EXP is never undone or replayed. */
+  private clearTransientAction() {
+    this.cueRemaining = 0; this.cueCommitted = false; this.pendingMealToken = undefined;
+    this.pendingLifeCommand = undefined;
+    this.postTouchRemaining = 0; this.petPulseRemaining = 0;
+    this.presentationState = EMPTY_ROOM_PRESENTATION; this.presentationHoldRemaining = 0;
+    this.refreshMorphOverlay();
+    this.life.cancel();
+    this.path = []; this.destination = null; this.targetRing.visible = false;
+  }
+
   pause() {
     const capture = this.performanceProbe.finishCaptureIfDue(true);
     if (capture) this.onPerformanceCapture?.(capture);
-    if (this.livingEnabled) this.life.cancel();
+    this.clearTransientAction();
     this.cancelPet();
     if (this.presentationState !== EMPTY_ROOM_PRESENTATION) {
       this.presentationState = EMPTY_ROOM_PRESENTATION;
@@ -869,6 +904,7 @@ export class RoomController {
       this.selectClip(this.sleeping ? 'sleep' : `idle_${this.profile}`, false, 1, true);
     }
     this.frames.stop(); this.clock.stop();
+    this.onRuntimeSnapshot?.(this.runtimeSnapshot());
     this.performanceProbe.resetRafClock();
   }
 

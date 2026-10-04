@@ -18,6 +18,7 @@ The 2026-09-19 user delegation accepts reversible technical choices under AUTO_D
 - [ADR-011 Android runtime evidence classification](ADR-011-android-runtime-evidence-classification.md) — observed synthetic AVD results and explicit pending boundaries.
 - [ADR-012 iOS Simulator GL submission](ADR-012-ios-simulator-gl-submission.md) — Apple Software Renderer cadence, frame-aligned hit projection, and layout/context ordering.
 - [ADR-013 reaction memory isolation and recovery](ADR-013-reaction-memory-isolation-recovery.md) — separate bounded presentation history, known-v1 quarantine recovery, future-version preservation.
+- [ADR-014 foreground rest-state recovery](ADR-014-foreground-rest-state-recovery.md) — active-time checkpoints, consistent manual sleep/hibernation UI, preserved-save return and recovery replay fencing; runtime verification pending.
 
 DEC-12/17 are approved only for local technical choices; final supported OS, legal retention, real services and release claims remain gated. DEC-31 release/environment scope remains OPEN.
 

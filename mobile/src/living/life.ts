@@ -34,6 +34,10 @@ export class LivingPet {
     this.offerIn = LIFE.offerMin + random() * LIFE.offerSpread;
   }
   get active() { return this.intent?.scene ?? null; }
+  get diagnosticIntent() {
+    return this.intent ? { id: this.intent.id, scene: this.intent.scene, phase: this.intent.phase,
+      commandToken: this.intent.commandToken } : null;
+  }
   get waiting() { return this.intent?.phase === 'waiting'; }
   command(command: LifeCommand, world: LifeWorld) {
     this.world = world;

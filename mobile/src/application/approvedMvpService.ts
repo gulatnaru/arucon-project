@@ -159,6 +159,9 @@ export class ApprovedMvpService {
   advanceTo(toMs: number) {
     return this.mutate(async () => { await this.prepareBenefitDay(toMs, false); return this.life.advanceTo(toMs); });
   }
+  advanceForeground(toMs: number) {
+    return this.mutate(async () => { await this.prepareBenefitDay(toMs, true); return this.life.advanceForeground(toMs); });
+  }
   leaveForeground(toMs: number) {
     return this.mutate(async () => { await this.prepareBenefitDay(toMs, true); return this.life.leaveForeground(toMs); });
   }
@@ -211,11 +214,16 @@ export class ApprovedMvpService {
       await this.prepareBenefitDay(nowMs, false);
       const benefitDay = approvedUtcGameDay(nowMs);
       const before = await this.life.currentState();
-      const sleepStart = before.sleeping
-        ? await this.latestSleepStartMs()
-        : await this.latestSleepStartMs(commandId);
+      const replay = await this.db.getFirstAsync<{ command_id: string; result_json: string }>(
+        'SELECT command_id, result_json FROM command_ledger WHERE pet_id = ? AND command_id = ?', [this.petId, commandId],
+      );
       let state = await this.life.wake(nowMs, commandId);
-      if (sleepStart === null || nowMs - sleepStart < APPROVED_MVP_POLICY.sleep.petSleepMinimumMs) return state;
+      if (!before.sleeping && !replay) return state;
+      if (replay) {
+        const committedAt = (JSON.parse(replay.result_json) as { state: PetState }).state.lastSimulatedAtMs;
+        if (committedAt < benefitDay.startUtcMs || committedAt >= benefitDay.endUtcMs) return state;
+      }
+      if (await this.activeSleepMsAtWake(commandId) < APPROVED_MVP_POLICY.sleep.petSleepMinimumMs) return state;
       const row = await this.db.getFirstAsync<{ command_json: string }>(`
         SELECT command_json FROM command_ledger
         WHERE pet_id = ? AND command_id IN (?, ?)
@@ -349,13 +357,13 @@ export class ApprovedMvpService {
     state = await this.resetBenefitDay(day);
     if (day.id !== targetDay.id) {
       state = continuousForeground
-        ? await this.life.leaveForeground(day.endUtcMs)
+        ? await this.life.advanceForeground(day.endUtcMs)
         : await this.life.advanceTo(day.endUtcMs);
       day = approvedUtcGameDay(day.endUtcMs);
       state = await this.resetBenefitDay(day);
       if (day.id !== targetDay.id) {
         state = continuousForeground
-          ? await this.life.leaveForeground(targetDay.startUtcMs)
+          ? await this.life.advanceForeground(targetDay.startUtcMs)
           : await this.life.advanceTo(targetDay.startUtcMs);
         state = await this.resetBenefitDay(targetDay);
       }
@@ -363,23 +371,40 @@ export class ApprovedMvpService {
     return state;
   }
 
-  private async latestSleepStartMs(wakeCommandId?: string): Promise<number | null> {
-    const rows = await this.db.getAllAsync<{ command_json: string; result_json: string }>(`
-      SELECT ledger.command_json, ledger.result_json
-      FROM local_outbox AS outbox
+  /** Committed active intervals only. Hibernation wall time never qualifies for recovery. */
+  private async activeSleepMsAtWake(wakeCommandId: string): Promise<number> {
+    const wake = await this.db.getFirstAsync<{ sequence: number }>(
+      'SELECT sequence FROM local_outbox WHERE pet_id = ? AND command_id = ?', [this.petId, wakeCommandId],
+    );
+    if (!wake) return 0;
+    const start = await this.db.getFirstAsync<{ sequence: number; result_json: string }>(`
+      SELECT outbox.sequence, ledger.result_json FROM local_outbox AS outbox
       JOIN command_ledger AS ledger ON ledger.command_id = outbox.command_id
-      WHERE outbox.pet_id = ? ORDER BY outbox.sequence DESC
-    `, [this.petId]);
-    let seekSleep = wakeCommandId === undefined;
+      WHERE outbox.pet_id = ? AND outbox.sequence < ? AND json_extract(ledger.command_json, '$.type') = 'sleep'
+      ORDER BY outbox.sequence DESC LIMIT 1
+    `, [this.petId, wake.sequence]);
+    if (!start) return 0;
+    let previous = (JSON.parse(start.result_json) as { state: PetState }).state;
+    const rows = await this.db.getAllAsync<{ command_json: string; result_json: string }>(`
+      SELECT ledger.command_json, ledger.result_json FROM local_outbox AS outbox
+      JOIN command_ledger AS ledger ON ledger.command_id = outbox.command_id
+      WHERE outbox.pet_id = ? AND outbox.sequence > ? AND outbox.sequence <= ?
+      ORDER BY outbox.sequence
+    `, [this.petId, start.sequence, wake.sequence]);
+    let elapsed = 0;
     for (const row of rows) {
       const command = JSON.parse(row.command_json) as Command;
-      if (command.type === 'wake' && command.commandId === wakeCommandId) seekSleep = true;
-      if (seekSleep && command.type === 'sleep') {
-        const result = JSON.parse(row.result_json) as { state?: PetState };
-        return result.state?.lastSimulatedAtMs ?? null;
+      const next = (JSON.parse(row.result_json) as { state?: PetState }).state;
+      if (!next) continue;
+      if (previous.sleeping && !previous.hibernating) {
+        const activeEnd = command.type === 'foregroundTick' || command.type === 'foregroundExit'
+          ? next.lastSimulatedAtMs
+          : Math.min(next.lastSimulatedAtMs, previous.lastForegroundAtMs + APPROVED_GAME_CONFIG.proposal.hibernateAfterMs);
+        elapsed += Math.max(0, activeEnd - previous.lastSimulatedAtMs);
       }
+      previous = next;
     }
-    return null;
+    return elapsed;
   }
 
   async deriveCareProfile(): Promise<CareProfile> {

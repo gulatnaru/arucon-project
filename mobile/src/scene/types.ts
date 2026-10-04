@@ -5,8 +5,21 @@ import type { RoomRendererProfileId } from './rendererConfig';
 import type { CharacterCandidateId } from './characterCandidates';
 import type { ComparisonCameraAngle, RoomPresentationBatch } from './presentationBridge';
 import type { LifeCommand, LifeEvent, LifeScene } from '../living/life';
+import type { PetRestMode } from '../presentation/petRest';
+import type { RoomInteraction } from './interactionLifecycle';
 
 export type { ComparisonCameraAngle, RoomPresentationBatch, RoomVisualCommand } from './presentationBridge';
+
+export type RoomRuntimeSnapshot = Readonly<{
+  restMode: PetRestMode; sleeping: boolean; interactionEnabled: boolean;
+  interaction: RoomInteraction; clip: string | null; paused: boolean;
+  blockedBy: 'background' | 'panel' | 'sleeping' | 'hibernating' | 'committed_cue' | null;
+  lifeIntent: Readonly<{ id: number; scene: LifeScene; phase: string; commandToken?: string }> | null;
+  lifePose: Readonly<{ scene: LifeScene; progress: number; side: number }> | null;
+  position: FloorPoint; destination: FloorPoint | null;
+  mealCue: Readonly<{ remaining: number; committed: boolean; pendingToken?: string; lastToken?: string }>;
+  pendingLifeToken?: string; lastLifeToken?: string;
+}>;
 
 /** APP-01 presentation port. Callbacks do not award resources or advance game time. */
 export type RoomProps = {
@@ -23,6 +36,7 @@ export type RoomProps = {
   formId?: FormId;
   personality?: 'reserved' | 'expressive';
   sleeping?: boolean;
+  restMode?: PetRestMode;
   reducedMotion?: boolean;
   tableInstalled?: boolean;
   toiletInstalled?: boolean;
@@ -54,6 +68,8 @@ export type RoomProps = {
   onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
   performanceCaptureToken?: string;
   onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
+  /** Bounded local diagnostics; not a UI state update or a GPU measurement. */
+  onRuntimeSnapshot?: (snapshot: RoomRuntimeSnapshot) => void;
 };
 
 export type FloorPoint = { x: number; z: number };

@@ -126,6 +126,50 @@ test('continuous foreground exit at 25 hours keeps activity checkpoint and auto 
   assert.equal((await service.readJournal()).some(entry => entry.commandId.startsWith('foreground-exit:') && entry.event.type === 'Returned'), false);
 });
 
+test('active foreground polls across the absence deadline stay awake; only later absence hibernates', async () => {
+  const { service } = await setup({ coin: 15, totalExpUnits: 25_125_000 });
+  await service.advanceForeground(23 * HOUR);
+  for (let time = 23 * HOUR + 30_000; time <= 25 * HOUR; time += 30_000) {
+    const state = await service.advanceForeground(time);
+    assert.equal(state.hibernating, false);
+    assert.equal(state.lastForegroundAtMs, time);
+  }
+  const journal = await service.readJournal();
+  assert.equal(journal.some(entry => ['Returned', 'Hibernated', 'MealConsumed', 'ActivityRewarded'].includes(entry.event.type)), false);
+  const absent = await service.advanceTo(49 * HOUR);
+  assert.equal(absent.hibernating, true);
+  assert.equal(absent.lastForegroundAtMs, 25 * HOUR);
+  assert.deepEqual([absent.coin, absent.totalExpUnits], [15, 25_125_000]);
+});
+
+test('long continuous foreground slicing preserves auto-meal equality and never claims a return', async () => {
+  const setupValues = { food: 8, tableInstalled: true, autoFeedOptIn: true };
+  const direct = await setup(setupValues), split = await setup(setupValues);
+  const once = await direct.service.advanceForeground(72 * HOUR);
+  for (let hour = 1; hour <= 72; hour++) await split.service.advanceForeground(hour * HOUR);
+  const many = await split.service.currentState();
+  for (const key of ['food', 'coin', 'totalExpUnits', 'stamina', 'hunger', 'poopCount', 'foodsSincePoop', 'hibernating', 'lastForegroundAtMs']) {
+    assert.equal(once[key], many[key], key);
+  }
+  assert.equal((await direct.service.readJournal()).filter(entry => entry.event.type === 'MealConsumed').length, 8);
+  assert.equal((await direct.service.readJournal()).some(entry => ['Returned', 'Hibernated'].includes(entry.event.type)), false);
+});
+
+test('heartbeat cannot wake hibernation; a return preserves manual sleep until legitimate wake', async () => {
+  const { service } = await setup({ food: 2, coin: 15 });
+  await service.sleep(23 * HOUR, 'sleep-before-absence');
+  const frozen = await service.advanceTo(50 * HOUR);
+  assert.equal(frozen.hibernating, true);
+  assert.equal((await service.advanceForeground(51 * HOUR)).hibernating, true);
+  await assert.rejects(service.wake(51 * HOUR, 'invalid-wake'), /hibernating/);
+  const resumed = await service.returnToForeground(51 * HOUR);
+  assert.equal(resumed.hibernating, false);
+  assert.equal(resumed.sleeping, true);
+  const awake = await service.wake(51 * HOUR, 'valid-wake');
+  assert.equal(awake.sleeping, false);
+  assert.deepEqual([awake.food, awake.coin, awake.totalExpUnits], [frozen.food, frozen.coin, frozen.totalExpUnits]);
+});
+
 test('persisted activity cursor rejects a different source after reload and repeated revision', async () => {
   const { db, service } = await setup();
   const first = await service.receiveActivity(syntheticActivity(500), 1_000);

@@ -131,6 +131,74 @@ test('new game day clears the prior bonus and qualified no-data wake recovers af
   assert.equal(late.benefitApplied, false, 'expired historical record cannot reopen an old benefit day');
 });
 
+test('sleep qualification excludes hibernation; return itself grants no recovery or EXP', async () => {
+  const hour = 3_600_000;
+  for (const resumedHours of [0, 3]) {
+    const db = new NodeSqliteAdapter();
+    const service = await ApprovedMvpService.initialize(db, options);
+    await service.sleep(23 * hour, 'sleep');
+    const frozen = await service.advanceTo(72 * hour);
+    assert.equal(frozen.hibernating, true);
+    await assert.rejects(service.wake(72 * hour, 'hibernation-is-not-sleep'), /hibernating/);
+    const returned = (await service.returnToForeground(72 * hour)).state;
+    assert.equal(returned.sleeping, true);
+    assert.equal(returned.hibernating, false);
+    assert.equal(returned.stamina, frozen.stamina);
+    assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 0);
+    await service.advanceForeground((72 + resumedHours) * hour);
+    const awake = await service.wake((72 + resumedHours) * hour, 'wake');
+    const replay = await service.wake((72 + resumedHours) * hour, 'wake');
+    assert.equal(awake.sleeping, false);
+    assert.equal(replay.stamina, awake.stamina);
+    assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, resumedHours === 3 ? 1 : 0);
+    assert.deepEqual([awake.food, awake.coin, awake.totalExpUnits], [0, 0, 0]);
+  }
+});
+
+test('approved foreground day rollover never hibernates or invents sleep/return rewards', async () => {
+  const db = new NodeSqliteAdapter();
+  const service = await ApprovedMvpService.initialize(db, options);
+  const state = await service.advanceForeground(72 * 3_600_000);
+  assert.equal(state.hibernating, false);
+  assert.equal(state.lastForegroundAtMs, 72 * 3_600_000);
+  assert.equal((await service.readJournal()).some(entry => ['Hibernated', 'Returned', 'MealConsumed', 'ActivityRewarded'].includes(entry.event.type)), false);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 0);
+});
+
+test('a new wake command while already awake cannot reuse an old sleep on a new benefit day', async () => {
+  const db = new NodeSqliteAdapter();
+  const service = await ApprovedMvpService.initialize(db, options);
+  const hour = 3_600_000;
+  await service.sleep(0, 'sleep');
+  await service.wake(4 * hour, 'wake');
+  await service.advanceForeground(24 * hour);
+  const before = await service.currentState();
+  const after = await service.wake(24 * hour, 'not-a-new-sleep');
+  assert.equal(after.stamina, before.stamina);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 1);
+});
+
+test('replaying yesterday wake cannot grant today recovery or end a newer sleep session', async () => {
+  const db = new NodeSqliteAdapter();
+  const service = await ApprovedMvpService.initialize(db, options);
+  const hour = 3_600_000;
+  await service.sleep(0, 'sleep-yesterday');
+  await service.wake(4 * hour, 'wake-yesterday');
+  await service.advanceForeground(24 * hour);
+  const before = await service.currentState();
+  const replay = await service.wake(24 * hour, 'wake-yesterday');
+  assert.equal(replay.stamina, before.stamina);
+  await service.sleep(24 * hour, 'sleep-today');
+  await service.advanceForeground(28 * hour);
+  const stale = await service.wake(28 * hour, 'wake-yesterday');
+  assert.equal(stale.sleeping, true);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 1);
+  const actual = await service.wake(28 * hour, 'wake-today');
+  assert.equal(actual.sleeping, false);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 2);
+  assert.deepEqual([actual.food, actual.coin, actual.totalExpUnits], [0, 0, 0]);
+});
+
 test('journal-derived care resolves once and persists the form into the pet snapshot', async () => {
   const db = new NodeSqliteAdapter();
   const store = new LocalPetStore(db, APPROVED_GAME_CONFIG);
