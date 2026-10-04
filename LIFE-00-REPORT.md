@@ -1,6 +1,59 @@
 # LIFE-00/01 생활 개편 검증 기록
 
-## 현재 수면·동면·입력 결함 — 2026-10-04
+## 현재 수면·동면·입력 결함 종료 — 2026-10-04 잠금 해제 검증
+
+**CLOSED — 실제 iOS Simulator 검증 범위**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 실제 원본과 보존 DB의 별도 Simulator 복제에서 정상 입력으로 검증했다. 과거 READY나 자동 테스트 숫자를 종료 근거로 쓰지 않았다. 재미·최종 아트 USER_REVIEW_PENDING, 실기기/실제 GPU 표시·물리 입력 지연은 NOT_RUN이다.
+
+### 실제로 달라진 플레이
+
+구형6cf015c에서 식사 패널의 ‘깨어 있어요/잠자기’를 직접 확인했다. 패널을 닫은 뒤에도 수면 동작이 계속됐고 바닥 이동은 반응하지 않았으며 직접 몸 접촉은 ‘지금 하던 행동이 끝나면…’으로 거절됐다. 같은 일반 저장은 sleeping=false / hibernating=true였다. 초기화·재시작 전에 이를 촬영하고 온라인 백업했다.
+
+준비된 cf26058을 **같은 원본 DB**에 설치했고 보고서의 `fbddd68f…` 번들과 일치했다. 앱 시작에서 동면을 자동 해제해 ‘동면 안내 → 다시 함께하기’ 경로가 나타나지 않았다. 이 부분을 REWORK_REQUIRED로 기록하고 **도착 정산과 동면 재개를 분리**했다. `enterForeground`는 먼저 부재를 정산하고 동면이면 안내/기존 버튼을 노출한다. 버튼은 정상 `returnToForeground`를 실행하며 일반 수면의 wake로 대체하지 않는다. 깨어 있거나 일반 수면인 복귀는 기존 서비스 경로를 따르고 일반 수면을 임의로 깨우지 않는다. 거절된 접촉 안내도 같은 rest 해석을 사용한다. 경제·schema·아트·모션·건강 OFF는 유지한다.
+
+cf26058의 정상 자동 복귀로 원래 동면은 이미 풀렸으므로 **원본을 다시 동면시키거나 과거 DB로 되감지 않았다**. 대신 착수 시 보존한 일반 DB를 새 iPhone16e ‘Arucon Sleep Replay’ Simulator에 **바이트 그대로 복사**했다. 이름/ID/상태/시간/원장 필드를 강제 수정하지 않았다. 이 복제와 원본 모두에 동일한 최종 Release를 설치했다. 복제에서는 동면 안내와 ‘다시 함께하기’를 직접 눌러 복귀한 뒤 이동·말캉한 접촉·자율생활을 확인했다. 잠자기/깨우기, 기록 닫기, 앱 전환/재실행도 이어졌다. 원본에서도 직접 이동·접촉과 **일반 수면 상태로 background/foreground 및 콜드 재실행 → 잠들어 있어요/깨우기 → 정상 이동·접촉·자율생활**을 확인했다.
+
+### 요청한 실제 경로 — 같은 최신 빌드
+
+| 번호 | 장면 | 실제 증거 / 범위 |
+|---|---|---|
+| 1 | 기존 sleeping=false / hibernating=true로 시작 | 원본 cf 설치 직전 및 별도 복제 초기 DB. 복제 백업 SHA 동일 |
+| 2 | 동면 상태 UI 표시 | 복제 최신 식사 ‘동면 중이에요’, 18 PNG |
+| 3 | 정상 다시 함께하기 → 동면 해제 | 복제에서 실제 버튼 입력, 17 영상·20 저장 |
+| 4 | 깨어 있음·3D·상태 일치 | 21 runtime 정상 방: awake / idle_reserved / sleeping=false / hibernating=false |
+| 5 | 바닥 이동 | 실제 회전·접근·위치 변경, 복제17/원본28 영상 |
+| 6 | 직접 쓰다듬기 | 실제 좌표 drag, 눌림/복원·말풍선, 두 영상·20/24 PNG |
+| 7 | 자율생활 재개 | 수동 입력 없는23초 관찰, seat/company 수행·완료 및 위치 변화 |
+| 8 | 잠자기 실행 | 정상 식사 버튼, 22/29 저장 sleeping=true |
+| 9 | 수면 UI·3D 일치 | 잠들어 있어요/깨우기, 실제 sleep clip, 22/23/31 증거 |
+| 10 | 깨우기 실행 | 정상 wake 버튼, 별도 hibernation return과 구분 |
+| 11 | 이동·접촉·자율생활 재개 | 실제 재이동·두 번째 접촉·22초 무입력 관찰, 24/32 증거 |
+| 12 | 메뉴/기록 닫기·앱 전환·재실행 | 복제 awake 전체; 원본은 manual sleep까지 유지, 이후 wake/입력 통과 |
+
+**12개 모두 실제 Simulator 정상 경로에서 확인**했다. 1~3의 최종 명시적 복귀 경로는 보존 원본의 별도 DB 복제이며, 이를 원래 Simulator에서 재연했다고 표현하지 않는다. 개발 메뉴는 진단 파일 내보내기에만 사용했다. 장면/모델/시계/성장/상태를 강제 재생하지 않았다.
+
+### 동일 시점 상태 대조
+
+| 실제 표본 | App sleeping / hibernating / restMode | 실제 controller clip / life intent·pose | currentInteraction / interactionEnabled |
+|---|---|---|---|
+| 동면 진단 19 | false / true / hibernating | sleep / null·null | panel / false (진단 패널 정상 차단) |
+| 복귀한 정상 방 21 | false / false / awake | idle_reserved / null·null (생활 완료 뒤) | idle / true, blockedBy=null |
+| 일반 수면 진단 23 | true / false / sleeping | sleep / null·null | panel / false (진단 패널 정상 차단) |
+| 원본 재실행·wake 뒤 32 | false / false / awake | idle_reserved / null·null (생활 완료 뒤) | panel / false (내보내기 때 진단 패널) |
+
+renderer의 legacy `sleeping` 필드는 rest gate라서 동면 표본에서 true이고, 일반 수면의 도메인 플래그와 구별한다. `restMode`는 App/controller 모두 동일했다. cue remaining0·committed=false, pending growth/lifecycle 없음, commandBusy/retry=false였다. panel 표본을 정상 방의 입력 차단이라고 오해하지 않았다. 실제 패널 닫기 후의 입력은 두 영상에서 확인했다. 자율 seat/company의 실제 perform/complete trace와 화면 위치 변경도 대조했다. frozen render·오래된 sleep clip/meal cue가 복귀 후 조작을 막는 현상은 재현되지 않았다.
+
+### 저장·검사·빌드·증거
+
+- 원본/복제 모두 `dev-local-pet-1`, Sim, arucon, reserved, 먹이0·코인15·EXP25.125 보존. **Meal ledger3→3, recovery ledger0→0**, 재화/EXP 추가·회수0. 원본 DB 초기화/되감기/시간 조작 없음. 별도 복제의 저장 쓰기는 실제 정상 서비스와 사용자 입력뿐이다.
+- 최신 소스 **6c76c9b**, Release SHA **`facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`**. 빌드/원본 설치/복제 설치/소스 파일 hash 모두 대조했다. 두 설치는 같은 빌드다. 이후 문서 commit은 앱 코드를 바꾸지 않는다.
+- 이번 새 **전체362/362·영향29/29·lint/typecheck PASS**, iOS Release xcodebuild exit0·Android JS bundle export exit0. 실제 Android native/실기기는 이번 범위 NOT_RUN이다. CNG/native config 변경이나 Expo 내부 패치 없음.
+- macOS15.6 / Xcode26.3 / Expo55 / iPhone16e, runtime 표시iOS26.3·실제26.3.1(build23D8133), 390×844pt /1170×2532px. 원본 device2170BD93…, 별도 복제FE2B778D…. 새 시스템/SDK/계정 설치 없음.
+- 로컬 `evidence/life-01-sleep-resume-2026-10-04/`: 02 수정 전 영상, 03/04 수정 전 화면, 05/07/08 cf 설치·자동 복귀 gap, **17 최신 복제 연속 영상18분56.595초**, **28 최신 원본 연속 영상13분24.113초**, 18/22/24/31/33 화면, 19/21/23/32 runtime, 35 보존 audit, 38 검증 matrix. 영상은 정상 속도·무편집이며 진단 내보내기/도구 창 전환 구간도 삭제하지 않았다. 추출 프레임은 SELF_REVIEW 보조다.
+- 이번은 기능·시각·입력 검증이다. 실제 GPU FPS/물리 touch-to-photon/실기기 발열·배터리·새 성능 benchmark는 NOT_RUN. 영상 인코딩 속도나 snapshot/과거 proxy 숫자로 성능 통과를 만들지 않았다.
+
+현재 원래 iPhone16e는 최신 Release의 깨어 있는 Sim 방이다. 건강 OFF, 재미/최종 아트 USER_REVIEW_PENDING, SRS MVP/출시 전체 gate 미완료를 유지한다. source checkpoint와 일반 push만 사용하며 DB·영상·빌드·native generated 산출물은 Git에서 제외했다. 최종 feature HEAD/원격 해시·clean 상태는 local Git audit와 최종 응답에 기록한다.
+
+## Historical 수면·동면·입력 결함 — 2026-10-04 잠금 중 실행
 
 **PARTIAL_WITH_BLOCKERS / 결함 OPEN — 수정·자동 검증 완료, 설치 앱 시각·입력 재검증 대기**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 요청 역할 Astra, effective model ROUTING_UNVERIFIED. 이전 READY는 아래 이력이며 이번 결함의 통과 증거가 아니다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
 

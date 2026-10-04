@@ -1,6 +1,21 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 새 수면·동면·입력 회귀 — 2026-10-04
+## 현재 수면·동면·입력 회귀 종료 — 2026-10-04 잠금 해제
+
+**CLOSED — 실제 iOS Simulator 범위**. 최신 소스6c76c9b/두 설치 동일facaf830… Release. 원본 초기화/되감기 없이 정상 입력과 원본 백업의 별도 Simulator 복제 경로를 구분했다. [최신 상세 증거](LIFE-00-REPORT.md).
+
+| 범위 | 이번 판정 |
+|---|---|
+| 수정 전 일반 저장/UI/입력 | 실제 원본에서 sleeping=false/hibernating=true, 식사 awake/sleep 버튼 및 패널 닫은 이동/접촉 거절 재현 |
+| 최종 명시적 동면 복귀 | PASS_ACTUAL_SIMULATOR: 별도 exact DB 복제, 정확한 동면 UI와 정상 다시 함께하기 버튼 |
+| 이동·직접 교감·자율생활·잠자기/깨우기 | PASS_ACTUAL_SIMULATOR: 같은 최종 Release에서 실제 장면·입력·clip/flags 대조 |
+| 메뉴/기록 닫기·앱 전환·재실행 | PASS_ACTUAL_SIMULATOR: 복제 전체12경로, 원본 manual sleep 보존/wake와 입력도 확인 |
+| 저장/경제 | PASS: 원본/복제 이름·먹이0·코인15·EXP25.125 동일, 섭취3/회복0 보존 |
+| 자동/빌드 | 새362/362·영향29/29·lint/typecheck·iOS Release compile/install/runtime·Android JS bundle PASS |
+| 성능/실기기/출시 | 실제 GPU/물리 입력/실기기/새 benchmark NOT_RUN; SRS MVP·출시 전체 완료 아님 |
+| 재미/아트/외부 경계 | USER_REVIEW_PENDING; 건강 OFF·법률/계정/실결제/출시 경계 유지 |
+
+## Historical 새 수면·동면·입력 회귀 — 2026-10-04 잠금 중
 
 **PARTIAL_WITH_BLOCKERS / 결함 OPEN**. 수정 소스cf26058, 실제 원본 설치6cf015c는 재현 보존. 아래 과거 READY는 현재 새 결함의 검증 결과가 아니다. [최신 상세 결과](LIFE-00-REPORT.md).
 

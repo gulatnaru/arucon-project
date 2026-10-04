@@ -1,6 +1,14 @@
 # iOS validation history and Release input resume
 
-## 현재 수면·동면·입력 결함 — 2026-10-04
+## 현재 수면·동면·입력 결함 CLOSED — 2026-10-04 잠금 해제
+
+**CLOSED / 실제 iOS Simulator 검증 범위**. ASTRA_DIRECT / SELF_REVIEW. 구형6cf015c에서 ‘깨어 있어요/잠자기’와 패널을 닫아도 계속되는 수면·이동/접촉 거절을 직접 재현했다. 원본은 sleeping=false/hibernating=true였다. cf26058 동일해시 설치 후 자동 cold return이 요청된 동면 안내/버튼을 건너뛰어 REWORK로 두고 도착 정산/정상 재개를 분리했다.
+
+최신 소스 **6c76c9b**, 빌드·원본·별도 백업복제 Simulator Release SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b` 일치. 백업을 바이트 그대로 사용한 복제에서 동면 안내→다시 함께하기→이동/직접 교감/생활→잠자기/깨우기→기록·앱 전환·재실행12개가 정상 입력으로 통과했다. 원본은 되감지 않고 정상 입력·manual sleep 전경/콜드 보존·wake/입력/생활을 추가 확인했다. 같은 시점 실제 clip/intent/pose/currentInteraction/입력 gate/App flags를 대조했다. 이름·재화·EXP 보존, meal3/recovery0 유지.
+
+새362/362·영향29/29·lint/typecheck·iOS Release exit0·Android JS bundle PASS. 실제 Android native/실기기·GPU/물리 입력/새 성능 benchmark NOT_RUN; 재미/최종 아트 USER_REVIEW_PENDING. 과거 READY/360개 숫자로 닫지 않았다. 17/28 무편집 영상18분56.595초/13분24.113초와 저장·runtime·보존 audit는 `evidence/life-01-sleep-resume-2026-10-04/`. [상세 결과](LIFE-00-REPORT.md), [현재 재개 안내](NEXT-RESUME.md). 건강 OFF, feature 일반 commit/push만 허용, excluded artifact stage0.
+
+## Historical 수면·동면·입력 결함 — 2026-10-04 잠금 중
 
 **PARTIAL_WITH_BLOCKERS / 결함 OPEN**, ASTRA_DIRECT / SELF_REVIEW. 원래 일반 저장 sleeping=false / hibernating=true를 백업과 원장으로 확인했다. 전경30초 폴링의2881회 advance가 마지막 전경 시각을 갱신하지 않아24시간 경계에서 동면을 만든다. 식사 UI는 sleeping만, renderer는 양쪽 flags를 읽어 표시/입력이 갈라진다. [이번 원인·수정·증거](LIFE-00-REPORT.md), [재개 순서](NEXT-RESUME.md).
 

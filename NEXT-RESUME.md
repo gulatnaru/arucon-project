@@ -1,6 +1,16 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 지점 — 새 수면·동면·입력 결함 / 2026-10-04
+## 현재 지점 — 수면·동면·입력 결함 CLOSED / 2026-10-04 잠금 해제
+
+**CLOSED — 실제 iOS Simulator 검증 범위**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 최신 소스 **6c76c9b**, 원래 iPhone16e 설치 Release SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`. 현재 정상 Sim 방, sleeping=false / hibernating=false, 먹이0·코인15·EXP25.125다. 원래 DB를 초기화·되감기하지 않았다. Metro는 필요 없다.
+
+구형의 패널 닫은 입력 거절을 실제로 재현했다. cf26058의 시작 자동 복귀가 요청된 동면 안내/버튼을 건너뛰어 `enterForeground`로 도착·재개를 분리했다. 같은 최종 빌드에서 원본 백업의 **별도 Simulator DB 복제**가 동면 표시→정상 다시 함께하기→이동/접촉/생활→잠자기/깨우기→메뉴/기록/앱 전환/재실행12경로를 통과했다. 원본에서도 정상 입력과 수면 중 전경/콜드 재실행 보존→wake→입력/생활을 확인했다. 원본을 다시 동면시키거나 복제 시험을 원본 시험이라고 기록하지 않는다.
+
+새362/362·영향29/29·lint/typecheck·iOS Release compile·Android JS bundle PASS. 원본과 복제 모두 섭취 원장3, 회복 원장0 및 이름/재화/EXP 동일. [최신 실제 증거/범위](LIFE-00-REPORT.md), 로컬 `evidence/life-01-sleep-resume-2026-10-04/`. 17/28 영상은 각각18분56.595초/13분24.113초의 같은 최종 빌드 무편집 연속 플레이다.
+
+이 결함은 완료했다. 재개 시 실제 새 증상이 없으면 전체 수면/진화 검증을 반복하거나 새 개편을 시작하지 않는다. 사용자는 원래 Simulator에서 최신 앱을 바로 평가할 수 있다. 실행이 종료돼 있으면 `xcrun simctl launch 2170BD93-715C-482E-AD9C-DD7479970003 com.arucon.dev`. 재미/최종 아트 USER_REVIEW_PENDING; 실기기/GPU/물리 입력·발열·배터리/현재 성능 benchmark는 NOT_RUN이다. 건강 OFF, feature checkpoint/일반 push만 유지한다.
+
+## Historical 지점 — 새 수면·동면·입력 결함 / 2026-10-04 잠금 중
 
 **PARTIAL_WITH_BLOCKERS / 결함 OPEN**. ASTRA_DIRECT / SELF_REVIEW. 수정 소스 `cf26058`; 이전 READY/성장·진화 PASS는 아래 이력이다. 이번 요청은 새 결함 수정이며 전체 개편을 다시 시작하지 않는다. [현재 원인·수정·증거](LIFE-00-REPORT.md), [ADR-014](docs/adr/ADR-014-foreground-rest-state-recovery.md).
 
