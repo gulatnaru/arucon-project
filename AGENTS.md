@@ -1,10 +1,18 @@
 # Arucon — 공통 작업 기준 v1.9
 
-제품 기준은 `docs/arucon-SRS.md` v1.9다. 2026-09-19 사용자 승인 여섯 MVP 기본 정책과 가역 config/ADR 위임을 적용한다. **2026-09-28 품질 복구·FUN 개편은 ASTRA_DIRECT 모드**다. Astra가 설계·구현·디버깅·실제 앱 검증을 직접 책임지고 새 서브에이전트를 생성하지 않는다. 과거 ENG-03 역할 설정과 결정 이력은 보존한다.
+제품 기준은 `docs/arucon-SRS.md` v1.9다. 2026-09-19 사용자 승인 여섯 MVP 기본 정책과 가역 config/ADR 위임을 적용한다. **2026-10-04 현재 직접 개발 책임자의 요청 모델은 GPT-6.1 Sol Max이며 SOL_DIRECT / AUTONOMOUS PRODUCT HARDENING으로 운영한다.** 직접 설계·구현·디버깅·실제 앱 검증과 SELF_REVIEW를 책임지고 새 subagent를 기본적으로 생성하지 않는다. 설정의 요청 모델과 실제 effective model 확인은 구분한다. 2026-09-28 이후 ASTRA_DIRECT의 완료 증거·과거 ENG-03 역할 설정·결정 이력은 보존한다.
+
+## 현재 제품 품질 강화
+- 소스6c76c9b·인계1d234d8에서 이어간다. 실제 HEAD/dirty/원격/설치본을 확인하고 과거 commit으로 reset하지 않는다.
+- 현재 설치된 Release를 먼저 제품 관점으로 관찰한다. 재현되는 명백한 기능 결함·화면 깨짐·상태 불일치·입력 잠금에 한해 기술 수정한다. 새 기능을 무작정 추가하지 않는다.
+- 재현 → 원인 → 수정 → Release → Simulator 정상 조작 → 시간/저장/입력 회귀 → SELF_REVIEW를 직접 반복한다. 자체 검토를 독립 리뷰라고 기록하지 않는다.
+- 사용자의 걷기·달리기·수면 결과에 따른 성장과 자율 식사·휴식·화장실·탐색·장난·기질/버릇을 제품 목표로 유지한다. 실제 건강 연결 OFF에서의 합성 검증과 실데이터 연결은 구별한다.
+- 기능 품질 / 표현 품질 / 게임 재미를 분리해 검토하고 테스트 개수로 완료를 판단하지 않는다. 반환은 PRODUCT_REVIEW_READY, 실제 환경/권한 BLOCKED, 성장·경제·진화 규칙 변경 필요, 사용자 캐릭터/재미 선택 필요 중 해당 사유로 한다.
+- 실기기·GPU·물리 입력 성능 NOT_RUN, 재미·최종 아트 USER_REVIEW_PENDING을 유지한다. 기존 feature checkpoint/일반 push만 허용하며 main/merge/deploy/실건강/실결제 권한은 확대하지 않는다.
 
 ## 안내판
-- 현재 LIFE-01 재개: `tasks/LIFE-01-autonomous-growth-resume.md` — 화면 복구 후 자율 생활·성장·발견을 우선한다. LIFE-00의 수동 놀이 중심 대표 검증을 갱신하며 ASTRA_DIRECT/SELF_REVIEW를 유지한다.
-- 현재 LIFE-00 개편: `tasks/LIFE-00-living-pet-overhaul.md` — 2026-09-29 ASTRA_DIRECT 직접 구현·검증. FUN의 관련 UX/행동/아트 범위를 갱신한다. 새 서브에이전트 없이 진행하며 재미·최종 아트는 USER_REVIEW_PENDING이다.
+- LIFE-01 실행 이력: `tasks/LIFE-01-autonomous-growth-resume.md` — 화면 복구 후 자율 생활·성장·발견을 검증했다. 당시 ASTRA_DIRECT/SELF_REVIEW 증거는 보존하며 현재 운영은 SOL_DIRECT를 따른다.
+- LIFE-00 개편 이력: `tasks/LIFE-00-living-pet-overhaul.md` — 2026-09-29 ASTRA_DIRECT 직접 구현·검증. FUN의 관련 UX·행동·아트 기준과 과거 증거를 계승하며 현재 운영은 SOL_DIRECT다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
 - FUN-00 개편: `tasks/FUN-00-overhaul.md`, `docs/fun-first-plan.md` — 기존 저장/정책/원본을 보존한 플레이 개편. 체형 두 후보 제작은 허용하며 최종 재미·아트는 USER_REVIEW_PENDING이다.
 - 자율 개발 시작: `tasks/AUTO-00-orchestrate.md`
 - 모델 라우팅: `docs/model-routing.md`
@@ -39,7 +47,7 @@
 
 ## 현재 운영과 과거 역할 라우팅
 
-이번 품질 복구·FUN 개편에서는 아래 분업 지침을 실행하지 않는다. 단계별 별도 reviewer를 요구하지 않으며 자체 검토는 `SELF_REVIEW`로 명시한다. 제품 요구·테스트 기대값·검증 증거·보안/외부 권한은 그대로 유지한다. 아래는 기존 ENG-03 역할 이력이다.
+현재 SOL_DIRECT 제품 품질 강화에서는 아래 분업 지침을 강제 적용하지 않는다. 단계별 별도 reviewer를 요구하지 않으며 자체 검토는 `SELF_REVIEW`로 명시한다. 제품 요구·테스트 기대값·검증 증거·보안/외부 권한은 그대로 유지한다. 아래는 기존 ENG-03 역할 이력이다.
 - 긴 계획·게이트 조율·교차 모듈 판단·최종 통합은 루트 Astra가 맡는다.
 - 고난도 구현/아키텍처는 `arucon_builder`.
 - 탐색·대량 읽기·호출경로 수집은 `arucon_explorer`.
@@ -49,4 +57,4 @@
 - 같은 파일의 동시 작성자는 하나다. 읽기 역할은 제품 코드를 수정하지 않는다.
 - 위임 브리핑에는 **결과 / 제약·허용 파일 / 검증 / 멈출 지점**을 넣는다.
 
-과거 ENG-03에서는 루트가 기본 구현자가 아니었으나, 현재 ASTRA_DIRECT 범위에서는 Astra가 직접 구현하고 검증한다. 재위임은 새로운 사용자 지시 전까지 중단한다.
+과거 ENG-03의 오케스트레이터 분업과 ASTRA_DIRECT 직접 구현은 이력이다. 현재는 요청된 GPT-6.1 Sol Max가 직접 개발을 책임지며 새 subagent를 기본적으로 생성하지 않는다. 과거 하위 역할 파일은 삭제하거나 현재 수행 기록으로 바꾸지 않는다.

@@ -1,5 +1,15 @@
 # Next resume — fresh macOS iOS validation
 
+## 현재 지점 — SOL_DIRECT 제품 품질 강화 / 2026-10-04
+
+**BLOCKED — 이번 실제 화면 접근에서 Mac locked 확인**. 요청 직접 개발 책임자 GPT-6.1 Sol Max. 프로젝트는 `gpt-6.1-sol` / max, SOL_DIRECT / AUTONOMOUS PRODUCT HARDENING / SELF_REVIEW이며 새 subagent를 기본 생성하지 않는다. 실제 effective model은 확인 불가로 ROUTING_UNVERIFIED다. 전역 설정·권한과 Astra 이력은 보존한다.
+
+앱 소스는 **6c76c9b**, 착수 HEAD/원격은 **1d234d8**이었다. 현재 설치 Release SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`를 직접 대조했다. 일반 Sim, sleeping=false/hibernating=false, 먹이0·코인15·EXP25.125를 읽기 전용으로 확인했다. 앱 소스·DB·설치를 변경하거나 과거 commit으로 reset하지 않았다. 수면·동면·입력 결함은 아래 실제 증거의 **CLOSED**를 유지한다.
+
+다음 한 작업은 **Mac 잠금 해제 후 현재 설치된 Release를 제품 관점에서 직접 관찰**하는 것이다. 새 관찰 전에는 PRODUCT_REVIEW_READY로 표현하지 않는다. 기존 수면12개·진화 전체를 처음부터 다시 시험하지 않는다. 먼저2분 무입력 생활→짧은 직접 교감→생활 복귀→정상 메뉴/기록을 보고, 현재 기존 격리 자동 식사·성장/화장실 체험에서 독립적인 생활 경로를 관찰한다. 일반 저장의 이름·재화·EXP·시계는 보존한다. 합성 체험을 실제 건강 연결로 표현하지 않는다.
+
+재현된 명백한 결함만 원인→수정→Release→실제 Simulator 조작→시간/저장/입력 회귀→SELF_REVIEW로 직접 처리한다. 기능 품질 / 표현 품질 / 재미는 별도 판단하며, 테스트 숫자나 과거 PASS로 종료하지 않는다. 실기기·GPU·물리 입력 NOT_RUN, 재미·최종 아트 USER_REVIEW_PENDING, 건강/결제 OFF 및 feature 일반 commit/push 경계 유지. 현재 설정 검증42/42는 운영 정합성만 의미한다. [현재 실행 보고](AUTONOMOUS-RUN-REPORT.md), 증거 `evidence/product-hardening-sol-2026-10-04/`.
+
 ## 현재 지점 — 수면·동면·입력 결함 CLOSED / 2026-10-04 잠금 해제
 
 **CLOSED — 실제 iOS Simulator 검증 범위**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 최신 소스 **6c76c9b**, 원래 iPhone16e 설치 Release SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`. 현재 정상 Sim 방, sleeping=false / hibernating=false, 먹이0·코인15·EXP25.125다. 원래 DB를 초기화·되감기하지 않았다. Metro는 필요 없다.

@@ -1,5 +1,18 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 현재 SOL_DIRECT 제품 관찰 — 2026-10-04
+
+**BLOCKED — 현재 Mac locked, 새 실제 플레이 NOT_RUN**. 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED. 소스6c76c9b·설치facaf830…·착수HEAD/원격1d234d8 일치, 저장/앱 코드 보존. 운영 정합성42/42를 제품 완료로 보지 않는다.
+
+| SELF_REVIEW 항목 | 현재 판정 |
+|---|---|
+| 기능 품질 | 현재 제품 관찰 NOT_RUN/BLOCKED; 아래 실제 수면·동면 CLOSED는 보존 |
+| 표현 품질 | 현재 제품 관찰 NOT_RUN/BLOCKED; 과거 영상으로 새 PASS를 만들지 않음 |
+| 게임 재미/최종 아트 | USER_REVIEW_PENDING |
+| 실기기/GPU/물리 입력 | NOT_RUN 유지 |
+
+잠금 해제 후 현 설치본의 자율생활·정상 교감·기존 격리 식사/성장을 관찰하고 실제 결함에 한해 기술 수정을 진행한다. 새 기능 확대·성장/경제/진화 자가 변경·권한 확대 없음. [재개](NEXT-RESUME.md).
+
 ## 현재 수면·동면·입력 회귀 종료 — 2026-10-04 잠금 해제
 
 **CLOSED — 실제 iOS Simulator 범위**. 최신 소스6c76c9b/두 설치 동일facaf830… Release. 원본 초기화/되감기 없이 정상 입력과 원본 백업의 별도 Simulator 복제 경로를 구분했다. [최신 상세 증거](LIFE-00-REPORT.md).

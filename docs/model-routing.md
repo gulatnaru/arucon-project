@@ -1,6 +1,14 @@
 # 아루콘 v1.9 — 멀티모델 라우팅
 
-## 현재 적용: ASTRA_DIRECT (2026-09-28)
+## 현재 적용: SOL_DIRECT / AUTONOMOUS PRODUCT HARDENING (2026-10-04)
+
+직접 개발 책임자의 요청 모델은 **GPT-6.1 Sol Max**, 프로젝트 설정은 `gpt-6.1-sol` / `max`다. 새 subagent는 기본적으로 생성하지 않으며 프로젝트 agents enabled=false를 유지한다. 요청 모델/추론 설정과 실제 effective model 확인을 구별하고, 현재 backend 식별 근거가 없으면 ROUTING_UNVERIFIED로 기록한다. 설정 파일만으로 실제 모델을 증명하지 않는다.
+
+현재 소스6c76c9b/인계1d234d8을 보존하고 설치된 Release를 먼저 관찰한다. 재현된 기능·화면·상태·입력 결함에 한해 직접 재현→원인→수정→Release→실제 Simulator 조작→시간/저장/입력 회귀→SELF_REVIEW를 수행한다. 기능·표현·재미는 별도 판정하며 테스트 개수로 제품 완료를 선언하지 않는다. PRODUCT_REVIEW_READY, 실제 BLOCKED, 성장/경제/진화 규칙 변경 필요, 캐릭터/재미의 사용자 선택 필요일 때 반환한다. 실건강·실결제·main/merge/deploy/권한 경계는 그대로다.
+
+아래 Astra 직접 개발과 ENG-03 분업은 역사 기록이다. 완료 증거와 과거 역할 파일을 보존하며 현재 강제 라우팅으로 해석하지 않는다.
+
+## Historical 적용: ASTRA_DIRECT (2026-09-28)
 
 LIFE-01(2026-09-30)의 화면 복구·자율 생활/성장 실행도 같은 직접 개발 모드다. 실제 수행 범위와 차단은 `LIFE-00-REPORT.md`의 현재 LIFE-01 절을 따른다.
 

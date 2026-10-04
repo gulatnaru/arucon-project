@@ -1,5 +1,17 @@
 # iOS validation history and Release input resume
 
+## 현재 SOL_DIRECT 제품 품질 강화 — 2026-10-04
+
+**BLOCKED — 현재 Mac 잠금으로 새 제품 관찰 미실행**. 요청 개발 책임자 GPT-6.1 Sol Max, AUTONOMOUS PRODUCT HARDENING / SELF_REVIEW. 프로젝트 요청 설정을 `gpt-6.1-sol` / max로 맞췄고 subagents disabled, 기존 승인·sandbox·network 설정 및 과거 역할 파일은 보존했다. 실제 effective model을 노출하는 근거가 없어 **ROUTING_UNVERIFIED**다. 설정만으로 현재 backend를 단정하지 않는다.
+
+착수 시 feature HEAD/추적/live origin은 모두 **1d234d8**, 작업 트리 clean이었다. 설치 Release SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`는 앱 소스 **6c76c9b**와 대응했다. 읽기 전용 일반 저장은 Sim, sleeping=false/hibernating=false, 먹이0·코인15·EXP25.125다. 원본 저장/설치/앱 소스를 바꾸거나 과거 commit으로 reset하지 않았다.
+
+실제 CUA Simulator 접근은 이번 실행에서 Mac locked를 반환했다. 따라서 **기능 품질: 현재 관찰 NOT_RUN/BLOCKED, 표현 품질: 현재 관찰 NOT_RUN/BLOCKED, 게임 재미: USER_REVIEW_PENDING**이다. 아래 Astra의 CLOSED·실행 증거를 보존하지만 새 제품 관찰의 PASS로 재사용하지 않는다. 재현된 새 결함이 없으므로 앱 코드 수정·불필요한 Release 재빌드·기능 확대는 수행하지 않았다. 운영 설정/문서 정합성만42/42로 확인했고 제품 완료 판정으로 쓰지 않는다.
+
+잠금 해제 후 현재 설치본에서 먼저 무입력 자율생활과 짧은 직접 교감·정상 메뉴를 관찰한다. 기존 격리 자동 식사/성장 체험은 같은 서비스 경로의 제품 관찰용으로만 사용하고 일반 저장에 체험 자원을 지급하지 않는다. 명백한 기능/화면/상태/입력 결함이 재현될 때만 직접 수정 루프를 진행한다. 반환 기준은 PRODUCT_REVIEW_READY, 실제 환경/권한 BLOCKED, 성장/경제/진화 변경 필요, 캐릭터/재미 사용자 선택 필요다. 실기기/GPU/물리 입력 NOT_RUN, 건강/실결제 OFF, 기존 feature checkpoint/일반 push 범위 유지.
+
+로컬 증거 `evidence/product-hardening-sol-2026-10-04/`: 현재 Git/설치/저장 audit, 설정 전후 비교, 운영 검증. DB·빌드·영상·비밀은 stage하지 않는다. [현재 재개 안내](NEXT-RESUME.md).
+
 ## 현재 수면·동면·입력 결함 CLOSED — 2026-10-04 잠금 해제
 
 **CLOSED / 실제 iOS Simulator 검증 범위**. ASTRA_DIRECT / SELF_REVIEW. 구형6cf015c에서 ‘깨어 있어요/잠자기’와 패널을 닫아도 계속되는 수면·이동/접촉 거절을 직접 재현했다. 원본은 sleeping=false/hibernating=true였다. cf26058 동일해시 설치 후 자동 cold return이 요청된 동면 안내/버튼을 건너뛰어 REWORK로 두고 도착 정산/정상 재개를 분리했다.
