@@ -1,6 +1,24 @@
 # iOS validation history and Release input resume
 
-## 현재 SOL_DIRECT 제품 품질 강화 — 2026-10-04
+## 현재 SOL_DIRECT 제품 관찰 — PRODUCT_REVIEW_READY
+
+**PRODUCT_REVIEW_READY — 현재 iOS Simulator/합성 체험의 사용자 검토용 범위**. SOL_DIRECT / SELF_REVIEW, 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED, 새 subagent0. 앱 소스 **6c76c9b**, 설치 Release `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`, 착수HEAD/원격 **2574135** 일치와 clean을 직접 확인했다. 새로운 앱 코드 변경·재빌드·재설치·게임 규칙/아트 확대는 수행하지 않았다.
+
+일반 Sim 방에서2분 이상 무입력 관찰과 직접 몸 접촉→반응/말풍선→생활 복귀, 기록 열기/닫기→이동을 실제 수행했다. 현재 실행에 속하는 자동 완료 trace에서 company/seat/drowsy/stretch/look5계열을 확인했다. 기존 격리 `auto_growth#1791126584135`를 정상 메뉴·함께 지내기로 시작하자 합성 활동 먹이1개가 자동 섭취되어15EXP와 **Lv.5→6**이 발생했다. 직접 먹이 주기나 강제 장면 버튼은 누르지 않았다. 실제 식사→성장 pose/대사/안내와 원장 mode=auto1회가 일치한다. 기존 화장실 체험은 초기화하지 않고 정상 동면 복귀한 뒤 보존된20초 타이머가 진행돼 시설 접근→가림→이용→복귀를 수행했고 자동 청결 poop0을 유지했다. 일반 이름/형태/성격/먹이0/코인15/EXP25.125·meal3/recovery0 보존, 최종 profile=original이다.
+
+| SELF_REVIEW | 현재 판정 |
+|---|---|
+| 기능 품질 | 관찰한 정상 입력·자율생활·자동 식사/성장·화장실/청결 경로에서 명백한 새 기능 결함/상태 불일치/입력 잠금 미재현 |
+| 표현 품질 | 실제 GLB·몸 반응·작은 말풍선·식사/성장/화장실 연결 확인. 작은 표정의 읽기성과 생활 소품/아트의 최종 만족도는 사용자 검토 대상 |
+| 게임 재미 | USER_REVIEW_PENDING. 생활 연결은 확인했으나 계속 보고 싶은 재미나 성장 만족도를 대신 승인하지 않음 |
+
+영상 일부 성장 안내 글자가 누락처럼 보이는 추출 프레임이 있었지만, 접근 복구 후 같은 설치본 실제 화면은 정상 전체 문자열이었다. 앱 화면 결함과 녹화/추출 영향을 구분하지 못한 프레임만으로 코드를 바꾸지 않았다. 중간 Mac 재잠금 실패·보존 기록도 유지했고, 실제 접근 재확인 성공 후 남은 WC 관찰을 끝냈다. 자율 제안 말풍선은 실제로 보았지만 만료된 선택 버튼 시도는 응답 성공으로 기록하지 않는다.
+
+이번 증거 `evidence/product-hardening-sol-unlocked-2026-10-04/`: 01 설치/Git/저장 baseline, 03 일반 생활 trace, 06 자동 식사/성장 원장·실제 장면, 14/16 화장실 timer·완료, 18 원본 보존 audit, **02 무편집 영상31분41.758초 /13 무편집 재개 영상13분55.253초**, meal/toilet 추출 프레임. 영상/DB/trace/build는 ignored·외부 업로드 없음. 테스트 개수로 완료하지 않았고 과거362/362를 이번 재실행 수치로 쓰지 않는다. 앱 변경이 없어 불필요한 전체 앱 회귀/Release build를 반복하지 않았다.
+
+현재 일반 Sim 방에서 바로 사용자 평가 가능하다. 새 자동 식사/성장은 메뉴→설정→자동 식사·성장 새 체험→함께 지내기(약30초 정상 관찰)로 비교한다. WC는 보존된 시험에서 남은20초를 관찰한 결과이며 재진입 때 언제나20초 장면을 약속하지 않는다; 영상13의 약326~330초를 참고한다. 실건강 OFF와 합성 공급임을 명시한다. 실기기/GPU/물리 입력 성능은 NOT_RUN, 재미/최종 아트 USER_REVIEW_PENDING, SRS MVP/출시 전체 완료 아님. [상세 검토](LIFE-00-REPORT.md), [현재 안내](NEXT-RESUME.md).
+
+## Historical SOL_DIRECT 제품 품질 강화 — 2026-10-04 잠금 중
 
 **BLOCKED — 현재 Mac 잠금으로 새 제품 관찰 미실행**. 요청 개발 책임자 GPT-6.1 Sol Max, AUTONOMOUS PRODUCT HARDENING / SELF_REVIEW. 프로젝트 요청 설정을 `gpt-6.1-sol` / max로 맞췄고 subagents disabled, 기존 승인·sandbox·network 설정 및 과거 역할 파일은 보존했다. 실제 effective model을 노출하는 근거가 없어 **ROUTING_UNVERIFIED**다. 설정만으로 현재 backend를 단정하지 않는다.
 

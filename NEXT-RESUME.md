@@ -1,6 +1,16 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 지점 — SOL_DIRECT 제품 품질 강화 / 2026-10-04
+## 현재 지점 — SOL_DIRECT / PRODUCT_REVIEW_READY
+
+현재 소스 **6c76c9b**, 설치 SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`, 원본 iPhone16e device2170BD93…의 **일반 Sim 방**이다. 앱을 새로 만들거나 재빌드/초기화하지 않았다. 정상 무입력 생활·직접 교감/복귀·기록 닫기/이동, 기존 격리 합성 자동 섭취15EXP/Lv5→6와 WC가 실제로 연결됐다. 관찰한 새 명백한 기능 결함이 없어서 코드 수정을 추가하지 않았다. 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED, SELF_REVIEW다.
+
+사용자는 현재 Simulator에서 바로 평가할 수 있다. 종료돼 있으면 `xcrun simctl launch 2170BD93-715C-482E-AD9C-DD7479970003 com.arucon.dev`. 비교할 장면은 일반 방2분 무입력→짧은 손길→자기 생활 복귀, 메뉴→설정→자동 식사·성장 새 체험→함께 지내기→약30초 정상 관찰, 그리고 기록 닫기 후 다시 조작이다. 이는 실제 건강 연결 없이 합성 활동으로 얻은 먹이를 같은 게임 서비스가 섭취하는 격리 체험이다. 일반 이름/재화/EXP를 바꾸거나 체험 자원을 지급하지 않는다.
+
+기존 WC 체험은 남은20초의 동면 복귀 타이머로 실제 수행됐다. 이미 지난 사건을 재진입 때 다시20초로 초기화하지 않는다. 영상13 약326~330초에서 가림/이용/복귀를 비교한다. 02/13 무편집 영상은 각각31분41.758초/13분55.253초, 증거 `evidence/product-hardening-sol-unlocked-2026-10-04/`. [기능/표현/재미 SELF_REVIEW](AUTONOMOUS-RUN-REPORT.md).
+
+**재미·최종 아트 USER_REVIEW_PENDING**, 실기기/GPU/물리 입력 성능 NOT_RUN 유지. 전체 출시/MVP 완성으로 해석하지 않는다. 다음은 사용자 제품 평가다. 새 기술 결함이 보고되면 현재 저장·설치본에서 재현하고 수정→Release→정상 Simulator 조작→회귀→SELF_REVIEW로 이어간다. 과거 수면12개나 전체 진화를 이유 없이 처음부터 반복하지 않는다. 건강/결제 OFF, feature 일반 commit/push 경계 유지.
+
+## Historical 지점 — SOL_DIRECT 제품 품질 강화 / 2026-10-04 잠금 중
 
 **BLOCKED — 이번 실제 화면 접근에서 Mac locked 확인**. 요청 직접 개발 책임자 GPT-6.1 Sol Max. 프로젝트는 `gpt-6.1-sol` / max, SOL_DIRECT / AUTONOMOUS PRODUCT HARDENING / SELF_REVIEW이며 새 subagent를 기본 생성하지 않는다. 실제 effective model은 확인 불가로 ROUTING_UNVERIFIED다. 전역 설정·권한과 Astra 이력은 보존한다.
 

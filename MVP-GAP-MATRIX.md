@@ -1,6 +1,20 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 SOL_DIRECT 제품 관찰 — 2026-10-04
+## 현재 SOL_DIRECT 제품 관찰 — PRODUCT_REVIEW_READY
+
+같은6c76c9b/설치facaf830… iOS Simulator를 실제 조작했다. 관찰한 새 명백한 결함이 없어 앱 소스/규칙/아트를 바꾸지 않았으며 과거 수면·동면 CLOSED는 보존한다. 현재 user-facing 결과는 검토 가능한 설치판이며 출시/MVP 전체 완료가 아니다.
+
+| 구분 | 현재 SELF_REVIEW |
+|---|---|
+| 기능 품질 | 정상 무입력 생활5계열·직접 교감/복귀·기록 닫기/이동, 격리 자동 식사15EXP/Lv5→6 및 WC/청결을 실제 확인 |
+| 표현 품질 | 몸·시선·말풍선·식사/성장/WC 연결 확인. 소품/작은 표정/캐릭터 최종 만족도는 사용자 검토 대상 |
+| 게임 재미/최종 아트 | USER_REVIEW_PENDING, 자동 테스트/동작 성공으로 승인하지 않음 |
+| 원본 보존 | Sim/arucon/reserved, 먹이0/코인15/EXP25.125, meal3/recovery0·profile original |
+| 성능/실기기 | 실기기/GPU/물리 입력 NOT_RUN, 이번 새 benchmark 없음 |
+
+현재 증거는 `evidence/product-hardening-sol-unlocked-2026-10-04/`. 중간 재잠금과 복구 기록도 보존했다. 실제 건강/결제/계정/출시/권한 경계는 그대로다. [현재 결과](AUTONOMOUS-RUN-REPORT.md), [실행/비교 안내](NEXT-RESUME.md).
+
+## Historical SOL_DIRECT 제품 관찰 — 2026-10-04 잠금 중
 
 **BLOCKED — 현재 Mac locked, 새 실제 플레이 NOT_RUN**. 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED. 소스6c76c9b·설치facaf830…·착수HEAD/원격1d234d8 일치, 저장/앱 코드 보존. 운영 정합성42/42를 제품 완료로 보지 않는다.
 

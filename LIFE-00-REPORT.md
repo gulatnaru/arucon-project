@@ -1,5 +1,17 @@
 # LIFE-00/01 생활 개편 검증 기록
 
+## 현재 제품 관찰 — SOL_DIRECT / PRODUCT_REVIEW_READY
+
+같은 **6c76c9b Release**를 직접 관찰했다. 일반 방에서는 사용자가 계속 누르지 않아도 주변 살피기·몸 풀기·자리 선택·곁에 있기·꾸벅임을 이어갔다. 짧은 손길에는 몸과 말풍선이 반응하고 다시 생활로 돌아갔다. 기존 일반 저장을 보존한 채 기록 닫기 후 이동도 확인했다. 별도 승인된 합성 자동 식사 체험에서는 먹이 버튼 없이 실제 섭취15EXP→Lv5에서6→식사 완료/성장 표현이 연결됐고, 기존 화장실 저장에서는 정상 동면 복귀 뒤 남은20초가 자연 경과해 가림·이용·복귀/자동 청결을 수행했다. 식사·성장·화장실은 개발용 강제 애니메이션 재생이 아니다.
+
+**기능 품질:** 관찰 범위에서 새 조작 불능/상태 불일치/화면 깨짐을 확인하지 못했다. 명백한 새 결함을 재현하지 않았으므로 앱/SDK/모션/경제를 수정하거나 다시 만들지 않았다. **표현 품질:** 3D 몸·시선·짧은 말풍선과 실제 생활의 연결은 확인했지만 작은 표정·생활 소품·최종 캐릭터 만족도는 사용자 검토 대상이다. **재미:** USER_REVIEW_PENDING. 기능 동작을 재미 승인으로 바꾸지 않는다. PRODUCT_REVIEW_READY는 이 Simulator 검토판의 사용자 평가 준비이며 출시/MVP 전체 완료나 실기기 성능 통과가 아니다.
+
+소스6c76c9b/설치facaf830… 대조, 착수2574135 clean/원격동기화 확인. 원본 Sim·arucon·reserved·먹이0·코인15·EXP25.125·섭취3/회복0 보존, 마지막은 일반 방이다. 새 격리 자동 성장 petId `life-experience-v1:auto_growth:1791126584135`, 원장 auto1회/15EXP와 실제 meal complete→growth perform/complete를 대조했다. trace automatic=false는 명령형 연출 경로 표시이고 섭취 원장의 mode=auto와 구분한다. 일반 방의 현재 자동 완료5계열은 baseline 이후 시각으로 필터했다. 건강 원본이나 실제 공급을 읽지 않았다.
+
+기록 `evidence/product-hardening-sol-unlocked-2026-10-04/`: 02 일반/자동 성장31분41.758초, 13 재개/WC13분55.253초, 모두 정상 속도·무편집. 중간 재잠금과 복구를 별도로 보존했다. 식사는 영상02 약1268초, 성장1272초, WC는 영상13 약326~330초 프레임으로 실제 장면을 검토했다. 일부 추출 프레임의 성장 글자 누락처럼 보이는 현상은 실제 재확인 화면에서는 재현되지 않아 원인을 단정하거나 코드를 바꾸지 않았다. 실제 자율 제안은 확인했으나 만료 후 선택 시도는 성공으로 세지 않았다. 실기기/GPU/물리 입력 성능은 NOT_RUN, 새 성능 benchmark는 수행하지 않았으며 인코딩 FPS를 앱 FPS로 보지 않는다. 재미·최종 아트 USER_REVIEW_PENDING, SELF_REVIEW/새 subagent0/effective ROUTING_UNVERIFIED다.
+
+자동/실제 실행 근거와 사용자 실행 안내는 [현재 실행 보고](AUTONOMOUS-RUN-REPORT.md)와 [NEXT-RESUME](NEXT-RESUME.md)에 있다. 아래 Astra의 수면·동면 CLOSED와 모든 역사 증거를 그대로 보존한다.
+
 ## 현재 수면·동면·입력 결함 종료 — 2026-10-04 잠금 해제 검증
 
 **CLOSED — 실제 iOS Simulator 검증 범위**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 실제 원본과 보존 DB의 별도 Simulator 복제에서 정상 입력으로 검증했다. 과거 READY나 자동 테스트 숫자를 종료 근거로 쓰지 않았다. 재미·최종 아트 USER_REVIEW_PENDING, 실기기/실제 GPU 표시·물리 입력 지연은 NOT_RUN이다.
