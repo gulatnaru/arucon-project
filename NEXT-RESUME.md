@@ -1,6 +1,19 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 지점 — LIFE-01 남은 검증 완료 / 2026-10-02
+## 현재 지점 — 새 수면·동면·입력 결함 / 2026-10-04
+
+**PARTIAL_WITH_BLOCKERS / 결함 OPEN**. ASTRA_DIRECT / SELF_REVIEW. 수정 소스 `cf26058`; 이전 READY/성장·진화 PASS는 아래 이력이다. 이번 요청은 새 결함 수정이며 전체 개편을 다시 시작하지 않는다. [현재 원인·수정·증거](LIFE-00-REPORT.md), [ADR-014](docs/adr/ADR-014-foreground-rest-state-recovery.md).
+
+현재 설치 앱은 **원래6cf015c Release**, SHA `6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7`. 일반 `original`/`dev-local-pet-1`, sleeping=false / hibernating=true, Sim·먹이0·코인15·EXP25.125를 보존했다. **먼저 앱을 launch/재시작/재설치하지 않는다.** CUA 접근3회 모두 Mac locked였고 DB는 읽기 전용 온라인 백업했다.
+
+1. Mac 잠금·실제 입력 접근을 새로 확인한다. 기존 설치본의 식사 패널을 촬영→닫기→빈 바닥/직접 펫 접촉을 확인한다. 메뉴가 막는 정상 입력과 domain 동면 차단을 구분한다. 원래 clip/intent/pose는 구형 진단에서 미확인이다. 재현이 사라졌으면 원본을 보호하고 복제 저장/시계로 비교한다.
+2. 같은 DB를 유지한 채 준비된 **cf26058 수정 Release**를 설치한다. DerivedData `app-aeehzayoirsbabgostbavuiibfkt/Build/Products/Release-iphonesimulator/app.app`, SHA `fbddd68f528802fcae25e3e63d3120dbdc4c6ee8ed1c59102183dea32dfe19f0`. 해시/코드가 맞으면 불필요한 재빌드·prebuild를 하지 않는다. 앱 삭제·DB 초기화·원래 시간/재화 수정 없음.
+3. cold start/foreground의 정상 return 서비스로 동면 해제→이동/직접 접촉/자율생활을 확인한다. 일반 수면이 있으면 이를 보존하고 별도 깨우기로 복귀한다. ‘잠자기’→실제 수면→‘깨우기’, 패널 닫기·기록 닫기·앱 전환·재실행을 같은 빌드에서 연속 확인한다.
+4. 기존 진단의 성능 JSON 저장은 `arucon-rest-runtime.json`도 로컬 캐시에 만든다. 최근24개에서 App flags/restMode/시간/menu와 실제 clip/intent/pose/입력 차단/meal cue/취소 epoch를 대조하고 실제 영상과 구분한다. 전경25/72시간·부재 경계·회복 중복은 이미 새 격리 검사에 있다; 실제 원본 시간을 변경하지 않는다.
+
+새360/360·영향27/27·lint/typecheck·workflow40/40·iOS Release compile·Android JS bundle PASS. 실제 새 설치·화면·입력·성능은 아직 NOT_RUN/BLOCKED_HOST_LOCKED이다. 복제 DB return PASS를 실제 원본 복귀로 표현하지 않는다. 증거 `evidence/life-01-sleep-input-2026-10-04/`. 잠금 해제 후 위 실제 검사 전에는 READY로 닫지 않는다. 재미·최종 아트 USER_REVIEW_PENDING, 건강 OFF, 기존 feature checkpoint/일반 push 범위 유지.
+
+## Historical 지점 — LIFE-01 남은 검증 완료 / 2026-10-02
 
 **READY_FOR_AUTONOMOUS_LIFE_REVIEW — 현재 iOS Simulator 환경**. 소스 **6cf015c**, 이후 보고서 commit은 앱 코드를 바꾸지 않는다. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0, effective model ROUTING_UNVERIFIED. 재미·최종 아트 USER_REVIEW_PENDING.
 

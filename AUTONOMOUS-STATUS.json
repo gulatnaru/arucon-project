@@ -1,16 +1,16 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-10-02",
+  "runDate": "2026-10-04",
   "timezone": "Asia/Seoul",
-  "status": "READY_FOR_AUTONOMOUS_LIFE_REVIEW",
+  "status": "PARTIAL_WITH_BLOCKERS",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "LIFE-01 screen recovery and autonomous life/growth, preserving approved domain rules and external boundaries",
-  "reason": "Remaining Piko stretch, latest-runtime meal cancellation and actual home-widget tap verified. Four fixed sixty-second ON/OFF captures with eight inputs each passed unchanged timing proxy budgets. Physical/GPU/user fun and final art remain unverified or pending.",
-  "sourceBaseline": "0aeb91753d2ece9963ab793833f0bed2491f4c54",
-  "sourceCheckpoint": "6cf015c",
+  "definition": "New sleep/hibernation/input defect repair inside LIFE-01; no new overhaul",
+  "reason": "Original save and foreground ledger confirm inconsistent rest projection and active polling hibernation. Fix cf26058 passes 360 tests and Release compile. Current host is locked; original installed runtime preserved, new install and normal UI recovery pending. Defect remains OPEN.",
+  "sourceBaseline": "1cbb99becc0063af2351a956b8c3bf4951bc774f",
+  "sourceCheckpoint": "cf26058",
   "currentLivingReport": "LIFE-00-REPORT.md",
   "life01": {
-    "authoritativeCurrentResult": true,
+    "authoritativeCurrentResult": false,
     "task": "tasks/LIFE-01-autonomous-growth-resume.md",
     "sourceCheckpoint": "6cf015c",
     "sourceCommit": "6cf015cd97087b5d398bb6748c9ed4800b8ff61b",
@@ -246,13 +246,13 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "READY_FOR_AUTONOMOUS_LIFE_REVIEW_CURRENT_IOS_SIMULATOR_SCOPE",
+    "independentLocalEngineering": "FIX_IMPLEMENTED_AUTOTESTED_RELEASE_BUILT_RUNTIME_BLOCKED",
     "productMvp": "NOT_COMPLETE",
-    "androidRuntime": "NOT_RUN_THIS_SCOPE",
-    "androidReleaseCompile": "NOT_RUN_THIS_SCOPE",
-    "widgetRuntimeQa": "PASS_ACTUAL_HOME_WIDGET_TAP_AND_TRIAL_ISOLATION",
-    "iosCurrentRuntime": "PASS_REMAINING_OBSERVATIONS_ON_6CF015C",
-    "performance": "PASS_4x60_SECOND_PROXY_GATES; GPU/physical NOT_RUN"
+    "androidRuntime": "NOT_RUN_CURRENT_DEFECT_SCOPE",
+    "androidReleaseCompile": "NOT_RUN_CURRENT_DEFECT_SCOPE",
+    "widgetRuntimeQa": "HISTORICAL_OCT02_PASS_RETAINED; NOT_RUN_CURRENT_SCOPE",
+    "iosCurrentRuntime": "BLOCKED_HOST_LOCKED; ORIGINAL_INSTALL_PRESERVED",
+    "performance": "NOT_RUN_CURRENT_RELEASE; historical proxy results retained"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -465,43 +465,49 @@
     ]
   },
   "lastValidation": {
-    "scope": "Remaining LIFE-01 native validation, ASTRA_DIRECT / SELF_REVIEW",
-    "sourceCommit": "6cf015cd97087b5d398bb6748c9ed4800b8ff61b",
-    "bundleSha256": "6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7",
+    "scope": "New sleep/hibernation/input repair, ASTRA_DIRECT / SELF_REVIEW",
+    "sourceCommit": "cf26058f4d2bd62f400796fae491f2bd601692b4",
+    "builtBundleSha256": "fbddd68f528802fcae25e3e63d3120dbdc4c6ee8ed1c59102183dea32dfe19f0",
+    "installedBundleSha256": "6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7",
     "mobileTests": {
-      "passed": 352,
-      "total": 352,
-      "skipped": 0
+      "passed": 360,
+      "total": 360,
+      "skipped": 0,
+      "failed": 0
     },
-    "impactTests": "78/78 PASS",
+    "impactTests": "27/27 PASS",
     "lint": "PASS",
     "typecheck": "PASS",
-    "iosCng": "23/23 PASS",
-    "workflow": "40/40 PASS",
-    "iosJsBundle": "PASS_EMBEDDED_RELEASE",
-    "androidJsBundle": "PASS",
-    "iosSimulatorReleaseBuildInstallLaunch": "PASS_ACTUAL_INPUT",
-    "remainingRuntimeCheck": "NONE_WITHIN_REQUESTED_SIMULATOR_SCOPE",
-    "performance": "PASS_4_FIXED_60_SECOND_PROXY_RUNS; exclusions retained",
+    "workflow": "40/40 PASS_BUNDLED_PYTHON",
+    "iosReleaseCompile": "PASS_EXIT_0",
+    "iosJsBundle": "PASS_EMBEDDED_RELEASE_BUILT_NOT_INSTALLED",
+    "androidJsBundle": "PASS_EXPORT_EXIT_0",
+    "iosCng": "NOT_RUN_NO_NATIVE_CONFIG_CHANGE",
+    "iosSimulatorInstallLaunch": "NOT_RUN_ORIGINAL_REPRODUCTION_PRESERVED_WHILE_HOST_LOCKED",
+    "originalSaveCloneReturn": "PASS_ISOLATED_COPY_NOT_UI",
+    "originalSaveRuntimeRecovery": "NOT_RUN",
+    "remainingRuntimeCheck": "BEFORE_SCREEN_INPUT_REPRODUCTION_THEN_CHANGED_RELEASE_NORMAL_RETURN_SLEEP_WAKE_INPUT_LIFECYCLE",
+    "performance": "NOT_RUN_CURRENT_RELEASE",
     "physicalDevice": "NOT_RUN",
     "healthReads": "OFF",
     "userFunAndFinalArt": "USER_REVIEW_PENDING",
-    "evidence": "evidence/life-01-finish-2026-10-01"
+    "evidence": "evidence/life-01-sleep-input-2026-10-04/"
   },
   "environment": {
     "host": "macOS 15.6",
     "node": "26.7.0",
     "npm": "11.19.0",
-    "androidToolchain": "CURRENT_MAC_ADB_AND_SDK_MISSING; historical Windows toolchain recorded separately",
+    "androidToolchain": "NOT_INSPECTED_CURRENT_SCOPE; prior inventory retained in historicalLife01Oct02BeforeRestDefect",
     "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
     "softwareEmulator": "software_balanced, 1.5 DPR, vertex-lit material, sparse CPU morph, public flushEXP queue barrier; no fixed frame cap",
-    "hostLocked": false,
+    "hostLocked": true,
     "iosRuntime": "26.3",
     "xcode": "26.3",
     "configuration": "Release",
-    "contentSize": "large"
+    "contentSize": "large",
+    "currentRendererSnapshot": "NOT_OBSERVABLE_ORIGINAL_INSTALL_WHILE_HOST_LOCKED"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
@@ -884,11 +890,13 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "sourceCheckpoint": "6cf015c",
+    "sourceCheckpoint": "cf26058",
     "sourceCommitPerformed": true,
+    "sourcePushPerformed": true,
+    "confirmedOriginSourceHash": "cf26058f4d2bd62f400796fae491f2bd601692b4",
     "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
-    "verificationEvidence": "evidence/life-01-finish-2026-10-01/git-audit.json",
-    "publicationRecordScope": "Prepared before documentation checkpoint. Final local/tracking/live-origin hashes and clean status are recorded in the ignored audit and final response."
+    "verificationEvidence": "evidence/life-01-sleep-input-2026-10-04/git-audit.json",
+    "publicationRecordScope": "Prepared after source checkpoint push. Final documentation HEAD, tracking/live-origin hashes and clean status recorded in ignored audit and final response."
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -956,7 +964,7 @@
       }
     }
   },
-  "evidenceDirectory": "evidence/life-01-finish-2026-10-01/",
+  "evidenceDirectory": "evidence/life-01-sleep-input-2026-10-04/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -1147,5 +1155,101 @@
     "nextAction": "Unlock Mac, inspect actual Piko stretch/ear attachment on source70cab57; do not repeat completed suites or reset saved profiles",
     "hostReLocked": true,
     "pikoStretch": "BLOCKED_HOST_LOCKED_ACTUAL_MOTION_NOT_CONFIRMED"
+  },
+  "sleepInputDefect": {
+    "status": "OPEN",
+    "mode": "ASTRA_DIRECT / SELF_REVIEW",
+    "sourceBaseline": "1cbb99b",
+    "installedSourceAtBaseline": "6cf015c",
+    "installedBundleSha256": "6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7",
+    "originalSave": {
+      "petId": "dev-local-pet-1",
+      "sleeping": false,
+      "hibernating": true,
+      "food": 0,
+      "coin": 15,
+      "totalExpUnits": 25125000
+    },
+    "actualUiBefore": "BLOCKED_HOST_LOCKED_THREE_CURRENT_CUA_CHECKS",
+    "actualUiAfter": "NOT_RUN; NEW_RELEASE_NOT_INSTALLED_WHILE_ORIGINAL_STATE_PRESERVED",
+    "historicalReady": "2026-10-02 retained in life01; not evidence for this defect",
+    "evidence": "evidence/life-01-sleep-input-2026-10-04/",
+    "healthRead": "OFF",
+    "implementation": "FIX_IMPLEMENTED_AUTOTESTED_RELEASE_BUILT",
+    "sourceCheckpoint": "cf26058",
+    "originalRuntimePreserved": true,
+    "originalRuntimeRecovery": "NOT_RUN",
+    "isolatedOriginalSaveCloneRecovery": "PASS_RETURNED_ONCE_NO_RESOURCE_OR_RECOVERY_DUPLICATION",
+    "approvedSleepTimeBoundary": "PASS_EXCLUDES_HIBERNATION_AND_STALE_CROSS_DAY_WAKE",
+    "tests": {
+      "passed": 360,
+      "total": 360,
+      "skipped": 0,
+      "failed": 0
+    },
+    "impactTests": "27/27 PASS",
+    "iosReleaseCompile": "PASS_EXIT_0",
+    "builtBundleSha256": "fbddd68f528802fcae25e3e63d3120dbdc4c6ee8ed1c59102183dea32dfe19f0",
+    "performance": "NOT_RUN_CURRENT_BUILD",
+    "remaining": "Unlock; inspect/close original food panel and attempt room input before launch/reinstall, then install prepared Release preserving DB and verify normal recovery/menu/input/lifecycle"
+  },
+  "historicalLife01Oct02BeforeRestDefect": {
+    "completion": {
+      "independentLocalEngineering": "READY_FOR_AUTONOMOUS_LIFE_REVIEW_CURRENT_IOS_SIMULATOR_SCOPE",
+      "productMvp": "NOT_COMPLETE",
+      "androidRuntime": "NOT_RUN_THIS_SCOPE",
+      "androidReleaseCompile": "NOT_RUN_THIS_SCOPE",
+      "widgetRuntimeQa": "PASS_ACTUAL_HOME_WIDGET_TAP_AND_TRIAL_ISOLATION",
+      "iosCurrentRuntime": "PASS_REMAINING_OBSERVATIONS_ON_6CF015C",
+      "performance": "PASS_4x60_SECOND_PROXY_GATES; GPU/physical NOT_RUN"
+    },
+    "lastValidation": {
+      "scope": "Remaining LIFE-01 native validation, ASTRA_DIRECT / SELF_REVIEW",
+      "sourceCommit": "6cf015cd97087b5d398bb6748c9ed4800b8ff61b",
+      "bundleSha256": "6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7",
+      "mobileTests": {
+        "passed": 352,
+        "total": 352,
+        "skipped": 0
+      },
+      "impactTests": "78/78 PASS",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iosCng": "23/23 PASS",
+      "workflow": "40/40 PASS",
+      "iosJsBundle": "PASS_EMBEDDED_RELEASE",
+      "androidJsBundle": "PASS",
+      "iosSimulatorReleaseBuildInstallLaunch": "PASS_ACTUAL_INPUT",
+      "remainingRuntimeCheck": "NONE_WITHIN_REQUESTED_SIMULATOR_SCOPE",
+      "performance": "PASS_4_FIXED_60_SECOND_PROXY_RUNS; exclusions retained",
+      "physicalDevice": "NOT_RUN",
+      "healthReads": "OFF",
+      "userFunAndFinalArt": "USER_REVIEW_PENDING",
+      "evidence": "evidence/life-01-finish-2026-10-01"
+    },
+    "environment": {
+      "host": "macOS 15.6",
+      "node": "26.7.0",
+      "npm": "11.19.0",
+      "androidToolchain": "CURRENT_MAC_ADB_AND_SDK_MISSING; historical Windows toolchain recorded separately",
+      "androidAvd": "preserved historical Windows AVD",
+      "healthAccess": "OFF",
+      "hostGpu": "Apple Software Renderer",
+      "softwareEmulator": "software_balanced, 1.5 DPR, vertex-lit material, sparse CPU morph, public flushEXP queue barrier; no fixed frame cap",
+      "hostLocked": false,
+      "iosRuntime": "26.3",
+      "xcode": "26.3",
+      "configuration": "Release",
+      "contentSize": "large"
+    },
+    "evidenceDirectory": "evidence/life-01-finish-2026-10-01/",
+    "git": {
+      "branch": "feature/arucon-mobile-autonomous",
+      "sourceCheckpoint": "6cf015c",
+      "sourceCommitPerformed": true,
+      "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
+      "verificationEvidence": "evidence/life-01-finish-2026-10-01/git-audit.json",
+      "publicationRecordScope": "Prepared before documentation checkpoint. Final local/tracking/live-origin hashes and clean status are recorded in the ignored audit and final response."
+    }
   }
 }

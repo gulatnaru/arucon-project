@@ -1,6 +1,20 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 LIFE-01 검토 환경 판정 — 2026-10-02
+## 현재 새 수면·동면·입력 회귀 — 2026-10-04
+
+**PARTIAL_WITH_BLOCKERS / 결함 OPEN**. 수정 소스cf26058, 실제 원본 설치6cf015c는 재현 보존. 아래 과거 READY는 현재 새 결함의 검증 결과가 아니다. [최신 상세 결과](LIFE-00-REPORT.md).
+
+| 범위 | 이번 판정 |
+|---|---|
+| 원본 상태/호출 원인 | 저장 sleeping=false/hibernating=true; 전경 advance2881회 후24h 동면, UI/renderer 해석 불일치 확인 |
+| 연속 전경/부재/일반 수면/회복 중복 | PASS 격리 SQLite; 새 공통 상태·서비스·취소 처리 구현 |
+| 실제 원본 저장의 정상 복귀 | 복제 DB PASS; 원래 앱은 미실행, 이름·재화·설치 상태 보존 |
+| 메뉴 닫은 방의 이동·접촉, 최신 Release 복귀·수면/깨우기·재실행 | BLOCKED_ENV: 현재 Mac locked, 새 설치/정상 화면 입력 NOT_RUN |
+| 자동 검사/컴파일 | 새360/360·영향27/27·lint/typecheck·workflow40/40, iOS Release compile·Android JS bundle PASS |
+| 실제 화면/성능/실기기 | 이번 시각·입력·모션·proxy NOT_RUN, GPU/물리/실기기 NOT_RUN |
+| 재미·최종 아트·외부 경계 | USER_REVIEW_PENDING, 건강 OFF 및 출시/법률/계정/결제 경계 유지 |
+
+## Historical LIFE-01 검토 환경 판정 — 2026-10-02
 
 **READY_FOR_AUTONOMOUS_LIFE_REVIEW — iOS Simulator**. [최신 실제 증거](LIFE-00-REPORT.md), 소스6cf015c/설치6edaf991…. SRS 출시/MVP 전체 완료와 구분한다.
 

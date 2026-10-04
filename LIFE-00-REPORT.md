@@ -1,6 +1,50 @@
 # LIFE-00/01 생활 개편 검증 기록
 
-## 현재 LIFE-01 남은 검증 완료 — 2026-10-02
+## 현재 수면·동면·입력 결함 — 2026-10-04
+
+**PARTIAL_WITH_BLOCKERS / 결함 OPEN — 수정·자동 검증 완료, 설치 앱 시각·입력 재검증 대기**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 요청 역할 Astra, effective model ROUTING_UNVERIFIED. 이전 READY는 아래 이력이며 이번 결함의 통과 증거가 아니다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
+
+### 1. 실제 저장과 확인된 원인
+
+시작 HEAD `1cbb99b` clean, 일반 프로필 `original`이다. 설치 Release는 `6cf015c`의 번들 SHA `6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7`. 재시작·재설치·DB 초기화 없이 일반/체험 SQLite를 읽기 전용 연결로 온라인 백업했다. 일반 `dev-local-pet-1`은 **sleeping=false / hibernating=true**, 이름 Sim / 먹이0 / 코인15 / EXP25.125다.
+
+원장의 마지막 Returned(sequence7149)부터 Hibernated(sequence10031)까지 전경 interval의 `advance`가2881회, 중앙 간격30,010ms로 이어졌다. 이 사이 foregroundExit/Return은0회다. App의 활성 상태 폴링이 부재용 `advanceTo`를 호출하면서 마지막 전경 시각을 갱신하지 않았고, 24시간 경계가 실제 전경에서도 동면을 만들었다. 이어 방은 `sleeping || hibernating`, 식사 패널·버튼은 `sleeping`만 읽어 안내/입력이 갈라진다. **저장·명령·호출 경로로 확인한 원인**이며 원래 runtime의 실제 clip/intent/pose를 측정했다고 주장하지 않는다.
+
+CUA Simulator 접근은 착수·수정 중·최종3회 모두 `The Mac is locked`를 반환했다. 따라서 패널 닫기→바닥 이동→직접 접촉의 원래 실제 화면 재현, 당시 메뉴/기록/진단 상태·meal cue·취소 토큰은 BLOCKED/NOT_OBSERVABLE이다. 과거 화면·영상을 이번 결함의 증거로 재사용하지 않았다.
+
+### 2. 수정 코드
+
+- 전경 폴링과 일반 돌봄 시작은 `advanceForeground`/`foregroundTick`으로 진행한다. 기존 foreground settlement의 안전한 구간 분할·자동 식사 임계값·날짜 배율 만료를 재사용한다. 부재·위젯·활동의 기존 시간 의미는 유지하고, 이미 동면 중인 저장은 heartbeat로 풀지 않는다.
+- `projectPetRest` 하나로 깨어 있음/일반 수면/동면을 해석한다. 식사 안내·동작 버튼·renderer restMode가 이를 읽는다. 동면의 ‘다시 함께하기’는 정상 `returnToForeground`를 호출하고, 남아 있는 일반 수면은 별도 ‘깨우기’로 처리한다. 꾸벅임/쿠션은 도메인 수면과 다른 취소 가능한 표현이다.
+- 수면/배경 전환은 임시 clip·life intent/pose·터치·meal/growth cue를 정리한다. 취소 epoch는 비동기 명령 시작과 원장 읽기 후를 대조하여 뒤늦은 결과가 취소한 연출을 되살리지 않게 한다. 확정 섭취/EXP는 취소하지 않는다.
+- 일반 수면 회복 자격은 원장의 활성 수면 구간만 합산해 동면 시간을 제외한다. 깨어 있는 새 wake 요청과 다른 날짜의 과거 wake 재시도로 추가 회복을 만들지 않는다. 같은 날짜의 저장 실패 재시도는 유지한다.
+- 실제 renderer clip/intent/pose/입력 차단 사유와 App 수면·시간·패널·cue·epoch의 최근24개 로컬 진단을 추가했다. 정상 상태는 ref에 최대 초당1회 기록하고 기존 성능 JSON 저장 때만 캐시에 내보낸다. 프레임 DB 쓰기/큰 진단 카드/외부 업로드는 없다. [ADR-014](docs/adr/ADR-014-foreground-rest-state-recovery.md).
+
+### 3. 저장 복귀와 실제 실행 범위
+
+실제 일반 저장의 **복제 DB**에서 production service로 return을 실행했다. 동면은 풀리고 sleeping=false를 유지했으며 이름·형태·성격·먹이·코인·EXP·체력·허기·청결은 동일했다. 동일 return 재시도도 상태가 동일하고 Returned1회, Meal/Activity/SleepChanged0회였다. 이는 **격리 복제 검증**이며 원래 설치 앱에서 복귀했다고 기록하지 않는다. 원래 앱의 설치 번들과 보호 상태는 최종 읽기에서도 모두 같았다. 기존 앱의30초 폴링으로 revision/lastSimulatedAt만 자연스럽게 진행한다.
+
+| 검증 | 이번 실제 결과 |
+|---|---|
+| 연속 전경25/72시간, 이후 부재 동면·구간 분할 자동 식사 | 격리 SQLite PASS |
+| 동면→정상 복귀→일반 수면 보존→깨우기 | 격리 SQLite PASS, 실제 앱 BLOCKED_HOST_LOCKED |
+| 활성 수면1시간 vs 복귀 후 누적4시간, 회복 재시도/날짜 변경 | 격리 SQLite PASS, 추가 EXP/재화 없음 |
+| 전체 테스트 / 영향 검사 | **360/360 / 27/27**, fail0 / skipped0 |
+| lint / typecheck / workflow | PASS / PASS / 40/40; 기본Python3.9의 tomllib 오류 후 이미 제공된Python으로 실행 |
+| iOS Release / Android JS bundle | xcodebuild exit0 / export exit0 |
+| 깨어 있음 이동·접촉·자율생활, 수면/깨우기, 메뉴 닫기, 앱 전환/재실행 | **BLOCKED_HOST_LOCKED / 새 설치 NOT_RUN** |
+| 실제 전후 화면·모션·입력 영상 | **NOT_RUN** — 이번 영상 없음 |
+| 성능 / 실기기 / 실제 GPU·물리 입력 지연 | 이번 빌드 NOT_RUN; 이전 proxy PASS는 역사 기록 |
+
+수정 소스 checkpoint **`cf26058`**, 최종 컴파일 Release SHA **`fbddd68f528802fcae25e3e63d3120dbdc4c6ee8ed1c59102183dea32dfe19f0`**. macOS15.6 / Xcode26.3 / Expo55 / iPhone16e iOS26.3 Simulator. 원래 재현 상태의 실제 입력 증거를 지우지 않도록 새 Release는 **아직 설치하지 않았다**. 잠금 해제 후 원래 상태를 먼저 확인하고, 같은 DB를 유지한 채 이 Release를 설치해 정상 복귀·수면/깨우기·입력을 검증한다. 성공한 컴파일을 실행 PASS로 바꾸지 않는다.
+
+### 4. 증거·다음 한 작업·Git
+
+로컬 `evidence/life-01-sleep-input-2026-10-04/`: `baseline.json`/두 baseline DB, `baseline-sleep-lifecycle-ledger.json`, `causal-audit.json`, `isolated-recovery-result.json`, `original-runtime-preservation.json`, `source-build-identity.json`, tests/lint/typecheck/build/bundle/workflow 로그. DB·빌드·개인 trace·영상은 ignored이며 stage하지 않았다. source/test/ADR15개 stage에서 secret/DB/generated native/build/media/gitlink0을 확인했다. mobile/package.json·lockfile mode100644, mobile/.git 없음.
+
+다음 한 작업은 **Mac 잠금 해제 후 원래 앱에서 식사 패널을 닫고 바닥 이동·직접 접촉을 촬영**하는 것이다. 재현이 사라졌으면 원본 백업을 보존하고 복제로 원인을 비교한다. 이어 준비된 Release를 저장 유지 설치하여 실제 복귀/정상 입력을 확인한다. 자세한 순서는 [NEXT-RESUME](NEXT-RESUME.md). feature 체크포인트와 일반 push만 유지하며 최종 원격 해시는 로컬 Git audit/최종 응답에 기록한다. 건강 OFF·main/merge/deploy 금지 경계는 유지한다.
+
+## Historical LIFE-01 남은 검증 완료 — 2026-10-02
 
 **READY_FOR_AUTONOMOUS_LIFE_REVIEW — 현재 iOS Simulator 검토 환경**. ASTRA_DIRECT / SELF_REVIEW, 새 subagent0. 재미·최종 아트 **USER_REVIEW_PENDING**. 실기기·실제 GPU 표시 FPS·물리 터치 지연은 **NOT_RUN**이다.
 

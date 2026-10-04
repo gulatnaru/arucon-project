@@ -1,6 +1,14 @@
 # iOS validation history and Release input resume
 
-## 현재 LIFE-01 남은 검증 결과 — 2026-10-02
+## 현재 수면·동면·입력 결함 — 2026-10-04
+
+**PARTIAL_WITH_BLOCKERS / 결함 OPEN**, ASTRA_DIRECT / SELF_REVIEW. 원래 일반 저장 sleeping=false / hibernating=true를 백업과 원장으로 확인했다. 전경30초 폴링의2881회 advance가 마지막 전경 시각을 갱신하지 않아24시간 경계에서 동면을 만든다. 식사 UI는 sleeping만, renderer는 양쪽 flags를 읽어 표시/입력이 갈라진다. [이번 원인·수정·증거](LIFE-00-REPORT.md), [재개 순서](NEXT-RESUME.md).
+
+소스 checkpoint **cf26058**: 전경 heartbeat 정산·공통 rest projection·정상 동면 return·수면/배경 cue 취소 epoch·활성 수면 자격·날짜를 넘긴 wake 재시도 보호. 경제/DB schema/원본 아트/건강 OFF 보존. 이번 새 **360/360·영향27/27·lint/typecheck·workflow40/40**, iOS Release compile exit0·Android JS bundle PASS. 복제한 실제 DB의 정상 return/idempotence/재화 보존 PASS.
+
+현재 CUA 접근3회 모두 **Mac locked**. 원래 설치 앱6cf015c/6edaf991…와 일반 보호 상태는 보존했고, 실제 화면 재현·새 설치·복귀/입력·이번 성능은 NOT_RUN/BLOCKED다. 준비된 cf26058 Release SHA `fbddd68f528802fcae25e3e63d3120dbdc4c6ee8ed1c59102183dea32dfe19f0`. 컴파일·복제 DB PASS를 실제 화면 PASS로 표현하지 않는다. 로컬 증거 `evidence/life-01-sleep-input-2026-10-04/`, 비밀/DB/영상/native/build 산출물 stage0. 재미/최종 아트 USER_REVIEW_PENDING. 실기기·GPU·물리 입력 NOT_RUN. 이전 READY는 이번 새 결함을 닫지 않는다.
+
+## Historical LIFE-01 남은 검증 결과 — 2026-10-02
 
 **READY_FOR_AUTONOMOUS_LIFE_REVIEW — 현재 iOS Simulator 환경**. 소스6cf015c, 설치/빌드 SHA `6edaf9913e9481a8a9ebc4ae03aa988b3d7667a5377c5baeedfda9625aa17ad7`. 현재Mac의 실제 접근부터 확인했다. 기존 저장피코의 일반 자율 기지개와 별도3뷰 자세, 최신meal623ms cancel→생활/접촉·정산1회, 실제 홈위젯 탭과snapshot 격리를 확인했다. 네 진화·전체 복원 재실행/새 개편은 하지 않았다.
 
