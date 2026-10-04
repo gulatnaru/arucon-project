@@ -199,6 +199,45 @@ test('replaying yesterday wake cannot grant today recovery or end a newer sleep 
   assert.deepEqual([actual.food, actual.coin, actual.totalExpUnits], [0, 0, 0]);
 });
 
+test('foreground arrival exposes hibernation without silently returning; explicit resume is idempotent', async () => {
+  const db = new NodeSqliteAdapter();
+  const service = await ApprovedMvpService.initialize(db, options);
+  const hour = 3_600_000;
+  const first = await service.enterForeground(25 * hour);
+  assert.equal(first.needsResume, true);
+  assert.equal(first.state.hibernating, true);
+  assert.equal(first.state.sleeping, false);
+  const reloaded = await ApprovedMvpService.initialize(db, options);
+  const repeated = await reloaded.enterForeground(26 * hour);
+  assert.equal(repeated.needsResume, true);
+  assert.equal(repeated.state.hunger, first.state.hunger);
+  assert.equal((await service.readJournal()).filter(entry => entry.event.type === 'Returned').length, 0);
+  const resumed = (await reloaded.returnToForeground(26 * hour)).state;
+  assert.equal(resumed.hibernating, false);
+  assert.equal(resumed.sleeping, false);
+  assert.deepEqual([resumed.food, resumed.coin, resumed.totalExpUnits], [0, 0, 0]);
+  assert.deepEqual((await reloaded.returnToForeground(26 * hour)).state, resumed);
+  assert.equal((await reloaded.enterForeground(26 * hour)).needsResume, false);
+  assert.equal((await service.readJournal()).filter(entry => entry.event.type === 'Returned').length, 1);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 0);
+});
+
+test('manual sleep survives hibernated arrival and explicit resume; only normal wake ends it', async () => {
+  const db = new NodeSqliteAdapter();
+  const service = await ApprovedMvpService.initialize(db, options);
+  const hour = 3_600_000;
+  await service.sleep(23 * hour, 'sleep');
+  const entry = await service.enterForeground(30 * hour);
+  assert.equal(entry.needsResume, true);
+  assert.deepEqual([entry.state.sleeping, entry.state.hibernating], [true, true]);
+  await assert.rejects(service.wake(30 * hour, 'not-a-resume'), /hibernating/);
+  const resumed = (await service.returnToForeground(30 * hour)).state;
+  assert.deepEqual([resumed.sleeping, resumed.hibernating], [true, false]);
+  const woke = await service.wake(30 * hour, 'wake');
+  assert.deepEqual([woke.sleeping, woke.hibernating], [false, false]);
+  assert.equal((await db.getFirstAsync('SELECT COUNT(*) AS count FROM dev_sleep_benefit_ledger')).count, 0);
+});
+
 test('journal-derived care resolves once and persists the form into the pet snapshot', async () => {
   const db = new NodeSqliteAdapter();
   const store = new LocalPetStore(db, APPROVED_GAME_CONFIG);

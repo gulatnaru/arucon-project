@@ -474,10 +474,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         publish(await service.currentState());
         const now = monotonicDevTime(Date.now(), clockRef.current, existing.lastSimulatedAtMs);
         try {
-          await service.beginGameDay(utcFixtureDay(now), now);
-          const receipt = await service.returnToForeground(now);
-          publish(receipt.state);
-          if (receipt.status === 'withheld_partial') setNotice(receipt.notice);
+          const entry = await service.enterForeground(now);
+          publish(entry.state);
+          if (entry.needsResume) setNotice('동면 중이에요. 먹이 메뉴의 ‘다시 함께하기’로 이어갈 수 있어요.');
           try { publish((await service.resolveEligibleGrowth(Math.random)).state); }
           catch { setGrowthWarning('저장된 성장 결과를 확인하지 못했어요. 게임 기록은 유지됩니다.'); }
         } catch (error) {
@@ -528,8 +527,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       const eventTime = () => monotonicDevTime(eventWallMs, clockRef.current, petRef.current?.lastSimulatedAtMs ?? 0);
       const task = next === 'active' ? async () => {
         const now = eventTime();
-        await service.beginGameDay(utcFixtureDay(now), now);
-        return (await service.returnToForeground(now)).state;
+        const entry = await service.enterForeground(now);
+        if (entry.needsResume) setNotice('동면 중이에요. 먹이 메뉴의 ‘다시 함께하기’로 이어갈 수 있어요.');
+        return entry.state;
       }
         : wasActive ? () => service.leaveForeground(eventTime()) : null;
       if (!task) return;

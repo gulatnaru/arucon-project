@@ -165,6 +165,15 @@ export class ApprovedMvpService {
   leaveForeground(toMs: number) {
     return this.mutate(async () => { await this.prepareBenefitDay(toMs, true); return this.life.leaveForeground(toMs); });
   }
+  /** Settle arrival before presentation. A saved hibernation exposes the existing resume action. */
+  enterForeground(nowMs: number) {
+    return this.mutate(async () => {
+      await this.prepareBenefitDay(nowMs, false);
+      const settled = await this.life.advanceTo(nowMs);
+      if (settled.hibernating) return Object.freeze({ state: settled, needsResume: true });
+      return Object.freeze({ state: await this.life.returnToForeground(nowMs), needsResume: false });
+    });
+  }
   returnToForeground(nowMs: number, activity?: NormalizedActivity): Promise<ApprovedActivityReceipt> {
     return this.mutate(async () => {
       await this.prepareBenefitDay(nowMs, false);

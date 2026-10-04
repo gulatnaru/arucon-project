@@ -8,6 +8,7 @@ import { shouldResumeRoomOnContext } from './lifecycle';
 import { roomRenderSurfaceScale, resolveRoomRendererProfile } from './rendererConfig';
 import type { RoomProps } from './types';
 import { PetGestureSession } from './interactionLifecycle';
+import { projectPetRest } from '../presentation/petRest';
 
 export type { RoomProps } from './types';
 
@@ -159,6 +160,8 @@ export function AruconRoom(props: RoomProps) {
     const hit = hits?.[name];
     return !!hit?.visible && hit.y >= topLimit && hit.y <= bottomLimit;
   };
+  const blockedPetHint = () => projectPetRest({ sleeping: latest.current.restMode === 'sleeping',
+    hibernating: latest.current.restMode === 'hibernating' }).hint ?? '지금 하던 행동이 끝나면 쓰다듬을 수 있어요.';
 
   return (
     <View style={styles.root} onLayout={onLayout}>
@@ -228,7 +231,7 @@ export function AruconRoom(props: RoomProps) {
               () => !!room?.beginPet(startedAtMs),
             );
             if (result === 'started') latest.current.onInteractionIntent?.('pet');
-            if (result === 'rejected') latest.current.onStatus?.('지금 하던 행동이 끝나면 쓰다듬을 수 있어요.');
+            if (result === 'rejected') latest.current.onStatus?.(blockedPetHint());
           }}
           onPressOut={(event) => {
             const result = petGesture.current.end(event.nativeEvent.identifier);
@@ -243,7 +246,7 @@ export function AruconRoom(props: RoomProps) {
             if (activation === 'committed_active') room?.endPet();
             if (activation === 'accessible_activation') {
               if (!room?.beginAccessiblePet(activationStartedAtMs)) {
-                latest.current.onStatus?.('지금 하던 행동이 끝나면 쓰다듬을 수 있어요.');
+                latest.current.onStatus?.(blockedPetHint());
                 return;
               }
               latest.current.onInteractionIntent?.('pet');
