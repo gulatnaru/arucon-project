@@ -27,6 +27,16 @@
 
 Mac actual access→현재v5 설치 bundle hash→최근 성장 이어보기로 동일 루미20 선택/원본 복귀→새 같은-build1→20 영상(중간 영상 대체 없음)→native150 경합 재실행→기록/직접 head·body 접촉/이동/background/cold/큰 글자/동작 줄이기→현재60초 proxy gate. 실패 시 해당 원인만 수정/Release/재검증. 실제 화면/최신 저장 안정성이 확인되기 전 READY_FOR_GROWTH_PLAYTHROUGH로 바꾸지 않는다.
 
+### Git / 빌드 대응
+
+앱 소스 checkpoint **6155b22a56d9cf81b33b356cdecb0737f669a61c**. v5는 cdb7325의 작업 트리로 빌드됐고, 이후 이 checkpoint의 App/src/lockfile 전체 파일 해시가 빌드 manifest와 일치했다. Source code 변경 없이 보고/상태만 후속 갱신한다. Feature 일반 push만 수행하며 actual 로컬/추적/live-origin 해시 및 최종 clean 상태는 최종 보고와 `git-final-audit.json`에 남긴다. 영상·DB·로그·CNG/native/build/node_modules/.expo·비밀은 staged되지 않았다.
+
+### 로컬 영상과 화면 증거
+
+`evidence/growth-playthrough-2026-10-06/09-v4-final-native-growth.mp4`는 **17분41.137초**의 무편집 정상 속도 영상이다. AVFoundation 실제 디코딩과 프레임 확인을 했다. 약250초에 루미 Lv1,400초에 Lv9/식사·말풍선,650초에 Lv20/mono/합성49일이 보인다. v4 selection trace에는 level11~19의 서로 다른 body recipe perform→complete와16의 new_stance가 있다. 이 프레임은 해당 시각의 시각 증거이며 정지 프레임이나 인코딩 FPS를 모션·GPU·입력 지연 측정으로 취급하지 않는다. 최신v5 실제 플레이/성능은 별도 환경 차단으로 남긴다.
+
+`01-before-storage.mp4`(구형), `02-v2-native-storage-and-growth.mp4`(중간), before DB backups, `native-contention-v4.json`, `10-growth-v4-start.json`, `13-v4-live-growth.json`, `14-v5-preserved-state.json`, `release-v5-manifest.json`, `v4-frame-review/`를 같은 ignored 폴더에 보존했다. 기본 sandbox의 AVFoundation decode는 실패했으나 로컬 파일 분석에 허용된 실행에서 실제 decode 성공했다. 호스트 화면 잠금/입력 차단과 과거 저장 영상 분석을 구분했다. 외부 업로드 없음.
+
 SOL_DIRECT / SELF_REVIEW, no subagents. Requested GPT-6.1 Sol Max; effective model ROUTING_UNVERIFIED. The previous PRODUCT_REVIEW_READY, Astra evidence and sleep/input CLOSED remain historical results. This new user-reported save/growth defect supersedes the readiness claim.
 
 Baseline Git HEAD/tracking/live origin `cdb73256ad74b81f9a083e033c322a5d6c98e32d`, feature/arucon-mobile-autonomous, clean. Current installed old app is preserved before replacement. CUA screen/input access succeeded. Original and experience DBs backed up with read-only online backup; integrity ok. No reset/reinstall/rewind used to erase the initial state.

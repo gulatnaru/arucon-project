@@ -2,11 +2,11 @@
 
 ## 현재 작업 — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
 
-**현재 Mac actual CUA 두 번 locked 확인**. 최신 설치 **growth-v5**, SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`. DB 초기화 없이 현재selected `growth_playthrough#1791218209615`, **루미**/reserved/mono/Lv20/6150EXP/meal374를 v5의 읽기 전용 저장에서도 보존했다. 일반 Sim/food0/coin15/EXP25.125도 동일하다. Source374/374·lint/typecheck·Release/Android JS bundle PASS. v4의150개 native 경합 및 정상 같은-pet1→20 영상은 실제 통과 이력이며 **v5 actual input으로 재표기하지 않는다**.
+**현재 실제 CUA에서 Mac locked 확인**. 앱 소스 checkpoint **6155b22**. 최신 설치 **growth-v5**, SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`. DB 초기화 없이 현재 선택된 `growth_playthrough#1791218209615`, **루미**/reserved/mono/Lv20/6150EXP/meal374를 v5의 읽기 전용 저장에서도 보존했다. 일반 Sim/food0/coin15/EXP25.125도 동일하다. 새374/374·lint/typecheck·Release/Android JS bundle PASS. v4의150개 native 경합 및 정상 동일 개체1→20 영상은 실제 통과 이력이며 **v5 실제 입력으로 재표기하지 않는다**.
 
-다음 한 작업: 실제 Mac access→현재v5 bundle hash→메뉴/설정의 **최근 성장 체험 이어보기**(일반 방에서도 같은루미로 복귀)→native150 재검사→최신같은-build1→20 및 head/body touch·기록닫기·이동·background/cold→현재60초 proxy 측정. 이미완료한코드/정책/자산을 다시만들거나DB/옛trials를지우지않는다. v5는저장선택UI만추가했고Lv/EXP/진화/자산/모션은v4와같다. 자세한정상경로/한계는 [현재 보고](GROWTH-PLAYTHROUGH-REPORT.md).
+다음 한 작업: 실제 Mac 접근→현재v5 bundle hash→메뉴/설정의 **최근 성장 체험 이어보기**(일반 방에서도 같은 루미로 복귀)→native150 재검사→최신 동일 빌드1→20 및 head/body 접촉·기록 닫기·이동·background/cold→현재60초 proxy 측정. 완료된 코드/정책/자산을 다시 만들거나 DB/옛 체험을 지우지 않는다. v5는 저장 선택 UI만 추가했고 Lv/EXP/진화/자산/모션은v4와 같다. 자세한 정상 경로/한계는 [현재 보고](GROWTH-PLAYTHROUGH-REPORT.md).
 
-실제GPU/물리지연/실기기 NOT_RUN, 재미·최종아트 USER_REVIEW_PENDING. 잠금·권한우회금지. Sourcefeature checkpoint와 일반push만허용. 최신UI/저장/성능이실제로확인되기전 READY_FOR_GROWTH_PLAYTHROUGH로승격하지않는다.
+실제 GPU/물리 지연/실기기 NOT_RUN, 재미·최종 아트 USER_REVIEW_PENDING. 잠금·권한 우회 금지. Feature checkpoint와 일반 push만 허용. 최신 UI/저장/성능이 실제 확인되기 전 READY_FOR_GROWTH_PLAYTHROUGH로 승격하지 않는다.
 
 ### 이번 실행 중간 지점 (historical)
 
