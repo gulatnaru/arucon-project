@@ -1,5 +1,15 @@
 # Growth playthrough and native save stability — 2026-10-06
 
+## LIFE-02 재개 — Context7 / SQLite 버전 감사
+
+현재 Codex의 실제 호출 목록에서 Context7 도구는0개다. 플러그인 관리 조회는 Context7이 설치·ENABLED임을 확인했으므로 미설치라고 단정하지 않는다. 다만 현재 세션에서 문서 조회 호출은 NOT_RUN_TOOL_NOT_EXPOSED다. user/project `config.toml`의 직접 MCP 항목에도 Context7이 없었다. Codex에서 기존 Context7의 활성/노출을 확인하고 세션을 새로 여는 것이 먼저다. 직접 MCP 등록이 필요하면 공개 remote URL `https://mcp.context7.com/mcp`를 이용할 수 있으며, 이 작업에서 설정 변경/설치/권한 확대는 하지 않았다.
+
+Expo55.0.31 / expo-sqlite55.0.20을 package.json·lock·설치본에서 대조했다. SDK55 공식 문서의 권장55.0.20과 일치하며 npm gitHead의 원본 소스도 설치본과 SHA256가 같았다. 트랜잭션 내부는txn으로 실행하고, 밖의 비동기 쓰기는 exclusive API가 자동 대기시키지 않는다는 조건을 확인했다. `SQLITE_BUSY`는 다른 연결 경합이며 finalize는 앞선 실행 실패를 전달할 수 있다. 원문 URL·버전·해시는 [ADR-015](docs/adr/ADR-015-sqlite-access-and-growth-playthrough.md)에 기록했다.
+
+현재30개 콜백과 helper 전달, 정산/접촉/생활 기억/설정/프로필 전환의 파일 대기열 경로를 감사했다. 새로운 우회 경로는 발견되지 않았다. 실제 기존 native 재현은 execute code5가 먼저, finalize code5가 뒤였다. 이 근거의 현재6155b22 구현을 유지하고, 재시도 시간을 늘리거나 API 이름만 바꾸지 않았다. 정리가 늦어지는 동안 외부 쓰기가 대기하는지와 정리 자체 실패를 구분하는 회귀를 추가해 **이번 영향16/16**, typecheck/lint PASS를 새로 실행했다. 과거374/374를 이번 전체 실행으로 복사하지 않았다.
+
+이번 실제 Simulator 접근도 두 번 **Mac locked**였다. 현재 v5의 저장 안정성/동일 개체1→20/정상 입력/성능은 아래 남은 검증을 그대로 이어간다. 문서 조회나 Context7 설치 상태 확인을 LIFE-02 완료로 보고하지 않는다. 상태는 PARTIAL_WITH_BLOCKERS, 재미·최종 아트 USER_REVIEW_PENDING이다.
+
 ## Current execution: PARTIAL_WITH_BLOCKERS / latest-v5 actual input pending
 
 루미 한 마리가 합성 활동으로 받은 먹이를 자동으로374회 섭취해 Lv.1→20/6,150EXP가 됐다. Lv.16에서 기존 케어 조건으로 모노가 됐고 이름·reserved 성격은 그대로다. 앞발 인사→작은 튀기/방향 장난→번갈아 발 인사/균형/두 박자→새 형태의 자세와 나만의 인사를 연결했다. Growth/reveal은 정상 속도이며 원장과 실제 native 영상으로 확인했다. **이 전체 연속 성장 증거는 v4**이며 최종 재미·아트 승인은 사용자 대기다.

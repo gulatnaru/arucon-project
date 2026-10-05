@@ -60,3 +60,49 @@ test('failed transaction does not poison the file lane or hide later save failur
   await assert.rejects(connection.withExclusiveTransactionAsync(() => Promise.resolve(1)), e => e === error);
   assert.equal(await connection.withExclusiveTransactionAsync(() => Promise.resolve(2)), 2);
 });
+
+test('external write waits for the transaction statement finalize and connection-close acknowledgement', async () => {
+  const order: string[] = [];
+  let finishFinalize!: () => void;
+  let finalizeStarted!: () => void;
+  const gate = new Promise<void>(resolve => { finishFinalize = resolve; });
+  const started = new Promise<void>(resolve => { finalizeStarted = resolve; });
+  const native = () => ({ databasePath: '/isolated/lifetime.db',
+    prepareAsync: async (sql: string) => {
+      order.push(`prepare:${sql}`);
+      return { executeAsync: async () => ({ changes: 1 }), finalizeAsync: async () => {
+        if (sql === 'game') { finalizeStarted(); await gate; }
+        order.push(`finalize:${sql}`);
+      } };
+    },
+    withExclusiveTransactionAsync: async (work: (tx: SQLiteDatabase) => Promise<void>) => {
+      order.push('begin'); await work(native() as unknown as SQLiteDatabase);
+      await Promise.resolve(); order.push('commit-close');
+    },
+  });
+  const game = expoSqliteConnection(native() as unknown as SQLiteDatabase);
+  const settings = expoSqliteConnection(native() as unknown as SQLiteDatabase);
+  const transaction = game.withExclusiveTransactionAsync(tx => tx.runAsync('game'));
+  await started;
+  const outside = settings.runAsync('settings');
+  await new Promise(resolve => setTimeout(resolve, 1));
+  assert.deepEqual(order, ['begin', 'prepare:game']);
+  finishFinalize(); await Promise.all([transaction, outside]);
+  assert.deepEqual(order, ['begin','prepare:game','finalize:game','commit-close','prepare:settings','finalize:settings']);
+});
+
+test('a finalize-only failure is reported as cleanup origin and does not prevent a later independent save', async () => {
+  const closeError = new Error('finalize IO failure');
+  let calls = 0;
+  const db = { databasePath: '/isolated/finalize-only.db', prepareAsync: async () => ({
+    executeAsync: async () => ({ changes: 1 }),
+    finalizeAsync: async () => { if (++calls === 1) throw closeError; },
+  }) } as unknown as SQLiteDatabase;
+  const connection = expoSqliteConnection(db);
+  await assert.rejects(connection.runAsync('UPDATE fixture SET value=1'), error => {
+    assert.ok(error instanceof SqlOperationError); assert.equal(error.phase,'finalize');
+    assert.equal(error.cause,closeError); assert.equal(error.cleanupError,undefined); return true;
+  });
+  assert.equal((await connection.runAsync('UPDATE fixture SET value=2') as { changes: number }).changes,1);
+  assert.equal(calls,2);
+});

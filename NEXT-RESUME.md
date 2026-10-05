@@ -1,5 +1,11 @@
 # Next resume — fresh macOS iOS validation
 
+## LIFE-02 현재 재개 메모 — 문서/DB 감사 후 실제 입력 대기
+
+Context7은 플러그인 목록상 설치/ENABLED이나 이번 Codex 호출 도구0개로 실제 문서 호출은 미실행이다. 설치본 Expo55.0.31/expo-sqlite55.0.20과 SDK55 원문/정확 npm gitHead 소스를 대조했다. Exclusive API가 모든 외부 쓰기를 자동 직렬화한다고 가정하지 않는다. 현재30개 callback은txn을 사용하며, 앱 쓰기는 기존 per-file lane을 통한다. 정리 지연/정리 자체 실패 검사를 추가해 이번 영향16/16·typecheck/lint PASS. 상세는 [현재 감사](GROWTH-PLAYTHROUGH-REPORT.md)와 [ADR-015](docs/adr/ADR-015-sqlite-access-and-growth-playthrough.md).
+
+이번 실제 CUA도 Mac locked 확인. 잠금 해제 후 아래의 현재 v5/native 경합/성장/복귀/입력/성능 검증을 이어간다. 테스트만 추가했고 앱 소스6155b22와 설치 v5는 변경하지 않아 불필요한 재빌드/DB 초기화를 하지 않았다. Context7 설정/권한/새 설치/프로젝트 외부 전송은 변경하지 않았다.
+
 ## 현재 작업 — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
 
 **현재 실제 CUA에서 Mac locked 확인**. 앱 소스 checkpoint **6155b22**. 최신 설치 **growth-v5**, SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`. DB 초기화 없이 현재 선택된 `growth_playthrough#1791218209615`, **루미**/reserved/mono/Lv20/6150EXP/meal374를 v5의 읽기 전용 저장에서도 보존했다. 일반 Sim/food0/coin15/EXP25.125도 동일하다. 새374/374·lint/typecheck·Release/Android JS bundle PASS. v4의150개 native 경합 및 정상 동일 개체1→20 영상은 실제 통과 이력이며 **v5 실제 입력으로 재표기하지 않는다**.
