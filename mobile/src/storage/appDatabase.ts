@@ -1,5 +1,6 @@
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 import { parseExperienceProfile, type ExperienceScenario } from '../living/experience';
+import { expoSqliteConnection } from './sqlite';
 export type RoomProfile = 'original' | ExperienceScenario | `${ExperienceScenario}#${number}`;
 
 const databases = new Map<string, Promise<SQLiteDatabase>>();
@@ -22,8 +23,9 @@ export function openAruconDatabase(name: 'arucon-dev.db' | 'arucon-life-experien
 
 async function profileDatabase() {
   const db = await openAruconDatabase();
-  await db.execAsync('CREATE TABLE IF NOT EXISTS presentation_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
-  return db;
+  const connection = expoSqliteConnection(db);
+  await connection.execAsync('CREATE TABLE IF NOT EXISTS presentation_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
+  return connection;
 }
 export async function readExperienceProfile(): Promise<RoomProfile> {
   const db = await profileDatabase();
@@ -33,5 +35,5 @@ export async function readExperienceProfile(): Promise<RoomProfile> {
 }
 export async function saveExperienceProfile(profile: RoomProfile): Promise<void> {
   const db = await profileDatabase();
-  await db.runAsync("INSERT INTO presentation_settings (key, value) VALUES ('experience', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", profile);
+  await db.runAsync("INSERT INTO presentation_settings (key, value) VALUES ('experience', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", [profile]);
 }

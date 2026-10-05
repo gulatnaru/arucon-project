@@ -6,9 +6,10 @@ export type ApprovedFixtureAction =
   | 'growth_status' | 'resolve_growth' | 'shop_medicine' | 'shop_table'
   | 'shop_ball' | 'shop_cushion' | 'widget_snapshot' | 'sync_status' | 'sync_handoff'
   | 'renderer_legacy_333' | 'renderer_low_resolution' | 'renderer_automatic' | 'performance_export' | 'performance_capture' | 'resume_saved_piko'
-  | 'evaluation_mode';
+  | 'evaluation_mode' | 'storage_contention';
 
 const ROWS: readonly { action: ApprovedFixtureAction; label: string }[] = [
+  { action: 'storage_contention', label: '격리 native 저장 경합 검사' },
   { action: 'synthetic_walk', label: 'SOURCE_SYNTHETIC · 걸음 500' },
   { action: 'synthetic_sleep_none', label: 'SOURCE_SYNTHETIC · 수면 무기록' },
   { action: 'synthetic_sleep_70', label: 'SOURCE_SYNTHETIC · 수면 70점' },

@@ -3,6 +3,7 @@ import type { GameConfig } from '../domain/config';
 import type { Command, PetState, Transition } from '../domain/model';
 import type { WriterIdentity } from '../sync/contracts';
 import type { SQLiteDatabase } from 'expo-sqlite';
+import { inSqliteLane, nativeStatement, traceTransaction } from './sqliteAccess';
 import { validateLocalSyncRegistration } from './syncRegistration';
 
 /** Minimal async surface implemented by Expo SQLite and by the Node test adapter. */
@@ -56,23 +57,36 @@ export async function retrySqliteBusy<T>(operation: () => Promise<T>, options: B
 export function expoSqliteConnection(database: SQLiteDatabase): SqlConnection {
   const executor = (db: SQLiteDatabase): SqlExecutor => ({
     execAsync: sql => db.execAsync(sql),
-    runAsync: (sql, params = []) => db.runAsync(sql, [...params]),
-    getFirstAsync: <T>(sql: string, params: readonly (string | number | null)[] = []) => db.getFirstAsync<T>(sql, [...params]),
-    getAllAsync: <T>(sql: string, params: readonly (string | number | null)[] = []) => db.getAllAsync<T>(sql, [...params]),
+    runAsync: (sql, params = []) => typeof db.prepareAsync === 'function' ? nativeStatement(db, sql, params, 'run') : db.runAsync(sql, [...params]),
+    getFirstAsync: <T>(sql: string, params: readonly (string | number | null)[] = []) => typeof db.prepareAsync === 'function' ? nativeStatement<T | null>(db, sql, params, 'first') : db.getFirstAsync<T>(sql, [...params]),
+    getAllAsync: <T>(sql: string, params: readonly (string | number | null)[] = []) => typeof db.prepareAsync === 'function' ? nativeStatement<T[]>(db, sql, params, 'all') : db.getAllAsync<T>(sql, [...params]),
   });
+  const direct = executor(database);
   return {
-    ...executor(database),
+    execAsync: sql => inSqliteLane(database, () => direct.execAsync(sql)),
+    runAsync: (sql, params) => inSqliteLane(database, () => direct.runAsync(sql, params)),
+    getFirstAsync: <T>(sql: string, params?: readonly (string | number | null)[]) => inSqliteLane(database, () => direct.getFirstAsync<T>(sql, params)),
+    getAllAsync: <T>(sql: string, params?: readonly (string | number | null)[]) => inSqliteLane(database, () => direct.getAllAsync<T>(sql, params)),
     async withExclusiveTransactionAsync<T>(work: (tx: SqlExecutor) => Promise<T>): Promise<T> {
-      return retrySqliteBusy(async () => {
+      return inSqliteLane(database, () => retrySqliteBusy(async () => {
         let result: T | undefined;
         let completed = false;
-        await database.withExclusiveTransactionAsync(async tx => {
-          result = await work(executor(tx));
-          completed = true;
-        });
+        let primary: unknown;
+        traceTransaction(database, 'start');
+        try {
+          await database.withExclusiveTransactionAsync(async tx => {
+            try { result = await work(executor(tx)); completed = true; }
+            catch (error) { primary = error; throw error; }
+          });
+        } catch (error) {
+          traceTransaction(database, 'failed', primary ?? error);
+          if (primary && primary !== error) traceTransaction(database, 'cleanup_failed', error);
+          throw primary ?? error;
+        }
         if (!completed) throw new Error('SQLite transaction did not complete');
+        traceTransaction(database, 'complete');
         return result as T;
-      });
+      }));
     },
   };
 }

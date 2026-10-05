@@ -1,6 +1,22 @@
 # iOS validation history and Release input resume
 
-## 현재 SOL_DIRECT 제품 관찰 — PRODUCT_REVIEW_READY
+## 현재 SOL_DIRECT — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
+
+SQLite 공통파일대기열/statement오류구분, 단일pet1→20실제섭취성장,20개표현/정상생활/상황접촉/비교와저장복귀를구현했다. **v4 실제루미1→20/6150EXP/374meal/mono 및 native150경합/동일식사1·별도auto1/wake replay동일 PASS**. 원래사용자오류그순간의SQL은trace없어특정불가하며격리native재현으로실행오류가finalize에전달되는원인을확인했다.
+
+저장복귀UI를추가한 **최신v5 SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`**가설치됐다. v5read-only저장은같은루미/20/mono/EXP6150/374와일반Sim/food0/coin15/EXP25.125를보존했다. 최신Source374/374·lint/typecheck·iOSRelease·AndroidJS bundle PASS. **실제현재CUA는두번Mac locked**: v5정상메뉴/입력/경합재검사와현재60초성능은BLOCKED/NOT_RUN. 이전영상이나테스트개수로최신통과/READY를선언하지않는다. [현재상세/영상/다음작업](GROWTH-PLAYTHROUGH-REPORT.md), [재개](NEXT-RESUME.md).
+
+SOL_DIRECT/SELF_REVIEW/새subagent0, 요청GPT-6.1SolMax/effective ROUTING_UNVERIFIED. 실기기/GPU/물리지연/발열/배터리NOT_RUN, 재미·최종아트USER_REVIEW_PENDING. 건강/결제/계정/배포/main경계유지. 아래는이번작업과거지점/이력이다.
+
+### 이번 실행 중간 지점 (historical)
+
+기존 PRODUCT_REVIEW_READY를 유지하는 작업이 아니다. 사용자 새 SQLite 잠금 오류와 성장/개성 경험 부족을 재오픈했다. 공통 파일 SQL 대기열·statement 최초/정리 실패 구분, 별도 한 개체의 실제 자동 섭취 기반 Lv.1→20,20개 성장/일반 생활 몸짓·상황 접촉·대사·전후 비교를 구현했다. 원본 DB·원본 아트·승인 경제/성격/진화·건강/결제 OFF를 유지한다.
+
+현재 최종 Release **growth-v4**(SHA `003d451ad1c69a34b19a69bb3689aea85462d976bc7a6c9602b9e394beb89504`)의 native150개 경합·동일 요청 식사/별도 자동 식사/wake 재시도 PASS, 새373/373·lint/typecheck·Release·Android JS bundle PASS. 실제 정상 메뉴에서 이름을 입력한 **루미** 한 마리의 Lv.1→20 연속 성장/표현·저장·입력·성능 검증은 진행 중이다. 중간v2 영상/20레벨을 최종v4 통과로 인용하지 않는다. [현재 상세 결과](GROWTH-PLAYTHROUGH-REPORT.md), [실행 계약](docs/living-pet-design.md), [다음 작업](NEXT-RESUME.md).
+
+현재 실행은 SELF_REVIEW/새 subagent0, 요청 GPT-6.1 Sol Max/effective ROUTING_UNVERIFIED다. 실기기/GPU/물리 지연 NOT_RUN, 재미·최종 아트 USER_REVIEW_PENDING이며 최종 gate 전 READY로 보고하지 않는다.
+
+## Historical SOL_DIRECT 제품 관찰 — PRODUCT_REVIEW_READY
 
 **PRODUCT_REVIEW_READY — 현재 iOS Simulator/합성 체험의 사용자 검토용 범위**. SOL_DIRECT / SELF_REVIEW, 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED, 새 subagent0. 앱 소스 **6c76c9b**, 설치 Release `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`, 착수HEAD/원격 **2574135** 일치와 clean을 직접 확인했다. 새로운 앱 코드 변경·재빌드·재설치·게임 규칙/아트 확대는 수행하지 않았다.
 

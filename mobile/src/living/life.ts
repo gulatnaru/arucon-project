@@ -1,20 +1,21 @@
 import type { FloorPoint } from '../scene/types';
 import { MEAL_APPROACH } from '../scene/navigation';
+import { LEVEL_EXPRESSIONS, levelExpression, levelRepertoire, type GrowthMotion } from './levelExpressions';
 
 /** Presentation seconds only; never passed to the domain simulation clock. */
 export const LIFE = Object.freeze({ idleMin: 8, idleSpread: 9, offerMin: 90, offerSpread: 60,
   offerWait: 5, speechGapMs: 20_000, dialogueRest: 25, ballRadius: .22 });
 export type LifeScene = 'greeting' | 'look' | 'stretch' | 'inspect' | 'offer' | 'ball' | 'peek'
-  | 'gesture' | 'rest' | 'drowsy' | 'meal' | 'toilet' | 'company' | 'mishap' | 'growth' | 'touch' | 'release' | 'hungry' | 'seat' | 'solo';
+  | 'gesture' | 'rest' | 'drowsy' | 'meal' | 'toilet' | 'company' | 'mishap' | 'growth' | 'touch' | 'release' | 'hungry' | 'seat' | 'solo' | 'explore' | 'prank' | 'trick';
 export type LifeInput = LifeScene | 'cancel' | 'roll' | 'left' | 'right' | 'high_five' | 'tilt';
-export type LifeCommand = Readonly<{ token: string; kind: LifeInput; target?: FloorPoint; replay?: boolean }>;
-export type LifeEvent = Readonly<{ id: number; scene: LifeScene; phase: 'perform' | 'waiting' | 'complete' | 'cancel'; automatic: boolean; replay: boolean; commandToken?: string }>;
-export type LifePose = Readonly<{ scene: LifeScene; progress: number; side: number }> | null;
+export type LifeCommand = Readonly<{ token: string; kind: LifeInput; target?: FloorPoint; replay?: boolean; touchTarget?: 'head' | 'body' | 'unknown'; expressionLevel?: number }>;
+export type LifeEvent = Readonly<{ id: number; scene: LifeScene; phase: 'perform' | 'waiting' | 'complete' | 'cancel'; automatic: boolean; replay: boolean; commandToken?: string; level?: number; motion?: GrowthMotion; motionLevel?: number; previousScene?: LifeScene; touchTarget?: 'head' | 'body' | 'unknown' }>;
+export type LifePose = Readonly<{ scene: LifeScene; progress: number; side: number; level?: number; motion?: GrowthMotion; touchTarget?: 'head' | 'body' | 'unknown' }> | null;
 export type LifeWorld = { awake: boolean; enabled: boolean; touching: boolean; moving: boolean; committed: boolean;
   ball: boolean; cushion: boolean; toilet: boolean; table?: boolean; preference?: LifeScene;
-  personality?: 'reserved' | 'expressive'; hungry?: boolean; mealAvailability?: string; growthStage?: number; position: FloorPoint };
+  personality?: 'reserved' | 'expressive'; hungry?: boolean; tired?: boolean; mealAvailability?: string; growthStage?: number; growthLevel?: number; position: FloorPoint };
 export type LifePorts = { navigate(target: FloorPoint): boolean; stop(): void; event(event: LifeEvent): void };
-type Intent = { id: number; scene: LifeScene; phase: 'approach' | 'perform' | 'waiting' | 'return'; elapsed: number; automatic: boolean; side: number; duration: number; parking: boolean; chased: boolean; replay: boolean; commandToken?: string };
+type Intent = { id: number; scene: LifeScene; phase: 'approach' | 'perform' | 'waiting' | 'return'; elapsed: number; automatic: boolean; side: number; duration: number; parking: boolean; chased: boolean; replay: boolean; commandToken?: string; level: number; motion?: GrowthMotion; motionLevel?: number; previousScene?: LifeScene; touchTarget?: 'head' | 'body' | 'unknown' };
 
 /** One persistent actor. React redraws neither reseed it nor restart an intent. */
 export class LivingPet {
@@ -30,6 +31,10 @@ export class LivingPet {
   private world?: LifeWorld;
   private hungerEpisode: string | null = null;
   private hungerShown = false;
+  private lastActivity?: LifeScene;
+  private nextContext?: Pick<LifeCommand, 'touchTarget' | 'expressionLevel'>;
+  private contactFollowUp?: LifeScene;
+  private recentMotions: GrowthMotion[] = [];
   constructor(private readonly ports: LifePorts, private readonly random = Math.random) {
     this.offerIn = LIFE.offerMin + random() * LIFE.offerSpread;
   }
@@ -45,6 +50,7 @@ export class LivingPet {
     if (command.kind === 'cancel') { this.lastToken = command.token; this.cancel(); return true; }
     if (!world.enabled || !world.awake || world.committed) return false;
     this.lastToken = command.token;
+    this.nextContext = { touchTarget: command.touchTarget, expressionLevel: command.expressionLevel };
     if (command.kind === 'roll') return this.roll(command.target ?? { x: -.6 + this.random() * 1.2, z: 4.4 });
     if (command.kind === 'left' || command.kind === 'right' || command.kind === 'high_five' || command.kind === 'tilt') {
       return this.start(command.kind === 'left' || command.kind === 'right' ? 'peek' : 'gesture', false,
@@ -55,18 +61,30 @@ export class LivingPet {
   cancel() {
     if (this.intent) this.emit('cancel');
     this.intent = null; this.pose = null; this.ball.vx = this.ball.vz = 0;
+    this.contactFollowUp = undefined;
     this.idle = LIFE.idleMin + this.random() * LIFE.idleSpread;
     this.ports.stop();
   }
   private emit(phase: LifeEvent['phase']) {
-    if (this.intent) this.ports.event({ id: this.intent.id, scene: this.intent.scene, phase, automatic: this.intent.automatic, replay: this.intent.replay, commandToken: this.intent.commandToken });
+    if (this.intent) this.ports.event({ id: this.intent.id, scene: this.intent.scene, phase, automatic: this.intent.automatic, replay: this.intent.replay, commandToken: this.intent.commandToken,
+      level: this.intent.level, motion: this.intent.motion, motionLevel: this.intent.motionLevel, previousScene: this.intent.previousScene, touchTarget: this.intent.touchTarget });
   }
   private start(scene: LifeScene, automatic: boolean, side = this.random() > .5 ? 1 : -1, replay = false, commandToken?: string) {
     const world = this.world;
     if (!world || (['ball', 'inspect', 'offer', 'mishap', 'solo'].includes(scene) && !world.ball) || (scene === 'hungry' && !world.hungry) ||
       (scene === 'rest' && !world.cushion) || (scene === 'toilet' && !world.toilet)) return false;
+    const previousScene = this.intent?.scene ?? this.lastActivity;
     this.cancel();
-    this.intent = { id: ++this.sequence, scene, phase: 'perform', elapsed: 0, automatic, side, duration: 3.8, parking: scene === 'rest' && !automatic && world.ball, chased: false, replay, commandToken };
+    const context = this.nextContext; this.nextContext = undefined;
+    const level = context?.expressionLevel ?? world.growthLevel ?? 1;
+    const beat = levelExpression(level);
+    const learned = LEVEL_EXPRESSIONS.filter(x => x.level <= level && x.scene === scene);
+    const freshActs = learned.filter(x => !this.recentMotions.slice(-2).includes(x.motion));
+    const options = freshActs.length ? freshActs : learned;
+    const act = scene === 'growth' ? beat : options[Math.floor(this.random() * options.length)];
+    const motion = act?.motion;
+    this.intent = { id: ++this.sequence, scene, phase: 'perform', elapsed: 0, automatic, side, duration: 3.8, parking: scene === 'rest' && !automatic && world.ball, chased: false, replay, commandToken,
+      level, motion, motionLevel: act?.level, previousScene, touchTarget: context?.touchTarget };
     this.rolled = false;
     let target: FloorPoint | null = null;
     if (['ball', 'inspect', 'offer', 'mishap', 'solo'].includes(scene)) target = { x: this.ball.x, z: this.ball.z - .72 };
@@ -75,6 +93,7 @@ export class LivingPet {
     else if (scene === 'company') target = { x: side * .5, z: world.personality === 'expressive' ? 4.3 : 3.7 };
     else if (['meal', 'hungry'].includes(scene) && world.table) target = { ...MEAL_APPROACH };
     else if (scene === 'seat') target = { x: side * .65, z: side < 0 ? 2.7 : 3.5 };
+    else if (scene === 'explore') target = { x: side * 1.1, z: side < 0 ? -.8 : 1.7 };
     if (target && Math.hypot(world.position.x - target.x, world.position.z - target.z) > .1) {
       if (!this.ports.navigate(target)) { this.cancel(); return false; }
       this.intent.phase = 'approach';
@@ -84,7 +103,7 @@ export class LivingPet {
   private perform() {
     if (!this.intent) return;
     this.intent.phase = 'perform'; this.intent.elapsed = 0;
-    this.intent.duration = this.intent.parking ? 2 : this.intent.scene === 'rest' ? 9 : this.intent.scene === 'company' ? 6 : 3.8;
+    this.intent.duration = this.intent.parking ? 2 : this.intent.scene === 'rest' ? 9 : this.intent.scene === 'company' ? 6 : this.intent.motion ? 5.2 : 3.8;
     if (!this.intent.parking) this.emit('perform');
   }
   private roll(target: FloorPoint) {
@@ -117,13 +136,16 @@ export class LivingPet {
       if (world.moving) { this.idle = Math.max(this.idle, 4); return; }
       this.idle -= dt;
       if (this.idle > 0) return;
-      const candidates: LifeScene[] = ['look', 'stretch', 'company', 'drowsy', 'seat', ...(world.ball ? ['inspect', 'mishap', 'solo'] as const : []), ...(world.cushion ? ['rest'] as const : [])];
+      const candidates: LifeScene[] = ['look', 'stretch', 'company', 'seat', 'explore', 'gesture',
+        ...(world.tired ? ['drowsy'] as const : ['explore'] as const),
+        ...levelRepertoire(world.growthLevel ?? 1).filter(scene => ['trick', 'prank', 'greeting', 'peek'].includes(scene)),
+        ...(world.ball ? ['inspect', 'mishap', 'solo'] as const : []), ...(world.cushion ? ['rest'] as const : [])];
       const fresh = candidates.filter(scene => !this.recent.slice(-3).includes(scene));
       const preference = world.preference === 'ball' ? 'inspect' : world.preference;
       if (preference && fresh.includes(preference)) fresh.push(preference);
       if (world.personality === 'expressive' && fresh.includes('company')) fresh.push('company');
-      if ((world.growthStage ?? 1) >= 2 && fresh.includes('stretch')) fresh.push('stretch');
-      const scene = world.hungry && !this.hungerShown ? 'hungry' : world.ball && this.offerIn <= 0 ? 'offer' : fresh[Math.floor(this.random() * fresh.length)] ?? 'stretch';
+      const scene = world.hungry && !this.hungerShown ? 'hungry' : this.offerIn <= 0 ? world.ball ? 'offer' : 'greeting' : fresh[Math.floor(this.random() * fresh.length)] ?? 'look';
+      if (scene === 'greeting') this.offerIn = LIFE.offerMin + this.random() * LIFE.offerSpread;
       if (scene === 'hungry') this.hungerShown = true;
       this.start(scene, true, this.random() > .5 ? 1 : -1);
       return;
@@ -148,7 +170,7 @@ export class LivingPet {
       return;
     }
     const progress = Math.min(1, intent.elapsed / intent.duration);
-    this.pose = { scene: intent.parking ? 'ball' : intent.scene, progress, side: intent.side };
+    this.pose = { scene: intent.parking ? 'ball' : intent.scene, progress, side: intent.side, motion: intent.motion, level: intent.level, touchTarget: intent.touchTarget };
     if ((intent.parking || ['ball', 'offer', 'inspect', 'mishap', 'solo'].includes(intent.scene)) && !this.rolled && progress >= (world.personality === 'reserved' ? .52 : .38)) {
       if (Math.hypot(world.position.x - this.ball.x, world.position.z - this.ball.z) > 1.05) { this.cancel(); return; }
       this.rolled = true;
@@ -171,11 +193,17 @@ export class LivingPet {
   private complete() {
     if (!this.intent) return;
     const released = this.intent.scene === 'touch';
+    const releaseContext = { touchTarget: this.intent.touchTarget, expressionLevel: this.intent.level };
+    const contactNext = released && this.intent.previousScene && ['ball', 'solo', 'trick', 'explore', 'prank'].includes(this.intent.previousScene) ? this.intent.previousScene : undefined;
+    const followUp = this.intent.scene === 'release' ? this.contactFollowUp : undefined;
     const replay = this.intent.replay;
     this.emit('complete');
+    if (!this.intent.replay) this.lastActivity = this.intent.scene;
+    if (!this.intent.replay && this.intent.motion) this.recentMotions = [...this.recentMotions, this.intent.motion].slice(-6);
     this.recent.push(this.intent.scene); this.recent = this.recent.slice(-6);
     this.intent = null; this.pose = null;
     this.idle = LIFE.idleMin + this.random() * LIFE.idleSpread;
-    if (released) this.start('release', false, undefined, replay);
+    if (released) { this.nextContext = releaseContext; this.start('release', false, undefined, replay); this.contactFollowUp = contactNext; }
+    else if (followUp) { this.contactFollowUp = undefined; this.start(followUp, true, undefined, replay); }
   }
 }

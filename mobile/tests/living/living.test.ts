@@ -191,3 +191,22 @@ test('cancelled meal completion cannot be confused with a later meal or album re
   a.life.command({ token: 'album:meal', kind: 'meal', replay: true }, a.world); a.step(5);
   assert.ok(a.events.some(e => e.commandToken === 'album:meal' && e.replay && e.phase === 'complete'));
 });
+
+test('healthy empty-room life includes active learned scenes and does not mistake chic personality for dozing', () => {
+  const a = actor(); a.world.ball = false; a.world.cushion = false; a.world.personality = 'reserved';
+  a.world.growthLevel = 20; a.world.tired = false;
+  a.step(300);
+  const scenes = a.events.filter(e => e.phase === 'perform').map(e => e.scene);
+  assert.ok(scenes.includes('explore')); assert.ok(scenes.some(x=>['trick','prank','gesture'].includes(x)));
+  assert.ok(!scenes.includes('drowsy')); assert.ok(new Set(scenes).size >= 5);
+});
+
+test('contact retains its position and interrupted activity, then releases and resumes without an economic command', () => {
+  const a = actor(); a.world.growthLevel = 13;
+  a.life.command({token:'normal-explore',kind:'explore'},a.world); a.step(1);
+  a.life.command({token:'hand-body',kind:'touch',touchTarget:'body'},a.world); a.step(12);
+  const touched = a.events.find(e=>e.scene==='touch' && e.phase==='perform');
+  assert.equal(touched.previousScene,'explore'); assert.equal(touched.touchTarget,'body'); assert.equal(touched.level,13);
+  assert.ok(a.events.some(e=>e.scene==='release' && e.phase==='perform' && e.touchTarget==='body'));
+  assert.ok(a.events.filter(e=>e.scene==='explore' && e.phase==='perform').length>=1);
+});

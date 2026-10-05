@@ -1,6 +1,22 @@
 # Next resume — fresh macOS iOS validation
 
-## 현재 지점 — SOL_DIRECT / PRODUCT_REVIEW_READY
+## 현재 작업 — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
+
+**현재 Mac actual CUA 두 번 locked 확인**. 최신 설치 **growth-v5**, SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`. DB 초기화 없이 현재selected `growth_playthrough#1791218209615`, **루미**/reserved/mono/Lv20/6150EXP/meal374를 v5의 읽기 전용 저장에서도 보존했다. 일반 Sim/food0/coin15/EXP25.125도 동일하다. Source374/374·lint/typecheck·Release/Android JS bundle PASS. v4의150개 native 경합 및 정상 같은-pet1→20 영상은 실제 통과 이력이며 **v5 actual input으로 재표기하지 않는다**.
+
+다음 한 작업: 실제 Mac access→현재v5 bundle hash→메뉴/설정의 **최근 성장 체험 이어보기**(일반 방에서도 같은루미로 복귀)→native150 재검사→최신같은-build1→20 및 head/body touch·기록닫기·이동·background/cold→현재60초 proxy 측정. 이미완료한코드/정책/자산을 다시만들거나DB/옛trials를지우지않는다. v5는저장선택UI만추가했고Lv/EXP/진화/자산/모션은v4와같다. 자세한정상경로/한계는 [현재 보고](GROWTH-PLAYTHROUGH-REPORT.md).
+
+실제GPU/물리지연/실기기 NOT_RUN, 재미·최종아트 USER_REVIEW_PENDING. 잠금·권한우회금지. Sourcefeature checkpoint와 일반push만허용. 최신UI/저장/성능이실제로확인되기전 READY_FOR_GROWTH_PLAYTHROUGH로승격하지않는다.
+
+### 이번 실행 중간 지점 (historical)
+
+과거 PRODUCT_REVIEW_READY 확인 요청이 아니다. 최신 작업은 [성장·저장 보고](GROWTH-PLAYTHROUGH-REPORT.md), [ADR-015](docs/adr/ADR-015-sqlite-access-and-growth-playthrough.md)와 사용자 최신 지시를 따른다. SOL_DIRECT / SELF_REVIEW, 새 subagent0. 원래 DB와 기존 모든 체험을 보존했고 SQLite 공통 파일 대기열·statement 최초/정리 오류 구분·동일 목표 재시도를 구현했다. SDK/원본 GLB/승인 경제·수면·진화 정책은 유지한다.
+
+현재 준비/설치 Release **growth-v4**, bundle SHA `003d451ad1c69a34b19a69bb3689aea85462d976bc7a6c9602b9e394beb89504`, 원래 iPhone16e device2170BD93…. 최종 normal-menu profile `growth_playthrough#1791218209615`, **루미** 한 마리의 Lv.1→20 자동 성장 검증 중이다. 과거 v2의20레벨/374식사 완료 영상은 중간 증거다. 현재소스 reset/원래 DB 초기화/기존 trial 덮어쓰기 금지. Native150 경합/동일 식사1·자동1·wake 재시도 동일과 새373/373·lint/typecheck·Release·Android bundle 결과는 로컬 `evidence/growth-playthrough-2026-10-06/`에 있다.
+
+다음 한 작업은 현재 실제 화면 접근을 확인한 뒤 **같은 v4의 연속 성장 영상/각 레벨 실제 표현·진화 → pause/compare → 기록/직접 접촉/이동 → background/foreground/콜드 재실행/프로필 전환 → native 원장·원본/widget 보존 → 현재 성능 gate**를 마무리하는 것이다. 실제 GPU/물리 지연/실기기는 NOT_RUN, 재미·최종 아트 USER_REVIEW_PENDING. 검사만으로 READY_FOR_GROWTH_PLAYTHROUGH 승격 금지. Feature checkpoint/일반 push만 허용한다.
+
+## Historical 지점 — SOL_DIRECT / PRODUCT_REVIEW_READY
 
 현재 소스 **6c76c9b**, 설치 SHA `facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b`, 원본 iPhone16e device2170BD93…의 **일반 Sim 방**이다. 앱을 새로 만들거나 재빌드/초기화하지 않았다. 정상 무입력 생활·직접 교감/복귀·기록 닫기/이동, 기존 격리 합성 자동 섭취15EXP/Lv5→6와 WC가 실제로 연결됐다. 관찰한 새 명백한 기능 결함이 없어서 코드 수정을 추가하지 않았다. 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED, SELF_REVIEW다.
 

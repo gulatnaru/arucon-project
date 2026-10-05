@@ -1,6 +1,19 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 SOL_DIRECT 제품 관찰 — PRODUCT_REVIEW_READY
+## 현재 재오픈 — 저장 안정성·동일 개체 성장 (2026-10-06)
+
+이전 PRODUCT_REVIEW_READY는 아래 이력이다. 현재 **PARTIAL_WITH_BLOCKERS**: 구현과 v4 실제1→20/저장경합은 완료했으나 v5 설치후 실제CUA locked로최신UI/성능재확인이막혔다. [실제 현재 결과](GROWTH-PLAYTHROUGH-REPORT.md), [생활/레벨 도달표](docs/living-pet-design.md).
+
+| 범위 | 현재 |
+|---|---|
+| native SQL 최초 오류·자원/경합 | v4 실제 execute→finalize 재현/공통lane150·식사/wake재시도 PASS; v5재검사 BLOCKED_HOST_LOCKED |
+| 단일 pet Lv.1→20 | v4 루미 actual374섭취/6150EXP/49합성관찰일/mono PASS. v5정상메뉴복귀·최신플레이대기 |
+| 레벨별 실제 몸짓/대사/표정/기억 |20개recipe·일반생활/상황접촉 연결; v4 actual연속영상/trace. v5같은motion/assets, actual재확인대기 |
+| 저장/시간/입력/원본/widget 보존 | 새374/374 PASS; v5설치후read-only저장20레벨/원본Sim보존. 실제v5입력/복귀는BLOCKED |
+| 최종 성능·플랫폼 | 현재60초proxy NOT_RUN/BLOCKED; Android최신JS bundle PASS, Android새native/UI NOT_RUN |
+| 실기기/GPU/물리 지연/재미·최종 아트 | NOT_RUN / USER_REVIEW_PENDING |
+
+## Historical SOL_DIRECT 제품 관찰 — PRODUCT_REVIEW_READY
 
 같은6c76c9b/설치facaf830… iOS Simulator를 실제 조작했다. 관찰한 새 명백한 결함이 없어 앱 소스/규칙/아트를 바꾸지 않았으며 과거 수면·동면 CLOSED는 보존한다. 현재 user-facing 결과는 검토 가능한 설치판이며 출시/MVP 전체 완료가 아니다.
 

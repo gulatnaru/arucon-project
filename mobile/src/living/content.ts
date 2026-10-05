@@ -1,5 +1,6 @@
 import type { LifeScene } from './life';
 import { LIFE } from './life';
+import { levelExpression } from './levelExpressions';
 
 type Lines = Readonly<{ reserved: readonly string[]; expressive: readonly string[] }>;
 export type MealAvailability = 'ready' | 'no_food' | 'no_table' | 'manual';
@@ -11,6 +12,9 @@ const HUNGER_LINES: Record<MealAvailability, Lines> = {
 };
 /** Each category is reached from a performed living intent, never a diagnostic-only line picker. */
 export const LIFE_LINES: Readonly<Record<LifeScene, Lines>> = {
+  explore: { reserved: ['먼저 저쪽부터.', '이 자리에선 다르게 보이네.', '돌아오는 길도 알아.', '조용히 구경 좀 하고.'], expressive: ['방 끝까지 가 볼래!', '여기서 보니 새롭다!', '한 바퀴 둘러보고 왔어.', '저쪽이 궁금했어!'] },
+  prank: { reserved: ['바로 그쪽으로 갈 줄 알았지?', '딴청은 잠깐이야.', '못 본 척해도 돼.', '이번에는 살짝 바꿔 봤어.'], expressive: ['깜짝, 방향 바꿨다!', '앗, 내가 먼저 장난쳤네!', '이번에는 이쪽이지!', '살짝 속여 봤어!'] },
+  trick: { reserved: ['이건 내가 해 볼게.', '연습한 건 아니고.', '보고 있었네.', '한 번쯤 보여 줄 수 있지.'], expressive: ['내 개인기 볼래?', '이번엔 내가 먼저!', '나 혼자서도 해 봤어.', '아까보다 편해졌어!'] },
   hungry: { reserved: ['그릇 쪽에 가 볼까.', '조금 먹어도 되겠네.'], expressive: ['간식 먹고 싶어.', '그릇 앞에서 기다릴게.'] },
   seat: { reserved: ['오늘은 이쪽.', '자리 한번 바꿔 볼까.'], expressive: ['여기도 편하네!', '다른 자리에 앉아 볼래.'] },
   solo: { reserved: ['어디까지 가나 보자.', '공이 자꾸 도망가네.'], expressive: ['데굴데굴, 따라간다!', '앗, 저쪽으로 갔네!'] },
@@ -37,25 +41,48 @@ export type LifeMemory = { schemaVersion: 1; petId: string; shown: { id: string;
 export const emptyLifeMemory = (petId: string): LifeMemory => ({ schemaVersion: 1, petId, shown: [], completed: [], lastAutomaticAtMs: 0 });
 
 export function chooseLifeLine(memory: LifeMemory, scene: LifeScene, personality: 'reserved' | 'expressive', atMs: number,
-  automatic: boolean, random = Math.random, catalog = LIFE_LINES, need?: MealAvailability): { text: string; id: string; eligible: string[]; excludedRecent: string[] } | null {
+  automatic: boolean, random = Math.random, catalog = LIFE_LINES, need?: MealAvailability,
+  context?: { level: number; motionLevel?: number; previousScene?: LifeScene; touchTarget?: 'head' | 'body' | 'unknown' }): { text: string; id: string; eligible: string[]; excludedRecent: string[] } | null {
   if (automatic && atMs >= memory.lastAutomaticAtMs && atMs - memory.lastAutomaticAtMs < LIFE.speechGapMs) return null;
   // Quiet observation deliberately includes wordless stretches, looks and pauses.
   if (automatic && scene !== 'offer' && scene !== 'hungry' && random() < .65) return null;
   const lines = scene === 'hungry' && need ? HUNGER_LINES[need] : catalog[scene];
   const candidates = lines[personality].map((text, index) => ({ text, id: `${scene}:${scene === 'hungry' && need ? `${need}:` : ''}${personality}:${index}` }));
+  if (context) {
+    const beat = levelExpression(context.motionLevel ?? context.level);
+    if (scene === 'growth') candidates.splice(0, candidates.length, { text: beat[personality], id: `growth:${personality}:level${beat.level}` });
+    else if (scene === beat.scene || scene === 'trick' || scene === 'prank') candidates.push({ text: beat[personality], id: `${scene}:${personality}:level${beat.level}` });
+    if (scene === 'touch') {
+      const body = context.touchTarget === 'body';
+      const growing = context.level >= 6;
+      const specific = personality === 'reserved' ? body ? ['그쪽으로 기대 볼게.', '등은 거기. 천천히.', '몸이 먼저 기울었네.', growing ? '내가 손 쪽으로 갈게.' : '어디까지 눌리나 보자.']
+        : ['고개는 조금만.', '귀 옆이 편하네.', '눈 감고 있어도 돼?', growing ? '인사는 발로 할게.' : '손 높이가 익숙해지네.']
+        : body ? ['등이 사르르 풀려!', '옆으로 기대 볼게!', '여기, 몸이 쏙 눌린다.', growing ? '손 쪽으로 내가 갈래!' : '조금만 기대 있어도 돼?']
+          : ['머리 쓰다듬어 줘서 좋아!', '귀 옆도 부탁해!', '눈 감고 느껴 볼게.', growing ? '앞발도 인사할게!' : '손이 얼마나 따뜻한지 알겠어!'];
+      candidates.push(...specific.map((text, index) => ({ text, id: `touch:${personality}:${body ? 'body' : 'head'}:${growing ? 'grown' : 'baby'}:${index}` })));
+      if (context.previousScene && ['ball', 'solo', 'prank', 'trick', 'explore'].includes(context.previousScene)) candidates.push({
+        text: personality === 'reserved' ? '잠깐만. 놀던 데로 갈게.' : '쉬고 나서 하던 거 또 할래!', id: `touch:${personality}:after:${context.previousScene}`,
+      });
+      if (memory.completed.some(x => x.scene === 'ball' && atMs - x.atMs >= 0 && atMs - x.atMs < 3_600_000)) candidates.push({ text: personality === 'reserved' ? '공은 잠깐 옆에 뒀어.' : '공놀이하고 쉬는 손길이 좋아!', id: `touch:${personality}:recent_ball` });
+    }
+  }
   if (scene === 'offer' && memory.completed.some(x => x.scene === 'ball' && atMs >= x.atMs && atMs - x.atMs < 3_600_000)) {
     candidates.push({ text: personality === 'reserved' ? '아까 그거, 한 번 더?' : '아까 공놀이 또 하자!', id: `offer:${personality}:remember` });
   }
-  const recent = memory.shown.filter(x => x.id.startsWith(`${scene}:`)).slice(-Math.min(3, candidates.length - 1)).map(x => x.id);
+  const excludedCount = Math.min(3, candidates.length - 1);
+  const recent = excludedCount > 0 ? memory.shown.filter(x => x.id.startsWith(`${scene}:`)).slice(-excludedCount).map(x => x.id) : [];
   const fresh = candidates.filter(x => !recent.includes(x.id));
-  const chosen = fresh[Math.min(fresh.length - 1, Math.floor(random() * fresh.length))];
+  const uses = (id: string) => memory.shown.filter(x => x.id === id).length;
+  const minimumUses = Math.min(...fresh.map(x => uses(x.id)));
+  const varied = fresh.filter(x => uses(x.id) === minimumUses);
+  const chosen = varied[Math.min(varied.length - 1, Math.floor(random() * varied.length))];
   if (!chosen) return null;
   memory.shown = [...memory.shown, { id: chosen.id, atMs }].slice(-48);
   if (automatic) memory.lastAutomaticAtMs = atMs;
   return { ...chosen, eligible: fresh.map(x => x.id), excludedRecent: recent };
 }
 
-export const LIFE_SCENE_NAMES: Record<LifeScene, string> = { greeting: '눈맞춤 인사', look: '방 구경', stretch: '기지개', inspect: '공 살펴보기',
+export const LIFE_SCENE_NAMES: Record<LifeScene, string> = { explore: '방 끝 탐색', prank: '방향 장난', trick: '먼저 보여준 개인기', greeting: '눈맞춤 인사', look: '방 구경', stretch: '기지개', inspect: '공 살펴보기',
   offer: '먼저 공을 건넨 날', ball: '공 주고받기', peek: '손가락 까꿍', gesture: '앞발 인사', rest: '쿠션에 푹', drowsy: '꾸벅꾸벅',
   meal: '맛있는 식사', toilet: '화장실 다녀오기', company: '곁에 앉기', mishap: '작은 헛발질', growth: '새 자세 발견', touch: '손에 기대기',
   release: '몸 정돈하기', hungry: '식사 기다리기', seat: '자리 고르기', solo: '혼자 공 따라가기' };

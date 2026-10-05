@@ -1,6 +1,7 @@
 import { Asset } from 'expo-asset';
 import { LivingPet, type LifeCommand, type LifeEvent, type LifeWorld } from '../living/life';
 import { growthExpression } from '../living/growthExpression';
+import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { prepareCpuMorphs } from './cpuMorph';
 import { createMorphedAnchor } from './morphedAnchor';
 import { File, Paths } from 'expo-file-system';
@@ -142,6 +143,8 @@ export class RoomController {
   private frontPaw?: THREE.Object3D;
   private leftPaw?: THREE.Object3D;
   private growthStage = 1;
+  private growthLevel = 1;
+  private lowEnergy = false;
   private growthStyle = growthExpression(1);
   private hungry = false;
   private mealAvailability: RoomProps['mealAvailability'] = 'ready';
@@ -157,8 +160,12 @@ export class RoomController {
     stop: () => { this.path = []; this.destination = null; this.targetRing.visible = false; this.restoreBaseClip(); },
     event: event => {
       if (event.phase === 'perform') {
+        const actExpression = event.motion ? growthGesture(event.motion, .5, 1).expression : null;
         this.presentationState = { ...EMPTY_ROOM_PRESENTATION, gaze: event.scene === 'look' || this.profile === 'reserved' && ['touch', 'company', 'ball'].includes(event.scene) ? 'aside' : 'user',
-          emotion: event.scene === 'rest' || event.scene === 'drowsy' ? 'sleepy' : event.scene === 'mishap' ? 'shy' : 'interested' };
+          emotion: actExpression === 'surprised' ? 'surprised' : actExpression === 'happy' ? 'content'
+            : actExpression === 'playful' ? this.profile === 'reserved' ? 'shy' : 'content'
+            : event.scene === 'rest' || event.scene === 'drowsy' ? 'sleepy' : event.scene === 'mishap' ? 'shy'
+            : ['touch', 'release', 'company', 'gesture'].includes(event.scene) ? 'content' : event.scene === 'prank' ? 'shy' : event.scene === 'growth' && (event.level ?? 1) === 16 ? 'surprised' : 'interested' };
         this.refreshMorphOverlay();
         if (event.scene === 'meal') this.selectClip('eat', true, 1.2, true);
       } else if (event.phase === 'cancel' || event.phase === 'complete') this.interruptFreePresentation();
@@ -171,7 +178,7 @@ export class RoomController {
       touching: this.touchHolding, moving: this.path.length > 0, committed: this.cueCommitted && this.cueRemaining > 0,
       ball: !!this.furniture.ball?.visible, cushion: !!this.furniture.cushion?.visible, toilet: !!this.furniture.toilet?.visible, table: !!this.furniture.table?.visible,
       position: this.position, preference: this.lifePreference, personality: this.profile, hungry: this.hungry,
-      mealAvailability: this.mealAvailability, growthStage: this.growthStage };
+      mealAvailability: this.mealAvailability, growthStage: this.growthStage, growthLevel: this.growthLevel, tired: this.lowEnergy };
   }
 
   runLife(command: LifeCommand) {
@@ -261,6 +268,8 @@ export class RoomController {
     this.lifePreference = props.lifePreference;
     this.growthStage = props.growthStage === 'final' ? 4 : props.growthStage ?? 1;
     this.growthStyle = growthExpression(this.growthStage);
+    this.growthLevel = props.growthLevel ?? 1;
+    this.lowEnergy = !!props.lowEnergy;
     this.loadedPet?.scale.setScalar(.62 * this.growthStyle.scale);
     this.hungry = !!props.hungry;
     this.mealAvailability = props.mealAvailability ?? 'ready';
@@ -271,7 +280,7 @@ export class RoomController {
       this.pendingLifeCommand = props.lifeCommand;
     }
     this.onLifeEvent = props.onLifeEvent;
-    const nextFormPresentation = selectFormPresentation(props.formId ?? 'arucon');
+    const nextFormPresentation = props.previewFormId ? selectFormPresentation(props.previewFormId) : selectFormPresentation(props.formId ?? 'arucon');
     const nextCandidateId = props.characterCandidateId ?? DEFAULT_CHARACTER_CANDIDATE_ID;
     const petAssetChanged = nextFormPresentation.assetKey !== this.formPresentation.assetKey ||
       nextCandidateId !== this.characterCandidateId;
@@ -1008,17 +1017,37 @@ export class RoomController {
       }
       case 'greeting': this.petOrientation.position.y = .1 * wave * scale * soft; break;
       case 'growth':
-        this.petOrientation.position.y = .1 * wave * soft;
-        this.petOrientation.rotation.y = Math.sin(p * Math.PI * 2) * .42 * soft;
-        this.frontPaw?.position.set(0, .16 * wave * soft, .1 * wave * soft);
-        this.leftPaw?.position.set(0, .12 * wave * soft, .07 * wave * soft); break;
+      case 'trick': case 'prank': case 'explore': {
+        const v = growthGesture(pose.motion ?? levelExpression(pose.level ?? this.growthLevel).motion, p, pose.side);
+        const style = this.profile === 'reserved' ? .84 : 1;
+        this.petOrientation.position.set(v.x * soft * style, v.y * soft, v.z * soft);
+        this.petOrientation.rotation.set(v.pitch * soft, v.yaw * soft, v.tilt * soft * style);
+        this.petOrientation.scale.set(1 + v.squash * .45 * soft, 1 - v.squash * soft, 1 + v.squash * .45 * soft);
+        this.frontPaw?.position.set(0, v.paw * soft, .06 * wave * soft);
+        this.leftPaw?.position.set(0, v.otherPaw * soft, .04 * wave * soft); break;
+      }
       case 'touch':
         this.petOrientation.scale.set(1 + .055 * wave * soft, 1 - .1 * wave * soft, 1 + .055 * wave * soft);
-        this.petOrientation.rotation.z = -.09 * wave * scale * soft; break;
+        this.petOrientation.rotation.z = (pose.touchTarget === 'body' ? -.14 : -.06) * wave * scale * soft;
+        this.petOrientation.position.z = (this.growthLevel >= 6 ? .15 : .07) * wave * soft;
+        if (pose.touchTarget !== 'body') this.frontPaw?.position.set(0, (this.growthLevel >= 6 ? .22 : .08) * wave * soft, 0);
+        break;
       case 'company': case 'release':
         this.petOrientation.rotation.z = -grown.settleLean * wave * scale * soft;
+        if (pose.scene === 'release' && pose.touchTarget !== 'body' && this.growthLevel >= 6) this.frontPaw?.position.set(0, .24 * wave * soft, .08 * wave * soft);
         if (grown.maturity >= 3) this.petOrientation.scale.y = 1 - .08 * wave * soft;
         break;
+    }
+    // An unlocked level act is also performed on its matching normal life
+    // scene, so the review reveal is not the only route to its body language.
+    if (pose.motion && !['growth', 'trick', 'prank', 'explore'].includes(pose.scene)) {
+      const v = growthGesture(pose.motion, p, pose.side);
+      this.petOrientation.position.x += v.x * soft;
+      this.petOrientation.position.y += v.y * soft;
+      this.petOrientation.rotation.y += v.yaw * soft;
+      this.petOrientation.rotation.z += v.tilt * soft;
+      this.frontPaw?.position.set(0, v.paw * soft, .05 * wave * soft);
+      this.leftPaw?.position.set(0, v.otherPaw * soft, .04 * wave * soft);
     }
   }
 }

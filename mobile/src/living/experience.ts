@@ -9,6 +9,7 @@ import { approvedSyntheticSleepFixture } from '../presentation/approvedPresentat
 export const EXPERIENCE = Object.freeze({ database: 'arucon-life-experience.db', petId: 'life-experience-v1', food: 40, coin: 400 });
 export const EXPERIENCE_SCENARIOS = {
   normal: '기본 생활 체험', expressive: '솔직한 성격 체험',
+  growth_playthrough: 'Lv.1부터 키워보기',
   auto_growth: '자동 식사·성장 새 체험',
   evolution_piko: '활동 이력·진화 새 체험', evolution_mongle: '수면 이력·진화 새 체험',
   evolution_mallu: '교감 이력·진화 새 체험', evolution_mono: '균형 이력·진화 새 체험',
@@ -24,6 +25,17 @@ export function parseExperienceProfile(value: string): { scenario: ExperienceSce
 }
 export const experiencePetId = (scenario: ExperienceScenario, runKey?: string) =>
   (scenario === 'normal' ? EXPERIENCE.petId : `${EXPERIENCE.petId}:${scenario}`) + (runKey ? `:${runKey}` : '');
+
+/** Normal-menu return to the most recently created growth save, without
+ * creating a new pet or changing its name, resources, clock, or EXP. */
+export async function latestGrowthExperience(db: SqlConnection): Promise<`growth_playthrough#${number}` | null> {
+  if (!await db.getFirstAsync("SELECT name FROM sqlite_master WHERE type='table' AND name='pet_snapshot'")) return null;
+  const row = await db.getFirstAsync<{ pet_id: string }>("SELECT pet_id FROM pet_snapshot WHERE pet_id LIKE 'life-experience-v1:growth_playthrough:%' ORDER BY rowid DESC LIMIT 1");
+  if (!row) return null;
+  const key = row.pet_id.slice('life-experience-v1:growth_playthrough:'.length);
+  const profile = `growth_playthrough#${key}`;
+  return parseExperienceProfile(profile) ? profile as `growth_playthrough#${number}` : null;
+}
 
 async function prepareCareHistory(store: LocalPetStore, petId: string, scenario: ExperienceScenario, originMs: number) {
   // Explicit synthetic history in this isolated pet only; autonomous animation never calls interact.
@@ -53,7 +65,7 @@ export async function prepareExperience(db: SqlConnection, givenName: string, pe
     const band = APPROVED_GROWTH_POLICY.bands[0];
     const firstBoundary = band.expPerLevel * APPROVED_GROWTH_POLICY.expScale * (band.toLevel - band.fromLevel + 1);
     const evolutionBoundary = APPROVED_GROWTH_POLICY.bands.slice(0, 2).reduce((sum, b) => sum + (b.toLevel - b.fromLevel + 1) * b.expPerLevel * APPROVED_GROWTH_POLICY.expScale, 0);
-    await store.createPet({ ...state, food: automatic ? 0 : EXPERIENCE.food, coin: EXPERIENCE.coin,
+    await store.createPet({ ...state, food: automatic || scenario === 'growth_playthrough' ? 0 : EXPERIENCE.food, coin: EXPERIENCE.coin,
       ...(automatic ? { hunger: APPROVED_GAME_CONFIG.proposal.mealHungerThreshold - APPROVED_GAME_CONFIG.proposal.hungerPerAwakeHour * 20 / 3600 } : {}),
       ...(scenario === 'toilet' ? { poopElapsedMs: Math.max(0, APPROVED_GAME_CONFIG.proposal.poopIntervalMs - 20_000) } : {}),
       ...(scenario === 'cleanup' ? { poopCount: 1 } : {}),
@@ -88,6 +100,7 @@ export async function prepareExperience(db: SqlConnection, givenName: string, pe
       }
       await service.setAutoFeed(origin, `life01-auto-consent:${petId}`, true);
     }
+    if (scenario === 'growth_playthrough') await service.setAutoFeed(origin, `growth-play-auto-consent:${petId}`, true);
     await db.withExclusiveTransactionAsync(tx => tx.runAsync('UPDATE experience_setup SET completed = 1 WHERE pet_id = ?', [petId]));
   }
   return service;

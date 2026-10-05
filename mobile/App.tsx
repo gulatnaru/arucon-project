@@ -25,12 +25,16 @@ import { approvedLocalExpoNativeWidgetBridge } from './src/native/aruconWidgetMo
 import { FailClosedNativeWidgetAdapter } from './src/native/widget';
 import { selectFormPresentation } from './src/scene/formPresentation';
 import { type LifeRoomAction } from './src/presentation/LifeRoomControls';
-import { EXPERIENCE, EXPERIENCE_SCENARIOS, prepareExperience, experiencePetId, parseExperienceProfile, type ExperienceScenario } from './src/living/experience';
+import { EXPERIENCE, EXPERIENCE_SCENARIOS, prepareExperience, experiencePetId, parseExperienceProfile, latestGrowthExperience, type ExperienceScenario } from './src/living/experience';
 import { chooseLifeLine, emptyLifeMemory, rememberLifeCompletion, lifePreference, LIFE_SCENE_NAMES, type LifeMemory } from './src/living/content';
 import { LifeMemoryStore } from './src/living/memory';
 import type { LifeCommand, LifeEvent, LifeInput, LifeScene } from './src/living/life';
 import { committedToiletScene } from './src/living/committedLife';
 import { growthExpression } from './src/living/growthExpression';
+import { GrowthPlaythrough, GROWTH_PLAYTHROUGH, type GrowthPlaythroughProgress, type GrowthCheckpoint } from './src/living/growthPlaythrough';
+import { GrowthPlaythroughControls } from './src/presentation/GrowthPlaythroughControls';
+import { levelExpression } from './src/living/levelExpressions';
+import { sqliteAccessTrace } from './src/storage/sqliteAccess';
 import { ApprovedFixturePanel, type ApprovedFixtureAction } from './src/presentation/ApprovedFixturePanel';
 import { ApprovedStatusPanel } from './src/presentation/ApprovedStatusPanel';
 import {
@@ -65,6 +69,10 @@ import type { RoomPerformanceCapture, RoomPerformanceSummary } from './src/scene
 import type { RoomRendererProfileId } from './src/scene/rendererConfig';
 
 const PET_ID = 'dev-local-pet-1';
+function saveStorageFailureTrace(context: string) {
+  try { new File(Paths.cache, 'arucon-sql-failure.json').write(JSON.stringify({ context, atMs: Date.now(), trace: sqliteAccessTrace() }, null, 2)); }
+  catch { /* Diagnostic export must not replace the actual save error. */ }
+}
 const PREVIEW_ACCOUNT_ID = 'dev-preview-account';
 const PREVIEW_DEVICE_ID = 'dev-preview-device';
 const EVALUATION_PET_ID = 'fun00-fixture-pet';
@@ -108,11 +116,12 @@ function growthSummary(view: Awaited<ReturnType<ApprovedMvpService['readGrowthVi
   return `Lv.${projection.level} · ${formPresentation.displayName} 모습 · ${sex}\n쌓인 성장 ${exp} EXP · 수면 보너스 +${bonus}%`;
 }
 
-function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (value: RoomProfile) => void }) {
+function AppContent({ profile, onProfile: requestProfile }: { profile: RoomProfile; onProfile: (value: RoomProfile) => void }) {
   const experience = profile !== 'original';
   const selected = parseExperienceProfile(profile);
   const scenario = selected?.scenario ?? 'normal';
   const runKey = selected?.runKey;
+  const continuousGrowth = scenario === 'growth_playthrough' && experience;
   const petId = experience ? experiencePetId(scenario, runKey) : PET_ID;
   const insets = useSafeAreaInsets();
   const { fontScale } = useWindowDimensions();
@@ -146,7 +155,24 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   const [reactionPresentation, setReactionPresentation] = useState<RoomReactionBatch | undefined>();
   const [reduceDialogue, setReduceDialogue] = useState(false);
   const [evaluation, setEvaluation] = useState<FunEvaluationState | null>(null);
-  const [menu, setMenu] = useState<'menu' | 'play' | 'food' | 'decor' | 'settings' | 'details' | null>(null);
+  const [menu, setMenu] = useState<'menu' | 'play' | 'food' | 'decor' | 'settings' | 'details' | 'growth' | null>(null);
+  const [growthProgress, setGrowthProgress] = useState<GrowthPlaythroughProgress | null>(null);
+  const [growthRunning, setGrowthRunning] = useState(false);
+  const [growthWorking, setGrowthWorking] = useState(false);
+  const [growthComparison, setGrowthComparison] = useState<GrowthCheckpoint | null>(null);
+  const growthDriverRef = useRef<GrowthPlaythrough | null>(null);
+  const growthWorkRef = useRef<Promise<void> | null>(null);
+  const growthRunningRef = useRef(false);
+  const mountedRef = useRef(true);
+  const growthHoldUntilRef = useRef(0);
+  const profileSwitchRef = useRef(0);
+  const onProfile = useCallback((next: RoomProfile) => {
+    const generation = ++profileSwitchRef.current;
+    growthRunningRef.current = false; setGrowthRunning(false);
+    const pending = growthWorkRef.current;
+    if (pending) void pending.then(() => { if (mountedRef.current && generation === profileSwitchRef.current) requestProfile(next); });
+    else requestProfile(next);
+  }, [requestProfile]);
   const [experienceName, setExperienceName] = useState('');
   const [experiencePersonality, setExperiencePersonality] = useState<'reserved' | 'expressive'>('reserved');
   const [lifeCommand, setLifeCommand] = useState<LifeCommand>();
@@ -203,24 +229,28 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   useEffect(() => {
     if (pet?.sleeping || pet?.hibernating) clearRestPresentation();
   }, [pet?.sleeping, pet?.hibernating, clearRestPresentation]);
-  const lifeInput = useCallback((kind: LifeInput, replay = false) => {
+  const lifeInput = useCallback((kind: LifeInput, replay = false, touchTarget?: 'head' | 'body' | 'unknown', expressionLevel?: number) => {
     if (kind === 'cancel') lifeProjectionEpochRef.current++;
     cancelLifeBubble();
-    setLifeCommand({ kind, replay, token: `life:${Date.now()}:${++sequenceRef.current}` });
+    setLifeCommand({ kind, replay, touchTarget, expressionLevel, token: `life:${Date.now()}:${++sequenceRef.current}` });
   }, [cancelLifeBubble]);
   const persistLife = useCallback(() => {
-    void lifeStoreRef.current?.save(lifeMemoryRef.current).then(() => setMemoryWarning(null)).catch(() => {
+    if (!mountedRef.current) return;
+    void lifeStoreRef.current?.save(lifeMemoryRef.current).then(() => { if (mountedRef.current) setMemoryWarning(null); }).catch(() => {
+      if (!mountedRef.current) return;
+      saveStorageFailureTrace('living_memory');
       setMemoryWarning('최근 놀이 기억을 저장하지 못했어요. 게임 저장과 교감은 계속할 수 있어요.');
     });
   }, []);
-  const showLifeLine = useCallback((scene: LifeScene, automatic: boolean, replay = false) => {
+  const showLifeLine = useCallback((scene: LifeScene, automatic: boolean, replay = false, event?: LifeEvent) => {
     const state = petRef.current;
     if (!state) return;
     if (reduceDialogue && automatic && scene !== 'offer') return;
     if (automatic && Date.now() < autoSpeechAfterRef.current) return;
     const memory = replay ? { ...lifeMemoryRef.current } : lifeMemoryRef.current;
     const chosen = chooseLifeLine(memory, scene, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', Date.now(), automatic, Math.random, undefined,
-      state.food <= 0 ? 'no_food' : !state.tableInstalled ? 'no_table' : !state.autoFeedOptIn ? 'manual' : 'ready');
+      state.food <= 0 ? 'no_food' : !state.tableInstalled ? 'no_table' : !state.autoFeedOptIn ? 'manual' : 'ready',
+      { level: event?.level ?? projectGrowth(state.totalExpUnits, APPROVED_GROWTH_POLICY).level, motionLevel: event?.motionLevel, previousScene: event?.previousScene, touchTarget: event?.touchTarget });
     if (!chosen) return;
     lifeTraceRef.current = [...lifeTraceRef.current, { scene, lineId: chosen.id, eligible: chosen.eligible, excludedRecent: chosen.excludedRecent, automatic, replay, kind: 'shown', atMs: Date.now() }].slice(-64);
     cancelLifeBubble();
@@ -231,8 +261,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   }, [cancelLifeBubble, ownedItems, persistLife, reduceDialogue]);
   const onLifeEvent = useCallback((event: LifeEvent) => {
     lifeTraceRef.current = [...lifeTraceRef.current, { ...event, atMs: Date.now() }].slice(-64);
-    if (event.phase === 'perform' && event.scene !== 'offer') showLifeLine(event.scene, event.automatic, event.replay);
-    if (event.phase === 'waiting') showLifeLine(event.scene, event.automatic, event.replay);
+    if (growthComparison || !mountedRef.current) return;
+    if (event.phase === 'perform' && event.scene !== 'offer') showLifeLine(event.scene, event.automatic, event.replay, event);
+    if (event.phase === 'waiting') showLifeLine(event.scene, event.automatic, event.replay, event);
     if (event.phase === 'complete') {
       if (!event.replay) { rememberLifeCompletion(lifeMemoryRef.current, event.scene, Date.now()); persistLife(); }
       if (event.scene === 'meal') setMealCue(current => event.commandToken === `meal:${current?.token}` ? null : current);
@@ -245,8 +276,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         if (pendingGrowthRef.current === event.commandToken) pendingGrowthRef.current = null;
       }
     }
-  }, [cancelLifeBubble, lifeInput, persistLife, showLifeLine]);
+  }, [cancelLifeBubble, lifeInput, persistLife, showLifeLine, growthComparison]);
   const openMenu = useCallback((next: typeof menu) => {
+    growthRunningRef.current = false; setGrowthRunning(false);
     reactionRuntimeRef.current?.cancel('scene_change');
     lifeInput('cancel'); setGame(null); setMenu(next);
   }, [lifeInput]);
@@ -299,7 +331,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     }
   }, []);
 
-  const serviceTime = useCallback(() => monotonicDevTime(Date.now(), clockRef.current, petRef.current?.lastSimulatedAtMs ?? 0), []);
+  const serviceTime = useCallback(() => continuousGrowth && petRef.current ? petRef.current.lastSimulatedAtMs : monotonicDevTime(Date.now(), clockRef.current, petRef.current?.lastSimulatedAtMs ?? 0), [continuousGrowth]);
   const actionId = useCallback((kind: string) => `ui:${Date.now()}:${++sequenceRef.current}:${Math.random().toString(36).slice(2)}:${kind}`, []);
 
   const refreshReadModels = useCallback(async (service: ApprovedMvpService, observedAtMs: number) => {
@@ -387,6 +419,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
           setFailure(errorText(reloadError));
         }
       } else {
+        saveStorageFailureTrace('game_command');
         retryRef.current = task;
         setFailure(errorText(error));
       }
@@ -425,6 +458,10 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     if (experience) {
       const service = await prepareExperience(connection, state.givenName, state.personalityProfileId === 'expressive' ? 'expressive' : 'reserved', state.lastSimulatedAtMs, scenario, runKey);
       serviceRef.current = service;
+      if (continuousGrowth) {
+        const driver = await GrowthPlaythrough.open(connection, service);
+        growthDriverRef.current = driver; setGrowthProgress(await driver.progress());
+      }
       return service;
     }
     const controller = await createLocalSyntheticSyncController({
@@ -450,7 +487,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     serviceRef.current = service;
     setRuntimeBadge(service.status.badge);
     return service;
-  }, [experience, petId, runKey, scenario]);
+  }, [experience, petId, runKey, scenario, continuousGrowth]);
 
   const initialize = useCallback(async () => {
     if (bootingRef.current) return;
@@ -488,6 +525,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       }
       setFailure(null);
     } catch (error) {
+      saveStorageFailureTrace('initialize');
       serviceRef.current = null;
       setFailure(errorText(error));
       setPhase('load_error');
@@ -502,6 +540,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   }, [initialize]);
 
   useEffect(() => () => {
+    mountedRef.current = false; growthRunningRef.current = false;
     if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
     reactionRuntimeRef.current?.dispose();
     reactionRuntimeRef.current = null;
@@ -520,11 +559,11 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       if (next === previous) return;
       const wasActive = previous === 'active';
       previous = next;
-      if (next !== 'active') clearRestPresentation();
+      if (next !== 'active') { clearRestPresentation(); growthRunningRef.current = false; setGrowthRunning(false); }
       const service = serviceRef.current;
       if (!service) return;
       const eventWallMs = Date.now();
-      const eventTime = () => monotonicDevTime(eventWallMs, clockRef.current, petRef.current?.lastSimulatedAtMs ?? 0);
+      const eventTime = () => continuousGrowth && petRef.current ? petRef.current.lastSimulatedAtMs : monotonicDevTime(eventWallMs, clockRef.current, petRef.current?.lastSimulatedAtMs ?? 0);
       const task = next === 'active' ? async () => {
         const now = eventTime();
         const entry = await service.enterForeground(now);
@@ -537,7 +576,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       else runLifecycle(task);
     });
     return () => subscription.remove();
-  }, [clearRestPresentation, runLifecycle]);
+  }, [clearRestPresentation, runLifecycle, continuousGrowth]);
 
   const startDevPet = useCallback((result: Pick<DevPetPreview, 'givenName'>) => {
     const connection = connectionRef.current;
@@ -559,6 +598,38 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     if (phase === 'load_error') { void initialize(); return; }
     if (retryRef.current) void runTask(retryRef.current);
   }, [initialize, phase, runTask]);
+
+  const advanceGrowthPlay = useCallback(async () => {
+    const driver = growthDriverRef.current;
+    if (!driver || busyRef.current || retryRef.current) return;
+    const targetLevel = growthProgress?.targetLevel ?? (growthProgress?.checkpoints.at(-1)?.level ?? 1) + 1;
+    if (targetLevel > 20) return;
+    setGrowthWorking(true);
+    const work = runTask(async () => {
+      const result = await driver.advanceLevel(() => mountedRef.current && growthRunningRef.current && AppState.currentState === 'active', targetLevel);
+      if (mountedRef.current) {
+        setGrowthProgress(result.progress);
+        growthHoldUntilRef.current = Date.now() + GROWTH_PLAYTHROUGH.holdMs;
+        if (result.progress.checkpoints.at(-1)?.level === 20 || result.interrupted) { growthRunningRef.current = false; setGrowthRunning(false); }
+        try { new File(Paths.cache, 'arucon-growth-playthrough.json').write(JSON.stringify({ progress: result.progress,
+          petId: result.state.petId, level: projectGrowth(result.state.totalExpUnits, APPROVED_GROWTH_POLICY).level,
+          formId: result.state.formId, totalExpUnits: result.state.totalExpUnits, trace: lifeTraceRef.current, sql: sqliteAccessTrace() }, null, 2)); }
+        catch (error) { setNotice(`성장은 저장됐지만 체험 진단 파일을 내보내지 못했어요: ${errorText(error)}`); }
+      }
+      return result.state;
+    }, { mode: 'auto' }, true);
+    growthWorkRef.current = work;
+    await work; if (growthWorkRef.current === work) growthWorkRef.current = null;
+    if (mountedRef.current) setGrowthWorking(false);
+  }, [runTask, growthProgress]);
+
+  useEffect(() => {
+    if (!continuousGrowth || phase !== 'room' || !growthRunning || menu || journal || fixtureVisible) return;
+    const timer = setInterval(() => {
+      if (Date.now() >= growthHoldUntilRef.current && !busyRef.current && !retryRef.current) void advanceGrowthPlay();
+    }, 500);
+    return () => clearInterval(timer);
+  }, [continuousGrowth, phase, growthRunning, menu, journal, fixtureVisible, advanceGrowthPlay]);
 
   const startLiveReaction = useCallback((
     trigger: ReactionTrigger,
@@ -692,6 +763,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
     if (action === 'journal') {
+      growthRunningRef.current = false; setGrowthRunning(false);
       lifeInput('cancel'); setGame(null); setMenu(null);
       reactionRuntimeRef.current?.cancel('scene_change');
       void runTask(async () => { setJournal(await service.readJournal()); setPreview(null); });
@@ -740,7 +812,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
           return;
         }
         if (evaluation) startLiveReaction('petting', { touchTarget });
-        else lifeInput('touch');
+        else lifeInput('touch', false, touchTarget);
         void runTask(async () => { await begin(); return service.interact(now, id, 'touch', gameDayId); }, undefined, true);
         break;
     }
@@ -765,13 +837,20 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     const state = petRef.current;
     if (!service || !state || retryRef.current) return;
     const now = serviceTime();
+    if (action === 'storage_contention') {
+      void import('./src/storage/nativeContentionCheck').then(module => module.checkNativeContention()).then(result => {
+        new File(Paths.cache, 'arucon-storage-contention.json').write(JSON.stringify(result, null, 2));
+        setNotice(`격리 native 저장 검사 통과 · ${result.operations}개 경합 요청 / 동일 요청 식사 1회·자동 식사 1회·깨우기 재시도 동일. 일반 저장은 보존했어요.`);
+      }).catch(error => setFailure(`native 저장 검사 실패: ${errorText(error)}`));
+      return;
+    }
     if (action === 'performance_capture') {
       setFixtureVisible(false); setNotice('');
       setPerformanceCaptureToken(`capture:${Date.now()}:${++sequenceRef.current}`);
       return;
     }
     if (action === 'resume_saved_piko') {
-      void openAruconDatabase(EXPERIENCE.database).then(db => db.getAllAsync<{ pet_id: string; state_json: string }>('SELECT pet_id,state_json FROM pet_snapshot ORDER BY rowid DESC')).then(rows => {
+      void openAruconDatabase(EXPERIENCE.database).then(db => expoSqliteConnection(db).getAllAsync<{ pet_id: string; state_json: string }>('SELECT pet_id,state_json FROM pet_snapshot ORDER BY rowid DESC')).then(rows => {
         const saved = rows.find(row => row.pet_id.startsWith(`${EXPERIENCE.petId}:evolution_piko:`) && JSON.parse(row.state_json).formId === 'piko');
         if (!saved) { setNotice('저장된 피코 체험이 없어요.'); return; }
         const runKey = saved.pet_id.split(':').at(-1)!;
@@ -895,7 +974,8 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
   if (phase === 'onboarding') return <View style={[styles.onboarding, { paddingTop: insets.top + 20 }]}>
     {experience ? <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 24, gap: 18 }}>
       <Text style={styles.fixtureTitle}>작은 친구를 만나 볼까요?</Text>
-      <Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 체험용 먹이와 공·쿠션·화장실이 있는 별도 방이에요. 기존 방은 보존됩니다.</Text>
+      <Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 공·쿠션·화장실이 있는 별도 방이에요. 기존 방은 보존됩니다.</Text>
+      {continuousGrowth && <Text>동일한 아이를 Lv.1부터 20까지 키웁니다. 합성 활동으로 먹이를 얻고 실제 자동 섭취로만 성장해요. 가상 일수가 진화 관찰일 조건을 채우며, 각 레벨의 새 몸짓은 정상 속도로 보여 줍니다. 일시정지·전후 비교가 가능해요. 운영 최대 레벨은 바뀌지 않습니다.</Text>}
       {(scenario === 'auto_growth' || scenario.startsWith('evolution_') || scenario.startsWith('sleep_')) && <Text>이 경계 체험은 자동급식에 동의한 식탁과 합성 활동으로 얻은 먹이를 준비합니다. 약 20~30초 관찰하면 정상 시간·식사 서비스로 성장합니다. 진화 체험의 7일 이력도 합성이며 일반 방에 넣지 않습니다.</Text>}
       <TextInput accessibilityLabel="체험 펫 이름" placeholder="이름 (비워 두면 아루콘)" maxLength={20} value={experienceName} onChangeText={setExperienceName} style={styles.nameInput} />
       <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => setExperiencePersonality(value => value === 'reserved' ? 'expressive' : 'reserved')}><Text>성격: {experiencePersonality === 'reserved' ? '새침하지만 다정한 아이' : '솔직하게 반기는 아이'}</Text></Pressable>
@@ -918,6 +998,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       <AruconRoom
         key={rendererProfileId}
         formId={evaluation?.formId ?? pet.formId}
+        previewFormId={growthComparison?.formId}
         mealCue={mealCue ?? undefined}
         personality={evaluation?.personality ?? (pet.personalityProfileId === 'expressive' ? 'expressive' : 'reserved')}
         restMode={evaluation ? (evaluation.sleeping ? 'sleeping' : 'awake') : petRest.mode}
@@ -935,7 +1016,9 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
         lifeCommand={lifeCommand}
         onLifeEvent={onLifeEvent}
         lifePreference={lifePreference(lifeMemoryRef.current)}
-        growthStage={projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage}
+        growthStage={projectGrowth(growthComparison?.totalExpUnits ?? pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage}
+        growthLevel={growthComparison?.level ?? projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).level}
+        lowEnergy={pet.stamina < APPROVED_GAME_CONFIG.source.lowStaminaThreshold}
         poopCount={pet.poopCount}
         hungry={pet.hunger >= APPROVED_GAME_CONFIG.proposal.mealHungerThreshold}
         mealAvailability={pet.food <= 0 ? 'no_food' : !pet.tableInstalled ? 'no_table' : !pet.autoFeedOptIn ? 'manual' : 'ready'}
@@ -1008,6 +1091,15 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
       </Pressable>
     </View>}
     {!evaluation && <View key={`bottom:${fontScale}`} onLayout={event => setControlsHeight(event.nativeEvent.layout.height)} style={[styles.bottom, { bottom: insets.bottom + 8 }]}>
+      {continuousGrowth && growthProgress && <GrowthPlaythroughControls progress={growthProgress} running={growthRunning} working={growthWorking} comparison={growthComparison}
+        onToggle={() => {
+          setGrowthComparison(null);
+          const next = !growthRunningRef.current; growthRunningRef.current = next; setGrowthRunning(next);
+          if (next) { growthHoldUntilRef.current = Date.now() + GROWTH_PLAYTHROUGH.holdMs; lifeInput('growth'); }
+        }}
+        onReveal={() => lifeInput('growth', true, undefined, growthComparison?.level)}
+        onCompare={() => { growthRunningRef.current = false; setGrowthRunning(false); lifeInput('cancel');
+          if (growthComparison) setGrowthComparison(null); else openMenu('growth'); }} />}
       {!!notice && <Text style={styles.notice}>{notice}</Text>}
       {memoryWarning && <Text accessibilityRole="alert" style={styles.notice}>{memoryWarning}</Text>}
       {growthWarning && <View style={styles.errorBox}><Text accessibilityRole="alert">{growthWarning}</Text><Pressable accessibilityRole="button" onPress={() => {
@@ -1030,7 +1122,7 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
     <Modal visible={menu !== null} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
       <View style={[styles.fixtureBackdrop, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 }]}>
         <View key={`sheet:${fontScale}`} accessibilityViewIsModal style={styles.fixtureSheet}>
-          <View style={styles.fixtureHeader}><Text style={[styles.fixtureTitle, { flex: 1 }]}>{menu === 'menu' ? '우리 방' : menu === 'play' ? '함께 놀기' : menu === 'food' ? '식사' : menu === 'decor' ? '방 꾸미기' : menu === 'settings' ? '설정' : '우리 아이'}</Text>
+          <View style={styles.fixtureHeader}><Text style={[styles.fixtureTitle, { flex: 1 }]}>{menu === 'menu' ? '우리 방' : menu === 'play' ? '함께 놀기' : menu === 'food' ? '식사' : menu === 'decor' ? '방 꾸미기' : menu === 'settings' ? '설정' : menu === 'growth' ? '지난 성장과 비교' : '우리 아이'}</Text>
             <Pressable accessibilityRole="button" accessibilityLabel="패널 닫기" style={styles.menuItem} onPress={() => setMenu(null)}><Text>닫기</Text></Pressable></View>
           <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 12 }}>
             {menu === 'menu' && <>
@@ -1062,9 +1154,20 @@ function AppContent({ profile, onProfile }: { profile: RoomProfile; onProfile: (
               <Text>실제 건강정보 연결 OFF · 실결제 OFF</Text>
               <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); doLifeAction('clean'); }}><Text>청결 확인 / 남은 것 치우기</Text></Pressable>
               <Text>아래는 일반 방과 분리된 저장이에요. 처음 만들 때만 체험 상태가 준비됩니다.</Text>
-              {(Object.keys(EXPERIENCE_SCENARIOS) as ExperienceScenario[]).map(value => <Pressable key={value} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => onProfile(value === 'auto_growth' || value.startsWith('evolution_') || value.startsWith('sleep_') ? `${value}#${Date.now()}` : value)}><Text>{EXPERIENCE_SCENARIOS[value]}</Text></Pressable>)}
+              <Pressable accessibilityRole="button" disabled={busy || growthWorking} style={styles.menuItem} onPress={() => {
+                void openAruconDatabase(EXPERIENCE.database).then(db => latestGrowthExperience(expoSqliteConnection(db))).then(saved => {
+                  if (saved) { setMenu(null); onProfile(saved); } else setNotice('아직 저장된 성장 체험이 없어요. 아래에서 Lv.1부터 시작할 수 있어요.');
+                }).catch(error => { saveStorageFailureTrace('growth_profile_read'); setFailure(`성장 체험을 열지 못했어요: ${errorText(error)}`); });
+              }}><Text>최근 성장 체험 이어보기</Text></Pressable>
+              {(Object.keys(EXPERIENCE_SCENARIOS) as ExperienceScenario[]).map(value => <Pressable key={value} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => onProfile(value === 'growth_playthrough' || value === 'auto_growth' || value.startsWith('evolution_') || value.startsWith('sleep_') ? `${value}#${Date.now()}` : value)}><Text>{EXPERIENCE_SCENARIOS[value]}</Text></Pressable>)}
             </>}
-            {menu === 'details' && <><Text>{growthText}</Text><Text>{pet.personalityProfileId === 'expressive' ? '솔직하게 마음을 표현하는 아이' : '새침하지만 다정하게 다가오는 아이'}</Text><Text>{growthExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage).description}</Text><Text>{growthExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage).next}</Text>
+            {menu === 'growth' && growthProgress && <>
+              <Text>이미 자란 같은 아이의 비교예요. 모습만 다시 보여 주며 EXP·식사·기억을 추가하지 않습니다.</Text>
+              {growthProgress.checkpoints.map(point => <Pressable key={point.level} accessibilityRole="button" style={styles.menuItem} onPress={() => {
+                setGrowthComparison(point); setMenu(null); lifeInput('growth', true, undefined, point.level);
+              }}><Text>Lv.{point.level} · {point.expression} · 실제 섭취 {point.meals}회 / 합성 관찰 {point.observedDays}일</Text></Pressable>)}
+            </>}
+            {menu === 'details' && <><Text>{growthText}</Text><Text>{pet.personalityProfileId === 'expressive' ? '솔직하게 마음을 표현하는 아이' : '새침하지만 다정하게 다가오는 아이'}</Text><Text>요즘 보여 주는 몸짓 · {levelExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).level).name}</Text><Text>{growthExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage).description}</Text><Text>{growthExpression(projectGrowth(pet.totalExpUnits, APPROVED_GROWTH_POLICY).stage).next}</Text>
               {!!lifeMemoryRef.current.completed.length && <Text>함께한 작은 장면 · 다시 보기는 보상과 기억을 추가하지 않아요.</Text>}
               {[...new Set(lifeMemoryRef.current.completed.map(x => x.scene))].slice(-6).map(scene => <Pressable key={scene} accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); setNotice('추억 다시 보기 · 보상과 기억은 추가하지 않아요.'); lifeInput(scene, true); }}><Text>{LIFE_SCENE_NAMES[scene]}</Text></Pressable>)}
             </>}
@@ -1140,7 +1243,7 @@ export default function App() {
   }, []);
   const changeProfile = useCallback((next: RoomProfile) => {
     void saveExperienceProfile(next).then(() => { setProfileError(null); setProfile(next); })
-      .catch(() => setProfileError('방 선택을 저장하지 못했어요. 현재 방은 유지됩니다.'));
+      .catch(() => { saveStorageFailureTrace('profile_switch'); setProfileError('방 선택을 저장하지 못했어요. 현재 방은 유지됩니다.'); });
   }, []);
   return <SafeAreaProvider>
     <StatusBar barStyle="dark-content" backgroundColor="#f2ebdc" />

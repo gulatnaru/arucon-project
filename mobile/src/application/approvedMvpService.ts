@@ -336,13 +336,14 @@ export class ApprovedMvpService {
   }
 
   private async latestSleepDayCommand(): Promise<Extract<Command, { type: 'setSleepGrowthMultiplier' }> | null> {
-    const rows = await this.db.getAllAsync<{ command_json: string }>(`
+    const row = await this.db.getFirstAsync<{ command_json: string }>(`
       SELECT ledger.command_json
       FROM local_outbox AS outbox
       JOIN command_ledger AS ledger ON ledger.command_id = outbox.command_id
-      WHERE outbox.pet_id = ? ORDER BY outbox.sequence DESC
+      WHERE outbox.pet_id = ? AND json_extract(ledger.command_json, '$.type') = 'setSleepGrowthMultiplier'
+      ORDER BY outbox.sequence DESC LIMIT 1
     `, [this.petId]);
-    for (const row of rows) {
+    if (row) {
       const command = JSON.parse(row.command_json) as Command;
       if (command.type === 'setSleepGrowthMultiplier') return command;
     }

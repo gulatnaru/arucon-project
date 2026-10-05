@@ -29,11 +29,15 @@ export type RoomProps = {
   onLifeEvent?: (event: LifeEvent) => void;
   lifePreference?: LifeScene;
   growthStage?: number | 'final';
+  growthLevel?: number;
+  lowEnergy?: boolean;
   poopCount?: number;
   hungry?: boolean;
   mealAvailability?: 'ready' | 'no_food' | 'no_table' | 'manual';
   onCleanup?: () => void;
   formId?: FormId;
+  /** Isolated, read-only before/after view; the authoritative form stays formId. */
+  previewFormId?: FormId;
   personality?: 'reserved' | 'expressive';
   sleeping?: boolean;
   restMode?: PetRestMode;
