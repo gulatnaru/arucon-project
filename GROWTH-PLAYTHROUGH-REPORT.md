@@ -1,5 +1,23 @@
 # Growth playthrough and native save stability — 2026-10-06
 
+## LIFE-02 현재 v5 마무리 시도 — PARTIAL_WITH_BLOCKERS
+
+현재 체크포인트 `a43ff69`에서 이어갔다. Git 작업 트리는 clean이고 `6155b22` 이후 App/src/package/lockfile 변경은 없다. 실제 설치 번들 SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`가 growth-v5 manifest와 일치하며 모든 앱 소스 파일 해시도 같았다. 재빌드·재설치·DB 초기화를 하지 않았다.
+
+두 DB를 읽기 전용으로 확인하고 온라인 백업했다. schema7/integrityok. 일반 Sim/reserved/arucon/food0/coin15/EXP25.125/meal3, 기존 루미/reserved/mono/EXP6150/meal374/coin2140이 보존됐다. 현재 선택은 `growth_playthrough#1791218209615`이며 잠금 해제 뒤 정상 메뉴로 일반 방을 먼저 선택할 예정이다. 이 DB 확인은 실제 메뉴/복원/입력 검증의 PASS가 아니다.
+
+이번 현재 CUA 접근 세 번 모두 **Mac locked**였다. 잠금 해제를 요청했으며 보안 설정을 우회하지 않았다. Context7 실제 호출 도구도 현재0개였다. 플러그인 설치 상태와 직접 MCP 등록형의 차이는 이전 감사 그대로 유지하고 중복 등록/새 설치/권한 변경을 하지 않았다.
+
+| 남은 현재 v5 검증 | 현재 결과 |
+|---|---|
+| 일반 방→최근 성장 이어보기→기존 루미20→접촉/자율 생활→일반 방→재실행→동일 루미 | BLOCKED_HOST_LOCKED / NOT_RUN |
+| 격리 native 경합·동일 요청·정산 중복 방지 및 일반 앱 정산/교감/설정/프로필 전환 | BLOCKED_HOST_LOCKED / NOT_RUN |
+| 새 별도 개체의 최신1→20 영상,1/5/10/15/16/20 장면 시각 | BLOCKED_HOST_LOCKED / NOT_RUN |
+| 정상 자율 개인기·몸짓/표정/대사 비교 | BLOCKED_HOST_LOCKED / NOT_RUN; 진단 재생으로 대체하지 않음 |
+| 최신 입력·background/cold·큰 글자·동작 줄이기·60초 성능 proxy | BLOCKED_HOST_LOCKED / NOT_RUN |
+
+증거 `evidence/life-02-v5-finish-2026-10-06/baseline.json`, `before-arucon-dev.db`, `before-arucon-life-experience.db`, `current-access.json`은 로컬 ignored 위치에 있다. 이번에 앱 변경이나 검사 재실행은 없으며 과거16/16·374/374·v4 영상/경합을 새 PASS로 재사용하지 않는다. Source build 대응과 저장 보존만 새로 확인했다. 재미·최종 아트 USER_REVIEW_PENDING, 실기기/GPU/물리 입력 NOT_RUN을 유지한다.
+
 ## LIFE-02 재개 — Context7 / SQLite 버전 감사
 
 현재 Codex의 실제 호출 목록에서 Context7 도구는0개다. 플러그인 관리 조회는 Context7이 설치·ENABLED임을 확인했으므로 미설치라고 단정하지 않는다. 다만 현재 세션에서 문서 조회 호출은 NOT_RUN_TOOL_NOT_EXPOSED다. user/project `config.toml`의 직접 MCP 항목에도 Context7이 없었다. Codex에서 기존 Context7의 활성/노출을 확인하고 세션을 새로 여는 것이 먼저다. 직접 MCP 등록이 필요하면 공개 remote URL `https://mcp.context7.com/mcp`를 이용할 수 있으며, 이 작업에서 설정 변경/설치/권한 확대는 하지 않았다.

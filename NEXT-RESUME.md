@@ -1,5 +1,13 @@
 # Next resume — fresh macOS iOS validation
 
+## LIFE-02 현재 다음 한 작업 — 실제 Mac 잠금 해제 후 정상 메뉴 복귀
+
+이번 재개는 `a43ff69`에서 시작했고 실제 설치 growth-v5/앱 소스6155b22/manifest 파일 해시가 모두 일치했다. 앱 변경·재빌드·재설치·DB 초기화 없음. 최신 실제 CUA 세 번 모두 Mac locked. 일반 Sim의 EXP25.125/food0/coin15/meal3와 루미/reserved/mono/EXP6150/meal374/coin2140을 읽기 전용으로 확인·백업했다. 현재 선택은 기존 루미의 `growth_playthrough#1791218209615`다.
+
+접근을 새로 확인하고 **정상 메뉴→기존 방으로 돌아가기→설정→최근 성장 체험 이어보기→기존 루미20→직접 head/body 접촉·자율 생활→일반 방 복귀→앱 재실행→같은 루미 이어보기**부터 수행한다. 원본과 루미를 되감지 않는다. 그다음 v5 격리 native 경합·정산 중복·실제 일반 앱 저장 경로, 새 별도 개체1→20,1/5/10/15/16/20 시각/장면 표시, 정상 자율 개인기 및 입력/성능을 확인한다. 모두 NOT_RUN/BLOCKED이며 v4/진단 버튼/Node 검사로 대체하지 않는다.
+
+최근 증거는 `evidence/life-02-v5-finish-2026-10-06/`. Context7 호출 도구가 보이면 공개 버전 문서를 조회하고, 없으면 이미 대조한 공식 SDK55 근거로 계속한다. 추가 설치/중복 MCP 등록/보안 설정 변경 금지. 상태 PARTIAL_WITH_BLOCKERS, 재미/아트 USER_REVIEW_PENDING이다.
+
 ## LIFE-02 현재 재개 메모 — 문서/DB 감사 후 실제 입력 대기
 
 Context7은 플러그인 목록상 설치/ENABLED이나 이번 Codex 호출 도구0개로 실제 문서 호출은 미실행이다. 설치본 Expo55.0.31/expo-sqlite55.0.20과 SDK55 원문/정확 npm gitHead 소스를 대조했다. Exclusive API가 모든 외부 쓰기를 자동 직렬화한다고 가정하지 않는다. 현재30개 callback은txn을 사용하며, 앱 쓰기는 기존 per-file lane을 통한다. 정리 지연/정리 자체 실패 검사를 추가해 이번 영향16/16·typecheck/lint PASS. 상세는 [현재 감사](GROWTH-PLAYTHROUGH-REPORT.md)와 [ADR-015](docs/adr/ADR-015-sqlite-access-and-growth-playthrough.md).

@@ -1584,5 +1584,21 @@
     "nativeLatest": "BLOCKED_HOST_LOCKED_ACTUAL_ACCESS",
     "appSourceUnchanged": "6155b22",
     "evidence": "evidence/life-02-context7-sqlite-2026-10-06/"
+  },
+  "life02FinishAttempt": {
+    "baselineHead": "a43ff69",
+    "status": "PARTIAL_WITH_BLOCKERS",
+    "actualAccess": "BLOCKED_HOST_LOCKED_THREE_CURRENT_ATTEMPTS",
+    "installedRelease": "growth-v5",
+    "bundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
+    "sourceMatches6155b22": true,
+    "rebuild": false,
+    "dbReset": false,
+    "ordinary": "Sim/reserved/arucon/EXP25.125/food0/coin15/meal3",
+    "rumi": "same petId/name/reserved/mono/Lv20/EXP6150/meal374/coin2140",
+    "actualV5MenusInputConcurrencyGrowthPerformance": "NOT_RUN_BLOCKED_HOST_LOCKED",
+    "freshTestsRun": false,
+    "context7CallableTools": 0,
+    "evidence": "evidence/life-02-v5-finish-2026-10-06/"
   }
 }
