@@ -1,22 +1,22 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-10-06",
+  "runDate": "2026-10-07",
   "timezone": "Asia/Seoul",
-  "status": "PARTIAL_WITH_BLOCKERS",
+  "status": "READY_FOR_GROWTH_PLAYTHROUGH",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "New database-lock defect and one-pet Lv1-to-20 growth/playthrough; earlier readiness is historical",
-  "reason": "SQLite contention fix and one-pet Lv1-to-20 implementation complete. Native v4 passed 150 contention requests and Rumi completed all20 levels via374 actual synthetic-fed meals; final v5 adds normal-menu saved-profile return. v5 Release installed and persisted state retained, but latest actual CUA reports Mac locked. v5 UI/pressure recheck and current performance/input metrics pending; not READY_FOR_GROWTH_PLAYTHROUGH.",
+  "definition": "LIFE-02 latest growth-v5 iOS Simulator native save, one-pet growth and normal-input review scope",
+  "reason": "Actual current Mac access succeeded. Preserved Rumi20 normal-menu/cold resume passed. A distinct Mori started at EXP0 and reached Lv20 through374 automatic synthetic-fed meals/6150EXP, one real Lv16 mono evolution and20 sequential checkpoints. Latest v5 native150 contention requests and replay protection passed; normal original/profile/input/restore and fixed60-second proxy gates passed. No app change, rebuild, reinstall or DB reset. Physical/GPU/physical latency and fun/final-art approval remain separate.",
   "sourceBaseline": "d3c86a7b42c50c829fac73254d3078e9146ca2f4",
   "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
   "currentLivingReport": "GROWTH-PLAYTHROUGH-REPORT.md",
   "growthPlaythrough": {
-    "status": "PARTIAL_WITH_BLOCKERS",
-    "baselineCommit": "cdb7325",
+    "status": "READY_FOR_GROWTH_PLAYTHROUGH",
+    "baselineCommit": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
     "buildVariant": "growth-v5",
     "bundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
-    "nativeStorage": "V4_PASS_150_REQUESTS; V5_ACTUAL_RECHECK_BLOCKED_HOST_LOCKED",
-    "continuousGrowth": "V4_NATIVE_ONE_PET_1_TO_20_PASS; V5_LATEST_UI_PENDING",
-    "tests": "374/374 PASS",
+    "nativeStorage": "V5_PASS_NATIVE_150; same_direct_request30_to_meal1, separate_auto1, wake_replay_full_state_equal",
+    "continuousGrowth": "V5_ACTUAL_MORI_SAME_PET_1_TO_20_PASS_374_AUTO_MEALS_6150_EXP_MONO_LV16",
+    "tests": "376/376 PASS_FRESH_RUN; fail0/skip0",
     "lint": "PASS",
     "typecheck": "PASS",
     "physicalDeviceGpuPhysicalLatency": "NOT_RUN",
@@ -26,12 +26,68 @@
     "subagents": 0,
     "requestedModel": "GPT-6.1 Sol Max",
     "effectiveModel": "ROUTING_UNVERIFIED",
-    "evidence": "evidence/growth-playthrough-2026-10-06/",
-    "currentPerformance": "NOT_RUN_BLOCKED_HOST_LOCKED",
-    "latestActualInput": "BLOCKED_HOST_LOCKED",
-    "originalPreservation": "Sim/food0/coin15/EXP25.125 unchanged",
+    "evidence": "evidence/life-02-unlocked-2026-10-06/",
+    "currentPerformance": "PASS_FIXED_60_SECOND_PROXY_GATES_ON_B_OFF_A; ON_A_INPUT_INSUFFICIENT_DATA",
+    "latestActualInput": "PASS_ACTUAL_SIMULATOR_NORMAL_MENUS_DIRECT_TOUCH_LIFE_JOURNAL_MOVE_LIFECYCLE_COLD_RESTORE",
+    "originalPreservation": "Sim/arucon/reserved/food0/coin15/EXP25.125/meal3 and existing Rumi20/mono/reserved/EXP6150/meal374/coin2140 unchanged",
     "reviewState": "USER_REVIEW_PENDING",
-    "sourceCommit": "6155b22a56d9cf81b33b356cdecb0737f669a61c"
+    "sourceCommit": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
+    "newReviewPet": {
+      "name": "모리",
+      "petId": "life-experience-v1:growth_playthrough:1791298466103",
+      "profile": "growth_playthrough#1791298466103",
+      "level": 20,
+      "form": "mono",
+      "personality": "reserved",
+      "meals": 374,
+      "totalExpUnits": 6150000000,
+      "observedSyntheticDays": 49,
+      "evolutionEvents": 1
+    },
+    "currentMenuResume": "Most recent Mori20; prior Rumi preserved and normal resume/cold chain verified before new-pet creation",
+    "performanceCaptures": [
+      {
+        "label": "ON_A",
+        "durationMs": 60000,
+        "frames": 3555,
+        "submittedHz": 59.25455111197295,
+        "rafP95Ms": 17.773207902908325,
+        "rafMaxMs": 125.13441705703735,
+        "inputCount": 0,
+        "inputP95Ms": null,
+        "inputStatus": "insufficient_data",
+        "over500Ms": 0,
+        "frameStatus": "pass"
+      },
+      {
+        "label": "ON_B",
+        "durationMs": 60000,
+        "frames": 3137,
+        "submittedHz": 52.2812750717907,
+        "rafP95Ms": 30.241542100906372,
+        "rafMaxMs": 87.58416700363159,
+        "inputCount": 7,
+        "inputP95Ms": 21.070291996002197,
+        "inputStatus": "pass",
+        "over500Ms": 0,
+        "frameStatus": "pass"
+      },
+      {
+        "label": "OFF_A",
+        "durationMs": 60000,
+        "frames": 3202,
+        "submittedHz": 53.3757230216537,
+        "rafP95Ms": 29.555541038513184,
+        "rafMaxMs": 42.90945911407471,
+        "inputCount": 12,
+        "inputP95Ms": 21.946917057037354,
+        "inputStatus": "pass",
+        "over500Ms": 0,
+        "frameStatus": "pass"
+      }
+    ],
+    "automaticObserved": "Normal Lv10 bounce, Lv12 feint start canceled by next meal, Lv16 learned Lv15 double_tap, Lv20 lean/peek/look/solo. Growth reveals and forced diagnostic replay distinguished.",
+    "originalUserFirstSql": "UNKNOWN_MISSING_ORIGINAL_TRACE; latest isolated execute_code5_before_finalize_code5 confirms mechanism only"
   },
   "life01": {
     "authoritativeCurrentResult": false,
@@ -270,12 +326,12 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "PRODUCT_REVIEW_READY_CURRENT_IOS_SIMULATOR_SYNTHETIC_SCOPE",
+    "independentLocalEngineering": "READY_FOR_GROWTH_PLAYTHROUGH_CURRENT_IOS_SIMULATOR_SYNTHETIC_SCOPE",
     "productMvp": "NOT_COMPLETE",
-    "iosCurrentRuntime": "PASS_CURRENT_OBSERVED_PRODUCT_SCOPE",
-    "androidRuntime": "NOT_RUN_THIS_SCOPE",
-    "widgetRuntimeQa": "historical gate retained; original sleeping snapshot observed incidentally, no full rerun",
-    "performance": "NOT_BENCHMARKED_CURRENT_RUN; physical/GPU NOT_RUN"
+    "iosCurrentRuntime": "PASS_LATEST_V5_NORMAL_INPUT_GROWTH_SAVE_RESTORE",
+    "androidRuntime": "NOT_RUN_LATEST_NATIVE_UI_THIS_SCOPE",
+    "widgetRuntimeQa": "PASS_GENERAL_SNAPSHOT_ISOLATION_DURING_GROWTH; widget_tap_not_rerun_this_scope",
+    "performance": "PASS_FIXED_60_SECOND_PROXY_GATES_ON_B_OFF_A; ON_A_INPUT_INSUFFICIENT_DATA; physical/GPU/input-to-photon NOT_RUN"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -488,29 +544,79 @@
     ]
   },
   "lastValidation": {
-    "scope": "Actual installed current Release product observation and read-only economy/time/trace checks",
-    "sourceCheckpoint": "6c76c9b",
-    "installedBundleSha256": "facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b",
-    "initialHead": "257413522dcfe927e45ca752ab960602e9873aca",
-    "actualScreenInput": "PASS_CURRENT_OBSERVED_SCOPE",
-    "ordinaryAutonomousLife": "five families; current-run trace filtered by baseline timestamp and real video",
-    "touchAndJournalClose": "PASS_ACTUAL_INPUT_NO_SAVE_FLASH_OR_PERMANENT_LOCK",
-    "syntheticAutoMealGrowth": "PASS_ACTUAL_MEAL_COMPLETION_GROWTH_AND_AUTO_LEDGER_ONCE",
-    "preservedToiletTimeAndClean": "PASS_ACTUAL_NORMAL_TIME_USE_RETURN_POOP0",
-    "ordinaryEconomy": "identity/food0/coin15/EXP25.125 and meal3/recovery0 preserved",
-    "appTestBuildRerun": "NOT_RUN_NO_APP_CHANGE; historical 362 not claimed as current rerun",
-    "newPerformanceBenchmark": "NOT_RUN",
+    "runDate": "2026-10-07",
+    "scope": "Current installed growth-v5 actual iOS Simulator LIFE-02 finish",
+    "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
+    "installedBundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
+    "initialHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
+    "actualScreenInput": "PASS_ACTUAL_NORMAL_UI",
+    "nativeContention": "PASS150_FAILURES0; isolated DB",
+    "firstRumiResumeColdChain": "PASS_SAME_RUMI20",
+    "continuousGrowth": "V5_ACTUAL_MORI_SAME_PET_1_TO_20_PASS_374_AUTO_MEALS_6150_EXP_MONO_LV16",
+    "moriColdResumeInput": "PASS_SAME_MORI20",
+    "normalApplicationWrites": "PASS_OBSERVED_SETTLEMENT_TOUCH_MEMORY_SETTINGS_PROFILE_LIFECYCLE",
+    "ordinaryEconomy": "Sim/arucon/reserved/food0/coin15/EXP25.125/meal3 and existing Rumi20/mono/reserved/EXP6150/meal374/coin2140 unchanged",
+    "widgetIsolation": "FULL_SNAPSHOT_EQUAL_WHILE_TRIAL; general pet only",
+    "mobileTests": {
+      "passed": 376,
+      "total": 376,
+      "failed": 0,
+      "skipped": 0
+    },
+    "lint": "PASS_FRESH",
+    "typecheck": "PASS_FRESH",
+    "workflow": "42/42 PASS_FRESH",
+    "appBuildRerun": "NOT_RUN_APP_SOURCE_HASHES_UNCHANGED_NO_REBUILD_NEEDED",
+    "performanceCaptures": [
+      {
+        "label": "ON_A",
+        "durationMs": 60000,
+        "frames": 3555,
+        "submittedHz": 59.25455111197295,
+        "rafP95Ms": 17.773207902908325,
+        "rafMaxMs": 125.13441705703735,
+        "inputCount": 0,
+        "inputP95Ms": null,
+        "inputStatus": "insufficient_data",
+        "over500Ms": 0,
+        "frameStatus": "pass"
+      },
+      {
+        "label": "ON_B",
+        "durationMs": 60000,
+        "frames": 3137,
+        "submittedHz": 52.2812750717907,
+        "rafP95Ms": 30.241542100906372,
+        "rafMaxMs": 87.58416700363159,
+        "inputCount": 7,
+        "inputP95Ms": 21.070291996002197,
+        "inputStatus": "pass",
+        "over500Ms": 0,
+        "frameStatus": "pass"
+      },
+      {
+        "label": "OFF_A",
+        "durationMs": 60000,
+        "frames": 3202,
+        "submittedHz": 53.3757230216537,
+        "rafP95Ms": 29.555541038513184,
+        "rafMaxMs": 42.90945911407471,
+        "inputCount": 12,
+        "inputP95Ms": 21.946917057037354,
+        "inputStatus": "pass",
+        "over500Ms": 0,
+        "frameStatus": "pass"
+      }
+    ],
     "physicalGpuInput": "NOT_RUN",
     "healthReads": "OFF",
     "userFunAndFinalArt": "USER_REVIEW_PENDING",
     "effectiveModel": "ROUTING_UNVERIFIED",
-    "midRunHostLock": "actual failure retained, new CUA success then remaining observation completed",
     "videoEvidence": [
-      "02-current-product-observation.mp4:1901.758333s",
-      "13-resumed-product-observation.mp4:835.253333s"
+      "01-v5-rumi-resume-native.mp4:1188.176667s",
+      "10-v5-new-pet-growth-playthrough.mp4:2030.071667s"
     ],
-    "growthTextVideoArtifact": "partial decoded text in some frames; full label verified on live screen, no confirmed app defect or cause claimed",
-    "evidence": "evidence/product-hardening-sol-unlocked-2026-10-04/"
+    "evidence": "evidence/life-02-unlocked-2026-10-06/"
   },
   "environment": {
     "host": "macOS 15.6",
@@ -524,9 +630,9 @@
     "hostLocked": false,
     "iosRuntime": "26.3.1",
     "xcode": "26.3",
-    "configuration": "Release",
-    "contentSize": "large",
-    "currentRendererSnapshot": "ACTUAL_CURRENT_RELEASE_PRODUCT_OBSERVATION; no GPU/physical metric claim",
+    "configuration": "Release; existing embedded growth-v5 bundle; no Metro needed",
+    "contentSize": "large restored; tested three Simulator increments and paired decrements",
+    "currentRendererSnapshot": "CURRENT_V5_SOFTWARE_BALANCED_585x1266_RENDER_SURFACE; proxy not GPU display",
     "iosRuntimeLabel": "26.3",
     "iosRuntimeBuild": "23D8133",
     "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
@@ -861,7 +967,7 @@
     "EXT-HEALTH real health reads remain OFF",
     "EXT-ACCOUNT actual accounts/cloud/signing",
     "EXT-RELEASE actual payments/store/release/support declaration",
-    "EXT-ENV host lock is resolved and Release synthetic input was verified; motion quality, physical-hardware performance and supported-OS acceptance remain unapproved."
+    "EXT-ENV current Mac host lock resolved; actual iOS Simulator scoped review passed. Physical/GPU/physical input/thermal/battery and supported-OS release acceptance remain unverified."
   ],
   "historicalMacGit": {
     "branch": "feature/arucon-mobile-autonomous",
@@ -913,14 +1019,14 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "sourceCheckpoint": "6c76c9b",
-    "initialHead": "257413522dcfe927e45ca752ab960602e9873aca",
+    "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
+    "initialHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
     "initialHeadTrackingLiveMatch": true,
     "initialClean": true,
     "appSourceUnchanged": true,
     "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
-    "verificationEvidence": "evidence/product-hardening-sol-unlocked-2026-10-04/git-audit.json",
-    "publicationRecordScope": "Final documentation checkpoint hashes/clean recorded in ignored audit and final response"
+    "verificationEvidence": "evidence/life-02-unlocked-2026-10-06/git-final-audit.json",
+    "publicationRecordScope": "Feature documentation checkpoint only; final local/tracking/live-origin hashes and clean status recorded after publication"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -988,7 +1094,7 @@
       }
     }
   },
-  "evidenceDirectory": "evidence/product-hardening-sol-unlocked-2026-10-04/",
+  "evidenceDirectory": "evidence/life-02-unlocked-2026-10-06/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -1481,7 +1587,8 @@
       "realHealthRead": false
     },
     "toilet": "existing save resumed; retained 20s timer advanced normally, actual perform/complete and poop0",
-    "evidence": "evidence/product-hardening-sol-unlocked-2026-10-04/"
+    "evidence": "evidence/product-hardening-sol-unlocked-2026-10-04/",
+    "authoritativeCurrentResult": false
   },
   "historicalSolBeforeUnlockedProductObservation": {
     "status": "BLOCKED",
@@ -1583,22 +1690,145 @@
     "lint": "PASS_TARGETED",
     "nativeLatest": "BLOCKED_HOST_LOCKED_ACTUAL_ACCESS",
     "appSourceUnchanged": "6155b22",
-    "evidence": "evidence/life-02-context7-sqlite-2026-10-06/"
+    "evidence": "evidence/life-02-context7-sqlite-2026-10-06/",
+    "authoritativeCurrentResult": false,
+    "historicalScope": "a43ff69 SDK55 source/documentation and16 targeted tests; historical host-lock result, current native/UI results are growthPlaythrough/lastValidation"
   },
   "life02FinishAttempt": {
-    "baselineHead": "a43ff69",
-    "status": "PARTIAL_WITH_BLOCKERS",
-    "actualAccess": "BLOCKED_HOST_LOCKED_THREE_CURRENT_ATTEMPTS",
+    "baselineHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
+    "status": "READY_FOR_GROWTH_PLAYTHROUGH",
+    "actualAccess": "PASS_CURRENT_SCREEN_AND_INPUT",
     "installedRelease": "growth-v5",
     "bundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
     "sourceMatches6155b22": true,
     "rebuild": false,
+    "reinstall": false,
     "dbReset": false,
-    "ordinary": "Sim/reserved/arucon/EXP25.125/food0/coin15/meal3",
-    "rumi": "same petId/name/reserved/mono/Lv20/EXP6150/meal374/coin2140",
-    "actualV5MenusInputConcurrencyGrowthPerformance": "NOT_RUN_BLOCKED_HOST_LOCKED",
-    "freshTestsRun": false,
+    "rewind": false,
+    "firstRumiChain": "PASS_CURRENT_NORMAL_UI_AND_COLD_RESUME",
+    "newMori1To20": "PASS_CURRENT_NATIVE_VIDEO_AND_LEDGER",
+    "actualV5MenusInputConcurrencyGrowthPerformance": "PASS_CURRENT_OBSERVED_SCOPE; physical/GPU/physical latency NOT_RUN",
+    "freshTestsRun": true,
     "context7CallableTools": 0,
-    "evidence": "evidence/life-02-v5-finish-2026-10-06/"
-  }
+    "evidence": "evidence/life-02-unlocked-2026-10-06/"
+  },
+  "historicalBeforeLife02V5UnlockedAt31a307f": {
+    "runDate": "2026-10-06",
+    "status": "PARTIAL_WITH_BLOCKERS",
+    "definition": "New database-lock defect and one-pet Lv1-to-20 growth/playthrough; earlier readiness is historical",
+    "reason": "SQLite contention fix and one-pet Lv1-to-20 implementation complete. Native v4 passed 150 contention requests and Rumi completed all20 levels via374 actual synthetic-fed meals; final v5 adds normal-menu saved-profile return. v5 Release installed and persisted state retained, but latest actual CUA reports Mac locked. v5 UI/pressure recheck and current performance/input metrics pending; not READY_FOR_GROWTH_PLAYTHROUGH.",
+    "growthPlaythrough": {
+      "status": "PARTIAL_WITH_BLOCKERS",
+      "baselineCommit": "cdb7325",
+      "buildVariant": "growth-v5",
+      "bundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
+      "nativeStorage": "V4_PASS_150_REQUESTS; V5_ACTUAL_RECHECK_BLOCKED_HOST_LOCKED",
+      "continuousGrowth": "V4_NATIVE_ONE_PET_1_TO_20_PASS; V5_LATEST_UI_PENDING",
+      "tests": "374/374 PASS",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "physicalDeviceGpuPhysicalLatency": "NOT_RUN",
+      "funAndFinalArt": "USER_REVIEW_PENDING",
+      "healthAndPayments": "OFF",
+      "reviewMode": "SELF_REVIEW",
+      "subagents": 0,
+      "requestedModel": "GPT-6.1 Sol Max",
+      "effectiveModel": "ROUTING_UNVERIFIED",
+      "evidence": "evidence/growth-playthrough-2026-10-06/",
+      "currentPerformance": "NOT_RUN_BLOCKED_HOST_LOCKED",
+      "latestActualInput": "BLOCKED_HOST_LOCKED",
+      "originalPreservation": "Sim/food0/coin15/EXP25.125 unchanged",
+      "reviewState": "USER_REVIEW_PENDING",
+      "sourceCommit": "6155b22a56d9cf81b33b356cdecb0737f669a61c"
+    },
+    "completion": {
+      "independentLocalEngineering": "PRODUCT_REVIEW_READY_CURRENT_IOS_SIMULATOR_SYNTHETIC_SCOPE",
+      "productMvp": "NOT_COMPLETE",
+      "iosCurrentRuntime": "PASS_CURRENT_OBSERVED_PRODUCT_SCOPE",
+      "androidRuntime": "NOT_RUN_THIS_SCOPE",
+      "widgetRuntimeQa": "historical gate retained; original sleeping snapshot observed incidentally, no full rerun",
+      "performance": "NOT_BENCHMARKED_CURRENT_RUN; physical/GPU NOT_RUN"
+    },
+    "lastValidation": {
+      "scope": "Actual installed current Release product observation and read-only economy/time/trace checks",
+      "sourceCheckpoint": "6c76c9b",
+      "installedBundleSha256": "facaf830af032898693a800c4a64a9017a37d5d161d906531ce74b981f32102b",
+      "initialHead": "257413522dcfe927e45ca752ab960602e9873aca",
+      "actualScreenInput": "PASS_CURRENT_OBSERVED_SCOPE",
+      "ordinaryAutonomousLife": "five families; current-run trace filtered by baseline timestamp and real video",
+      "touchAndJournalClose": "PASS_ACTUAL_INPUT_NO_SAVE_FLASH_OR_PERMANENT_LOCK",
+      "syntheticAutoMealGrowth": "PASS_ACTUAL_MEAL_COMPLETION_GROWTH_AND_AUTO_LEDGER_ONCE",
+      "preservedToiletTimeAndClean": "PASS_ACTUAL_NORMAL_TIME_USE_RETURN_POOP0",
+      "ordinaryEconomy": "identity/food0/coin15/EXP25.125 and meal3/recovery0 preserved",
+      "appTestBuildRerun": "NOT_RUN_NO_APP_CHANGE; historical 362 not claimed as current rerun",
+      "newPerformanceBenchmark": "NOT_RUN",
+      "physicalGpuInput": "NOT_RUN",
+      "healthReads": "OFF",
+      "userFunAndFinalArt": "USER_REVIEW_PENDING",
+      "effectiveModel": "ROUTING_UNVERIFIED",
+      "midRunHostLock": "actual failure retained, new CUA success then remaining observation completed",
+      "videoEvidence": [
+        "02-current-product-observation.mp4:1901.758333s",
+        "13-resumed-product-observation.mp4:835.253333s"
+      ],
+      "growthTextVideoArtifact": "partial decoded text in some frames; full label verified on live screen, no confirmed app defect or cause claimed",
+      "evidence": "evidence/product-hardening-sol-unlocked-2026-10-04/"
+    },
+    "git": {
+      "branch": "feature/arucon-mobile-autonomous",
+      "sourceCheckpoint": "6c76c9b",
+      "initialHead": "257413522dcfe927e45ca752ab960602e9873aca",
+      "initialHeadTrackingLiveMatch": true,
+      "initialClean": true,
+      "appSourceUnchanged": true,
+      "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
+      "verificationEvidence": "evidence/product-hardening-sol-unlocked-2026-10-04/git-audit.json",
+      "publicationRecordScope": "Final documentation checkpoint hashes/clean recorded in ignored audit and final response"
+    },
+    "life02Audit": {
+      "runDate": "2026-10-06",
+      "status": "PARTIAL_WITH_BLOCKERS",
+      "context7": {
+        "catalog": "INSTALLED_ENABLED",
+        "callableTools": 0,
+        "documentationCall": "NOT_RUN_TOOL_NOT_EXPOSED",
+        "settingsChanged": false
+      },
+      "installed": {
+        "expo": "55.0.31",
+        "expoSqlite": "55.0.20"
+      },
+      "documentation": "OFFICIAL_SDK55_AND_EXACT_NPM_GITHEAD_MATCH",
+      "transactionCallbacks": 30,
+      "outerSqlCallsInsideCallbacks": 0,
+      "impactTests": {
+        "passed": 16,
+        "total": 16,
+        "skipped": 0
+      },
+      "typecheck": "PASS",
+      "lint": "PASS_TARGETED",
+      "nativeLatest": "BLOCKED_HOST_LOCKED_ACTUAL_ACCESS",
+      "appSourceUnchanged": "6155b22",
+      "evidence": "evidence/life-02-context7-sqlite-2026-10-06/"
+    },
+    "life02FinishAttempt": {
+      "baselineHead": "a43ff69",
+      "status": "PARTIAL_WITH_BLOCKERS",
+      "actualAccess": "BLOCKED_HOST_LOCKED_THREE_CURRENT_ATTEMPTS",
+      "installedRelease": "growth-v5",
+      "bundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
+      "sourceMatches6155b22": true,
+      "rebuild": false,
+      "dbReset": false,
+      "ordinary": "Sim/reserved/arucon/EXP25.125/food0/coin15/meal3",
+      "rumi": "same petId/name/reserved/mono/Lv20/EXP6150/meal374/coin2140",
+      "actualV5MenusInputConcurrencyGrowthPerformance": "NOT_RUN_BLOCKED_HOST_LOCKED",
+      "freshTestsRun": false,
+      "context7CallableTools": 0,
+      "evidence": "evidence/life-02-v5-finish-2026-10-06/"
+    },
+    "evidenceDirectory": "evidence/product-hardening-sol-unlocked-2026-10-04/"
+  },
+  "implementedScope": "Historical SRS engineering inventory; current execution evidence is lastValidation/growthPlaythrough, not every earlier placeholder or external gate."
 }

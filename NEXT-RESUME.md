@@ -1,6 +1,22 @@
 # Next resume — fresh macOS iOS validation
 
-## LIFE-02 현재 다음 한 작업 — 실제 Mac 잠금 해제 후 정상 메뉴 복귀
+## LIFE-02 현재 지점 — READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
+
+현재 iOS Simulator의 **growth-v5**로 남은 실제 검증을 마쳤다. 앱 소스 `6155b22a56d9cf81b33b356cdecb0737f669a61c`, 설치 bundle SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12` 일치. 착수 HEAD `31a307f`, 현재 최종 문서 checkpoint는 Git과 최종 응답에서 확인한다. 앱 소스 변경·재빌드·재설치·DB 초기화·과거 reset 없음. SOL_DIRECT / SELF_REVIEW / 새 subagent0, effective ROUTING_UNVERIFIED다.
+
+**첫 요청 경로를 실제 완료했다**: 일반 Sim→정상 최근 성장 이어보기→기존 루미20→직접 head/body 접촉·자율생활→일반 방→cold restart→같은 루미20. 이어 별도 새 **모리** (`growth_playthrough#1791298466103`)가 EXP0/Lv1에서 동일 petId로 실제 자동374섭취/6150EXP/Lv20/합성49일, Lv16 모노 진화1회를 완료했다. 모리20→원본→cold restart→최근 이어보기→같은 모리20→접촉·이동도 실제 확인했다. 루미를 되감거나 기존 저장을 삭제하지 않았다.
+
+현재 정상 메뉴의 **최근 성장 체험 이어보기는 가장 최근 모리20**을 연다. 기존 루미의 저장은 그대로다. 사용자는 현재 설치 앱에서 바로 평가하거나 메뉴→설정→Lv.1부터 키워보기→이름→함께 지내기→계속 키우기를 한 번 눌러 새 개체를 볼 수 있다. 일시정지/전후 비교는 보상·기억을 추가하지 않는다. 실제 건강 연결 없는 합성 활동·수면/가상 시간임을 유지한다. 새 개편이나 완료된 전체 시험을 이유 없이 다시 시작하지 않는다.
+
+최신 v5 격리 native150 요청 실패0, 동일 직접식사30회→1/별도auto1/wake replay 동일, 실제 일반 앱 교감·설정·정산·프로필 저장 경로도 오류/영구 잠금 미재현. 이번 새376/376·lint/typecheck PASS. 같은 Release/루미20/같은 방/정상 renderer의60초 ON/OFF proxy gates PASS: RAF p9530.24/29.56ms, 제출52.28/53.38Hz, 입력7/12개 p9521.07/21.95ms, >500ms gap0. 예비 ON A의 입력0은 INSUFFICIENT_DATA로 보존했다. GPU/물리 지연 측정으로 바꾸지 않는다.
+
+원본 Sim/food0/coin15/EXP25.125/meal3 및 기존 루미/reserved/mono/EXP6150/meal374/coin2140 보존. 체험 중 일반 위젯 snapshot 동일. 기록 닫기·대화 닫기·직접 손길·자율생활 복귀·background/foreground·큰 글자·동작 줄이기 ON/OFF·설정 복원 확인. 첫 오류 당시 정확 SQL은 여전히 특정 불가이며 격리 execute→finalize 재현과 구분한다.
+
+증거는 `/Users/heung/projects/arucon-project/evidence/life-02-unlocked-2026-10-06/`: `01-v5-rumi-resume-native.mp4`19:48.177, `10-v5-new-pet-growth-playthrough.mp4`33:50.072, 장면 시각 `24-video-scene-index.json`, 현재 원장/DB audit `25-native-growth-final-audit.json`. 같은 최신 빌드의 무편집 정상 속도 native 영상이며 v4 영상을 재사용하지 않았다. [장면 시각/현재 결과](GROWTH-PLAYTHROUGH-REPORT.md).
+
+다음은 **사용자 성장·재미·캐릭터 평가**다. 재미·최종 아트 USER_REVIEW_PENDING; 실기기/Android 최신 native·GPU/input-to-photon/발열·배터리 NOT_RUN. 새 기술 결함이 보고되면 현재 저장·설치를 보호하고 재현→원인→수정→필요한 Release→정상 앱 조작→영향 회귀→SELF_REVIEW로 이어간다. 건강/실결제 OFF, feature checkpoint/일반 push만, main/merge/배포/보안 변경 금지. 현재 검증 범위에서 환경 blocker가 없으며 과거 아래 locked 기록은 이력이다.
+
+## Historical — LIFE-02 다음 한 작업 / 잠금 중 2026-10-06
 
 이번 재개는 `a43ff69`에서 시작했고 실제 설치 growth-v5/앱 소스6155b22/manifest 파일 해시가 모두 일치했다. 앱 변경·재빌드·재설치·DB 초기화 없음. 최신 실제 CUA 세 번 모두 Mac locked. 일반 Sim의 EXP25.125/food0/coin15/meal3와 루미/reserved/mono/EXP6150/meal374/coin2140을 읽기 전용으로 확인·백업했다. 현재 선택은 기존 루미의 `growth_playthrough#1791218209615`다.
 
@@ -8,13 +24,13 @@
 
 최근 증거는 `evidence/life-02-v5-finish-2026-10-06/`. Context7 호출 도구가 보이면 공개 버전 문서를 조회하고, 없으면 이미 대조한 공식 SDK55 근거로 계속한다. 추가 설치/중복 MCP 등록/보안 설정 변경 금지. 상태 PARTIAL_WITH_BLOCKERS, 재미/아트 USER_REVIEW_PENDING이다.
 
-## LIFE-02 현재 재개 메모 — 문서/DB 감사 후 실제 입력 대기
+## Historical — LIFE-02 문서/DB 감사 후 실제 입력 대기
 
 Context7은 플러그인 목록상 설치/ENABLED이나 이번 Codex 호출 도구0개로 실제 문서 호출은 미실행이다. 설치본 Expo55.0.31/expo-sqlite55.0.20과 SDK55 원문/정확 npm gitHead 소스를 대조했다. Exclusive API가 모든 외부 쓰기를 자동 직렬화한다고 가정하지 않는다. 현재30개 callback은txn을 사용하며, 앱 쓰기는 기존 per-file lane을 통한다. 정리 지연/정리 자체 실패 검사를 추가해 이번 영향16/16·typecheck/lint PASS. 상세는 [현재 감사](GROWTH-PLAYTHROUGH-REPORT.md)와 [ADR-015](docs/adr/ADR-015-sqlite-access-and-growth-playthrough.md).
 
 이번 실제 CUA도 Mac locked 확인. 잠금 해제 후 아래의 현재 v5/native 경합/성장/복귀/입력/성능 검증을 이어간다. 테스트만 추가했고 앱 소스6155b22와 설치 v5는 변경하지 않아 불필요한 재빌드/DB 초기화를 하지 않았다. Context7 설정/권한/새 설치/프로젝트 외부 전송은 변경하지 않았다.
 
-## 현재 작업 — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
+## Historical — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
 
 **현재 실제 CUA에서 Mac locked 확인**. 앱 소스 checkpoint **6155b22**. 최신 설치 **growth-v5**, SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`. DB 초기화 없이 현재 선택된 `growth_playthrough#1791218209615`, **루미**/reserved/mono/Lv20/6150EXP/meal374를 v5의 읽기 전용 저장에서도 보존했다. 일반 Sim/food0/coin15/EXP25.125도 동일하다. 새374/374·lint/typecheck·Release/Android JS bundle PASS. v4의150개 native 경합 및 정상 동일 개체1→20 영상은 실제 통과 이력이며 **v5 실제 입력으로 재표기하지 않는다**.
 

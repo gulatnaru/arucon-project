@@ -1,6 +1,69 @@
-# Growth playthrough and native save stability — 2026-10-06
+# Growth playthrough and native save stability — 2026-10-07
 
-## LIFE-02 현재 v5 마무리 시도 — PARTIAL_WITH_BLOCKERS
+## LIFE-02 최신 v5 — READY_FOR_GROWTH_PLAYTHROUGH
+
+같은 모리 한 마리가 EXP 0/Lv.1에서 시작해 합성 활동으로 얻은 먹이를 **자동으로 374회 섭취**, 6,150 EXP/Lv.20에 도달했다. Lv.16에서 기존 케어 조건으로 모노가 됐으며 이름·reserved 성격·petId를 유지했다. 눈맞춤→방향 장난→작은 인사→두 박자→새 형태의 자세→돌아보고 인사하는 몸짓을 실제 앱에 연결한 최신 **growth-v5** 영상이다. 정상 자율 생활에서도 Lv.10의 작은 튀기, Lv.12의 방향 장난 시작(다음 식사로 중단), Lv.16의 Lv.15 두 박자 몸짓, Lv.20의 가까이 기대기와 공놀이를 관찰했다. 진단용 개인기/강제 모델 선택으로 이를 대신하지 않았다. 작은 앞발·표정의 읽기성과 계속 보고 싶은 재미, 최종 아트는 **USER_REVIEW_PENDING**이다.
+
+이번에는 실제 Mac 화면·입력 접근이 성공했다. 착수 HEAD `31a307fbaffda9bc5dba3bdf912d25c9084e26df`, 앱 소스 `6155b22a56d9cf81b33b356cdecb0737f669a61c`, 설치/manifest SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`를 대조했다. App/src/package/lockfile 해시가 같아 **앱 변경·재빌드·재설치·DB 초기화·과거 commit reset을 하지 않았다**. macOS15.6/Xcode26.3, iPhone16e/iOS26.3(label)/26.3.1 runtime, Release 내장 번들/Metro 불필요, SDK55/Expo55.0.31/expo-sqlite55.0.20/RN0.83.10/React19.2.0이다.
+
+### 같은 최신 설치본에서 실제 확인한 경로
+
+| 확인 | 이번 실행 결과 |
+|---|---|
+| 요청한 첫 이어보기 | 일반 Sim→정상 메뉴/설정→최근 성장 이어보기→기존 루미20→직접 head/body 접촉·자율 생활→일반 방→앱 종료/재실행→동일 루미20. PASS_ACTUAL_SIMULATOR |
+| 격리 native 경합/재시도 | 최신 v5의 정상 설정/진단 메뉴에서 150 요청, 수정 경로 실패0. 같은 직접 식사 요청30회→섭취1, 별도 자동섭취1, wake replay full state 동일, integrity ok |
+| 최초/정리 오류 구분 | 격리된 무조정 비교에서 runAsync execute code5가 먼저, finalizeAsync code5가 뒤. 최초 사용자 사건의 정확한 SQL/콜백은 당시 trace 부재로 특정 불가. 그 SQL을 찾았다고 주장하지 않음 |
+| 새 연속 성장 | 모리 / `life-experience-v1:growth_playthrough:1791298466103`, 시작 EXP0/food0/arucon,20개 순차 checkpoint/374개 고유 meal ID/합성49일/진화1회. 모든 EXP는 MealConsumed 합계와 일치 |
+| 일반 서비스·저장 | 체험의 실제 공급·자동 식사·수면/wake·진화, 원래 방의 전경 정산·직접 교감·설정 ON/OFF·프로필 전환·cold restore에서 오류/영구 입력 잠금 미재현. 격리 검사와 일반 앱 조작을 구분 |
+| 일시정지/전후 비교 | Lv.10→읽기 전용 Lv.1 비교→현재 모습→직접 교감. EXP1,950/meal118 그대로, 보상·레벨·진화 되감기 없음 |
+| 최신 성장 저장 복원 | 모리20→일반 방→앱 종료/재실행→정상 최근 성장 이어보기→같은 모리20→직접 접촉·대화 닫기·이동. PASS_ACTUAL_SIMULATOR |
+| UI/입력 | 기록 열기/닫기, 직접 손길·후속 생활, 연속 목적지 변경, 실제 Home/앱 아이콘 background/foreground, 동작 줄이기 ON 이동/OFF 복원, 큰 글자·방 가장자리 말풍선/닫기 확인 |
+| 원본·기존 루미·위젯 | Sim/arucon/reserved/food0/coin15/EXP25.125/meal3 및 루미/mono/reserved/coin2140/EXP6150/meal374 보존. 체험 중 일반 위젯 전체 snapshot 동일, petId=dev-local-pet-1. 이번 홈 복귀는 앱 아이콘 입력이며 위젯 탭으로 재표기하지 않음 |
+
+일반 원본 시간을 조작하지 않았다. 새 체험만 기존 가상 시계와 정상 서비스를 사용했으며 시작 후 pet의 레벨/EXP/형태 직접 수정은 없다. 최종 두 DB schema7/integrity ok, 새 체험 pending command0·pending plan null·target null·양수 수면 회복의 중복 일자0, EvolutionFormApplied1. 실제 건강 읽기/실결제 OFF, 외부 서비스·권한·OS 보안 설정 변경 없음.
+
+### 최신 영상과 장면 찾기
+
+로컬 ignored 위치: `/Users/heung/projects/arucon-project/evidence/life-02-unlocked-2026-10-06/`. 두 영상은 현재 v5의 **무편집·정상 속도 native 화면 녹화**이며 실제 AVFoundation 디코딩/시각 대조를 했다. `01-v5-rumi-resume-native.mp4` **19분48.177초**(루미 복귀·경합·입력), `10-v5-new-pet-growth-playthrough.mp4` **33분50.072초**(생활/복귀·새 모리 생성·1→20·큰 글자·비교·원본/새 성장 복원). 중간 v4 영상을 최신 증거로 사용하지 않았다.
+
+아래는 두 번째 영상의 재생 시각이다. 성장 행은 실제 섭취 확정 후의 성장 표현이며 자동 생활 행과 구분한다. trace의 perform→complete 및 디코딩된 전/중/후 프레임을 함께 확인했다.
+
+| 장면 | 영상 시각 | 실제 변화 |
+|---|---|---|
+| Lv.1 |13:02~13:08|시선·몸 기울이기, ‘여기부터 볼까.’ |
+| Lv.5 |15:14~15:20|방향 속임과 장난 표정, ‘이쪽인 줄 알았어?’ |
+| Lv.10 |18:10~18:16|몸 낮추기·앞발 인사, ‘내 인사는 이거야.’ |
+| Lv.15 |22:31~22:37|앞발 두 박자·돌아보기, ‘두 번이면 알겠지.’ |
+| Lv.16 |22:53~22:59|실제 모노 모델·새 자세·놀람 표정, ‘자세가 달라졌네.’ |
+| Lv.20 |26:27~26:33|방향 전환·인사·복원, ‘이게 내 방식이야.’ |
+| 일반 자율 개인기 |19:55~,21:39~,24:15~|Lv.10 작은 튀기, Lv.12 방향 장난 시작 후 식사로 중단, Lv.16에서 배운 두 박자. automatic=true/replay=false |
+| 성장 후 일반 생활 |26:49~,27:07~,27:24~|Lv.20 까꿍·가까이 기대기·주변 살피기와 공놀이. 강제 장면 버튼 미사용 |
+
+세부 장면은 `24-video-scene-index.json`, `20-complete-growth-timeline.json`, `growth-frame-review/`에 있다. 20개 성장 몸짓 모두 perform→complete, 주목 레벨6개는 실제 프레임으로 확인했다. 모든 새로운 개인기가 이번 무작위 관찰에서 자율 선택됐다고 주장하지 않는다. Lv.20 signature는 실제 성장 표현으로 확인했고 정상 생활의 도달성은 공통 selector/회귀 검사로 확인했다.
+
+### 현재 성능 — proxy gate PASS / 실기기·GPU·물리 지연 NOT_RUN
+
+같은 v5 Release·루미20/모노·같은 방·software_balanced·동작 줄이기 OFF,60초 고정 구간으로 녹화 ON/OFF를 확인했다. 기준은 RAF p95≤33.34ms, 제출≥30Hz, 입력→다음 제출 p95≤100ms(5표본 이상),500ms 초과 gap0 그대로다. 호스트의 당시 CPU/온도 부하를 수치로 계측하지 않았고 녹화만 원인이라고 단정하지 않는다. 이 구간에는 위의 새 테스트/lint/typecheck를 병렬 실행하지 않았다. 큰 글자/동작 줄이기 설정은 원래대로 복원했다.
+
+| 구간 | 길이 | 제출 proxy Hz | RAF p95/max ms | 입력 n / p95 ms | >500ms gap | 판정 |
+|---|---:|---:|---:|---:|---:|---|
+| ON A |60초|59.25|17.77 /125.13|0 /미측정|0|프레임 PASS, 입력 INSUFFICIENT_DATA. 바닥 이동은 현재 probe 계측 대상 아님 |
+| ON B |60초|52.28|30.24 /87.58|7 /21.07|0|모든 proxy gate PASS |
+| OFF A |60초|53.38|29.56 /42.91|12 /21.95|0|모든 proxy gate PASS |
+
+입력은 Simulator의 실제 클릭/드래그를 RN이 touch로 분류한 표본이며 물리 터치 지연이 아니다. RAF/endFrameEXP 제출/영상 인코딩 FPS는 GPU 표시 FPS가 아니다. 소프트웨어 Simulator에서 긴 정지나 대화·메뉴 뒤 영구 잠금은 관찰하지 않았으나 실제 기기·GPU·input-to-photon·발열·배터리는 **NOT_RUN**이다. Android 최신 native/UI는 이번 범위 **NOT_RUN**, 과거 Windows Android/이전 bundle·CNG·Release compile은 이력으로 유지한다.
+
+### 현재 검사·SELF_REVIEW·사용자 실행
+
+이번 새 실행: `npm test` **376/376**(실패/skip0), `npm run typecheck`, `npm run lint` PASS. 과거374/348/360을 새 실행 숫자로 복사하지 않았다. 운영/문서 정합성 검사 `validation/check_workflow.py`도 이번에 **42/42 PASS**. 새 결과는 로컬 evidence에 보존하고 추적된 과거 generated 검사 파일은 그대로 유지했다. 앱 소스가 같으므로 native/JS bundle 재빌드는 하지 않았다. Context7은 이번 실제 호출 목록도0개라 문서 호출 NOT_RUN_TOOL_NOT_EXPOSED, 설치/중복 등록 없이 이전 정확한 SDK55 원문 감사 근거를 유지했다.
+
+**SELF_REVIEW**: 기능 품질은 저장/연속 성장/진화/입력/복원 확인, 표현 품질은 실제 몸짓·표정·대사·후속 행동의 연결 확인이다. 게임 재미·작은 앞발/표정 가독성·최종 아트는 사용자 검토 대기이며 별도 독립 리뷰라고 기록하지 않는다. SOL_DIRECT, 새 subagent0, 요청 GPT-6.1 Sol Max/effective ROUTING_UNVERIFIED. 이번 미완료는 실기기/Android 최신 native·GPU/물리 계측과 사용자 재미·아트 평가이며 현재 iOS Simulator LIFE-02 검토의 host-lock blocker는 해소됐다. SRS 전체 출시 완료로 확대하지 않는다.
+
+현재 앱은 **모리 Lv.20**에서 바로 볼 수 있다. 메뉴→설정→**최근 성장 체험 이어보기**는 가장 최근 모리를 연다. 기존 루미는 삭제되지 않았고 첫 검증에서 정상 이어보기/재실행을 확인했다. 새 1→20을 볼 때는 메뉴→설정→**Lv.1부터 키워보기**→이름→함께 지내기→계속 키우기를 한 번 누른다. 성장 일시정지/전후 비교가 가능하고 일반 방으로 돌아가도 저장을 지우지 않는다. 건강 연결 없는 합성/가상 시간 체험임을 유지한다.
+
+Git은 기존 feature의 문서 checkpoint/일반 push 범위다. 최종 staged 파일·로컬/추적/live-origin 해시·clean 결과는 같은 증거 폴더의 `git-final-audit.json` 및 최종 응답에 남긴다. 영상/DB/native/build/node_modules/비밀은 stage/외부 업로드하지 않는다.
+
+## Historical — LIFE-02 v5 마무리 시도 / 잠금 중 2026-10-06
 
 현재 체크포인트 `a43ff69`에서 이어갔다. Git 작업 트리는 clean이고 `6155b22` 이후 App/src/package/lockfile 변경은 없다. 실제 설치 번들 SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`가 growth-v5 manifest와 일치하며 모든 앱 소스 파일 해시도 같았다. 재빌드·재설치·DB 초기화를 하지 않았다.
 
@@ -18,7 +81,7 @@
 
 증거 `evidence/life-02-v5-finish-2026-10-06/baseline.json`, `before-arucon-dev.db`, `before-arucon-life-experience.db`, `current-access.json`은 로컬 ignored 위치에 있다. 이번에 앱 변경이나 검사 재실행은 없으며 과거16/16·374/374·v4 영상/경합을 새 PASS로 재사용하지 않는다. Source build 대응과 저장 보존만 새로 확인했다. 재미·최종 아트 USER_REVIEW_PENDING, 실기기/GPU/물리 입력 NOT_RUN을 유지한다.
 
-## LIFE-02 재개 — Context7 / SQLite 버전 감사
+## Historical — LIFE-02 Context7 / SQLite 버전 감사
 
 현재 Codex의 실제 호출 목록에서 Context7 도구는0개다. 플러그인 관리 조회는 Context7이 설치·ENABLED임을 확인했으므로 미설치라고 단정하지 않는다. 다만 현재 세션에서 문서 조회 호출은 NOT_RUN_TOOL_NOT_EXPOSED다. user/project `config.toml`의 직접 MCP 항목에도 Context7이 없었다. Codex에서 기존 Context7의 활성/노출을 확인하고 세션을 새로 여는 것이 먼저다. 직접 MCP 등록이 필요하면 공개 remote URL `https://mcp.context7.com/mcp`를 이용할 수 있으며, 이 작업에서 설정 변경/설치/권한 확대는 하지 않았다.
 
@@ -28,7 +91,7 @@ Expo55.0.31 / expo-sqlite55.0.20을 package.json·lock·설치본에서 대조�
 
 이번 실제 Simulator 접근도 두 번 **Mac locked**였다. 현재 v5의 저장 안정성/동일 개체1→20/정상 입력/성능은 아래 남은 검증을 그대로 이어간다. 문서 조회나 Context7 설치 상태 확인을 LIFE-02 완료로 보고하지 않는다. 상태는 PARTIAL_WITH_BLOCKERS, 재미·최종 아트 USER_REVIEW_PENDING이다.
 
-## Current execution: PARTIAL_WITH_BLOCKERS / latest-v5 actual input pending
+## Historical — PARTIAL_WITH_BLOCKERS / latest-v5 actual input pending
 
 루미 한 마리가 합성 활동으로 받은 먹이를 자동으로374회 섭취해 Lv.1→20/6,150EXP가 됐다. Lv.16에서 기존 케어 조건으로 모노가 됐고 이름·reserved 성격은 그대로다. 앞발 인사→작은 튀기/방향 장난→번갈아 발 인사/균형/두 박자→새 형태의 자세와 나만의 인사를 연결했다. Growth/reveal은 정상 속도이며 원장과 실제 native 영상으로 확인했다. **이 전체 연속 성장 증거는 v4**이며 최종 재미·아트 승인은 사용자 대기다.
 

@@ -1,6 +1,24 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 재오픈 — 저장 안정성·동일 개체 성장 (2026-10-06)
+## 현재 LIFE-02 — READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
+
+최신 growth-v5/소스6155b22/설치92452f2a…를 실제 조작해 남은 iOS Simulator 범위를 완료했다. 앱 재구현·재빌드·재설치·원본/루미 초기화 없음. [현재 증거/장면](GROWTH-PLAYTHROUGH-REPORT.md). 아래 이력의 host lock/v4 PASS를 최신 증거로 재사용하지 않았다.
+
+| 범위 | 현재 결과 |
+|---|---|
+| native SQL 경합·자원 정리·같은 요청 | PASS_NATIVE: v5 격리150 실패0, 같은직접식사30회→1/별도auto1/wake 동일. execute→finalize 오류 재현. 최초 사용자 당시 SQL 특정은 불가 |
+| 정상 저장 이어보기 | PASS_ACTUAL_SIMULATOR: 일반→기존루미20→접촉/생활→원본→cold→동일루미 |
+| 최신 단일pet1→20 | PASS_ACTUAL_SIMULATOR: 새모리 EXP0→자동374섭취/6150EXP/20순차checkpoint/합성49일, Lv16 실제mono진화1회. 일반→cold→같은모리20 복원 |
+| 실제 몸짓·상황·기억 | PASS_OBSERVED_SCOPE: 주목6레벨의 실제영상/전중후프레임, 배운 자율 작은튀기·방향장난시작·두박자·기대기/공놀이. 강제 진단/성장표현과 구분, 모든 무작위 개인기를 이번에 관찰했다는 의미 아님 |
+| 일반 저장·UI·위젯 | PASS: 원본Sim/coin15/food0/EXP25.125/meal3 및 기존루미20 보존, 체험중일반snapshot 동일. 기록/대화닫기·접촉·이동·foreground/cold·큰글자·동작줄이기/설정복원 |
+| 성능·자동 회귀 | PASS_PROXY:60초ON/OFF 고정gate, RAFp9530.24/29.56ms·제출52.28/53.38Hz·입력7/12개 p9521.07/21.95ms·>500gap0. 예비ON 입력0 미측정. 새376/376·lint/typecheck PASS |
+| Android 최신 native/UI·실기기/GPU/물리지연·발열/배터리 | NOT_RUN_THIS_SCOPE; 이전Android/compile 이력을 새 통과로 표시하지 않음 |
+| 게임 재미·최종 아트·작은 앞발/표정 가독성 | USER_REVIEW_PENDING |
+| 법률·실건강·외부계정·실결제·출시 | 기존Hard Stop 유지. 실제 건강/결제 OFF, 전체MVP/출시 완료 아님 |
+
+현재 정상 ‘최근 성장 체험 이어보기’는 가장 최근 **모리20**을 연다. 기존루미는 보존했고 새 체험 생성 전에 정상 이어보기 전체경로를 검증했다. [실행 방법/다음 사용자 평가](NEXT-RESUME.md).
+
+## Historical — 저장 안정성·동일 개체 성장 재오픈 (2026-10-06)
 
 이전 PRODUCT_REVIEW_READY는 아래 이력이다. 현재 **PARTIAL_WITH_BLOCKERS**: 구현과 v4 실제1→20/저장경합은 완료했으나 v5 설치후 실제CUA locked로최신UI/성능재확인이막혔다. [실제 현재 결과](GROWTH-PLAYTHROUGH-REPORT.md), [생활/레벨 도달표](docs/living-pet-design.md).
 

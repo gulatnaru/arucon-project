@@ -1,6 +1,22 @@
 # iOS validation history and Release input resume
 
-## 현재 SOL_DIRECT — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
+## 현재 SOL_DIRECT — LIFE-02 / READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
+
+현재 Mac의 실제 화면·입력 접근은 성공했다. 착수HEAD31a307f와 앱 소스6155b22/현재growth-v5 SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`를 대조했고 앱 수정·재빌드·재설치·DB 초기화 없이 남은 검증을 마쳤다. 과거 locked/v4 기록은 아래 이력이며 새 PASS로 복사하지 않았다.
+
+일반 방→정상 메뉴 최근 성장 이어보기→기존 **루미20**→직접 접촉·자율생활→원본→cold restart→같은 루미를 실제 확인했다. 이후 별도 **모리** 한 마리가 EXP0/Lv1→정상 합성 활동 공급/자동374섭취→6150EXP/Lv20, Lv16 모노 진화1회를 완료했다. 모리20→원본→cold restart→같은 모리20→접촉·이동도 확인했다. 원래 Sim의 이름/coin15/food0/EXP25.125/meal3, 기존 루미/reserved/mono/EXP6150/meal374/coin2140과 체험 중 일반 위젯 전체snapshot을 보존했다.
+
+최신v5의 **격리 native150 요청 실패0**, 동일 직접식사 요청30회→1/별도auto1/wake replay 동일. 격리 비교의 execute code5→finalize code5는 원인 기전을 재현하며 최초 사용자 오류 당시 정확 SQL을 특정한 것은 아니다. 최신 원장의 고유 meal374·EXP합계6150·회복 중복일0·진화1·pending0·두 DB integrityok와 일반 앱 정산/교감/설정/프로필 쓰기·복원에서 오류 미재현을 대조했다.
+
+**SELF_REVIEW**: 기능은 저장·연속 성장·진화·입력·복원 확인, 표현은 실제 레벨별 몸짓/표정/말풍선과 배운 자율 행동의 연결 확인, 게임 재미/최종 아트는 USER_REVIEW_PENDING이다. 실제 일반 자율 개인기는 강제 진단 버튼/성장 reveal과 구분했다. 작은 앞발/표정 가독성과 만족도를 대신 승인하지 않는다. 새 subagent0, 요청GPT-6.1SolMax/effective ROUTING_UNVERIFIED.
+
+이번 새376/376·lint/typecheck PASS. 같은v5/루미20/같은방/정상renderer에서60초 녹화ON B/OFF A: 제출52.28/53.38Hz, RAF p9530.24/29.56ms, 입력7/12개 p9521.07/21.95ms, >500ms gap0. 고정 기존proxy 기준 PASS이며 예비ON A의 입력0은미측정으로남겼다. GPU표시/물리입력/실기기/발열·배터리 NOT_RUN, Android최신native/UI NOT_RUN. 현재 소스가 같아 이전 compile/bundle/CNG 이력은 보존하고 새 빌드 실행으로 재표기하지 않는다.
+
+현재 무편집 정상 속도 영상은 `evidence/life-02-unlocked-2026-10-06/01-v5-rumi-resume-native.mp4`19:48.177와 `10-v5-new-pet-growth-playthrough.mp4`33:50.072다. 후자13:02/15:14/18:10/22:31/22:53/26:27에서 Lv1/5/10/15/16/20을 비교한다. 실제 디코딩/전·중·후 프레임 및 selection trace/원장 대조. [현재 상세 증거와 한계](GROWTH-PLAYTHROUGH-REPORT.md), [사용자 실행/다음 작업](NEXT-RESUME.md).
+
+현재 iOS Simulator LIFE-02 검토의 host-lock blocker는 해소됐다. 재미·최종 아트/실기기와 법률·실건강·계정·실결제·출시 경계는 유지하며 SRS 전체 출시 완료를 주장하지 않는다. Feature 문서checkpoint/일반push만, 증거영상/DB/비밀/generated native/build는 로컬ignored이며 외부전송하지 않는다. 최종HEAD/추적/live-origin/clean은같은폴더git-final-audit와최종응답에기록한다.
+
+## Historical — 성장·저장 v5 / PARTIAL_WITH_BLOCKERS
 
 SQLite 공통파일대기열/statement오류구분, 단일pet1→20실제섭취성장,20개표현/정상생활/상황접촉/비교와저장복귀를구현했다. **v4 실제루미1→20/6150EXP/374meal/mono 및 native150경합/동일식사1·별도auto1/wake replay동일 PASS**. 원래사용자오류그순간의SQL은trace없어특정불가하며격리native재현으로실행오류가finalize에전달되는원인을확인했다.
 
