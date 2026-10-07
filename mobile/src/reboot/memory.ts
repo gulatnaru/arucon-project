@@ -2,6 +2,22 @@ import type { SqlConnection } from '../storage/sqlite';
 import type { FloorPoint } from '../scene/types';
 import { type RebootFact, type RebootSnapshot, type RebootStage } from './contracts';
 
+/** Keep first/latest completed experience per object within the same 64-fact budget.
+ * Quiet cushion repeats must not turn a familiar hat into a first encounter.
+ * Existing pruned facts are not reconstructed or inferred from ownership. */
+function retainExperience(events: RebootFact[]): RebootFact[] {
+  if (events.length <= 64) return events;
+  const first = new Map<string, RebootFact>(), last = new Map<string, RebootFact>();
+  for (const event of events) {
+    const key = `${event.kind}:${event.itemId}`;
+    if (!first.has(key)) first.set(key, event);
+    last.set(key, event);
+  }
+  const keep = new Set([...first.values(), ...last.values()].map(event => event.eventId));
+  for (let i = events.length - 1; i >= 0 && keep.size < 64; i--) keep.add(events[i].eventId);
+  return events.filter(event => keep.has(event.eventId));
+}
+
 /** Auxiliary experience state; no economic migration and no raw SQLite handle. */
 export class RebootMemoryStore {
   constructor(private readonly db: SqlConnection, readonly petId: string) {
@@ -53,7 +69,7 @@ export class RebootMemoryStore {
       if (x.revision !== expectedRevision || x.events.some(e => e.eventId === event.eventId)) return x;
       if (event.kind === 'hat_used' && !x.hatWorn || event.kind === 'cushion_used' && event.itemRevision !== x.cushion.revision) return x;
       if (event.kind === 'cushion_used' && (!event.position || event.position.x !== x.cushion.x || event.position.z !== x.cushion.z)) return x;
-      return { ...x, revision: x.revision + 1, events: [...x.events, event].slice(-64) };
+      return { ...x, revision: x.revision + 1, events: retainExperience([...x.events, event]) };
     });
   }
 }

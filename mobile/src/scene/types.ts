@@ -20,6 +20,10 @@ export type RoomRuntimeSnapshot = Readonly<{
   position: FloorPoint; destination: FloorPoint | null;
   mealCue: Readonly<{ remaining: number; committed: boolean; pendingToken?: string; lastToken?: string }>;
   pendingLifeToken?: string; lastLifeToken?: string;
+  rebootIntent?: Readonly<{ kind: string; phase: string; token: string }> | null;
+  rebootPose?: Readonly<{ kind: string; phase: string; progress: number; gazeTarget?: FloorPoint; dockTarget?: FloorPoint }> | null;
+  /** Visual root world coordinates, not a GPU/physical touch measurement. */
+  visualRoot?: Readonly<{ x: number; y: number; z: number }>;
 }>;
 
 /** APP-01 presentation port. Callbacks do not award resources or advance game time. */

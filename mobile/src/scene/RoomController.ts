@@ -11,7 +11,7 @@ import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 import { Platform } from 'react-native';
 import * as THREE from 'three';
-import { FLOOR, MEAL_BOWL, TOILET_SPOT, localDockOffset, nearestFree, route, type NavigationOptions } from './navigation';
+import { FLOOR, MEAL_BOWL, TOILET_SPOT, isFree, localDockOffset, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
 import { readAssetBytes } from './assetBytes';
 import {
@@ -170,6 +170,7 @@ export class RoomController {
   private onRebootEvent?: (event: RebootEvent) => void;
   private rebootHandMarker?: THREE.Group;
   private rebootTime = 0;
+  private readonly rebootDockOffset = new THREE.Vector3();
   private readonly reboot = new RebootDirector({
     navigate: point => !!this.navigateTo(point),
     stop: () => { this.path = []; this.destination = null; this.targetRing.visible = false; this.restoreBaseClip(); },
@@ -357,7 +358,8 @@ export class RoomController {
     if (this.rebootHandMarker) this.rebootHandMarker.visible = !!this.rebootView?.handOffered && !nextSleeping;
     const hat = this.loadedPet?.getObjectByName('RebootHat');
     if (hat) hat.visible = !!this.rebootView?.hatWorn;
-    this.navigationOptions = { tableInstalled: props.tableInstalled ?? true, toiletInstalled: !!props.toiletInstalled };
+    this.navigationOptions = { tableInstalled: props.tableInstalled ?? true, toiletInstalled: !!props.toiletInstalled,
+      ...(this.rebootView ? { cushion: { x: this.rebootView.cushion.x, z: this.rebootView.cushion.z, rx: .91 * .72 + .18, rz: .68 * .72 + .18 } } : {}) };
     if (props.mealCue && props.mealCue.token !== this.lastMealToken) {
       if (nextSleeping) this.lastMealToken = props.mealCue.token;
       else if (!this.mixer) this.pendingMealToken = props.mealCue.token;
@@ -694,6 +696,7 @@ export class RoomController {
 
   private runtimeSnapshot(): RoomRuntimeSnapshot {
     const interaction = this.currentInteraction();
+    const visual = this.petOrientation.getWorldPosition(new THREE.Vector3());
     return { restMode: this.restMode, sleeping: this.sleeping, interactionEnabled: this.interactionEnabled,
       interaction, clip: this.activeAction?.getClip().name ?? null,
       blockedBy: !this.frames.running ? 'background' : interaction === 'panel' ? 'panel'
@@ -704,7 +707,9 @@ export class RoomController {
       destination: this.destination ? { ...this.destination } : null,
       mealCue: { remaining: this.cueRemaining, committed: this.cueCommitted,
         pendingToken: this.pendingMealToken, lastToken: this.lastMealToken },
-      pendingLifeToken: this.pendingLifeCommand?.token, lastLifeToken: this.lastPropLifeToken };
+      pendingLifeToken: this.pendingLifeCommand?.token, lastLifeToken: this.lastPropLifeToken,
+      ...(this.rebootView ? { rebootIntent: this.reboot.current, rebootPose: this.reboot.pose ? { ...this.reboot.pose } : null,
+        visualRoot: { x: visual.x, y: visual.y, z: visual.z } } : {}) };
   }
 
   private project(object: THREE.Object3D, elevation = 0) {
@@ -750,7 +755,10 @@ export class RoomController {
     if (!this.interactionEnabled || !canStartRoomInteraction(this.currentInteraction(), 'move')) return null;
     const target = nearestFree(raw, this.navigationOptions);
     if (!target) return null;
-    const path = route(this.position, target, this.navigationOptions);
+    const exitOptions = this.rebootView && !isFree(this.position, this.navigationOptions) &&
+      isFree(this.position, { ...this.navigationOptions, cushion: false })
+      ? { ...this.navigationOptions, cushion: false as const } : this.navigationOptions;
+    const path = route(this.position, target, exitOptions);
     if (!path.length) return null;
     this.interruptFreePresentation();
     this.path = path; this.destination = target;
@@ -893,8 +901,24 @@ export class RoomController {
     this.mixer?.update(dt);
     this.applyMorphOverlay();
     if (this.livingEnabled || this.comparisonStretchProgress !== undefined) this.applyLifePose();
-    if (this.rebootView && this.loadedPet && !this.sleeping) applyRebootPose(this.petOrientation, this.loadedPet,
-      this.reboot.pose, this.rebootTime, !!this.path.length, this.reducedMotion);
+    if (this.rebootView && this.loadedPet && !this.sleeping) {
+      applyRebootPose(this.petOrientation, this.loadedPet, this.reboot.pose, this.rebootTime,
+        !!this.path.length, this.reducedMotion, this.position, this.facing);
+      const dock = this.reboot.pose?.dockTarget && ['contact', 'recover'].includes(this.reboot.pose.phase);
+      if (dock) {
+        const p = this.petOrientation.position;
+        this.rebootDockOffset.set(p.x * Math.cos(this.facing) + p.z * Math.sin(this.facing), p.y,
+          -p.x * Math.sin(this.facing) + p.z * Math.cos(this.facing));
+      } else if (this.rebootDockOffset.lengthSq() > 1e-7) {
+        // Canceling/moving a cushion settles the visual offset without a snap
+        // and without completing an interrupted experience or economic command.
+        this.rebootDockOffset.multiplyScalar(Math.exp(-12 * dt));
+        const p = this.rebootDockOffset;
+        this.petOrientation.position.x += p.x * Math.cos(this.facing) - p.z * Math.sin(this.facing);
+        this.petOrientation.position.z += p.x * Math.sin(this.facing) + p.z * Math.cos(this.facing);
+        this.petOrientation.position.y += p.y;
+      }
+    }
     const frameSubmitted = this.submissions.shouldSubmit(
       timestamp,
       this.modelReady || this.submissionIntervalMs === 0,
@@ -949,6 +973,7 @@ export class RoomController {
     this.refreshMorphOverlay();
     this.life.cancel();
     this.reboot.cancel();
+    this.rebootDockOffset.set(0, 0, 0);
     if (this.rebootView) { this.petOrientation.position.set(0, 0, 0); this.petOrientation.rotation.set(0, 0, 0); this.petOrientation.scale.set(1, 1, 1); }
     this.path = []; this.destination = null; this.targetRing.visible = false;
   }

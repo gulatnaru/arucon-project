@@ -10,7 +10,8 @@ export type RebootSnapshot = { schemaVersion: 1; petId: string; revision: number
 export type RebootCommand = Readonly<{ token: string; kind: RebootIntent; sourceRevision: number;
   target?: FloorPoint; resume?: 'explore' | 'dash' | 'stretch'; itemRevision?: number }>;
 export type RebootEvent = Readonly<{ token: string; kind: RebootIntent; phase: 'start' | 'look' | 'approach' | 'contact' | 'recover' | 'complete' | 'cancel';
-  automatic: boolean; stage: RebootStage; sourceRevision: number; itemRevision?: number; target?: FloorPoint }>;
+  automatic: boolean; stage: RebootStage; sourceRevision: number; itemRevision?: number; target?: FloorPoint;
+  rememberedPosition?: FloorPoint; currentTarget?: FloorPoint }>;
 export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revision: number;
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand }>;
 export const REBOOT_SCALE: Record<RebootStage, number> = { baby: .53, growing: .48, evolved: .43 };

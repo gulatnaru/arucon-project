@@ -2,7 +2,7 @@ import type { FloorPoint } from '../scene/types';
 import { REBOOT_HAND, type RebootCommand, type RebootEvent, type RebootIntent, type RebootStage, type RebootView } from './contracts';
 
 export type RebootWorld = { enabled: boolean; awake: boolean; moving: boolean; touching: boolean; position: FloorPoint; view: RebootView };
-export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number; gazeTarget?: FloorPoint };
+export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number; gazeTarget?: FloorPoint; dockTarget?: FloorPoint };
 type Intent = { command: RebootCommand; phase: RebootEvent['phase']; elapsed: number; automatic: boolean; releaseFrom?: number };
 let sessionSequence = 0;
 /** One persistent actor. Frame updates contain no lookup, promise, React or SQL. */
@@ -22,7 +22,9 @@ export class RebootDirector {
   get current() { return this.intent ? { kind: this.intent.command.kind, phase: this.intent.phase, token: this.intent.command.token } : null; }
   private emit(phase: RebootEvent['phase']) {
     if (!this.intent || !this.view) return;
-    this.ports.event({ ...this.intent.command, phase, automatic: this.intent.automatic, stage: this.view.stage });
+    this.ports.event({ ...this.intent.command, phase, automatic: this.intent.automatic, stage: this.view.stage,
+      ...(['rest', 'cushion_changed'].includes(this.intent.command.kind) ? { currentTarget: this.view.cushion } : {}),
+      ...(this.intent.command.kind === 'cushion_changed' && this.intent.command.target ? { rememberedPosition: this.intent.command.target } : {}) });
   }
   cancel() { if (this.intent) this.emit('cancel'); this.intent = undefined; this.touched = undefined; this.pose = undefined; this.ports.stop(); this.idle = 1.8; }
   private begin(command: RebootCommand, automatic: boolean) {
@@ -72,13 +74,18 @@ export class RebootDirector {
     const i = this.intent!;
     i.elapsed += Math.min(dt, .1);
     if (i.command.kind.startsWith('hat') && !w.view.hatWorn) { this.cancel(); return; }
-    if (i.command.kind === 'cushion_changed' && i.command.itemRevision !== w.view.cushion.revision) { this.cancel(); return; }
+    if (['rest', 'cushion_changed'].includes(i.command.kind) && i.command.itemRevision !== undefined &&
+        i.command.itemRevision !== w.view.cushion.revision) { this.cancel(); return; }
     const recoveryDuration = w.view.stage === 'baby' ? 1.4 : 2.2;
     this.pose = { kind: i.command.kind, phase: i.phase,
       progress: Math.min(1, i.elapsed / (i.phase === 'recover' ? recoveryDuration : this.contactDuration(i.command.kind))),
       releaseFrom: i.releaseFrom, stage: w.view.stage, held: this.touching || this.hand,
-      ...(i.command.kind === 'hand' && i.command.target ? { gazeTarget: i.command.target } : {}) };
-    if (i.phase === 'look' && i.elapsed >= (w.view.stage === 'baby' ? .65 : .30)) {
+      ...(i.command.kind === 'hand' && i.command.target ? { gazeTarget: i.command.target } : {}),
+      ...(i.command.kind === 'cushion_changed' && i.phase === 'look' ? { gazeTarget: i.command.target ?? w.view.cushion } : {}),
+      ...(['rest', 'cushion_changed'].includes(i.command.kind) ? { dockTarget: w.view.cushion } : {}) };
+    // Remembered coordinates are a glance only; route/dock always use current truth.
+    const lookDuration = i.command.kind === 'cushion_changed' ? 1.1 : w.view.stage === 'baby' ? .65 : .30;
+    if (i.phase === 'look' && i.elapsed >= lookDuration) {
       const target = i.command.kind === 'hand' ? { x: REBOOT_HAND.x, z: REBOOT_HAND.z - .48 }
         : i.command.kind === 'cushion_changed' ? w.view.cushion
           : i.command.kind === 'hat_first' ? { x: Math.min(1.6, w.position.x + .38), z: Math.max(-.3, w.position.z - .25) } : i.command.target;

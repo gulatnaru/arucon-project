@@ -12,7 +12,7 @@ import { projectPetRest } from '../presentation/petRest';
 import { utcFixtureDay } from '../application/devClock';
 import { RebootMemoryStore } from './memory';
 import { eligibleMemories, hatReaction, REBOOT_ITEM, type RebootCommand, type RebootEvent, type RebootSnapshot, type RebootStage } from './contracts';
-import type { FloorPoint } from '../scene/types';
+import type { FloorPoint, RoomRuntimeSnapshot } from '../scene/types';
 import type { RoomPerformanceCapture, RoomPerformanceSummary } from '../scene/performanceProbe';
 import { RebootSemanticQueue } from './semantic';
 import { nativeEmbeddingPort } from './nativeEmbedding';
@@ -30,12 +30,14 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const [quiet, setQuiet] = useState(false), [reduced, setReduced] = useState(false), [busy, setBusy] = useState(false);
   const [error, setError] = useState(''), [captureToken, setCaptureToken] = useState<string>();
   const [backend, setBackend] = useState<'A' | 'B'>('A'), [modelStatus, setModelStatus] = useState('A · 구조화된 실제 기억');
+  const [evidenceStatus, setEvidenceStatus] = useState('');
   const backendRef = useRef<'A' | 'B'>('A');
   const service = useRef<ApprovedMvpService | null>(null), memories = useRef<RebootMemoryStore | null>(null);
   const latest = useRef({ pet, memory }), alive = useRef(true), sequence = useRef(0), epoch = useRef(0);
   const queue = useRef<Promise<void>>(Promise.resolve()), retry = useRef<(() => Promise<CommandResult>) | null>(null);
   const activeIntent = useRef<RebootEvent | null>(null), trace = useRef<object[]>([]);
   const perf = useRef<RoomPerformanceSummary | undefined>(undefined), capture = useRef<RoomPerformanceCapture | undefined>(undefined);
+  const runtime = useRef<RoomRuntimeSnapshot | undefined>(undefined);
   const semantic = useRef(new RebootSemanticQueue(null));
   const token = useCallback((kind: string) => `reboot:${PET_ID}:${kind}:${Date.now()}:${++sequence.current}`, []);
   const apply = useCallback((x: CommandResult) => {
@@ -144,9 +146,9 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-01-v5',
-      pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current,
-      ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setBubble('검토 기록을 기기 안에 저장했어요.'); }
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-01-v7',
+      pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
+      ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
   };
   const chooseBackend = async () => {
@@ -180,7 +182,8 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       onPetTouch={() => { const id = token('touch'); void run(async () => ({ state: await service.current!.interact(now(), id, 'touch', utcFixtureDay(now()).id) })); }}
       onStatus={setBubble} onFurnitureHit={kind => { if (kind === 'cushion') setCommand({ token: token('rest'), kind: 'rest', sourceRevision: memory.revision, target: memory.cushion, itemRevision: memory.cushion.revision }); }}
       reactionBubble={!quiet && bubble ? <View style={styles.bubble}><Text style={styles.bubbleText}>{bubble}</Text><Pressable accessibilityLabel="말풍선 닫기" onPress={() => setBubble('')}><Text>×</Text></Pressable></View> : undefined}
-      onPerformanceSummary={x => { perf.current = x; }} performanceCaptureToken={captureToken} onPerformanceCapture={x => { capture.current = x; }} />
+      onPerformanceSummary={x => { perf.current = x; }} performanceCaptureToken={captureToken} onPerformanceCapture={x => { capture.current = x; }}
+      onRuntimeSnapshot={x => { runtime.current = x; }} />
     <View pointerEvents="box-none" style={[styles.header, { top: insets.top + 8 }]}>
       <View><Text style={styles.name}>{pet.givenName}</Text><Text style={styles.level}>Lv.{growth.level} · 검토</Text><View style={styles.track}><View style={[styles.progress, { width: `${Math.max(0, Math.min(100, (growth.atFinalLevel ? 1 : growth.expIntoLevelUnits / Math.max(1, growth.expIntoLevelUnits + (growth.expToNextLevelUnits ?? 0))) * 100))}%` }]} /></View></View>
       <Pressable accessibilityLabel="리부트 메뉴 열기" style={styles.menuButton} onPress={() => { setHand(false); setPlacement(false); setMenu('main'); }}><Text>☰</Text></Pressable>
@@ -214,6 +217,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
             <Pressable style={styles.row} accessibilityLabel={backend === 'A' ? '로컬 검색 B 준비' : '구조화된 기억 A 사용'} onPress={() => { void chooseBackend(); }}><Text>{backend === 'A' ? '로컬 검색 B 준비 / 비교' : '구조화된 기억 A로 비교'}</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel="60초 리부트 성능 측정" onPress={() => { setCaptureToken(token('performance')); setMenu(null); }}><Text>60초 검토 성능 기록</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel="리부트 검토 기록 저장" onPress={exportEvidence}><Text>검토 기록 저장</Text></Pressable>
+            {!!evidenceStatus && <Text accessibilityLiveRegion="polite">{evidenceStatus}</Text>}
             <Pressable disabled={busy} style={styles.row} accessibilityLabel="원래 방으로 돌아가기" onPress={() => { cancel(); onExit(); }}><Text>원래 방으로 돌아가기</Text></Pressable>
           </>}
         </ScrollView>

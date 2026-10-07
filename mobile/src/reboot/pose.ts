@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { RebootPose } from './director';
 import type { FloorPoint } from '../scene/types';
+import { localDockOffset } from '../scene/navigation';
 
 /** Arrival faces the offered hand, never the heading of the last route segment. */
 export function rebootFacing(pose: RebootPose | undefined, position: FloorPoint, facing: number, dt: number): number {
@@ -16,7 +17,7 @@ export function rebootFacing(pose: RebootPose | undefined, position: FloorPoint,
 
 /** Whole attached body motion and facial morphs; no content/DB access. */
 export function applyRebootPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
-  time: number, moving: boolean, reduced: boolean) {
+  time: number, moving: boolean, reduced: boolean, position?: FloorPoint, facing = 0) {
   orientation.position.set(0, 0, 0); orientation.rotation.set(0, 0, 0); orientation.scale.set(1, 1, 1);
   const front = model.getObjectByName('Foot_R_Front'), left = model.getObjectByName('Foot_L_Front');
   for (const name of ['Foot_R_Front', 'Foot_L_Front', 'Foot_R_Back', 'Foot_L_Back']) model.getObjectByName(name)?.position.set(0, 0, 0);
@@ -53,7 +54,12 @@ export function applyRebootPose(orientation: THREE.Group, model: THREE.Object3D,
       orientation.position.x = (first ? .12 : .04) * contactPulse * soft;
       if (!first) front?.position.set(0, .23 * contactPulse * soft, .05 * contactWeight);
     } else if ((contact || recovering) && (pose.kind === 'rest' || pose.kind === 'cushion_changed')) {
-      orientation.position.y = .30 * Math.min(1, contactProgress * 4) * contactWeight;
+      const settle = Math.min(1, contactProgress * 4) * contactWeight;
+      if (position && pose.dockTarget) {
+        const offset = localDockOffset(position, pose.dockTarget, facing, settle);
+        orientation.position.x = offset.x; orientation.position.z = offset.z;
+      }
+      orientation.position.y = .30 * settle;
       orientation.scale.set(1 + .06 * contactPulse, 1 - .12 * contactPulse, 1 + .06 * contactPulse);
       orientation.rotation.z = -.11 * contactPulse * soft;
     } else if ((contact || recovering) && pose.kind === 'stretch') {

@@ -21,12 +21,14 @@ const OBSTACLES = [
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 const valid = (p: FloorPoint) => Number.isFinite(p.x) && Number.isFinite(p.z);
-export type NavigationOptions = { tableInstalled?: boolean; toiletInstalled?: boolean };
+export type NavigationOptions = { tableInstalled?: boolean; toiletInstalled?: boolean;
+  /** undefined preserves the legacy fixed room; review uses its current object. */
+  cushion?: { x: number; z: number; rx: number; rz: number } | false };
 
 function obstacles(options: NavigationOptions) {
   return [
     ...(options.tableInstalled ?? true ? [OBSTACLES[0]] : []),
-    OBSTACLES[1], OBSTACLES[2],
+    ...(options.cushion === false ? [] : [options.cushion ?? OBSTACLES[1]]), OBSTACLES[2],
     ...(options.toiletInstalled ? [{ ...TOILET_SPOT, rx: 0.85, rz: 0.85 }] : []),
   ];
 }

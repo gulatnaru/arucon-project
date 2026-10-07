@@ -61,6 +61,23 @@ test('write failure rolls back; bounded memory and economic tables remain separa
   for (let i = 0; i < 90; i++) s = await store.complete({ ...fact, eventId: 'done:'+i }, s.revision);
   assert.equal(s.events.length, 64); assert.equal(db.native.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE name='meal_ledger'").get()?.n, 0);
 });
+test('autonomous rest repeats cannot erase completed familiarity; cold recall keeps current cushion latest', async () => {
+  const db = new DB(), store = new RebootMemoryStore(db, fact.petId); await store.load();
+  let s = await store.wear(true);
+  s = await store.complete({ ...fact, context: 'hat_first' }, s.revision);
+  const oldCushion = { ...s.cushion };
+  s = await store.complete({ ...fact, eventId: 'rest:old', kind: 'cushion_used', itemId: REBOOT_ITEM.cushion,
+    context: 'rest', itemRevision: oldCushion.revision, position: oldCushion }, s.revision);
+  s = await store.moveCushion({ x: 1.4, z: 1.8 }, s.revision);
+  for (let i = 0; i < 90; i++) s = await store.complete({ ...fact, eventId: `rest:${i}`, kind: 'cushion_used',
+    itemId: REBOOT_ITEM.cushion, context: 'rest', itemRevision: s.cushion.revision, position: { ...s.cushion } }, s.revision);
+  const cold = await new RebootMemoryStore(db, fact.petId).load();
+  assert.equal(cold.events.length, 64); assert.equal(hatReaction(cold), 'hat_again');
+  assert.ok(cold.events.some(e => e.eventId === fact.eventId));
+  assert.deepEqual(cold.events.filter(e => e.kind === 'cushion_used').at(-1)?.position, cold.cushion);
+  assert.deepEqual(cold.events.find(e => e.eventId === 'rest:old')?.position, oldCushion);
+  assert.equal(hatReaction(await new RebootMemoryStore(db, 'reboot-01:other').load()), 'hat_first');
+});
 test('hand is not contact before approach; early withdrawal never completes experience', () => {
   const events: RebootEvent[] = [], world: RebootWorld = { enabled: true, awake: true, moving: false, touching: false,
     position: { x: 0, z: 1 }, view: { stage: 'baby', hatWorn: false, revision: 0, handOffered: true, cushion: { x: -1, z: 0, revision: 0 } } };
@@ -125,6 +142,31 @@ test('offered-hand contact faces its target from either approach without a sudde
       assert.ok(Math.abs(Math.atan2(Math.sin(facing), Math.cos(facing))) < .01);
       assert.equal(rebootFacing({ ...pose, phase: 'approach' }, { x: 0, z: 2.87 }, start, .1), start);
     }
+  }
+});
+test('moved cushion glances at completed old position but approaches and docks at current truth', () => {
+  const events: RebootEvent[] = [], destinations: { x: number; z: number }[] = [], old = { x: -1.6, z: .2 }, current = { x: 1.45, z: 1.87, revision: 1 };
+  const world: RebootWorld = { enabled: true, awake: true, moving: false, touching: false, position: { x: 0, z: 1.8 },
+    view: { stage: 'evolved', hatWorn: false, revision: 1, handOffered: false, cushion: current,
+      command: { token: 'move:1', kind: 'cushion_changed', sourceRevision: 1, target: old, itemRevision: 1 } } };
+  const director = new RebootDirector({ navigate: p => { destinations.push(p); return true; }, stop: () => {}, event: e => events.push(e) });
+  director.update(.1, world); assert.deepEqual(director.pose?.gazeTarget, old); assert.deepEqual(director.pose?.dockTarget, current);
+  for (let i=0;i<14;i++) director.update(.1, world);
+  assert.deepEqual(destinations[0], current);
+  assert.deepEqual(events.find(e => e.phase === 'look')?.rememberedPosition, old);
+  assert.deepEqual(events.find(e => e.phase === 'contact')?.currentTarget, current);
+  world.view = { ...world.view, cushion: { x: -1.1, z: 2.4, revision: 2 } }; director.update(.1, world);
+  assert.equal(director.pose, undefined); assert.equal(events.some(e => e.phase === 'complete'), false);
+});
+test('cushion rest visual root reaches current object through turned parent and recovers without stale offset', () => {
+  const model = new THREE.Group(), orientation = new THREE.Group(), parent = new THREE.Group();parent.add(orientation);
+  const position = { x: .55, z: 1.87 }, target = { x: 1.45, z: 1.87 };
+  for (const facing of [-Math.PI, -.8, 0, 1.7]) {
+    parent.position.set(position.x,0,position.z);parent.rotation.y=facing;
+    applyRebootPose(orientation, model, { kind:'rest',phase:'contact',progress:1,held:false,stage:'evolved',dockTarget:target },0,false,false,position,facing);
+    const world = orientation.getWorldPosition(new THREE.Vector3());assert.ok(Math.abs(world.x-target.x)<1e-10);assert.ok(Math.abs(world.z-target.z)<1e-10);assert.ok(Math.abs(world.y-.30)<1e-10);
+    applyRebootPose(orientation, model, { kind:'rest',phase:'recover',progress:1,releaseFrom:1,held:false,stage:'evolved',dockTarget:target },0,false,false,position,facing);
+    assert.equal(orientation.position.lengthSq(),0, 'recovery returns to zero offset including signed zero');
   }
 });
 test('semantic queue TEST DOUBLE rejects stale owner/state and invalid vectors, never invents actions', async () => {

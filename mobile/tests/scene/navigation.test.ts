@@ -53,6 +53,15 @@ test('uninstalled table does not remain an invisible obstacle', () => {
   assert.equal(isFree(table, { tableInstalled: false }), true);
   assert.deepEqual(nearestFree(table, { tableInstalled: false }), table);
 });
+test('review cushion collision follows actual placement and frees the old location', () => {
+  const cushion = { x: 1.45, z: 1.87, rx: .83, rz: .67 }, options = { tableInstalled: false, cushion };
+  assert.equal(isFree({ x: -2.05, z: .2 }, options), true);
+  assert.equal(isFree(cushion, options), false);
+  const approach = nearestFree(cushion, options)!;
+  assert.ok(isFree(approach, options)); assert.ok(Math.hypot(approach.x - cushion.x, approach.z - cushion.z) < 1);
+  assert.ok(route({ x: 0, z: 1.8 }, approach, options).length);
+  assert.equal(isFree({ x: -2.05, z: .2 }), false, 'legacy room retains its fixed layout');
+});
 
 test('installed toilet creates a collision boundary', () => {
   const toilet = { x: -2.1, z: -1.62 };
