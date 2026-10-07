@@ -1,6 +1,40 @@
-# Next resume — fresh macOS iOS validation
+# Next resume — REBOOT-01 첫 범위
 
-## LIFE-02 현재 지점 — READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
+## 현재 PARTIAL_WITH_BLOCKERS / 2026-10-07
+
+[실행 지시](tasks/REBOOT-01-core-experience-and-memory.md)와 [현재 보고](REBOOT-01-REPORT.md)를 읽고 이어간다. LIFE-02는 기능 검증 이력이며 사용자는 재미·성격·외형이 불충족이라고 평가했다. SOL_DIRECT / SELF_REVIEW / 새 subagent 없이 한 계열·세 모습·손 교감·모자 하나·쿠션 이동만 마무리한다. 기존 30개 저장과 원본 아트, 경제·진화·건강 OFF를 보존한다. DB 초기화·과거 reset·전계열/새1~20 전체 제작 금지.
+
+### 다음 한 작업
+
+**Mac 실제 화면/입력 접근 확인 → 현재 v3의 정상 메뉴/설정 → 리부트 첫 검토판 → 우리 아이에서 세 모습 → 손 내밀기/접근/접촉/거두기/생활 복귀.**
+
+현재 실제 CUA가 Mac locked를 확인했고 잠금 해제를 요청했다. 잠금/TCC/보안 우회나 이전 LIFE-02 영상·테스트 숫자로 시각·입력 PASS를 만들지 않는다. 잠금 해제 후 자동 재개를 약속하지 않는다.
+
+### 설치본과 저장
+
+앱 소스 checkpoint **`8e012eb6f37a6af3021e461fc5a283768eab1a1a`**. 후속 문서 HEAD와 구분하고 현재 Git/dirty/설치 hash를 직접 확인한다. 과거 커밋으로 reset하지 않는다.
+
+- 현재 **REBOOT-01 v3 Release**, bundle SHA `1b380d85c43002d58e4ae4cc19401204494affd91fee5dbcf37fc658f06fcf09`.
+- iPhone16e UUID `2170BD93-715C-482E-AD9C-DD7479970003`, embedded Release라 Metro 불필요. source manifest `evidence/reboot-01-2026-10-07/release-v3-manifest.json`의 파일 해시와 실제 HEAD를 대조한다. 동일하면 불필요한 재빌드/재설치 금지.
+- compile/install/process start는 PASS. 새 검토판의 실제 시각·정상 입력은 BLOCKED이며 전체 앱 실행 PASS와 같지 않다.
+- 데이터 컨테이너는 `simctl get_app_container ... data`로 새로 조회한다. 설치 후 경로가 바뀔 수 있으므로 과거 UUID를 고정하지 않는다. v3 설치 후 기존 30개 이름·형태·성격·먹이·코인·EXP·식사·시설 값 일치, 두 DB integrity `ok` 확인. 원래 선택된 모리20 저장도 보존했다.
+- 새 검토 화면은 `reboot_review` / `arucon-reboot-review.db`, pet `reboot-01:main` / 아루다. 세 모습은 비교 프리뷰이며 Lv/EXP/진화 조작이 아니다.
+
+### 같은 빌드에서 남은 검증
+
+세 모습의 동일 손 교감/말풍선 가리기/직접 접촉/생활 복귀 → 첫·재·행동 중 모자와 뿔 간섭 → 쿠션 실제 바닥 이동/옛 기억/현재 좌표 → 메뉴 닫기·큰 글자·화면 끝·동작 줄이기 → background/cold/동일 개체 기억 → 정상 수면·깨우기와 격리 동면 복귀 → 기존 저장·일반 위젯 보존 → 최신 Release 성능/정상 속도 영상. 전후·중간 동작은 실제 화면에서 판정한다. 결함이면 영향 검사→필요 Release→수정된 같은 설치본에서 재검증한다.
+
+v3는 소스 검토에서 바닥 이동의 오래된 의도 취소, 모자 제거 취소, 손 접촉 자세의 부드러운 복원과 성장기 잔여 앞발 offset을 수정했다. 이번 전체387/387·영향11/11·lint/typecheck·Android JS bundle·iOS Release/CNG23/23·운영42/42 PASS. **실제 연기·입력·현재 성능은 미검증**이다.
+
+### AI 가지
+
+Mac CPU의 실제 한국어768차원/호스트24개 A/B는 수행했고 A/B Recall@2 모두1.0, 불필요/범위 위반0이다. 작은 합성 검색 평가이며 B 우월성/게임효과/폰 지원을 증명하지 않는다. Node 더블은 TEST_DOUBLE이다.
+
+v2의 실제 native MediaPipe1.1.0 + 공식 text-only LiteRT 모델 초기화는 `tf_lite_vision_encoder not found`로 **AI_ADAPTER_BLOCKED**. v3도 동일 adapter/SDK/모델이며 성공으로 재표기하지 않는다. 공개 원본에서 모든 encoder backend 초기화, Swift 옵션에 text-only 선택 경로 없음 확인. 기본 A 유지, native AB24/AI ON-OFF 성능 NOT_RUN. 정확한 공식 호환경로라는 새 근거가 있을 때만 재검토하며 무한 변환/다운로드/SDK 내부 패치 금지. 모델/리비전/해시/실패는 보고서와 로컬 증거에 있다.
+
+재미·최종 아트 USER_REVIEW_PENDING. Android 최신 native/UI와 실기기/GPU/물리 입력/발열·배터리 NOT_RUN. Feature checkpoint/일반 push만, main/merge/force/tag/release/배포/실건강/실결제/전역 설치/보안 변경/외부 업로드 금지. 모델/SDK/DB/빌드/영상은 ignored 로컬만 사용한다.
+
+## Historical — LIFE-02 기능 검토 지점 / 2026-10-07
 
 현재 iOS Simulator의 **growth-v5**로 남은 실제 검증을 마쳤다. 앱 소스 `6155b22a56d9cf81b33b356cdecb0737f669a61c`, 설치 bundle SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12` 일치. 착수 HEAD `31a307f`, 현재 최종 문서 checkpoint는 Git과 최종 응답에서 확인한다. 앱 소스 변경·재빌드·재설치·DB 초기화·과거 reset 없음. SOL_DIRECT / SELF_REVIEW / 새 subagent0, effective ROUTING_UNVERIFIED다.
 

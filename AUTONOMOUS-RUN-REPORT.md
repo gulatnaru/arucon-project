@@ -1,6 +1,16 @@
 # iOS validation history and Release input resume
 
-## 현재 SOL_DIRECT — LIFE-02 / READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
+## 현재 SOL_DIRECT — REBOOT-01 / PARTIAL_WITH_BLOCKERS / 2026-10-07
+
+사용자가 LIFE-02의 재미·성격·외형이 의도에 미치지 못한다고 평가해 첫 범위만 다시 구현했다. 첨부 원문을 tasks에 그대로 보존했고, 한 계열의 새 세 모델·손 교감·모자 경험·이동 가능한 쿠션 기억을 기존 앱의 분리 검토 화면에 연결했다. 실제 같은 빌드에서 자연스러운 연기와 플레이를 확인하는 단계는 **현재 실제 Mac locked**로 막혔다. 과거 기능 PASS를 재미 승인이나 최신 시각 증거로 사용하지 않는다.
+
+최신 v3 Release SHA `1b380d85c43002d58e4ae4cc19401204494affd91fee5dbcf37fc658f06fcf09`, iOS arm64 Simulator compile/install/process start 성공. 설치 후 기존30개 이름·성격·형태·재화·EXP·섭취·시설 값 일치/두DB integrityok. 새387/387·영향11/11·lint/typecheck·Android JS bundle·iOS CNG23/23·운영42/42 PASS. 바닥 이동의 옛 의도 취소·모자 제거·손 복원과 성장기 앞발 잔여 offset을 소스 SELF_REVIEW에서 수정했다. 실제 새 시각·입력·모션·현재 성능과 영상은 BLOCKED/NOT_RUN이다.
+
+Mac 호스트 실제 한국어 EmbeddingGemma2/768차원과24개 A/B는 수행했으나 두 경로 Recall@2모두1.0으로 B 우월성을 확인하지 못했다. v2 실제 native SDK 초기화는 text-only 모델에 vision encoder를 요구해 AI_ADAPTER_BLOCKED, v3 동일 SDK/adapter이며 기본A 유지. native A/B와 AI ON/OFF 성능은 미실행이다. 외부 데이터 전송·SDK 내부 패치·전역 설치·보안 우회 없음.
+
+SOL_DIRECT / SELF_REVIEW / subagent0 / effective ROUTING_UNVERIFIED. 재미·최종 아트 USER_REVIEW_PENDING, 실기기/GPU/물리 입력/발열·배터리 NOT_RUN. [현재 결과·도구·파일 해시·남은 검증](REBOOT-01-REPORT.md), [다음 한 작업](NEXT-RESUME.md). Feature checkpoint/일반push만 허용하며 이전 LIFE-02 결과는 아래 이력으로 보존한다.
+
+## Historical — LIFE-02 / READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
 
 현재 Mac의 실제 화면·입력 접근은 성공했다. 착수HEAD31a307f와 앱 소스6155b22/현재growth-v5 SHA `92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12`를 대조했고 앱 수정·재빌드·재설치·DB 초기화 없이 남은 검증을 마쳤다. 과거 locked/v4 기록은 아래 이력이며 새 PASS로 복사하지 않았다.
 

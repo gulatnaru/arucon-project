@@ -1,6 +1,24 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 LIFE-02 — READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
+## 현재 REBOOT-01 — 첫 교감·외형·기억 재검토 / PARTIAL_WITH_BLOCKERS
+
+LIFE-02 기능 PASS는 아래 보존하지만 사용자가 재미·성격·외형을 승인하지 않았다. [첨부 실행 기준](tasks/REBOOT-01-core-experience-and-memory.md)과 [현재 보고](REBOOT-01-REPORT.md)의 첫 범위만 진행한다. 새 소스/설치 v3와 과거 영상을 혼합하지 않는다.
+
+| 범위 | 현재 분류 | 실제 결과/남은 일 |
+|---|---|---|
+| 기존 저장·원본·경제/성장 계약 | PASS | v3 설치 후30개 정체성·재화·EXP·식사·시설 값 일치, integrityok. 원본 GLB 동일, 공통 SQLite lane·중복 정산 재사용 |
+| 세 성장 모습·작은 얼굴·한 뿔 | BLOCKED_ENV | 편집 소스/새 세 GLB 생성·구조 검사, 최신 compile PASS. 실제 silhouette/얼굴/귀·발·장착물 비교는 Mac locked |
+| 손 교감·성장별 표현·자율 리듬 | BLOCKED_ENV | 유지되는 actor/접근·접촉·복원·생활 연결과 자동 검사. 실제 정상 속도 연기·입력은 미검증 |
+| 모자 경험·쿠션 이동·동일 개체 기억 | BLOCKED_ENV | 완료 사건/petId/현재좌표/취소/revision/bounded 저장 구현. 정상 메뉴·재실행 기억 반응 미검증 |
+| UI/수면·동면/전경·입력 회귀 | BLOCKED_ENV | 기존 서비스·rest projection 재사용. 최신 같은 화면에서 실제 복귀/메뉴/글자/프로필·위젯 확인 필요 |
+| 자동 검사·플랫폼 빌드 | PASS | 현재387/387·영향11/11·lint/typecheck·Android JS bundle·iOS arm64 Release compile/install/process start·CNG23/23·운영42/42. UI PASS를 뜻하지 않음 |
+| 실제 호스트 한국어 AI/A-B24 | PASS | google 모델 pinned revision/해시/Apache2.0, 실제768차원. A/B Recall@2모두1.0·불필요/위반0; B 효과/우월성은 미확인 |
+| 실제 native AI | BLOCKED_ENV | 공식 SDK1.1.0 실제 초기화가 `tf_lite_vision_encoder not found`로 실패. 기본A 유지, native AB24/AI ON-OFF성능 미실행 |
+| 현재 성능·실기기/GPU/물리 입력 | NEEDS_DEVICE_VALIDATION | 새 Release proxy/실제 표시/입력 영상은 현재 잠금으로 미실행, 실기기/GPU/물리 지연·발열·배터리 NOT_RUN |
+| 재미·최종 계열·최종 아트 | HARD_STOP_DECISION | USER_REVIEW_PENDING. 기존 모노와 이번 세 모습은 비교 초안, 사용자 불충족 평가 보존 |
+| 법률·실건강·외부 계정·실결제·출시 | HARD_STOP_EXTERNAL | 기존 경계 유지, 실제 건강/결제 OFF. 이번 범위로 권한 확대하지 않음 |
+
+## Historical — LIFE-02 — READY_FOR_GROWTH_PLAYTHROUGH / 2026-10-07
 
 최신 growth-v5/소스6155b22/설치92452f2a…를 실제 조작해 남은 iOS Simulator 범위를 완료했다. 앱 재구현·재빌드·재설치·원본/루미 초기화 없음. [현재 증거/장면](GROWTH-PLAYTHROUGH-REPORT.md). 아래 이력의 host lock/v4 PASS를 최신 증거로 재사용하지 않았다.
 

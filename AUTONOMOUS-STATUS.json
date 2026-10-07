@@ -2,13 +2,13 @@
   "schemaVersion": 6,
   "runDate": "2026-10-07",
   "timezone": "Asia/Seoul",
-  "status": "READY_FOR_GROWTH_PLAYTHROUGH",
+  "status": "PARTIAL_WITH_BLOCKERS",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "LIFE-02 latest growth-v5 iOS Simulator native save, one-pet growth and normal-input review scope",
-  "reason": "Actual current Mac access succeeded. Preserved Rumi20 normal-menu/cold resume passed. A distinct Mori started at EXP0 and reached Lv20 through374 automatic synthetic-fed meals/6150EXP, one real Lv16 mono evolution and20 sequential checkpoints. Latest v5 native150 contention requests and replay protection passed; normal original/profile/input/restore and fixed60-second proxy gates passed. No app change, rebuild, reinstall or DB reset. Physical/GPU/physical latency and fun/final-art approval remain separate.",
-  "sourceBaseline": "d3c86a7b42c50c829fac73254d3078e9146ca2f4",
-  "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
-  "currentLivingReport": "GROWTH-PLAYTHROUGH-REPORT.md",
+  "definition": "REBOOT-01 first three-stage core interaction and memory review; user rejected LIFE-02 fun/art",
+  "reason": "First core code/assets, isolated memory and native Release prepared. Actual Mac re-locked before new UI/input validation. Real host Korean embedding/A-B24 passed; actual native text-only SDK initialization fails requesting missing vision encoder. No new visual/motion/normal-input PASS claimed.",
+  "sourceBaseline": "3a7a6c1bd7a28f3fa42b82430a54ff20a4fc0ddf",
+  "sourceCheckpoint": "8e012eb6f37a6af3021e461fc5a283768eab1a1a",
+  "currentLivingReport": "REBOOT-01-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
     "baselineCommit": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
@@ -326,12 +326,12 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "READY_FOR_GROWTH_PLAYTHROUGH_CURRENT_IOS_SIMULATOR_SYNTHETIC_SCOPE",
+    "independentLocalEngineering": "REBOOT_FIRST_CORE_PREPARED_ACTUAL_UI_BLOCKED",
     "productMvp": "NOT_COMPLETE",
-    "iosCurrentRuntime": "PASS_LATEST_V5_NORMAL_INPUT_GROWTH_SAVE_RESTORE",
+    "iosCurrentRuntime": "COMPILE_INSTALL_LAUNCH_PASS; CORE_VISUAL_INPUT_BLOCKED",
     "androidRuntime": "NOT_RUN_LATEST_NATIVE_UI_THIS_SCOPE",
-    "widgetRuntimeQa": "PASS_GENERAL_SNAPSHOT_ISOLATION_DURING_GROWTH; widget_tap_not_rerun_this_scope",
-    "performance": "PASS_FIXED_60_SECOND_PROXY_GATES_ON_B_OFF_A; ON_A_INPUT_INSUFFICIENT_DATA; physical/GPU/input-to-photon NOT_RUN"
+    "widgetRuntimeQa": "NOT_RUN_REBOOT_CURRENT; prior general snapshot isolation retained in historicalLife02At3a7a6c1",
+    "performance": "NOT_RUN_REBOOT_CURRENT; prior LIFE-02 proxy gates historical"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -544,79 +544,25 @@
     ]
   },
   "lastValidation": {
-    "runDate": "2026-10-07",
-    "scope": "Current installed growth-v5 actual iOS Simulator LIFE-02 finish",
-    "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
-    "installedBundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
-    "initialHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
-    "actualScreenInput": "PASS_ACTUAL_NORMAL_UI",
-    "nativeContention": "PASS150_FAILURES0; isolated DB",
-    "firstRumiResumeColdChain": "PASS_SAME_RUMI20",
-    "continuousGrowth": "V5_ACTUAL_MORI_SAME_PET_1_TO_20_PASS_374_AUTO_MEALS_6150_EXP_MONO_LV16",
-    "moriColdResumeInput": "PASS_SAME_MORI20",
-    "normalApplicationWrites": "PASS_OBSERVED_SETTLEMENT_TOUCH_MEMORY_SETTINGS_PROFILE_LIFECYCLE",
-    "ordinaryEconomy": "Sim/arucon/reserved/food0/coin15/EXP25.125/meal3 and existing Rumi20/mono/reserved/EXP6150/meal374/coin2140 unchanged",
-    "widgetIsolation": "FULL_SNAPSHOT_EQUAL_WHILE_TRIAL; general pet only",
+    "scope": "REBOOT-01 source/build/real host AI/native initialization probe; visual/input blocked",
+    "sourceManifest": "evidence/reboot-01-2026-10-07/release-v3-manifest.json",
     "mobileTests": {
-      "passed": 376,
-      "total": 376,
+      "passed": 387,
+      "total": 387,
       "failed": 0,
       "skipped": 0
     },
-    "lint": "PASS_FRESH",
-    "typecheck": "PASS_FRESH",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "cng": "23/23 PASS_CURRENT_IOS",
     "workflow": "42/42 PASS_FRESH",
-    "appBuildRerun": "NOT_RUN_APP_SOURCE_HASHES_UNCHANGED_NO_REBUILD_NEEDED",
-    "performanceCaptures": [
-      {
-        "label": "ON_A",
-        "durationMs": 60000,
-        "frames": 3555,
-        "submittedHz": 59.25455111197295,
-        "rafP95Ms": 17.773207902908325,
-        "rafMaxMs": 125.13441705703735,
-        "inputCount": 0,
-        "inputP95Ms": null,
-        "inputStatus": "insufficient_data",
-        "over500Ms": 0,
-        "frameStatus": "pass"
-      },
-      {
-        "label": "ON_B",
-        "durationMs": 60000,
-        "frames": 3137,
-        "submittedHz": 52.2812750717907,
-        "rafP95Ms": 30.241542100906372,
-        "rafMaxMs": 87.58416700363159,
-        "inputCount": 7,
-        "inputP95Ms": 21.070291996002197,
-        "inputStatus": "pass",
-        "over500Ms": 0,
-        "frameStatus": "pass"
-      },
-      {
-        "label": "OFF_A",
-        "durationMs": 60000,
-        "frames": 3202,
-        "submittedHz": 53.3757230216537,
-        "rafP95Ms": 29.555541038513184,
-        "rafMaxMs": 42.90945911407471,
-        "inputCount": 12,
-        "inputP95Ms": 21.946917057037354,
-        "inputStatus": "pass",
-        "over500Ms": 0,
-        "frameStatus": "pass"
-      }
-    ],
+    "actualScreenInput": "BLOCKED_HOST_LOCKED",
+    "nativeAi": "AI_ADAPTER_BLOCKED: tf_lite_vision_encoder not found in text-only model; actual SDK1.1.0 initialization failed",
+    "performance": "NOT_RUN_CURRENT_REBOOT_UI",
     "physicalGpuInput": "NOT_RUN",
-    "healthReads": "OFF",
     "userFunAndFinalArt": "USER_REVIEW_PENDING",
-    "effectiveModel": "ROUTING_UNVERIFIED",
-    "videoEvidence": [
-      "01-v5-rumi-resume-native.mp4:1188.176667s",
-      "10-v5-new-pet-growth-playthrough.mp4:2030.071667s"
-    ],
-    "evidence": "evidence/life-02-unlocked-2026-10-06/"
+    "healthReads": "OFF",
+    "sourceCheckpoint": "8e012eb6f37a6af3021e461fc5a283768eab1a1a"
   },
   "environment": {
     "host": "macOS 15.6",
@@ -627,12 +573,12 @@
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
     "softwareEmulator": "software_balanced, 1.5 DPR, vertex-lit material, sparse CPU morph, public flushEXP queue barrier; no fixed frame cap",
-    "hostLocked": false,
+    "hostLocked": true,
     "iosRuntime": "26.3.1",
     "xcode": "26.3",
-    "configuration": "Release; existing embedded growth-v5 bundle; no Metro needed",
-    "contentSize": "large restored; tested three Simulator increments and paired decrements",
-    "currentRendererSnapshot": "CURRENT_V5_SOFTWARE_BALANCED_585x1266_RENDER_SURFACE; proxy not GPU display",
+    "configuration": "Release; REBOOT-01 v3 embedded bundle; Metro not required",
+    "contentSize": "preserved existing setting; latest Reboot accessibility validation BLOCKED",
+    "currentRendererSnapshot": "NOT_MEASURED_REBOOT_V3; prior LIFE-02 renderer setup retained as history",
     "iosRuntimeLabel": "26.3",
     "iosRuntimeBuild": "23D8133",
     "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
@@ -1019,14 +965,15 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
-    "initialHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
+    "sourceCheckpoint": "8e012eb6f37a6af3021e461fc5a283768eab1a1a",
+    "initialHead": "3a7a6c1bd7a28f3fa42b82430a54ff20a4fc0ddf",
     "initialHeadTrackingLiveMatch": true,
     "initialClean": true,
-    "appSourceUnchanged": true,
+    "appSourceUnchanged": false,
     "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
-    "verificationEvidence": "evidence/life-02-unlocked-2026-10-06/git-final-audit.json",
-    "publicationRecordScope": "Feature documentation checkpoint only; final local/tracking/live-origin hashes and clean status recorded after publication"
+    "verificationEvidence": "evidence/reboot-01-2026-10-07/git-final-audit.json",
+    "publicationRecordScope": "Feature implementation/art/task checkpoint plus resume report; final hashes and clean status audited after push",
+    "publicationState": "SOURCE_CHECKPOINT_COMMITTED; report_checkpoint_and_normal_feature_push_to_be_audited_in_git-final-audit.json"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -1094,7 +1041,7 @@
       }
     }
   },
-  "evidenceDirectory": "evidence/life-02-unlocked-2026-10-06/",
+  "evidenceDirectory": "evidence/reboot-01-2026-10-07/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -1830,5 +1777,154 @@
     },
     "evidenceDirectory": "evidence/product-hardening-sol-unlocked-2026-10-04/"
   },
-  "implementedScope": "Historical SRS engineering inventory; current execution evidence is lastValidation/growthPlaythrough, not every earlier placeholder or external gate."
+  "implementedScope": "Historical SRS engineering inventory; current execution evidence is lastValidation/growthPlaythrough, not every earlier placeholder or external gate.",
+  "historicalLife02At3a7a6c1": {
+    "status": "READY_FOR_GROWTH_PLAYTHROUGH",
+    "reason": "Actual current Mac access succeeded. Preserved Rumi20 normal-menu/cold resume passed. A distinct Mori started at EXP0 and reached Lv20 through374 automatic synthetic-fed meals/6150EXP, one real Lv16 mono evolution and20 sequential checkpoints. Latest v5 native150 contention requests and replay protection passed; normal original/profile/input/restore and fixed60-second proxy gates passed. No app change, rebuild, reinstall or DB reset. Physical/GPU/physical latency and fun/final-art approval remain separate.",
+    "lastValidation": {
+      "runDate": "2026-10-07",
+      "scope": "Current installed growth-v5 actual iOS Simulator LIFE-02 finish",
+      "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
+      "installedBundleSha256": "92452f2aad011ba3096dd89ffb56b1545eb8ef6653d00c725bd5bbaaa71d6c12",
+      "initialHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
+      "actualScreenInput": "PASS_ACTUAL_NORMAL_UI",
+      "nativeContention": "PASS150_FAILURES0; isolated DB",
+      "firstRumiResumeColdChain": "PASS_SAME_RUMI20",
+      "continuousGrowth": "V5_ACTUAL_MORI_SAME_PET_1_TO_20_PASS_374_AUTO_MEALS_6150_EXP_MONO_LV16",
+      "moriColdResumeInput": "PASS_SAME_MORI20",
+      "normalApplicationWrites": "PASS_OBSERVED_SETTLEMENT_TOUCH_MEMORY_SETTINGS_PROFILE_LIFECYCLE",
+      "ordinaryEconomy": "Sim/arucon/reserved/food0/coin15/EXP25.125/meal3 and existing Rumi20/mono/reserved/EXP6150/meal374/coin2140 unchanged",
+      "widgetIsolation": "FULL_SNAPSHOT_EQUAL_WHILE_TRIAL; general pet only",
+      "mobileTests": {
+        "passed": 376,
+        "total": 376,
+        "failed": 0,
+        "skipped": 0
+      },
+      "lint": "PASS_FRESH",
+      "typecheck": "PASS_FRESH",
+      "workflow": "42/42 PASS_FRESH",
+      "appBuildRerun": "NOT_RUN_APP_SOURCE_HASHES_UNCHANGED_NO_REBUILD_NEEDED",
+      "performanceCaptures": [
+        {
+          "label": "ON_A",
+          "durationMs": 60000,
+          "frames": 3555,
+          "submittedHz": 59.25455111197295,
+          "rafP95Ms": 17.773207902908325,
+          "rafMaxMs": 125.13441705703735,
+          "inputCount": 0,
+          "inputP95Ms": null,
+          "inputStatus": "insufficient_data",
+          "over500Ms": 0,
+          "frameStatus": "pass"
+        },
+        {
+          "label": "ON_B",
+          "durationMs": 60000,
+          "frames": 3137,
+          "submittedHz": 52.2812750717907,
+          "rafP95Ms": 30.241542100906372,
+          "rafMaxMs": 87.58416700363159,
+          "inputCount": 7,
+          "inputP95Ms": 21.070291996002197,
+          "inputStatus": "pass",
+          "over500Ms": 0,
+          "frameStatus": "pass"
+        },
+        {
+          "label": "OFF_A",
+          "durationMs": 60000,
+          "frames": 3202,
+          "submittedHz": 53.3757230216537,
+          "rafP95Ms": 29.555541038513184,
+          "rafMaxMs": 42.90945911407471,
+          "inputCount": 12,
+          "inputP95Ms": 21.946917057037354,
+          "inputStatus": "pass",
+          "over500Ms": 0,
+          "frameStatus": "pass"
+        }
+      ],
+      "physicalGpuInput": "NOT_RUN",
+      "healthReads": "OFF",
+      "userFunAndFinalArt": "USER_REVIEW_PENDING",
+      "effectiveModel": "ROUTING_UNVERIFIED",
+      "videoEvidence": [
+        "01-v5-rumi-resume-native.mp4:1188.176667s",
+        "10-v5-new-pet-growth-playthrough.mp4:2030.071667s"
+      ],
+      "evidence": "evidence/life-02-unlocked-2026-10-06/"
+    },
+    "completion": {
+      "independentLocalEngineering": "READY_FOR_GROWTH_PLAYTHROUGH_CURRENT_IOS_SIMULATOR_SYNTHETIC_SCOPE",
+      "productMvp": "NOT_COMPLETE",
+      "iosCurrentRuntime": "PASS_LATEST_V5_NORMAL_INPUT_GROWTH_SAVE_RESTORE",
+      "androidRuntime": "NOT_RUN_LATEST_NATIVE_UI_THIS_SCOPE",
+      "widgetRuntimeQa": "PASS_GENERAL_SNAPSHOT_ISOLATION_DURING_GROWTH; widget_tap_not_rerun_this_scope",
+      "performance": "PASS_FIXED_60_SECOND_PROXY_GATES_ON_B_OFF_A; ON_A_INPUT_INSUFFICIENT_DATA; physical/GPU/input-to-photon NOT_RUN"
+    },
+    "git": {
+      "branch": "feature/arucon-mobile-autonomous",
+      "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
+      "initialHead": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
+      "initialHeadTrackingLiveMatch": true,
+      "initialClean": true,
+      "appSourceUnchanged": true,
+      "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
+      "verificationEvidence": "evidence/life-02-unlocked-2026-10-06/git-final-audit.json",
+      "publicationRecordScope": "Feature documentation checkpoint only; final local/tracking/live-origin hashes and clean status recorded after publication"
+    }
+  },
+  "reboot01": {
+    "task": "tasks/REBOOT-01-core-experience-and-memory.md",
+    "scope": "one family/three appearances/one hand interaction/one hat/movable cushion",
+    "status": "PARTIAL_WITH_BLOCKERS",
+    "initialHead": "3a7a6c1bd7a28f3fa42b82430a54ff20a4fc0ddf",
+    "build": "reboot-01-v3",
+    "bundleSha256": "1b380d85c43002d58e4ae4cc19401204494affd91fee5dbcf37fc658f06fcf09",
+    "nativeCompileInstallLaunch": "PASS_ARM64_SIMULATOR_RELEASE",
+    "visualInput": "BLOCKED_HOST_LOCKED_ACTUAL_CUA",
+    "mobileTests": "387/387 PASS_FRESH; impact11/11",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "androidBundle": "PASS",
+    "androidNativeUiPhysical": "NOT_RUN",
+    "hostAi": "REAL_LOCAL_HOST_VERIFIED; AB24_A_RecallAt2_1.0_B_1.0; unnecessary0/illegal0",
+    "nativeAi": "AI_ADAPTER_BLOCKED: tf_lite_vision_encoder not found in text-only model; actual SDK1.1.0 initialization failed",
+    "physicalGpuTouchThermalBattery": "NOT_RUN",
+    "funFinalArt": "USER_REVIEW_PENDING",
+    "originalPreservation": "30 existing pet identities/economy/EXP/meal counts equal; source original GLB SHA unchanged",
+    "dbReset": false,
+    "newSubagents": 0,
+    "review": "SELF_REVIEW",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "evidence": "evidence/reboot-01-2026-10-07/",
+    "next": "Actual unlocked screen -> existing v3 -> normal settings Reboot first review -> three-stage hand, then hat/cushion/lifecycle/rest/restore/performance",
+    "sourceCheckpoint": "8e012eb6f37a6af3021e461fc5a283768eab1a1a"
+  },
+  "historicalLife02Source": {
+    "sourceBaseline": "d3c86a7b42c50c829fac73254d3078e9146ca2f4",
+    "sourceCheckpoint": "6155b22a56d9cf81b33b356cdecb0737f669a61c",
+    "environment": {
+      "host": "macOS 15.6",
+      "node": "26.7.0",
+      "npm": "11.19.0",
+      "androidToolchain": "NOT_INSPECTED_CURRENT_SCOPE; prior inventory retained in historicalLife01Oct02BeforeRestDefect",
+      "androidAvd": "preserved historical Windows AVD",
+      "healthAccess": "OFF",
+      "hostGpu": "Apple Software Renderer",
+      "softwareEmulator": "software_balanced, 1.5 DPR, vertex-lit material, sparse CPU morph, public flushEXP queue barrier; no fixed frame cap",
+      "hostLocked": true,
+      "iosRuntime": "26.3.1",
+      "xcode": "26.3",
+      "configuration": "Release; existing embedded growth-v5 bundle; no Metro needed",
+      "contentSize": "large restored; tested three Simulator increments and paired decrements",
+      "currentRendererSnapshot": "CURRENT_V5_SOFTWARE_BALANCED_585x1266_RENDER_SURFACE; proxy not GPU display",
+      "iosRuntimeLabel": "26.3",
+      "iosRuntimeBuild": "23D8133",
+      "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
+      "isolatedReplayDevice": "FE2B778D-B598-45F3-BE4F-0E1BB3F76A5B"
+    }
+  }
 }
