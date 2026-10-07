@@ -108,6 +108,8 @@ export function AruconRoom(props: RoomProps) {
     props.performanceCaptureToken,
     props.onPerformanceCapture,
     props.onRuntimeSnapshot,
+    props.rebootView,
+    props.onRebootEvent,
     systemReduced,
   ]);
 
@@ -148,6 +150,7 @@ export function AruconRoom(props: RoomProps) {
     if (!room) return;
     const floor = room.screenToFloor(x, y);
     if (!floor) return;
+    if (latest.current.rebootPlacement) { latest.current.onRebootPlacement?.(floor); return; }
     if (latest.current.ballPlayInput) {
       room.runLife({ token: `roll:${performance.now()}`, kind: 'roll', target: floor });
       return;

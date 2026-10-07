@@ -57,6 +57,8 @@ test-videos/
 *.zip
 
 # Re-generable native folders
+mobile/native/arucon-embedding/ios/vendor/
+*.litertlm
 mobile/android/
 mobile/ios/
 

@@ -7,6 +7,7 @@ import type { ComparisonCameraAngle, RoomPresentationBatch } from './presentatio
 import type { LifeCommand, LifeEvent, LifeScene } from '../living/life';
 import type { PetRestMode } from '../presentation/petRest';
 import type { RoomInteraction } from './interactionLifecycle';
+import type { RebootEvent, RebootView } from '../reboot/contracts';
 
 export type { ComparisonCameraAngle, RoomPresentationBatch, RoomVisualCommand } from './presentationBridge';
 
@@ -23,6 +24,11 @@ export type RoomRuntimeSnapshot = Readonly<{
 
 /** APP-01 presentation port. Callbacks do not award resources or advance game time. */
 export type RoomProps = {
+  /** Opt-in isolated review. Does not replace any legacy room or saved form. */
+  rebootView?: RebootView;
+  onRebootEvent?: (event: RebootEvent) => void;
+  rebootPlacement?: boolean;
+  onRebootPlacement?: (point: FloorPoint) => void;
   livingEnabled?: boolean;
   lifeCommand?: LifeCommand;
   ballPlayInput?: boolean;

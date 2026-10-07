@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "source": "source.json + generate-reboot-characters.mjs",
+  "originalPreserved": true,
+  "records": [
+    {
+      "stage": "baby",
+      "file": "baby.glb",
+      "sha256": "f8268a2a472fab83fb8696556d702c3987868ad8c21886027d2946912d296e79",
+      "bytes": 238396,
+      "runtimeScale": 0.53,
+      "hornCount": 1,
+      "topology": "new parametric body/face/feet/horn/hat",
+      "approval": "USER_REVIEW_PENDING"
+    },
+    {
+      "stage": "growing",
+      "file": "growing.glb",
+      "sha256": "3eba884af719b2ba2b03536b43948de9d38570679ac3648da172a052f386ce48",
+      "bytes": 238392,
+      "runtimeScale": 0.48,
+      "hornCount": 1,
+      "topology": "new parametric body/face/feet/horn/hat",
+      "approval": "USER_REVIEW_PENDING"
+    },
+    {
+      "stage": "evolved",
+      "file": "evolved.glb",
+      "sha256": "8ef1096c9cfbd5d0b9a23401e103fe93003606c64bbf302637753986f5d4c9e4",
+      "bytes": 238400,
+      "runtimeScale": 0.43,
+      "hornCount": 1,
+      "topology": "new parametric body/face/feet/horn/hat",
+      "approval": "USER_REVIEW_PENDING"
+    }
+  ]
+}

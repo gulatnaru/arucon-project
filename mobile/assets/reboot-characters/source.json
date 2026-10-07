@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "family": "mono-review-lineage",
+  "approval": "USER_REVIEW_PENDING",
+  "hornCount": 1,
+  "bodyRings": 18,
+  "radialSegments": 28,
+  "stages": [
+    { "id": "baby", "height": 1.60, "width": 0.70, "depth": 0.64, "outline": [0.25, 0.80, 1.00, 0.96, 0.70, 0.08], "eyeY": 1.05, "eyeWidth": 0.067, "eyeHeight": 0.094, "earLength": 0.23, "earAngle": 0.32, "hornHeight": 0.24, "bodyColor": "#f4eee9", "accent": "#d5e5ef", "runtimeScale": 0.53 },
+    { "id": "growing", "height": 1.87, "width": 0.61, "depth": 0.62, "outline": [0.22, 0.89, 0.90, 0.98, 0.82, 0.06], "eyeY": 1.30, "eyeWidth": 0.083, "eyeHeight": 0.063, "earLength": 0.34, "earAngle": 0.70, "hornHeight": 0.31, "bodyColor": "#edf0ed", "accent": "#c7d9ed", "runtimeScale": 0.48 },
+    { "id": "evolved", "height": 2.10, "width": 0.63, "depth": 0.68, "outline": [0.24, 1.00, 0.93, 0.78, 0.64, 0.05], "eyeY": 1.50, "eyeWidth": 0.080, "eyeHeight": 0.065, "earLength": 0.46, "earAngle": 1.00, "hornHeight": 0.37, "bodyColor": "#eceef3", "accent": "#d5cfea", "runtimeScale": 0.43 }
+  ]
+}

@@ -1,7 +1,7 @@
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 import { parseExperienceProfile, type ExperienceScenario } from '../living/experience';
 import { expoSqliteConnection } from './sqlite';
-export type RoomProfile = 'original' | ExperienceScenario | `${ExperienceScenario}#${number}`;
+export type RoomProfile = 'original' | 'reboot_review' | ExperienceScenario | `${ExperienceScenario}#${number}`;
 
 const databases = new Map<string, Promise<SQLiteDatabase>>();
 
@@ -10,7 +10,7 @@ const databases = new Map<string, Promise<SQLiteDatabase>>();
  * Reusing one open promise avoids accumulating native references when Android
  * recreates the Activity for configuration changes such as font scaling.
  */
-export function openAruconDatabase(name: 'arucon-dev.db' | 'arucon-life-experience.db' = 'arucon-dev.db'): Promise<SQLiteDatabase> {
+export function openAruconDatabase(name: 'arucon-dev.db' | 'arucon-life-experience.db' | 'arucon-reboot-review.db' = 'arucon-dev.db'): Promise<SQLiteDatabase> {
   const existing = databases.get(name);
   if (existing) return existing;
   const opening = openDatabaseAsync(name).catch((error: unknown) => {
@@ -31,6 +31,7 @@ export async function readExperienceProfile(): Promise<RoomProfile> {
   const db = await profileDatabase();
   const row = await db.getFirstAsync<{ value: string }>("SELECT value FROM presentation_settings WHERE key = 'experience'");
   if (row?.value === 'yes') return 'normal';
+  if (row?.value === 'reboot_review') return 'reboot_review';
   return row && parseExperienceProfile(row.value) ? row.value as RoomProfile : 'original';
 }
 export async function saveExperienceProfile(profile: RoomProfile): Promise<void> {
