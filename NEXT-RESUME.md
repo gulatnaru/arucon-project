@@ -1,6 +1,22 @@
 # Next resume — REBOOT-01 첫 범위
 
-## 현재 v5 재개 — PARTIAL_WITH_BLOCKERS / 2026-10-07
+## 현재 v7 첫 범위 — READY_FOR_CORE_EXPERIENCE_REVIEW / 2026-10-08
+
+다음은 **사용자 첫 핵심 경험 평가**다. [현재 결과](REBOOT-01-REPORT.md)의 최상단부터 읽고 다음 계열/상점/새 Lv.1~20 제작으로 확대하지 않는다. 재미·최종아트 **USER_REVIEW_PENDING**, 기본 **A**. 게임B 연기/자연스러움 NOT_RUN, 별도 Swift Simulator 추론을 통합 완료로 바꾸지 않는다.
+
+앱 소스 **`cf1d57fa9a3d2838279a98e5adbd5dbf05532ded`**, 현재 **REBOOT-01 v7 Release SHA `6d5cc5f315529d16d1dad6eabd6b34cbf3de47ad09dac6f7da7afaba1b208e61`**. `evidence/reboot-01-memory-2026-10-07/43-release-v7-manifest.json`135개runtime 해시/설치를 대조한다. 일치하면 재빌드/재설치/DB 초기화하지 않는다. HEAD는 후속 보고서와 구분. 원본30개·소유·경제/EXP/meal·원본GLB 보존(`51`).
+
+사용자 실행: 현재 Simulator 아루 방 **☰→우리 아이**에서 세 후보, 하단 손 내밀기/거두기. **☰→상점·꾸미기→모자 벗기/쓰기**, **쿠션 옮기기→빈 바닥**. 일반 방이면 메뉴→설정→리부트 첫 검토판. 지금 아루는 모자를 경험했으므로 최초장면은 이번 `02-hat-first-v5.mp4`로 비교하고 저장을 되감지 않는다. preview진화후지만 실제arucon/Lv1/EXP0이며 진화 시험 아님.
+
+실제v5 첫/재/자율달리기 중 모자→v6 자연기지개 중 모자/복귀→v7 완료기억 재착용·쿠션 왼쪽기억/오른쪽 현재위치 접근·접지·복원→실제홈위젯 cold→같은 아루·모자·쿠션·완료ID3개→수면/깨우기·접촉·이동. 변경하지 않은 초기경험을v7에서새로수행했다고하지않는다. 같은64개/32KiB 예산에 물건별 **남아 있는** 최초/최신 완료경험을 보존해 휴식반복이 친숙함을 지우지 않게 수정; 이미 버려진 사실은 재구성하지 않는다.
+
+최신 정상 원본영상 `44-memory-cushion-cold-latest-v7.mp4`10:27.695, 쿠션 약64.6~73.9초/원본프레임`52`/cold감사`50`. 강제진단/시간·재화조작아님. 새392/392·영향30/30·lint/typecheck·iOSRelease exit0·AndroidJS·CNG23/23·운영42/42 PASS. 최종60초 펫입력8개 입력→제출p9516.97ms/RAF interval16.75ms·제출59.92Hz·>500gap0 **PASS_PROXY**(`47`). 예비 입력0 INSUFFICIENT_DATA; 실제GPU/표시FPS/물리입력/실기기/발열·배터리·Android최신nativeUI·장기동면 최신GUI재시험은 NOT_RUN이다.
+
+A/B는 실제UI검증 후 같은완료모자 후보5개로 **Mac 실제** Swift검색 비교(`27/28/31`); 오래된 기억회수 가능성/게임 자연스러움 이점 미확인이라 A유지/**NOT_ADOPTED_AFTER_COMPARISON**. 공식Swift0.18/text270m/768벡터의 이전Mac/arm64Simulator 별도예제 성공 보존, 기존게임MediaPipe는통합완료아님. 추가설치/SDK내부패치/외부업로드금지.
+
+사용자 집중 수정/새 명백한 결함이 오면 **현재 접근→HEAD/dirty/설치hash→같은저장 정상재현→필요수정/영향검사/필요Release→실제재검증→SELF_REVIEW**로 한 범위를 이어간다. 잠금이면 현재실패기록/우회금지. SOL_DIRECT/subagent0/effective ROUTING_UNVERIFIED. Feature checkpoint/일반push만, main/merge/force/tag/release/배포/실건강/실결제/보안·전역설치권한확대없음.
+
+## Historical — v5 재개 / PARTIAL_WITH_BLOCKERS / 2026-10-07
 
 [현재 보고](REBOOT-01-REPORT.md)의 최상단 v5 절부터 읽는다. 착수 da7e869/소스8e012eb/v3 설치 일치 후 실제 정상 메뉴로 세 모습을 비교했고, 접촉 방향·입 가림 결함을 수정해 **v5에서 세 단계의 손 교감/복원/생활 복귀를 실제 재검증했다**. 기존30개 저장과 소유·원본은 보존했다. 전체를 새로 시작하거나 DB/원래 루미·모리/리부트 아루를 초기화하지 않는다.
 

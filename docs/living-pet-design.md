@@ -1,5 +1,15 @@
 # LIFE-00/01 생활 개편 — 구현 계약
 
+## REBOOT-01 첫 범위의 현재 좌표·완료 경험 계약
+
+`reboot-01:main`/아루의 별도 검토 DB에서만 세 제작 후보·진주빛 한 뿔·작은 모자·이동 쿠션을 비교한다. 실제 form/Lv/EXP와 previewStage를 구분하며 일반 저장의 personality·소유·경제·위젯을 바꾸지 않는다. [첫 범위](../tasks/REBOOT-01-core-experience-and-memory.md), [실제 결과](../REBOOT-01-REPORT.md).
+
+- 같은64개 완료 사실/32KiB/schema1/petId 예산을 유지한다. 물건별 **현재 남아 있는** 최초·최신 완료 경험을 보존하고 나머지는 최근 순으로 채워 자율 휴식이 친숙한 모자를 잊게 하지 않는다. 과거 cap에서 삭제된 사실을 복원·창작하지 않는다. 다른펫/취소/중복ID/오래된 revision은 기존 transaction/lane 계약으로 거부한다.
+- hat_first/again/busy는 실제 완료 기억·현재 하던 의도에서 결정한다. 각각3.8/1.7/1.1초 접촉과 다른 접근/앞발·체중 연기. 성격ID를 교체하지 않고 preview 성장별 pose를 재사용한다. 완료 뒤 resume은 같은 행동 계열이며 기존 목적지를 그대로 복원하는 계약은 아니다.
+- 옛 쿠션 경험 좌표는1.1초 look의 gazeTarget에만 사용한다. 접근·접지·collider·새 완료 사실은 현재 cushion 좌표/revision만 사용한다. 쿠션 중심 localDockOffset은 부모 yaw를 반영하고 연출 취소 잔여 offset은12/s로 정리한다. rest/cushion cue의 itemRevision이 바뀌면 완료 없이 취소한다. 일반방은 legacy collider 그대로다.
+- runtime/currentTarget/rememberedPosition trace는 bounded 로컬 진단이며 프레임마다 DB/React root state를 쓰지 않는다. 정상 export 안내는 설정에 두고 펫 발화로 기록하지 않는다. 경제·수면/동면/정산의 새 경로를 만들지 않는다.
+- 공식 Swift standalone 추론 성공과 게임B통합을 구분한다. 실제 경험 후보 비교에서 게임 효과가 확인되지 않아 기본A 유지. 다음계열/전체상점/새1~20/모델 SDK 교체로 확대하지 않는다.
+
 ## 2026-10-06 저장 안정성과 동일 개체 성장 체험
 
 현재 사용자 요청은 과거 READY 확인이 아니라 새 저장 오류와 성장 표현 개선이다. SOL_DIRECT / SELF_REVIEW, 기존 경제·원본 아트·이름·저장·건강 OFF를 보존한다. [ADR-015](adr/ADR-015-sqlite-access-and-growth-playthrough.md), [실제 실행 보고](../GROWTH-PLAYTHROUGH-REPORT.md).

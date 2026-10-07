@@ -1,6 +1,24 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 REBOOT-01 v5 — 세 성장 교감 확인 / PARTIAL_WITH_BLOCKERS
+## 현재 REBOOT-01 첫 범위 — READY_FOR_CORE_EXPERIENCE_REVIEW / v7
+
+한 계열·세 후보·손 교감·한 모자·이동 쿠션·완료 기억의 iOS Simulator 검토 판정이다. SRS 전체MVP/출시·재미·최종아트 승인이 아니다. LIFE-02 재미 불충족 평가·기존 승인 정책 보존. [현재 증거/빌드](REBOOT-01-REPORT.md), [실행/다음 사용자 평가](NEXT-RESUME.md).
+
+| 항목 | 현재 판정·한계 |
+|---|---|
+| 세 후보·손 교감·한 뿔/모자 | PASS_OBSERVED_SCOPE: v5 정상 세 모습, shared nav/pose 수정 뒤 v6 착용 세 모습 최소 회귀. v7자산/pose동일. 프리뷰이며실제성장/진화아님; 아트만족사용자평가 |
+| 첫/재/다른 일 중 모자 | PASS_NORMAL_UI_SCOPE: v5 최초ID, v5/v6 자연달리기/기지개 중 착용·같은행동계열복귀; 최신v7 기억재착용. 빌드출처구분/문장수만늘린결과아님 |
+| 쿠션 이동·옛 기억/현재 사실 | PASS_LATEST_V7_NORMAL_INPUT: 옛좌표 시선→현재접근/접지/복원, 실제 원본영상/trace. 현재collider·revision취소·offset정리수정 |
+| 기억·cold·원본/위젯 | PASS_LATEST_V7: 같은아루·가용모자ID3개·쿠션·bounded64기억. 원본30개/소유/경제/EXP/meal일치/3DBok, 위젯일반pet. 가용최초/최신물건사실보호/이미버려진사실창작없음 |
+| 메뉴·입력·수면/깨우기 | PASS_V7_NORMAL_UI: 실제홈위젯cold→기억패널닫기→수면/깨우기→접촉·이동·생활. 최신GUI장기동면 NOT_RUN; 이전CLOSED/이번자동경계·중복회귀구분 |
+| 저장·경제·시간 회귀/빌드 | PASS_FRESH:392/392·영향30/30·lint/typecheck·iOSRelease exit0/DB유지install/실제입력·AndroidJS·CNG23/23·운영42/42·assetcheck |
+| 성능 | PASS_PROXY_V7_60S_PET_INPUT8: 입력→제출p9516.97ms/RAF interval16.75ms/제출59.92Hz/>500gap0. 예비입력0 INSUFFICIENT_DATA. 실제GPU/표시FPS/물리입력/발열·배터리 NOT_RUN |
+| 실제 local 모델 | 이전공식Swift0.18 Mac/arm64Simulator한국어768추론 REAL_LOCAL_VERIFIED_STANDALONE. 이번Mac같은후보비교B오래된회수가능성/자연스러움미확인. A유지/NOT_ADOPTED_AFTER_COMPARISON; 게임B NOT_INTEGRATED/nativeAB24·AI ON/OFF NOT_RUN |
+| Android최신native/UI·실기기 | NEEDS_DEVICE_VALIDATION / NOT_RUN_THIS_SCOPE; 과거PASS를새플랫폼통과로표시하지않음 |
+| 재미·최종아트·후속범위 | USER_REVIEW_PENDING. 사용자첫평가뒤집중수정범위설정/전체제작자동확대없음 |
+| 법률·실건강·계정·실결제·출시 | 기존HARD_STOP/건강·결제OFF, main/merge/deploy없음 |
+
+## Historical — REBOOT-01 v5 / PARTIAL_WITH_BLOCKERS
 
 v3 실제 방향 결함과 v4 입 가림을 고쳐 같은 v5의 정상 메뉴/대사숨김/세모습 손교감·복원·자율생활을 실제 확인했다. 최신무편집150.58/138.27/117.72초 영상과 동일카메라 비교/0.1초복원프레임을 보존했다. **모자 첫/재/행동중 착용·쿠션 이동·cold기억/수면·동면/남은 입력·성능 직전 실제Mac 재잠금**으로 아직첫범위READY가 아니다. 기존30개와 전체소유·경제/EXP/원본을보존,미실행을과거PASS로대체하지않았다.
 

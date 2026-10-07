@@ -1,6 +1,64 @@
 # REBOOT-01 — 첫 교감·외형·기억 검토판
 
-## 현재 재개 — v5 / PARTIAL_WITH_BLOCKERS / 2026-10-07
+## 현재 첫 범위 — v7 / READY_FOR_CORE_EXPERIENCE_REVIEW / 2026-10-08
+
+같은 **아루**가 모자를 처음 받으면 살펴보고 몇 걸음 움직여 확인하고, 완료 경험이 있는 재착용에서는 짧게 앞발·몸을 정돈한다. 자율 기지개/달리기 중에는 짧게 반응하고 같은 행동 계열로 돌아간다. 쿠션을 옮기면 기억한 옛 위치를 먼저 바라본 뒤 **현재 쿠션**으로 접근해 몸을 얹고 복원한다. 실제 홈 위젯 탭으로 cold restart한 뒤에도 같은 개체·모자·현재 쿠션·완료 경험이 남았다. 기본 **A의 구조화된 실제 경험**에 따른 결과이며 AI가 게임을 실행한 것이 아니다.
+
+이 판정은 iPhone16e Simulator의 **첫 검토 범위**다. 세 성장 모습은 제작 후보 프리뷰이고 실제 Lv/EXP/진화를 바꾼 시험이 아니다. 재미·최종 아트 **USER_REVIEW_PENDING**, 사용자의 LIFE-02 재미 불충족 평가를 보존한다. 전 계열·상점·새 Lv.1~20 제작으로 확대하지 않는다.
+
+### 소스·설치·환경
+
+착수 HEAD/추적/live origin `b006a51`, 앱 소스 `6fbfaea`와 설치 v5 SHA 일치, 작업 트리 clean 확인. 실제 CUA 화면/입력 접근 성공. 과거 reset·DB 초기화 없음. 현재 앱 소스 **`cf1d57fa9a3d2838279a98e5adbd5dbf05532ded`**, 설치 **REBOOT-01 v7 Release**, bundle SHA **`6d5cc5f315529d16d1dad6eabd6b34cbf3de47ad09dac6f7da7afaba1b208e61`**. dirty build의135개 runtime 파일 해시를 이후 source commit/index와 모두 대조했다. 후속 보고서 HEAD와 앱 소스를 구분한다.
+
+manifest `evidence/reboot-01-memory-2026-10-07/43-release-v7-manifest.json`, 실제 설치/저장 감사 `51-final-native-v7-audit.json`. macOS15.6/Xcode26.3, iOS runtime26.3.1(화면26.3), iPhone16e `2170BD93-715C-482E-AD9C-DD7479970003`, Expo55.0.31/RN0.83.10/React19.2. Embedded Release라 Metro 불필요. 동일 `software_balanced`/1.5DPR, draw surface585×1266/원본 화면1170×2532. 원본 GLB·애니메이션 클립·경제·성장·건강 OFF·package/lock·native plugin/template 변경 없음.
+
+### 재현·수정·SELF_REVIEW
+
+| 실제 결함 | 수정과 현재 근거 |
+|---|---|
+| v5 쿠션의 옛 위치 시선 누락·이동한 쿠션 옆에 떠서 쉼 | 완료 기억의 좌표는 look 시선에만 사용. 접근/접지/collider는 현재 snapshot 좌표 사용. 회전된 부모 좌표를 변환해 현재 쿠션 중심에 정착. v6/v7 정상 이동 영상·원본 프레임·trace로 확인 |
+| 이동/취소 때 stale 쿠션 연출·잔여 offset 위험 | cushion revision이 달라진 rest/cushion cue 취소. 잔여 offset은 월드 좌표에서 부드럽게 정리하고 수면/전경 전환 시 초기화. 관련 자동 회귀·최신 수면/깨우기·접촉/이동 확인 |
+| 오랜 자율 휴식이 최근64개를 채워 모자 경험을 밀어냄 | 실제 v6 저장에서 이전 모자 기록이 줄어듦 확인. v7은 같은64개/32KiB 예산 안에 물건별 최초 **남아 있는** 완료 경험과 최신 경험 보존. 이미 버려진 사실은 재구성하지 않음. 격리 자동검사90회 휴식/cold와 실제 native64→65 경계 쓰기·재실행에서 가용 모자ID 유지 |
+| 검토 저장 안내가 펫 말풍선처럼 표시됨 | 설정의 조용한 완료 안내로 이동. 실제 실패 안내 유지 |
+
+새 subagent0. 직접 구현·정상 입력·원본 영상/프레임 대조·**SELF_REVIEW**, 독립 reviewer라고 부르지 않는다. 요청 GPT-6.1 Sol Max / effective **ROUTING_UNVERIFIED**.
+
+### 실제 입력·기억의 인과 — 빌드 출처 구분
+
+| 장면 | 증거와 판정 범위 |
+|---|---|
+| 첫 모자 착용 | 같은 아루의 **v5 최초 경험** `02-hat-first-v5.mp4`/`03-hat-first-state.json`. 모자 기억0→hat_first→살피기/짧은 접근/접촉3817ms/복원/실제 완료ID. 기존 아루를 초기화해 최초 장면을 재연하지 않음 |
+| 제거·재착용 | v5 `04/05`, 최신v7 `44/45`. 이전 완료ID→hat_again, 접근 생략·접촉 약1717ms. ‘이제 잘 맞네.’와 짧은 몸/앞발 반응. 문장 개수만 늘린 결과 아님 |
+| 다른 실제 행동 중 착용 | v5 `08/10/11` 자연 달리기, v6 `35/37/38` 자연 기지개 도중 정상 메뉴 착용→hat_busy 접촉1116/1117ms→복원→동일 행동 계열 재개. v5 `06/07`의 타이밍을 놓친 시도는 busy PASS가 아님. **목적지 그대로가 아니라 행동 계열을 재개**하는 현재 계약 |
+| 한 뿔·모자·세 모습 | 정상 영상과 v6 `32-three-stage-minimum-regression-v6.mp4`의 착용 상태 세 모습 손 교감/복원 최소 회귀. 관찰 구간에 눈에 띄는 모자 관통/얼굴·뿔 가림 미관찰. v7은 기억 보존만 후속 변경, 자산/pose 동일. 모든 각도/미세 접지·최종 아트 승인은 아님 |
+| 쿠션 이동 | 최신v7 `44-memory-cushion-cold-latest-v7.mp4` 약64.6~73.9초. 옛 좌표(-1.31596,1.88809) 시선→현재(1.56303,1.54199,rev3) 접근/접촉/복원. `45` rememberedPosition/currentTarget, 원본 `52-current-cushion-original-v7.png` 대조. v6 반대 방향 이동 `19/20/22` 보존 |
+| cold·기억·복귀 | 같은v7 원본 영상에 Home→프로세스 종료→**실제 홈 위젯 탭**→같은 아루/모자/오른쪽 쿠션→우리 아이 기억64개→수면/깨우기·직접 접촉·바닥 이동. `48/49/50` 같은 petId/이름/형태/성격/EXP/coin/food와 가용 모자ID3개 보존. DB 읽기/프로세스 시작만으로 화면 PASS를 대신하지 않음 |
+
+최초v5/busy v5·v6/최신v7 재착용·쿠션·cold·입력 증거를 구분한다. 변경하지 않은 최초/성장 연기를 v7에서 새로 수행했다고 표시하지 않는다. 완료될 때만 기억하며 취소/다른 개체/오래된 revision은 거부한다. trace/저장은 로컬만 사용하고 일반 저장 시간·재화·소유를 조작하지 않았다.
+
+### AI — A 유지, B 효과 별도
+
+기존 공식 **LiteRT-LM Swift0.18 EmbeddingEngine/text270m**의 Mac·arm64 Simulator 한국어768차원 실제 추론 성공 보존. 별도예제이며 게임 MediaPipe adapter를 Swift 경로로 통합한 것이 아니다. [공식 Embedding Models](https://developers.google.com/edge/litert-lm/embedding_models), `mobile/scripts/reboot-litert-probe/README.md`와 이전 `ai-swift` receipt에 근거/재현이 있다. SDK 내부 패치·추가 설치·대형 모델 교체 없음.
+
+모자·쿠션 실제 검증 **후** 같은 아루 완료 모자 후보5개로 실제 Mac Swift 추론 비교 (`27/28/31`). 익숙함/행동중 사례는 A/B 모두 관련 경험을 찾았고 첫 경험 회상에서는 최근2개 A가 놓친 오래된 경험을 B가 찾았다(질의34.76~40.16ms). 작은 구조화 데이터는 별도의 타입/상황 조회로도 같은 경험을 찾을 수 있으며 이 대조 조회를 현재 A 결과와 구분했다. **게임 B의 연기/자연스러움·native A/B24·AI ON/OFF 성능 NOT_RUN, 제품B NOT_INTEGRATED**. 우월성 미확인으로 **A / NOT_ADOPTED_AFTER_COMPARISON** 유지. 이전 host24개를 이번 새 실행 숫자로 재사용하지 않는다.
+
+### 최신 검사·성능·보존
+
+- v7 새 **392/392**, 영향 **30/30**(기억/현재좌표/SQLite lane·BUSY retry), lint/typecheck PASS. iOS Release compile exit0·DB유지 설치·실제 실행, AndroidJS bundle PASS. iOS CNG **23/23**, asset generator `--check`, 운영검사 **42/42** PASS. 이전v6 391/391·영향38/38은 중간 이력.
+- 같은v7/방/정상renderer/A/동작줄이기OFF/녹화ON의60초 (`47-v7-pet-input-performance.json`): 정상 펫 입력8개, 입력→다음RAF p95 **10.81ms**, 입력→제출 p95 **16.97ms**, RAF interval p95 **16.75ms**/max59.27ms, >500gap0, 제출 **59.92Hz**. 기존100ms/33.34ms/500ms/30Hz gate **PASS_PROXY**. draw p95.782ms/morph.0409ms/queueDrain5.747ms.
+- 예비v6 `30`/v7 `46` 입력0은 **INSUFFICIENT_DATA**. 바닥 이동은 실제 작동하지만 기존 probe는 펫 접촉만 기록하므로 이동 지연으로 해석하지 않는다. 최종 창은 CUA 정상 펫 입력8개로 확인. EncodingFPS/이 proxy는 실제 표시FPS·GPU·물리 touch-to-photon이 아니다. 게임B가 없어 AI ON/OFF 미실행.
+- 원본30개 이름·형태·성격·food·coin·EXP·meal·시설 및 전체 소유 행 **모두 일치**,3DB integrity `ok` (`51`). 일반 위젯은 `dev-local-pet-1` snapshot이며 아루가 덮어쓰지 않았다. 착수의 정상 일반방 전경에 따른 합법적 갱신과 최초snapshot byte동일 보존을 혼동하지 않는다.
+- 장기동면의 최신v7 GUI 재시험·Android 최신native/UI·실기기·GPU·물리입력·발열/배터리 **NOT_RUN_THIS_SCOPE**. 수면/동면 경계·경제·중복정산은 이번 자동 회귀, 이전 실제 동면CLOSED는 별도 이력이다.
+
+도구: CUA 실제 조작·화면, simctl 로컬 영상·설치, Node 기존 자산 `--check`, Apple AVFoundation 원본 디코딩, bundled Python 비교 배치, Swift 실제 host 검색 사용. Blender/Maestro 호출 도구 없음·새 설치 없음. Context7 도구는 노출되지만 이번 좁은 수정에서 새 문서 호출하지 않음(이전 성공과 구분). Figma/이미지생성/외부 업로드 미사용. 정지 시안을 앱 실행으로 납품하지 않았다.
+
+### 바로 평가·Git
+
+현재 Simulator 아루 방에서 **☰→우리 아이**로 세 후보, 하단 **손 내밀기/거두기**로 같은 교감. **☰→상점·꾸미기**의 모자 벗기/쓰기·쿠션 옮기기→빈 바닥. 일반 방이면 메뉴→설정→**리부트 첫 검토판**. 지금 같은 아루는 모자를 경험했으므로 최초 장면은 위 v5 원본으로 비교하고 저장을 되감지 않는다.
+
+최신 연속 원본 `evidence/reboot-01-memory-2026-10-07/44-memory-cushion-cold-latest-v7.mp4` **10:27.695**, 관찰/대기 구간도 남긴 정상 속도 영상. cue 시각 `45`, cold 감사 `48/49/50`을 함께 읽는다. 영상·DB·모델·SDK·build/generated native·개인 로그는 stage/업로드하지 않는다. 앱 소스cf1d57f와 후속 보고서 HEAD 구분; 최종 feature HEAD/추적/live origin/clean은 동일 증거 폴더 `git-final-audit.json`과 최종 응답에 기록한다. 다음은 사용자 핵심 경험 평가이며 승인 없이 다음 제작 범위로 진행하지 않는다.
+
+## Historical — v5 / PARTIAL_WITH_BLOCKERS / 2026-10-07
 
 아기·성장기·진화 후를 정상 ‘우리 아이’ 메뉴로 전환하고, **대사를 가린 동일 손 내밀기→접근→접촉→손 거두기→복원→자율생활 복귀**를 실제 Simulator에서 확인했다. 아기는 둥근 몸과 조심스러운 반응, 성장기는 앞발과 기울어진 기대기, 진화 후는 안정된 기대기와 손을 놓은 뒤의 시선/앞발·윙크를 비교할 수 있다. 이는 같은 아이의 제작 후보 프리뷰이며 실제 레벨/EXP/진화를 진행한 시험이 아니다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
 
