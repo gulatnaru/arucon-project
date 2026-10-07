@@ -1,6 +1,22 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 REBOOT-01 — 첫 교감·외형·기억 재검토 / PARTIAL_WITH_BLOCKERS
+## 현재 REBOOT-01 v5 — 세 성장 교감 확인 / PARTIAL_WITH_BLOCKERS
+
+v3 실제 방향 결함과 v4 입 가림을 고쳐 같은 v5의 정상 메뉴/대사숨김/세모습 손교감·복원·자율생활을 실제 확인했다. 최신무편집150.58/138.27/117.72초 영상과 동일카메라 비교/0.1초복원프레임을 보존했다. **모자 첫/재/행동중 착용·쿠션 이동·cold기억/수면·동면/남은 입력·성능 직전 실제Mac 재잠금**으로 아직첫범위READY가 아니다. 기존30개와 전체소유·경제/EXP/원본을보존,미실행을과거PASS로대체하지않았다.
+
+| 범위 | 현재 |
+|---|---|
+| 세 성장 외형·동일 손교감 | PASS_SIMULATOR_OBSERVED_V5_NORMAL_UI_SCOPE; 프리뷰이며 실제 성장·진화 아님 |
+| 방향/손 표식의 입 가림 | CLOSED_OBSERVED_V5; 다른동작/전체아트 품질과 분리 |
+| 모자·쿠션·정상 cold기억·rest/input/widget | BLOCKED_ENV_HOST_RELOCKED, 아직실제검증 미완료 |
+| 공식 Swift 텍스트 임베딩 | 실제Mac/arm64Simulator 별도예제 REAL_LOCAL_VERIFIED; 동일한국어768벡터/cosine 일치. 게임은A, 제품B통합/효과아님 |
+| 자동 검사·빌드 | 새388/388·영향12/12·lint/typecheck·v5Release·AndroidJS·CNG23/23·운영42/42 PASS |
+| 성능·실기기/GPU/물리 입력 | NOT_RUN_CURRENT; 영상인코딩FPS를앱FPS로쓰지않음 |
+| 재미·최종아트·계열 | USER_REVIEW_PENDING, 사용자 LIFE-02 재미불충족 평가보존 |
+
+[현재 결과/해시/도구/한계](REBOOT-01-REPORT.md), [다음 한 작업](NEXT-RESUME.md). SOL_DIRECT/SELF_REVIEW/subagent0, 기존 featurecheckpoint/일반push만. 아래 이전 REBOOT/LIFE의 기능 증거와 결정 이력을 그대로 보존한다.
+
+## Historical — 초기v3 REBOOT-01 — 첫 교감·외형·기억 재검토 / PARTIAL_WITH_BLOCKERS
 
 LIFE-02 기능 PASS는 아래 보존하지만 사용자가 재미·성격·외형을 승인하지 않았다. [첨부 실행 기준](tasks/REBOOT-01-core-experience-and-memory.md)과 [현재 보고](REBOOT-01-REPORT.md)의 첫 범위만 진행한다. 새 소스/설치 v3와 과거 영상을 혼합하지 않는다.
 

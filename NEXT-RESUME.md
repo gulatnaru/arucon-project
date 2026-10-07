@@ -1,6 +1,24 @@
 # Next resume — REBOOT-01 첫 범위
 
-## 현재 PARTIAL_WITH_BLOCKERS / 2026-10-07
+## 현재 v5 재개 — PARTIAL_WITH_BLOCKERS / 2026-10-07
+
+[현재 보고](REBOOT-01-REPORT.md)의 최상단 v5 절부터 읽는다. 착수 da7e869/소스8e012eb/v3 설치 일치 후 실제 정상 메뉴로 세 모습을 비교했고, 접촉 방향·입 가림 결함을 수정해 **v5에서 세 단계의 손 교감/복원/생활 복귀를 실제 재검증했다**. 기존30개 저장과 소유·원본은 보존했다. 전체를 새로 시작하거나 DB/원래 루미·모리/리부트 아루를 초기화하지 않는다.
+
+앱 소스 checkpoint **`6fbfaea9dcdc145d57afc3cd098f1bd32259ecfc`**. 이후 문서 HEAD와 구분한다.
+
+현재 설치 **v5 Release SHA `5d4668402b41d1043840df1113cb076f28960830e0d4abea7866d3a004591dde`**, manifest `evidence/reboot-01-resume-2026-10-07/18-release-v5-manifest.json`. 실제 HEAD/dirty와 runtime 파일 해시를 대조한다. 일치하면 재빌드/재설치하지 않는다. 데이터 컨테이너는 매번 simctl로 조회하고 과거 UUID를 고정하지 않는다. 직접개발/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED 유지.
+
+**다음 한 작업: 현재 Mac 실제 접근 → v5/아루(같은reboot-01:main) → 정상 메뉴로 첫 모자 착용 완료 → 벗기/재착용 → 실제 다른 행동 중 착용.** 세 성장 영상을 마친 뒤 첫 모자 검증을 시작하려던 CUA가 실제 Mac locked를 반환했고 잠금 해제를 요청했다. 이전 BLOCKED 복사나 보안/TCC 우회 금지.
+
+이어 쿠션 위치를 정상 바닥 입력으로 바꾸고, 옛 기억/현재 좌표/실제 접근·접지, 정상 cold restart 동일개체/완료 기억, 메뉴·직접 접촉·수면/깨우기·격리 동면 복귀·일반 위젯/저장 경합, 최신 performance를 검증한다. 읽기 전용 확인 시 아루는XP0/coin0/previewevolved/hatfalse, 완료기억47개였고 hat경험·쿠션이동은 시험하지 못했다. 현재 실제값은 다시 읽고 임의로 바꾸지 않는다. 이동 소품의 현재 nav/접지와 취소 복원은 실제 입력 전까지 PASS가 아니다.
+
+완료한 v5 영상은 `19-baby-hand-v5.mp4`150.58초 / `21-growing-hand-v5.mp4`138.27초 / `23-evolved-hand-v5.mp4`117.72초, 동일 카메라 `25-same-camera-three-stages-v5.png`. v3/v4 중간 영상을 최신 통과로 재사용하지 않는다. 두 접촉 결함은v5관찰범위CLOSED이며 전체첫범위READY는아니다. 다음 코드가 변경되면 영향 있는 구간만 최신 설치에서 재검증한다.
+
+AI는 공식 **LiteRT-LM Swift0.18.0/b2f686e2… EmbeddingEngine/visionBackend=nil/audioBackend=nil**의 별도예제로 Mac과현재arm64Simulator에서 같은한국어·같은text270m/SHA2d079…의 실제768차원추론을확인했다. 기존게임MediaPipe adapter/SDK·package/lock은변경하지않았고A를실제모델사용이라고하지않는다. 별도예제SDK성공을게임B통합/효과로표시하지않는다. 재현 `mobile/scripts/reboot-litert-probe/README.md`, actual `ai-swift/real-swift-host.json`/`real-swift-simulator-current.json`/receipt. SDK/모델/DB/빌드/영상은ignored로컬만.
+
+이번새388/388·영향12/12·lint/typecheck·v5Release·AndroidJS bundle·CNG23/23·운영42/42 PASS. Proxy/GPU/물리입력/실기기/발열·배터리미측정,재미·최종아트USER_REVIEW_PENDING. 다른계열/상점/전체1~20/가격/변기이전으로확대하지않는다. Featurecheckpoint/일반push만, main/merge/force/tag/release/배포/실건강/실결제/전역설치/보안/외부업로드금지. 현재v5로돌려두었으며잠금중simctl프로세스시작을정상GUI재실행PASS로표시하지않는다.
+
+## Historical — v3 initial PARTIAL_WITH_BLOCKERS / 2026-10-07
 
 [실행 지시](tasks/REBOOT-01-core-experience-and-memory.md)와 [현재 보고](REBOOT-01-REPORT.md)를 읽고 이어간다. LIFE-02는 기능 검증 이력이며 사용자는 재미·성격·외형이 불충족이라고 평가했다. SOL_DIRECT / SELF_REVIEW / 새 subagent 없이 한 계열·세 모습·손 교감·모자 하나·쿠션 이동만 마무리한다. 기존 30개 저장과 원본 아트, 경제·진화·건강 OFF를 보존한다. DB 초기화·과거 reset·전계열/새1~20 전체 제작 금지.
 

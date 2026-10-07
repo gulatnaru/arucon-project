@@ -1,6 +1,65 @@
 # REBOOT-01 — 첫 교감·외형·기억 검토판
 
-## PARTIAL_WITH_BLOCKERS
+## 현재 재개 — v5 / PARTIAL_WITH_BLOCKERS / 2026-10-07
+
+아기·성장기·진화 후를 정상 ‘우리 아이’ 메뉴로 전환하고, **대사를 가린 동일 손 내밀기→접근→접촉→손 거두기→복원→자율생활 복귀**를 실제 Simulator에서 확인했다. 아기는 둥근 몸과 조심스러운 반응, 성장기는 앞발과 기울어진 기대기, 진화 후는 안정된 기대기와 손을 놓은 뒤의 시선/앞발·윙크를 비교할 수 있다. 이는 같은 아이의 제작 후보 프리뷰이며 실제 레벨/EXP/진화를 진행한 시험이 아니다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
+
+### 직접 관찰한 결함과 최신 설치본
+
+앱 소스 checkpoint **`6fbfaea9dcdc145d57afc3cd098f1bd32259ecfc`**. 이후 보고서 commit은 앱 코드를 바꾸지 않는다.
+
+착수 HEAD/추적/live origin은 `da7e869`, 앱 소스8e012eb/설치v3 SHA1b380d85…가 일치하고 clean이었다. 기존30개와 소유 테이블을 온라인 백업·읽기 전용 대조했고, 코드가 같아 처음에는 재빌드/재설치하지 않았다.
+
+실제 v3 성장기/진화 후에서 **경로의 마지막 방향이 접촉에 남아 손 옆을 바라봄**을 발견했다. `RebootDirector`가 손의 실제 target을 pose에 유지하고 `rebootFacing`이 최단 각도/3.6rad/s 제한으로 시선과 접촉 방향을 맞추도록 수정했다. v4에서 방향 수정은 확인했지만 **높이 .48의 손 표식이 입을 가림**을 관찰해, `.14`의 앞발 높이로 조정했다. 실제 표식·몸짓을 유지하며 얼굴/앞발을 함께 볼 수 있게 했다. 원본 자산과 경제·성장·저장 서비스는 변경하지 않았다.
+
+최신 **v5 Release SHA `5d4668402b41d1043840df1113cb076f28960830e0d4abea7866d3a004591dde`**, manifest `evidence/reboot-01-resume-2026-10-07/18-release-v5-manifest.json`. v3/v4 영상은 수정 전/중간 이력이다. 새 기본 시각 결함 두 가지는 **v5 관찰 구간에서 CLOSED**이며 첫 범위 전체 완료와 구분한다. 실제 같은 v5의 모자·쿠션·기억/수면·동면·정상 재실행/입력·성능 검증 직전 Mac이 다시 잠겼고 CUA가 실제 실패했다. 새 영상이 없는 항목을 과거 PASS로 닫지 않았다.
+
+### 실제 세 성장 비교 증거
+
+| 최신 v5 증거 | 실제 구간·길이 | 판정 범위 |
+|---|---|---|
+| `19-baby-hand-v5.mp4` | 무편집 정상 속도150.58초. 완료 기억 기준 약126.89~128.29초가 손 해제/복원 | 접근·손 접촉·몸 반응·해제·생활 복귀 실제 관찰 |
+| `21-growing-hand-v5.mp4` | 무편집 정상 속도138.27초. 약124.47~126.67초 복원 | 같은 카메라에서 성장기 앞발·기대기·시선·복원 비교 |
+| `23-evolved-hand-v5.mp4` | 무편집 정상 속도117.72초. 약73.62~75.82초 복원 | 진화 후의 실루엣·앞발·마무리 표정/시선·생활 복귀 비교 |
+| `20/22/24-*-contact-v5.png` 및 `25-same-camera-three-stages-v5.png` | 원본1170×2532. 비교는 각 원본을 같은390×844로 축소 배치, 카메라/설정 동일 | 한 뿔·몸 비율/귀 차이·눈/입 가독성·얼굴 가림 수정 확인. 확대 시안을 게임 크기 PASS로 대체하지 않음 |
+| `31-contact-recovery-sequences-v5.png` | 원본 영상의0.1초 간격 복원 프레임/동일 crop; 원본 full frame도 보존 | SELF_REVIEW: 관찰 구간에서 귀 분리/몸·얼굴 찢어짐·급격한 복원 미관찰. 미세 접지/전체 보행 품질을 모든 상황에서 보장한 것은 아님 |
+
+완료 시각은 실제 기억 UTC와 녹화 파일 생성시각을 대조한 근사 구간이다. 저장 대기열 지연/영상 인코딩 FPS를 물리 입력 지연이나 실제 표시 FPS로 부르지 않는다. 최신 프레임 제출 proxy 측정·GPU·물리 입력·실기기·발열·배터리는 NOT_RUN이다.
+
+### 기억·신뢰성 — 완료와 미실행
+
+기존 두 DB의30개 이름·형태·성격·재화·EXP·식사·시설 및 전체 소유 행이 착수 값과 동일하다. 새 리부트 pet `reboot-01:main`/아루, 실제 EXP0/coin0/Lv1와47개의 완료 경험을 읽었다. 세 모습 비교와 손 교감은 클릭 EXP를 만들지 않았다. 같은 저장/최근 모습은 필요한 기술 설치 과정에서도 보존했고 DB 초기화 없음.
+
+**모자 첫/재/행동 중 착용·쿠션 이동·정상 메뉴를 통한 cold 기억 복원은 BLOCKED_HOST_RELOCKED**다. 당시 hatWorn=false이고 hat 경험도 없으며 쿠션은 초기 위치다. 정상 입력으로 시험하지 않은 A 기억 반응을 실제 모델 효과 또는 실제 PASS로 표시하지 않는다. 이동한 쿠션의 접근/접지·옛 좌표 vs 현재 좌표와 일반 위젯 보존도 다음 실제 입력에서 확인해야 한다. 아직 원격·출시/MVP 완성이나 READY_FOR_CORE_EXPERIENCE_REVIEW가 아니다.
+
+### 공식 Swift 임베딩 — 새 실제 결과
+
+[공식 LiteRT-LM embedding guide](https://developers.google.com/edge/litert-lm/embedding_models)와 [핀된 Swift options](https://github.com/google-ai-edge/LiteRT-LM/blob/b2f686e2ed4718fb84ec398a61dd59ca0f0aff27/swift/EmbeddingEngineConfig.swift)를 대조했다. **0.18.0 / b2f686e2ed4718fb84ec398a61dd59ca0f0aff27**의 `EmbeddingEngine`은 `visionBackend=nil / audioBackend=nil`로 해당 encoder 초기화를 생략한다. 일반 채팅 `Engine`/conversation을 호출하지 않았다. 기존 MediaPipe 내부 바이너리·게임 SDK/Expo55·package/lockfile은 변경하지 않았다.
+
+공식 배포 XCFramework ZIP checksum: iOS `d765b99592d4ec3d0c9e2bd69469454af06c834861340672da1891c0c121c347`, Mac `5f6ee68d95eeccb084c6e66d5ee47255e3020fa0fb29696dd0301ae26d6cfb4f`. iOS archive의 arm64 Simulator slice와 실제 Mach-O platform7/minOS15.1/SDK26.2를 확인했고, 현재 Xcode26.3에서 별도 예제 compile/sign/install/실제 추론까지 성공했다. 이것은 최종 출시 최소 OS 선언·x86/실기기 지원 검증이 아니다.
+
+모델은 기존 **text270m/164,626,432bytes**, revision9be6e8b… / 실제 SHA2d079ee2… / Apache-2.0. 모델을 크게 바꾸거나 새로 외부로 입력을 보내지 않았다. 같은 한국어 query/모자·쿠션 문장으로 **Mac과 iOS arm64 Simulator 각각 실제768차원·유한·정규화**를 확인했다. cosine은 둘 다 **0.8132188 / 0.7273953**, 첫5개 값도 동일했다.
+
+| 현재 재현 스크립트 실행 | SDK init ms | 첫3개 추론 ms | warm query ms |
+|---|---:|---:|---:|
+| Mac CPU2threads | 68.60 | 291.84 | 32.79 |
+| iOS arm64 Simulator CPU2threads | 96.52 | 332.33 | 42.06 |
+
+해시 검증이 먼저 파일 페이지를 읽은 뒤 SDK init을 측정했다. 따라서 위 init은 cold 앱 시작/기기 성능이 아니며, 이전 별도 첫 실행422.78/414.04ms와 성능 개선으로 섞지 않는다. 신규24개 native A/B·B 우월성/게임 효과는 미검증이다. 이전 호스트 AB24(A/B Recall@2 모두1.0)는 아래 이력으로 보존한다.
+
+**게임의 A는 규칙/구조화된 기억이고 B 실제 모델 사용으로 표시하지 않는다.** 현재 게임의 MediaPipe adapter는 변경하지 않았으며 별도 SDK 예제 성공과 통합된 B를 구분한다. [재현 소스/명령](mobile/scripts/reboot-litert-probe/README.md), `ai-swift/real-swift-host.json`, `real-swift-simulator-current.json`, `cross-platform-inference-audit.json`, `receipt.json`에 actual 결과와 checksum/source hash가 있다. 실제 SDK는 ignored 로컬에만 있다.
+
+### 현재 자동 검사·도구·남은 한 작업
+
+이번 새 **388/388 fail0/skip0, 영향12/12, lint/typecheck, v5 iOS Release compile/install/launch, Android JS bundle, CNG23/23, 운영42/42 PASS**. 실제 화면·성능 미실행을 숫자로 대신하지 않는다. SOL_DIRECT/SELF_REVIEW, 새 subagent0, effective ROUTING_UNVERIFIED.
+
+실제로 사용한 도구: CUA 정상 앱 조작, 현재 Three renderer/기존 편집 자산, Swift/AVFoundation 영상 디코딩, Pillow 비교 이미지, 공식 Swift/C SDK의 별도 예제. 자산을 새로 전 계열 제작하지 않았다. Context7은 callable이며 앞 작업의 Expo 조회는 이력; 이번 SDK 확인은 공식 URL/핀 원문/실제 binary/API 호출이다. Blender/Maestro는 callable/local 실행이 없으며 새 설치 없음. Figma는 이번 쓰기/업로드 없음, 과거 link_id 오류를 성공으로 바꾸지 않는다.
+
+다음 한 작업은 **Mac 실제 접근→현재v5/source manifest→정상 설정/검토판→처음 모자 쓰기/완료→벗기/재착용→다른 실제 행동 중 착용**이다. 이어 쿠션 이동·옛/현재 좌표·동일개체 cold 기억, 메뉴/수면·동면/저장·일반위젯, 현재 performance를 확인한다. 필요한 결함만 수정하며 다음 계열/상점/전체1~20으로 확대하지 않는다. 현재 완성된 세 모습/교감은 아래 이력 영상으로 덮어쓰지 않고 다음 최신 빌드에서도 변경 영향을 구분한다.
+
+현재 로컬 증거 `evidence/reboot-01-resume-2026-10-07/`. 모델/SDK/DB/빌드/영상/개인 로그는 Git 제외, source/checkpoint·일반feature push만. main/merge/force/tag/release/배포/실건강/실결제/보안/전역 설치/외부 업로드 없음.
+
+## Historical — 초기 구현 v1~v3 / PARTIAL_WITH_BLOCKERS
 
 한 뿔 계열의 **아기·성장기·진화 후 제작 후보**, 손을 내밀고 거두는 교감, 모자 착용 경험과 이동한 쿠션의 기억을 기존 앱의 별도 검토 화면에 구현했다. 성장에 따라 접근·몸의 기대기·앞발·손을 놓은 뒤의 몸짓이 달라지도록 연결했다. **새 화면을 실제로 조작·관찰한 증거는 아직 없다.** Mac이 작업 도중 다시 잠겨 실제 비교와 정상 속도 플레이 검증이 막혔다. 과거 LIFE-02 기능 PASS는 보존하지만 사용자의 재미·성격·외형 불충족 평가를 덮어쓰지 않는다.
 
