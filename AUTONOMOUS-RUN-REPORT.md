@@ -2,6 +2,8 @@
 
 ## 현재 REBOOT-01 v7 — READY_FOR_CORE_EXPERIENCE_REVIEW
 
+원격 publication은 **BLOCKED_REMOTE_SERVER**: 일반feature push3회 모두 GitHub Internal Server Error, 실제origin/추적b006a51. sourcecf1d57f·검토보고926abde·후속인계는로컬checkpoint로보존. 앱검토READY와push미반영을구분하고최종HEAD/clean은같은증거폴더git-final-audit에기록한다.
+
 현재 실제 Mac 접근 성공. 같은 아루의 첫/재/자율 행동 중 모자, 쿠션 옛 시선→현재 위치 접근/접지, 실제 홈 위젯 cold/기억·메뉴·수면/깨우기·접촉/이동 완료. v5 쿠션 옆에 뜨는 결함·옛 위치 시선 누락과64개 기록에서 모자 경험이 밀려나는 문제를 직접 수정했다. 같은 크기에 가용 최초/최신 물건 경험을 보존하고 이미 버려진 사실은 창작하지 않는다. 원본30개·소유/경제·EXP/meal 일치/3DB integrityok, 일반위젯에 아루를 쓰지 않았다.
 
 소스 **cf1d57fa9a3d2838279a98e5adbd5dbf05532ded**, 설치v7 bundle **6d5cc5f315529d16d1dad6eabd6b34cbf3de47ad09dac6f7da7afaba1b208e61**,135개runtime 대조. 최초v5/행동중v5·v6/최신v7 재착용·쿠션·cold/input을 구분하고 미변경 초기경험을 새로 수행했다고 하지 않는다. 최신무편집 정상영상10:27.695·원본프레임/trace/cold감사는 `evidence/reboot-01-memory-2026-10-07/` 로컬만.

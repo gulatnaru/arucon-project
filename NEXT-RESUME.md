@@ -4,6 +4,8 @@
 
 다음은 **사용자 첫 핵심 경험 평가**다. [현재 결과](REBOOT-01-REPORT.md)의 최상단부터 읽고 다음 계열/상점/새 Lv.1~20 제작으로 확대하지 않는다. 재미·최종아트 **USER_REVIEW_PENDING**, 기본 **A**. 게임B 연기/자연스러움 NOT_RUN, 별도 Swift Simulator 추론을 통합 완료로 바꾸지 않는다.
 
+**Git만 원격 미반영**: sourcecf1d57f·검토보고926abde 이후 현재 인계까지 로컬에 보존했다. 동일 일반push3회 모두 GitHub Internal Server Error; 실제 origin/추적은b006a51. 최종HEAD/clean은로컬 `git-final-audit.json`. 서버정상화 후 실제원격을다시읽고feature의일반push만재시도한다. 인증/권한/보안/force로우회하지않는다. push오류를native실패로표시하거나앱재빌드/DB초기화하지않는다.
+
 앱 소스 **`cf1d57fa9a3d2838279a98e5adbd5dbf05532ded`**, 현재 **REBOOT-01 v7 Release SHA `6d5cc5f315529d16d1dad6eabd6b34cbf3de47ad09dac6f7da7afaba1b208e61`**. `evidence/reboot-01-memory-2026-10-07/43-release-v7-manifest.json`135개runtime 해시/설치를 대조한다. 일치하면 재빌드/재설치/DB 초기화하지 않는다. HEAD는 후속 보고서와 구분. 원본30개·소유·경제/EXP/meal·원본GLB 보존(`51`).
 
 사용자 실행: 현재 Simulator 아루 방 **☰→우리 아이**에서 세 후보, 하단 손 내밀기/거두기. **☰→상점·꾸미기→모자 벗기/쓰기**, **쿠션 옮기기→빈 바닥**. 일반 방이면 메뉴→설정→리부트 첫 검토판. 지금 아루는 모자를 경험했으므로 최초장면은 이번 `02-hat-first-v5.mp4`로 비교하고 저장을 되감지 않는다. preview진화후지만 실제arucon/Lv1/EXP0이며 진화 시험 아님.

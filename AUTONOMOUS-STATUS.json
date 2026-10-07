@@ -995,7 +995,11 @@
     "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
     "verificationEvidence": "evidence/reboot-01-memory-2026-10-07/git-final-audit.json",
     "publicationRecordScope": "Feature source and evidence report checkpoints; final hashes audited after ordinary push",
-    "publicationState": "Feature source/report checkpoints; final HEAD/tracking/live hashes and clean status are audited after push in verificationEvidence"
+    "publicationState": "BLOCKED_REMOTE_SERVER; three ordinary push attempts rejected with Internal Server Error; local source/report/handoff commits preserved",
+    "lastPushedTrackingAndLiveOrigin": "b006a51a5cff661b05681902386e7e7096b6706e",
+    "ordinaryPushAttempts": 3,
+    "lastPushError": "Internal Server Error; no credentials/permissions/security/force changes",
+    "resumePush": "Read actual origin first; retry ordinary feature push only after server recovers; no rebuild/reset for publication failure"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,

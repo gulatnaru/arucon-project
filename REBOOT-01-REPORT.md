@@ -54,6 +54,8 @@ manifest `evidence/reboot-01-memory-2026-10-07/43-release-v7-manifest.json`, 실
 
 ### 바로 평가·Git
 
+**원격 저장은 미완료**: 소스cf1d57f·첫 보고서926abde는 로컬에 commit됐지만 같은 일반push3회 모두 GitHub `Internal Server Error`로 거절됐다. 오류 뒤 실제origin은 `b006a51`이며 인증/권한·transport·보안을 바꾸거나 force하지 않았다. 로컬 앱 검토 판정과 원격 반영을 구분한다. 최종 추가 인계 commit/clean·로컬/추적/live 해시는 `git-final-audit.json`과 최종 응답이 기준이다. 서버가 정상화되면 먼저 실제원격을 대조하고 현재feature 일반push만 재시도한다.
+
 현재 Simulator 아루 방에서 **☰→우리 아이**로 세 후보, 하단 **손 내밀기/거두기**로 같은 교감. **☰→상점·꾸미기**의 모자 벗기/쓰기·쿠션 옮기기→빈 바닥. 일반 방이면 메뉴→설정→**리부트 첫 검토판**. 지금 같은 아루는 모자를 경험했으므로 최초 장면은 위 v5 원본으로 비교하고 저장을 되감지 않는다.
 
 최신 연속 원본 `evidence/reboot-01-memory-2026-10-07/44-memory-cushion-cold-latest-v7.mp4` **10:27.695**, 관찰/대기 구간도 남긴 정상 속도 영상. cue 시각 `45`, cold 감사 `48/49/50`을 함께 읽는다. 영상·DB·모델·SDK·build/generated native·개인 로그는 stage/업로드하지 않는다. 앱 소스cf1d57f와 후속 보고서 HEAD 구분; 최종 feature HEAD/추적/live origin/clean은 동일 증거 폴더 `git-final-audit.json`과 최종 응답에 기록한다. 다음은 사용자 핵심 경험 평가이며 승인 없이 다음 제작 범위로 진행하지 않는다.

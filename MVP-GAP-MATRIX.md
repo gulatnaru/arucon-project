@@ -17,6 +17,7 @@
 | Android최신native/UI·실기기 | NEEDS_DEVICE_VALIDATION / NOT_RUN_THIS_SCOPE; 과거PASS를새플랫폼통과로표시하지않음 |
 | 재미·최종아트·후속범위 | USER_REVIEW_PENDING. 사용자첫평가뒤집중수정범위설정/전체제작자동확대없음 |
 | 법률·실건강·계정·실결제·출시 | 기존HARD_STOP/건강·결제OFF, main/merge/deploy없음 |
+| feature 원격 체크포인트 | LOCAL_COMMITTED / BLOCKED_REMOTE_SERVER: 일반push3회 GitHub Internal Server Error, 실제origin/추적b006a51. 로컬앱READY·최종소스cf1d57f와원격미반영구분 |
 
 ## Historical — REBOOT-01 v5 / PARTIAL_WITH_BLOCKERS
 
