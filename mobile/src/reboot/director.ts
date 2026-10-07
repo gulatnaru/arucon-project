@@ -2,7 +2,7 @@ import type { FloorPoint } from '../scene/types';
 import { REBOOT_HAND, type RebootCommand, type RebootEvent, type RebootIntent, type RebootStage, type RebootView } from './contracts';
 
 export type RebootWorld = { enabled: boolean; awake: boolean; moving: boolean; touching: boolean; position: FloorPoint; view: RebootView };
-export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number };
+export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number; gazeTarget?: FloorPoint };
 type Intent = { command: RebootCommand; phase: RebootEvent['phase']; elapsed: number; automatic: boolean; releaseFrom?: number };
 let sessionSequence = 0;
 /** One persistent actor. Frame updates contain no lookup, promise, React or SQL. */
@@ -76,7 +76,8 @@ export class RebootDirector {
     const recoveryDuration = w.view.stage === 'baby' ? 1.4 : 2.2;
     this.pose = { kind: i.command.kind, phase: i.phase,
       progress: Math.min(1, i.elapsed / (i.phase === 'recover' ? recoveryDuration : this.contactDuration(i.command.kind))),
-      releaseFrom: i.releaseFrom, stage: w.view.stage, held: this.touching || this.hand };
+      releaseFrom: i.releaseFrom, stage: w.view.stage, held: this.touching || this.hand,
+      ...(i.command.kind === 'hand' && i.command.target ? { gazeTarget: i.command.target } : {}) };
     if (i.phase === 'look' && i.elapsed >= (w.view.stage === 'baby' ? .65 : .30)) {
       const target = i.command.kind === 'hand' ? { x: REBOOT_HAND.x, z: REBOOT_HAND.z - .48 }
         : i.command.kind === 'cushion_changed' ? w.view.cushion

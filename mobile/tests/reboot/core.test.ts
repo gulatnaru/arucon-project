@@ -7,7 +7,7 @@ import { hatReaction, REBOOT_ITEM, type RebootFact, type RebootEvent } from '../
 import { RebootSemanticQueue, EMBEDDING_IDENTITY, cosine, type RealEmbeddingPort } from '../../src/reboot/semantic';
 import type { SqlConnection, SqlExecutor } from '../../src/storage/sqlite';
 import * as THREE from 'three';
-import { applyRebootPose } from '../../src/reboot/pose';
+import { applyRebootPose, rebootFacing } from '../../src/reboot/pose';
 
 class DB implements SqlConnection {
   native = new DatabaseSync(':memory:'); tail: Promise<void> = Promise.resolve(); failWrite = false;
@@ -110,6 +110,20 @@ test('withdrawal starts at held weight and returns body/feet to neutral in every
       const restored = snapshot();
       applyRebootPose(orientation, model, undefined, 0, false, false);
       assert.ok(restored.every((x, i) => Math.abs(x - snapshot()[i]) < 1e-12), `${stage} neutral restored`);
+    }
+  }
+});
+test('offered-hand contact faces its target from either approach without a sudden turn', () => {
+  for (const stage of ['baby', 'growing', 'evolved'] as const) {
+    const pose = { kind: 'hand' as const, phase: 'contact', progress: 1, held: true, stage, gazeTarget: { x: 0, z: 3.35 } };
+    for (const start of [-Math.PI / 2, Math.PI / 2, Math.PI - .05]) {
+      let facing = start;
+      for (let frame = 0; frame < 100; frame++) {
+        const next = rebootFacing(pose, { x: 0, z: 2.87 }, facing, 1 / 60);
+        assert.ok(Math.abs(next - facing) <= 3.6 / 60 + 1e-12); facing = next;
+      }
+      assert.ok(Math.abs(Math.atan2(Math.sin(facing), Math.cos(facing))) < .01);
+      assert.equal(rebootFacing({ ...pose, phase: 'approach' }, { x: 0, z: 2.87 }, start, .1), start);
     }
   }
 });

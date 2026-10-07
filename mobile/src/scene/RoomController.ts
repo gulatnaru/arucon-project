@@ -3,8 +3,8 @@ import { LivingPet, type LifeCommand, type LifeEvent, type LifeWorld } from '../
 import { growthExpression } from '../living/growthExpression';
 import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { RebootDirector } from '../reboot/director';
-import { applyRebootPose } from '../reboot/pose';
-import { REBOOT_HAND, REBOOT_SCALE, type RebootView, type RebootEvent, type RebootStage } from '../reboot/contracts';
+import { applyRebootPose, rebootFacing } from '../reboot/pose';
+import { REBOOT_HAND, REBOOT_HAND_HEIGHT, REBOOT_SCALE, type RebootView, type RebootEvent, type RebootStage } from '../reboot/contracts';
 import { prepareCpuMorphs } from './cpuMorph';
 import { createMorphedAnchor } from './morphedAnchor';
 import { File, Paths } from 'expo-file-system';
@@ -438,7 +438,7 @@ export class RoomController {
     const stripe = new THREE.Mesh(new THREE.TorusGeometry(.219, .012, 4, 20), this.material(0xf7dfb9));
     ball.add(stripe);
     this.scene.add(ball); this.furniture.ball = ball;
-    const hand = new THREE.Group(); hand.position.set(REBOOT_HAND.x, .48, REBOOT_HAND.z);
+    const hand = new THREE.Group(); hand.position.set(REBOOT_HAND.x, REBOOT_HAND_HEIGHT, REBOOT_HAND.z);
     this.addSphere(hand, 0xe3bcc8, [.16, .035, .18], [0, 0, 0]);
     for (const x of [-.10, 0, .10]) this.addSphere(hand, 0xe9c9d2, [.04, .04, .10], [x, 0, -.12]);
     hand.visible = false; this.scene.add(hand); this.rebootHandMarker = hand;
@@ -861,7 +861,12 @@ export class RoomController {
     }
     if (this.touchHolding) this.touchTime += dt;
     this.petPulseRemaining = Math.max(0, this.petPulseRemaining - dt);
+    if (this.rebootView && !this.path.length && !this.sleeping) {
+      this.facing = rebootFacing(this.reboot.pose, this.position, this.facing, dt);
+      this.petAnchor.rotation.y = this.facing;
+    }
     if (!this.comparisonMode && !this.path.length && !(this.livingEnabled && this.life.pose) &&
+        !(this.rebootView && this.reboot.pose?.gazeTarget) &&
         (this.touchHolding || this.petPulseRemaining > 0 || this.presentationState !== EMPTY_ROOM_PRESENTATION)) {
       const targetFacing = this.presentationState.gaze === 'aside' ? -0.22 : 0;
       this.facing += Math.atan2(Math.sin(targetFacing - this.facing), Math.cos(targetFacing - this.facing)) * (1 - Math.exp(-10 * dt));

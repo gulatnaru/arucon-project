@@ -1,5 +1,18 @@
 import * as THREE from 'three';
 import type { RebootPose } from './director';
+import type { FloorPoint } from '../scene/types';
+
+/** Arrival faces the offered hand, never the heading of the last route segment. */
+export function rebootFacing(pose: RebootPose | undefined, position: FloorPoint, facing: number, dt: number): number {
+  const target = pose?.gazeTarget;
+  if (!target || !['look', 'contact', 'recover'].includes(pose!.phase)) return facing;
+  const dx = target.x - position.x, dz = target.z - position.z;
+  if (Math.hypot(dx, dz) < .01) return facing;
+  const desired = Math.atan2(dx, dz), delta = Math.atan2(Math.sin(desired - facing), Math.cos(desired - facing));
+  const elapsed = Math.max(0, Math.min(.1, dt));
+  const step = delta * (1 - Math.exp(-9 * elapsed)), limit = 3.6 * elapsed;
+  return facing + Math.max(-limit, Math.min(limit, step));
+}
 
 /** Whole attached body motion and facial morphs; no content/DB access. */
 export function applyRebootPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,

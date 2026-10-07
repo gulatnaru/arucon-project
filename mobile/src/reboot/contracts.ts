@@ -15,6 +15,8 @@ export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revisi
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand }>;
 export const REBOOT_SCALE: Record<RebootStage, number> = { baby: .53, growing: .48, evolved: .43 };
 export const REBOOT_HAND: FloorPoint = Object.freeze({ x: 0, z: 3.35 });
+// Meet the front paws below the face; the old .48 height covered the mouth.
+export const REBOOT_HAND_HEIGHT = .14;
 export const REBOOT_ITEM = Object.freeze({ hat: 'review:pearl-beret', cushion: 'review:rest-cushion' });
 
 export function eligibleMemories(snapshot: RebootSnapshot, itemId: string): RebootFact[] {
