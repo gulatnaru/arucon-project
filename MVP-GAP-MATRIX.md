@@ -1,6 +1,21 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 REBOOT-01 첫 범위 — READY_FOR_CORE_EXPERIENCE_REVIEW / v7
+## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / 제품판정 REWORK_REQUIRED OPEN
+
+사용자REBOOT01재미/캐릭터/모션/표정불충족평가가현재기준이다. 아기한마리만수정하며과거기능PASS/READY를제품승인으로쓰지않는다. [실제결과](REBOOT-02-REPORT.md).
+
+| 항목 | 현재 |
+|---|---|
+| 아기얼굴/한뿔 | editableparametric곡면/morph초안GLB285000bytes/정지nativeframebuffer렌더확인; Blender/MCP없음/.blend/완성아트아님/최종아트USER_REVIEW_PENDING |
+| +15/+25/+35 | 메뉴/config구현/finalSize=null; +25정지렌더만관찰, 3개정상게임비교 BLOCKED_HOST_LOCKED |
+| 자율생활/7표정/교감/말풍선/기억 | 구현/자동검사PASS; 정상3분·혼합입력·무언·모자/쿠션체감·sleep/cold/현재성능 BLOCKED_HOST_LOCKED |
+| 새회귀/build/보존 | 404/404·영향42/42·lint/typecheck·iOSRelease/install/hash/process·AndroidJS·CNG23/23·assetcheck·운영42/42 PASS; 원본30+아루/경제/EXP/meal/소유/모자·쿠션/원본 3GLB보존/3DBok |
+| Figma/AI B | Figma도구노출/2계정작성대상미응답/실제호출없음; 기본A·기존standalone연구보존/B이번완료조건아님 |
+| 성장기/진화형 유사함·크기 | REWORK_REQUIRED_DEFERRED_BY_USER_SCOPE; 아기검토후집중범위/전계열제작안함 |
+| 실기기/GPU/물리 입력 지연/발열·배터리/최신Androidnative | NOT_RUN; 과거proxy를신규값으로복사하지않음 |
+| 재미/아트/크기/출시 | USER_REVIEW_PENDING; 건강/계정/결제/출시HardStop유지/전체MVP완료아님 |
+
+## Historical — REBOOT-01 첫 범위 / READY_FOR_CORE_EXPERIENCE_REVIEW / v7
 
 한 계열·세 후보·손 교감·한 모자·이동 쿠션·완료 기억의 iOS Simulator 검토 판정이다. SRS 전체MVP/출시·재미·최종아트 승인이 아니다. LIFE-02 재미 불충족 평가·기존 승인 정책 보존. [현재 증거/빌드](REBOOT-01-REPORT.md), [실행/다음 사용자 평가](NEXT-RESUME.md).
 

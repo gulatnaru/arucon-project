@@ -1,6 +1,14 @@
 # iOS validation history and Release input resume
 
-## 현재 REBOOT-01 v7 — READY_FOR_CORE_EXPERIENCE_REVIEW
+## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / baby v2
+
+사용자제품평가 REWORK_REQUIRED—CHARACTER/MOTION/EXPRESSION 재오픈. 아기얼굴곡면patch/morph·한뿔·+15/+25/+35후보·6계열관심→접근→결과→반응·7표정·머리/몸/이력교감·작은말풍선·모자/쿠션경험표현을직접구현했다. **현재실제CUA는착수메뉴와최신설치후둘다Mac locked**, 최신정상3분/입력/세크기/기억/복귀/성능은BLOCKED이다. 정지framebuffer는새얼굴렌더확인에만쓰고모션PASS로하지않았다.
+
+소스9a09f8382da45816f4882d32ca854e6944148abf/설치babyv2 SHA5877d697c0e1c43fbc9ffd855bde80d17864f54fa81ee501c801eaf2a99b92e2/141runtime파일대조. 새404/404·영향42/42·lint/typecheck·iOSRelease exit0/DB유지install/process·AndroidJS·CNG23/23·assetcheck·운영42/42 PASS. 원본30개+같은아루 identity/경제/EXP/meal/facility/소유/모자/쿠션/preview보존/3DBok. 원본3GLB도byte일치.
+
+Blender실행/MCP없음: editablegenerator/sourceJSON+runtimeGLB **초안**, Blender/.blend/완성아트납품아님. Figma2계정의작성대상미응답/성공호출없음. AI B 조건아님/기본A/기존모델연구보존. SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 사용자결함은미닫음/재미·아트·크기USER_REVIEW_PENDING. [현재범위/증거/실제미완료](REBOOT-02-REPORT.md), [첫재개경로](NEXT-RESUME.md). 기존소스/저장엔진재작성·성장기/진화형대량제작·경제·건강/권한변경없음.
+
+## Historical — REBOOT-01 v7 / READY_FOR_CORE_EXPERIENCE_REVIEW
 
 원격 publication은 **BLOCKED_REMOTE_SERVER**: 일반feature push3회 모두 GitHub Internal Server Error, 실제origin/추적b006a51. sourcecf1d57f·검토보고926abde·후속인계는로컬checkpoint로보존. 앱검토READY와push미반영을구분하고최종HEAD/clean은같은증거폴더git-final-audit에기록한다.
 

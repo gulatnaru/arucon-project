@@ -1,6 +1,20 @@
-# Next resume — REBOOT-01 첫 범위
+# Next resume — REBOOT-02 아기
 
-## 현재 v7 첫 범위 — READY_FOR_CORE_EXPERIENCE_REVIEW / 2026-10-08
+## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / baby v2
+
+[실행지시](tasks/REBOOT-02-baby-charm.md), [실제결과/한계](REBOOT-02-REPORT.md). 사용자판정 REWORK_REQUIRED — CHARACTER/MOTION/EXPRESSION은 **OPEN**. 아기만 진행하며 이전REBOOT01READY를제품승인으로쓰지않는다. 재미/최종아트/세크기 USER_REVIEW_PENDING.
+
+앱소스 **9a09f8382da45816f4882d32ca854e6944148abf**, 현재설치 **reboot-02-baby-v2 Release SHA5877d697c0e1c43fbc9ffd855bde80d17864f54fa81ee501c801eaf2a99b92e2**. `evidence/reboot-02-baby-2026-10-08/24-release-v2-manifest.json`141개runtime/source해시와현재설치를먼저대조한다. 같으면재빌드/재설치/DB초기화하지않는다. source와문서HEAD구분/과거reset금지. 현재원본30개·같은아루·모자·쿠션rev4/previewbaby·경제/EXP/meal/소유모두보존/3DBok(`27`).
+
+**다음 한 작업: Mac 실제접근→정상아루방 ☰→우리 아이→+15/+25/+35 동일카메라/방 실제비교 캡처.** 첫메뉴입력과최신설치후screenshot접근 모두 실제CUA_MAC_LOCKED. 잠금해제질문pending, 보안/자동잠금설정우회없음. +25의정지nativeframebuffer`26`만있고모션/입력PASS아님.
+
+이어같은v2 3분정상무입력영상/관심→행동→결과/7표정→정상머리·몸·현재행동·연속접촉20회/말풍선가림→모자/쿠션기억체감→메뉴·수면/깨우기·전환/cold→현재60초proxy. 강제진단/자동배속/과거v7영상·성능으로대체하지않는다. 새기술결함은수정→영향검사→필요Release→실제재검증/SELF_REVIEW.
+
+새404/404·영향42/42·lint/최종typecheck·iOSRelease exit0/install/hash/process·AndroidJS·CNG23/23·assetcheck·운영42/42 PASS. Blender/PATH/앱/Spotlight/프로젝트tools/MCP없음: parametric얼굴/morph/GLB초안이며Blender제작/완성아트/.blend납품아님. Figma2계정선택질문미응답/실제호출없음. 기본A유지/AI B 완료조건아님/기존연구보존. 직접개발/subagent0/effective ROUTING_UNVERIFIED.
+
+실제GPU/물리지연/실기기/발열·배터리/최신AndroidnativeUI미검증. source원본/경제·성장·수면/동면/SQLite대기열/일반위젯/건강OFF유지. 다음계열/상점/전체새1~20/가격/변기정책/미니게임확대금지. featurecheckpoint/일반push범위만; 최종원격반영은현재git-final-audit를읽고판단한다.
+
+## Historical — v7 첫 범위 / READY_FOR_CORE_EXPERIENCE_REVIEW / 2026-10-08
 
 다음은 **사용자 첫 핵심 경험 평가**다. [현재 결과](REBOOT-01-REPORT.md)의 최상단부터 읽고 다음 계열/상점/새 Lv.1~20 제작으로 확대하지 않는다. 재미·최종아트 **USER_REVIEW_PENDING**, 기본 **A**. 게임B 연기/자연스러움 NOT_RUN, 별도 Swift Simulator 추론을 통합 완료로 바꾸지 않는다.
 

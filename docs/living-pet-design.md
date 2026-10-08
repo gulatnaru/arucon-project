@@ -1,5 +1,17 @@
 # LIFE-00/01 생활 개편 — 구현 계약
 
+## REBOOT-02 아기 한 마리 — 구현과 검증 대기
+
+`reboot_review`/같은아루/기존SQLite lane·64개완료기억을재사용한다. 일반저장/성격ID/EXP/원장/시설/건강을바꾸지않고아기표현만비교한다. [지시](../tasks/REBOOT-02-baby-charm.md), [현재실행/차단](../REBOOT-02-REPORT.md).
+
+- 새baby-charmGLB는머리곡면을따르는눈/눈꺼풀/눈썹/볼/입, 실제morph와귀/모자localpivot을가진parametric초안이다. 원본 v7모델/clip보존. Blender없음/완성아트승인아님.
+- 크기는v7baby.53의1.15/1.25/1.35곱이며부모camera/room동일.1.25임시비교/finalSize=null. 사용자선택전확정하지않는다. menuoverlay/size변경이GL컨텍스트를재생성하지않도록기존controller를유지한다.
+- 한persistentRebootDirector가관심대상/접근을완료·취소까지유지한다. 현재 cushionedge/window/plant/사용자화면/발장난/휴식의6계열,scan/sniff/통통/too_close/shake/look_back/paw/휴식으로결과와반응연결. stagebabyCharm에만적용하고성장기/진화형동작은이력으로보존한다.
+- 일곱순간표정은저장personality/mood/경제를재계산하지않는다. 실제morph+귀/몸/앞발rig가프레임마다cachednode/vector를사용한다. reducedmotion은별도입력,배경/수면시decorative표정을초기화하고latecallback을폐기한다.
+- 직접press의head/body/unknown을같은서비스로전달하고완료때만기억한다. 현재탐색·8초반복·45분완료hand ID로기대기/놀람/꼼지락/옆기대기/앞발응답이달라진다. 연타EXP/호감도/보상없음.
+- 자동발화9초간격/짧은cue2300ms읽기보호/최근3줄제외/무언beat. timer는epoch/token·앱전환/닫기로취소.164pt말풍선/50ptheadclearance는현재비교용이며최신GUI/큰글자검증전PASS아님. trace256개는로컬진단만,기억DB예산은기존64개/32KiB.
+- 실제최신 native입력/3분/7표정읽기성/세크기/기억체감/성능은Mac잠금으로미완료. 구현·Node수치·정지framebuffer를실제플레이승인으로대체하지않는다. AI B는이번완료조건이아니다.
+
 ## REBOOT-01 첫 범위의 현재 좌표·완료 경험 계약
 
 `reboot-01:main`/아루의 별도 검토 DB에서만 세 제작 후보·진주빛 한 뿔·작은 모자·이동 쿠션을 비교한다. 실제 form/Lv/EXP와 previewStage를 구분하며 일반 저장의 personality·소유·경제·위젯을 바꾸지 않는다. [첫 범위](../tasks/REBOOT-01-core-experience-and-memory.md), [실제 결과](../REBOOT-01-REPORT.md).
