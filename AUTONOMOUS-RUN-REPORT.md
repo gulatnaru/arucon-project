@@ -2,6 +2,8 @@
 
 ## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / baby v2
 
+현재feature일반push성공, 첫보고서e5f3032 local/tracking/live 일치. 이전REBOOT01의원격미반영은이번push로해소됐고현재Git최종receipt와별도기록한다. 앱정상입력의Mac잠금은여전히별도BLOCKED이다.
+
 사용자제품평가 REWORK_REQUIRED—CHARACTER/MOTION/EXPRESSION 재오픈. 아기얼굴곡면patch/morph·한뿔·+15/+25/+35후보·6계열관심→접근→결과→반응·7표정·머리/몸/이력교감·작은말풍선·모자/쿠션경험표현을직접구현했다. **현재실제CUA는착수메뉴와최신설치후둘다Mac locked**, 최신정상3분/입력/세크기/기억/복귀/성능은BLOCKED이다. 정지framebuffer는새얼굴렌더확인에만쓰고모션PASS로하지않았다.
 
 소스9a09f8382da45816f4882d32ca854e6944148abf/설치babyv2 SHA5877d697c0e1c43fbc9ffd855bde80d17864f54fa81ee501c801eaf2a99b92e2/141runtime파일대조. 새404/404·영향42/42·lint/typecheck·iOSRelease exit0/DB유지install/process·AndroidJS·CNG23/23·assetcheck·운영42/42 PASS. 원본30개+같은아루 identity/경제/EXP/meal/facility/소유/모자/쿠션/preview보존/3DBok. 원본3GLB도byte일치.

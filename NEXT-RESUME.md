@@ -2,6 +2,8 @@
 
 ## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / baby v2
 
+이번feature일반push성공/첫인계e5f3032의로컬·추적·live일치확인. 이전unpublished REBOOT01도반영됐으며최종HEAD/원격/clean은현재evidence/git-final-audit를읽는다. 새재개에서과거push오류를현상으로가정하지않는다.
+
 [실행지시](tasks/REBOOT-02-baby-charm.md), [실제결과/한계](REBOOT-02-REPORT.md). 사용자판정 REWORK_REQUIRED — CHARACTER/MOTION/EXPRESSION은 **OPEN**. 아기만 진행하며 이전REBOOT01READY를제품승인으로쓰지않는다. 재미/최종아트/세크기 USER_REVIEW_PENDING.
 
 앱소스 **9a09f8382da45816f4882d32ca854e6944148abf**, 현재설치 **reboot-02-baby-v2 Release SHA5877d697c0e1c43fbc9ffd855bde80d17864f54fa81ee501c801eaf2a99b92e2**. `evidence/reboot-02-baby-2026-10-08/24-release-v2-manifest.json`141개runtime/source해시와현재설치를먼저대조한다. 같으면재빌드/재설치/DB초기화하지않는다. source와문서HEAD구분/과거reset금지. 현재원본30개·같은아루·모자·쿠션rev4/previewbaby·경제/EXP/meal/소유모두보존/3DBok(`27`).
