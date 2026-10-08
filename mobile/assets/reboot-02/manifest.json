@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "source": "source.json + generate-reboot-baby.mjs",
+  "originalPreserved": true,
+  "file": "baby-charm.glb",
+  "bytes": 285000,
+  "sha256": "2e2146605d93a0482cfe45c602172b25b1287e3fb1f1d78ae50d6db10e791a1b",
+  "hornCount": 1,
+  "face": "curved surface patches + inset lids + attached cheeks/mouth; spherical eyes removed",
+  "morphs": [
+    "Blink",
+    "Surprised",
+    "Happy",
+    "Mischief",
+    "Sleepy",
+    "Curious",
+    "Smile",
+    "Open",
+    "Playful",
+    "Bashful"
+  ],
+  "artStatus": "DRAFT_REVIEW_NOT_FINAL_ART",
+  "blender": "NOT_AVAILABLE",
+  "finalSize": null
+}

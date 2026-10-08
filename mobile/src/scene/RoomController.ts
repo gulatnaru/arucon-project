@@ -4,7 +4,8 @@ import { growthExpression } from '../living/growthExpression';
 import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { RebootDirector } from '../reboot/director';
 import { applyRebootPose, rebootFacing } from '../reboot/pose';
-import { REBOOT_HAND, REBOOT_HAND_HEIGHT, REBOOT_SCALE, type RebootView, type RebootEvent, type RebootStage } from '../reboot/contracts';
+import { applyBabyPose, resetBabyPose } from '../reboot/babyPose';
+import { REBOOT_HAND, REBOOT_HAND_HEIGHT, REBOOT_SCALE, type RebootView, type RebootEvent, type RebootStage, type RebootIntent, type TouchRegion } from '../reboot/contracts';
 import { prepareCpuMorphs } from './cpuMorph';
 import { createMorphedAnchor } from './morphedAnchor';
 import { File, Paths } from 'expo-file-system';
@@ -73,6 +74,10 @@ const REBOOT_ASSETS: Record<RebootStage, number> = {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   evolved: require('../../assets/reboot-characters/evolved.glb') as number,
 };
+// Review-only baby draft. Legacy originals and the other stages stay available.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const BABY_CHARM_ASSET = require('../../assets/reboot-02/baby-charm.glb') as number;
+const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? view.sizeCandidate ?? 1.25 : 1);
 
 export class RoomController {
   readonly scene = new THREE.Scene();
@@ -171,8 +176,10 @@ export class RoomController {
   private rebootHandMarker?: THREE.Group;
   private rebootTime = 0;
   private readonly rebootDockOffset = new THREE.Vector3();
+  private rebootTouchRegion: TouchRegion = 'unknown';
+  private rebootInterruptedForTouch?: RebootIntent;
   private readonly reboot = new RebootDirector({
-    navigate: point => !!this.navigateTo(point),
+    navigate: point => { const target = this.navigateTo(point); this.targetRing.visible = false; return !!target; },
     stop: () => { this.path = []; this.destination = null; this.targetRing.visible = false; this.restoreBaseClip(); },
     event: event => this.onRebootEvent?.(event),
   });
@@ -286,6 +293,7 @@ export class RoomController {
 
   setPresentation(props: RoomProps) {
     const oldRebootStage = this.rebootView?.stage;
+    const oldBabyCharm = this.rebootView?.babyCharm;
     this.rebootView = props.rebootView;
     this.onRebootEvent = props.onRebootEvent;
     this.livingEnabled = !!props.livingEnabled;
@@ -294,7 +302,7 @@ export class RoomController {
     this.growthStyle = growthExpression(this.growthStage);
     this.growthLevel = props.growthLevel ?? 1;
     this.lowEnergy = !!props.lowEnergy;
-    this.loadedPet?.scale.setScalar(this.rebootView ? REBOOT_SCALE[this.rebootView.stage] : .62 * this.growthStyle.scale);
+    this.loadedPet?.scale.setScalar(this.rebootView ? rebootScale(this.rebootView) : .62 * this.growthStyle.scale);
     this.hungry = !!props.hungry;
     this.mealAvailability = props.mealAvailability ?? 'ready';
     if (props.poopCount && !this.cleanupProp) this.cleanupProp = this.addSphere(this.scene, 0xaa876b, [.22, .16, .22], [-.5, .12, 3.1]);
@@ -307,8 +315,8 @@ export class RoomController {
     const nextFormPresentation = props.previewFormId ? selectFormPresentation(props.previewFormId) : selectFormPresentation(props.formId ?? 'arucon');
     const nextCandidateId = props.characterCandidateId ?? DEFAULT_CHARACTER_CANDIDATE_ID;
     const petAssetChanged = nextFormPresentation.assetKey !== this.formPresentation.assetKey ||
-      nextCandidateId !== this.characterCandidateId || oldRebootStage !== this.rebootView?.stage;
-    if (oldRebootStage !== this.rebootView?.stage) { this.reboot.cancel(); this.cancelPet(); this.pinComparisonView(); }
+      nextCandidateId !== this.characterCandidateId || oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm;
+    if (oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm) { this.reboot.cancel(); this.cancelPet(); this.pinComparisonView(); }
     this.formPresentation = nextFormPresentation;
     this.characterCandidateId = nextCandidateId;
     this.setComparisonView(props.comparisonCameraAngle);
@@ -317,6 +325,7 @@ export class RoomController {
     const nextProfile = props.personality ?? 'reserved';
     const nextRestMode = props.restMode ?? (props.sleeping ? 'sleeping' : 'awake');
     const nextSleeping = nextRestMode !== 'awake';
+    if (nextSleeping !== this.sleeping && this.loadedPet) resetBabyPose(this.loadedPet);
     this.restMode = nextRestMode;
     this.onPerformanceSummary = props.onPerformanceSummary;
     this.onPerformanceCapture = props.onPerformanceCapture;
@@ -451,6 +460,7 @@ export class RoomController {
   }
 
   private petAsset() {
+    if (this.rebootView?.babyCharm && this.rebootView.stage === 'baby') return BABY_CHARM_ASSET;
     if (this.rebootView) return REBOOT_ASSETS[this.rebootView.stage];
     return this.formPresentation.formId !== 'arucon' || this.characterCandidateId === DEFAULT_CHARACTER_CANDIDATE_ID
       ? FORM_ASSETS[this.formPresentation.assetKey]
@@ -458,7 +468,7 @@ export class RoomController {
   }
 
   async loadPet() {
-    const assetKey = this.rebootView ? `reboot:${this.rebootView.stage}` : `${this.formPresentation.assetKey}:${this.characterCandidateId}`;
+    const assetKey = this.rebootView ? `reboot:${this.rebootView.stage}:${this.rebootView.babyCharm ? 'charm' : 'legacy'}` : `${this.formPresentation.assetKey}:${this.characterCandidateId}`;
     if (assetKey === this.loadingPetKey || assetKey === this.loadedPetKey) return;
     const generation = ++this.petLoadGeneration;
     this.loadingPetKey = assetKey;
@@ -485,7 +495,7 @@ export class RoomController {
       this.mealMouth = mouth instanceof THREE.Mesh ? createMorphedAnchor(mouth) : undefined;
       this.updateCpuMorphs = this.softwareRenderer && ['software_low_resolution', 'software_balanced'].includes(this.rendererConfig.id)
         ? prepareCpuMorphs(loaded) : null;
-      loaded.scale.setScalar(this.rebootView ? REBOOT_SCALE[this.rebootView.stage] : 0.62 * growthExpression(this.growthStage).scale);
+      loaded.scale.setScalar(this.rebootView ? rebootScale(this.rebootView) : 0.62 * growthExpression(this.growthStage).scale);
       const hat = loaded.getObjectByName('RebootHat'); if (hat) hat.visible = !!this.rebootView?.hatWorn;
       const firstModel = !this.loadedPet;
       this.petOrientation.rotation.y = this.comparisonMode ? comparisonCameraYaw(this.comparisonCameraAngle) : 0;
@@ -772,9 +782,10 @@ export class RoomController {
     return target;
   }
 
-  beginPet(inputStartedAtMs = performance.now()) {
+  beginPet(inputStartedAtMs = performance.now(), region: TouchRegion = 'unknown') {
     if (!this.canStartPet()) return false;
     if (this.livingEnabled) this.life.cancel();
+    this.rebootInterruptedForTouch = this.reboot.current?.kind; this.rebootTouchRegion = region;
     this.interruptFreePresentation();
     this.path = []; this.destination = null; this.targetRing.visible = false;
     this.touchHolding = true; this.touchTime = 0;
@@ -793,6 +804,7 @@ export class RoomController {
   beginAccessiblePet(inputStartedAtMs: number) {
     if (!this.canStartPet()) return false;
     if (this.livingEnabled) this.life.cancel();
+    this.rebootInterruptedForTouch = this.reboot.current?.kind; this.rebootTouchRegion = 'unknown';
     this.interruptFreePresentation();
     this.petPulseRemaining = 0.4;
     this.performanceProbe.recordInputHandled(inputStartedAtMs, 'accessibility');
@@ -825,7 +837,7 @@ export class RoomController {
     this.rebootTime += dt;
     if (this.rebootView && this.modelReady) this.reboot.update(dt, { enabled: this.interactionEnabled,
       awake: !this.sleeping, moving: !!this.path.length, touching: this.touchHolding || this.petPulseRemaining > 0,
-      position: this.position, view: this.rebootView });
+      position: this.position, view: this.rebootView, touchRegion: this.rebootTouchRegion, interruptedForTouch: this.rebootInterruptedForTouch });
     if (this.livingEnabled) this.life.update(dt, this.lifeWorld());
     if (this.cueRemaining > 0) {
       this.cueRemaining = Math.max(0, this.cueRemaining - dt);
@@ -847,7 +859,7 @@ export class RoomController {
         const h = Math.min(MOTION.simulationStep, remaining);
         const next = this.path[0];
         const updated = advanceWalk({ position: this.position, facing: this.facing, speed: this.walkSpeed }, next, h,
-          this.rebootView && this.reboot.current?.kind === 'dash' ? 'expressive' : this.profile, this.path.length > 1);
+          this.rebootView && (this.reboot.current?.kind === 'dash' || this.rebootView.babyCharm) ? 'expressive' : this.profile, this.path.length > 1);
         this.position = updated.position; this.facing = updated.facing; this.walkSpeed = updated.speed;
         if (Math.hypot(next.x - this.position.x, next.z - this.position.z) < 0.025) this.path.shift();
         remaining -= h;
@@ -904,6 +916,8 @@ export class RoomController {
     if (this.rebootView && this.loadedPet && !this.sleeping) {
       applyRebootPose(this.petOrientation, this.loadedPet, this.reboot.pose, this.rebootTime,
         !!this.path.length, this.reducedMotion, this.position, this.facing);
+      if (this.rebootView.babyCharm && this.rebootView.stage === 'baby') applyBabyPose(this.petOrientation, this.loadedPet,
+        this.reboot.pose, this.rebootTime, dt, !!this.path.length, this.reducedMotion);
       const dock = this.reboot.pose?.dockTarget && ['contact', 'recover'].includes(this.reboot.pose.phase);
       if (dock) {
         const p = this.petOrientation.position;
@@ -974,6 +988,7 @@ export class RoomController {
     this.life.cancel();
     this.reboot.cancel();
     this.rebootDockOffset.set(0, 0, 0);
+    if (this.loadedPet) resetBabyPose(this.loadedPet);
     if (this.rebootView) { this.petOrientation.position.set(0, 0, 0); this.petOrientation.rotation.set(0, 0, 0); this.petOrientation.scale.set(1, 1, 1); }
     this.path = []; this.destination = null; this.targetRing.visible = false;
   }

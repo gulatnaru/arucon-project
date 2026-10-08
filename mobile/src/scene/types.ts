@@ -65,6 +65,8 @@ export type RoomProps = {
   topOcclusion?: number;
   bottomOcclusion?: number;
   reactionBubble?: ReactNode;
+  reactionBubbleWidth?: number;
+  reactionBubbleHeadClearance?: number;
   /** Reversible common-form comparison; it never mutates formId or saved state. */
   characterCandidateId?: CharacterCandidateId;
   /** Comparison view rotates only the loaded character inside the unchanged room. */

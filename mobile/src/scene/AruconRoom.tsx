@@ -26,7 +26,8 @@ export function AruconRoom(props: RoomProps) {
   const [bubbleHeight, setBubbleHeight] = useState(100);
   const topLimit = props.topOcclusion ?? insets.top + 74;
   const bottomLimit = size.height - (props.bottomOcclusion ?? insets.bottom + 94);
-  const bubble = petBubbleBounds(hits?.pet ?? { x: size.width / 2, y: size.height / 2 }, size.width, topLimit, bottomLimit, bubbleHeight);
+  const bubble = petBubbleBounds(hits?.pet ?? { x: size.width / 2, y: size.height / 2 }, size.width, topLimit, bottomLimit, bubbleHeight,
+    props.reactionBubbleWidth, props.reactionBubbleHeadClearance);
   const rendererProfileId = props.rendererProfileId ?? 'automatic';
   const requestedRendererProfile = useRef(rendererProfileId);
   const [effectiveRendererProfileId, setEffectiveRendererProfileId] = useState(rendererProfileId);
@@ -234,7 +235,7 @@ export function AruconRoom(props: RoomProps) {
             const result = petGesture.current.begin(
               event.nativeEvent.identifier,
               event.nativeEvent.touches.length,
-              () => !!room?.beginPet(startedAtMs),
+              () => !!room?.beginPet(startedAtMs, touchTarget.current),
             );
             if (result === 'started') latest.current.onInteractionIntent?.('pet');
             if (result === 'rejected') latest.current.onStatus?.(blockedPetHint());

@@ -1150,7 +1150,7 @@ function AppContent({ profile, onProfile: requestProfile }: { profile: RoomProfi
               {(['ball', 'cushion', 'table'] as const).map((id, i) => <Pressable key={id} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { if (serviceRef.current) doShopPurchase(serviceRef.current, pet, id); }}><Text>{['공', '쿠션', '식탁'][i]} · {APPROVED_MVP_POLICY.shop.items.find(item => item.id === id)?.coinPrice}코인</Text></Pressable>)}
             </>}
             {menu === 'settings' && <>
-              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => onProfile('reboot_review')}><Text>리부트 첫 검토판</Text></Pressable>
+              <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => onProfile('reboot_review')}><Text>아기 매력 검토판</Text></Pressable>
               <Pressable accessibilityRole="switch" accessibilityState={{ checked: reducedMotion }} style={styles.menuItem} onPress={() => setReducedMotion(value => !value)}><Text>동작 줄이기 {reducedMotion ? '켜짐' : '꺼짐'}</Text></Pressable>
               <Pressable accessibilityRole="switch" accessibilityState={{ checked: reduceDialogue }} style={styles.menuItem} onPress={() => setReduceDialogue(value => !value)}><Text>자동 말걸기 줄이기 {reduceDialogue ? '켜짐' : '꺼짐'}</Text></Pressable>
               <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => { setMenu(null); setFixtureVisible(true); }}><Text>체험 도구와 빌드 진단</Text></Pressable>

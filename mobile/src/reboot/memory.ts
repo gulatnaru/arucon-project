@@ -32,7 +32,8 @@ export class RebootMemoryStore {
         !Number.isSafeInteger(e.atMs) || e.atMs < 0 || !['hat_used', 'cushion_used', 'hand'].includes(e.kind) ||
         !['review:pearl-beret', 'review:rest-cushion', 'user:hand'].includes(e.itemId) ||
         e.position && (!Number.isFinite(e.position.x) || !Number.isFinite(e.position.z)) ||
-        typeof e.eventId !== 'string' || e.eventId.length > 120 || !['baby', 'growing', 'evolved'].includes(e.stage))) {
+        typeof e.eventId !== 'string' || e.eventId.length > 120 || !['baby', 'growing', 'evolved'].includes(e.stage) ||
+        e.touchRegion !== undefined && !['head', 'body', 'unknown'].includes(e.touchRegion))) {
       throw new Error('기억 형식을 확인할 수 없어 저장을 보존했어요.');
     }
   }

@@ -16,7 +16,7 @@ globalThis.FileReader = class {
 const digest = b => createHash('sha256').update(b).digest('hex');
 const interpolate = (a, t) => { const p = Math.min(a.length - 1.00001, Math.max(0, t) * (a.length - 1)); const i = Math.floor(p); return a[i] + (a[i + 1] - a[i]) * (p - i); };
 function bodyGeometry(s) {
-  const positions = [], index = [], nx = specs.radialSegments, ny = specs.bodyRings;
+  const positions = [], index = [], nx = s.radialSegments ?? specs.radialSegments, ny = s.bodyRings ?? specs.bodyRings;
   for (let row = 0; row <= ny; row++) {
     const t = row / ny, radius = interpolate(s.outline, t);
     for (let col = 0; col <= nx; col++) {
@@ -32,7 +32,7 @@ function bodyGeometry(s) {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   g.setIndex(index); g.computeVertexNormals(); return g;
 }
-function build(s) {
+export function buildRebootCharacter(s) {
   const scene = new THREE.Scene(), root = new THREE.Group(); root.name = 'AruconRoot'; scene.add(root);
   const skin = new THREE.MeshStandardMaterial({ color: s.bodyColor, roughness: .87 });
   const eye = new THREE.MeshStandardMaterial({ color: '#282e43', roughness: .95 });
@@ -101,10 +101,11 @@ function build(s) {
     ...['Eye_L', 'Eye_R'].map(name => new THREE.NumberKeyframeTrack(name + '.morphTargetInfluences[Blink]', [0, 4], [1, 1]))]));
   return { scene, clips };
 }
+if (resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
 await mkdir(directory, { recursive: true });
 const records = [];
 for (const spec of specs.stages) {
-  const { scene, clips } = build(spec);
+  const { scene, clips } = buildRebootCharacter(spec);
   const bytes = Buffer.from(await new GLTFExporter().parseAsync(scene, { binary: true, animations: clips }));
   const filename = spec.id + '.glb';
   if (process.argv.includes('--check')) {
@@ -118,3 +119,4 @@ if (process.argv.includes('--check')) {
   if (await readFile(resolve(directory, 'manifest.json'), 'utf8') !== manifest) throw Error('Manifest differs');
 } else await writeFile(resolve(directory, 'manifest.json'), manifest);
 console.log(JSON.stringify(records));
+}
