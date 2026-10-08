@@ -1,6 +1,14 @@
 # LIFE-00/01 생활 개편 — 구현 계약
 
-## REBOOT-02 아기 한 마리 — 구현과 검증 대기
+## REBOOT-02 v4 실제 입력 후 좁은 수정
+
+같은 아기의 크기 변경 때 표현 intent·접촉·잔여 dock만 취소하고(0,1.8)/정면을 맞춘다. GL/카메라/저장 재생성 없음. 식물 접근은 화장실 가림을 피하는x=-.90이며 실제 장소·사물은 유지한다. 장난=한쪽윙크, 만족=열린눈/미소, 졸림=내려간눈/하품 조합을 기존 morph로 조정했다.
+
+같은 부위8초 이내 반복4회 이상은 최근2개 motor를 제외한다. 현재 region·실제 중단관심·완료 handId·burst를 deterministic ranking에 사용하고 최근3개만 보관한다. 완료사건 기억과 표시/선택 이력은 분리, 신규 EXP/애정/경제 없음. 실제 v3 A-B 고착을 고친 것이며 단순 랜덤 문장 증량이 아니다.
+
+최신 v4 정상영상 첫180초13완료/6생활계열·7표정, 정상21접촉/7motor, 세크기비교·말풍선가림·sleep/wake·reducedON→OFF 최소검증. [현재보고](../REBOOT-02-REPORT.md). 하단 손은 `REBOOT 교감 비교 도구` 표시로 review-only 유지. finalSize=null/아트·재미USER_REVIEW_PENDING. 이전 잠금 기록은 아래 이력이며 현재차단이 아니다. 모자/쿠션전경로·cold·장기동면을이번7항목에서재시험한것으로쓰지않는다.
+
+## Historical — REBOOT-02 v2 아기 구현/검증 대기
 
 `reboot_review`/같은아루/기존SQLite lane·64개완료기억을재사용한다. 일반저장/성격ID/EXP/원장/시설/건강을바꾸지않고아기표현만비교한다. [지시](../tasks/REBOOT-02-baby-charm.md), [현재실행/차단](../REBOOT-02-REPORT.md).
 

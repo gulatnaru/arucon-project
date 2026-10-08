@@ -2,12 +2,12 @@
   "schemaVersion": 6,
   "runDate": "2026-10-08",
   "timezone": "Asia/Seoul",
-  "status": "PARTIAL_WITH_BLOCKERS",
+  "status": "BABY_CHARM_REVIEW_READY",
   "overallGate": "MVP_NOT_COMPLETE",
   "definition": "REBOOT-02 baby only: character/motion/expression product rework, three unapproved size candidates",
-  "reason": "User reopened CHARACTER/MOTION/EXPRESSION. Baby face/topology, causal life episodes, contextual touch, small bubble and memory acting implemented. Latest v2 native installed and static framebuffer rendered. Actual normal UI before/after install blocked by current Mac lock; 3min/three-size/input/memory/rest/cold/performance not verified.",
-  "sourceBaseline": "603b437499437af1e95ffa59574f66409b41c9ac",
-  "sourceCheckpoint": "9a09f8382da45816f4882d32ca854e6944148abf",
+  "reason": "Current Mac pixel/input succeeded. v2 observed first; size anchor/plant occlusion/face clarity/late A-B touch loop fixed and v4 Release revalidated. Narrow requested7 scope ready; fun/art/final size pending, physical/GPU not run.",
+  "sourceBaseline": "f8b0e80d2e938536e76353bdf1f7e1bf8c9eed34",
+  "sourceCheckpoint": "7bf1031c23e376d6db16bfae4b0381eb21635fd9",
   "currentLivingReport": "REBOOT-02-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
@@ -2286,15 +2286,31 @@
   "activeTask": "tasks/REBOOT-02-baby-charm.md",
   "reboot02": {
     "task": "tasks/REBOOT-02-baby-charm.md",
-    "status": "PARTIAL_WITH_BLOCKERS",
-    "productJudgement": "REWORK_REQUIRED_CHARACTER_MOTION_EXPRESSION_OPEN",
-    "sourceCheckpoint": "9a09f8382da45816f4882d32ca854e6944148abf",
-    "build": "reboot-02-baby-v2",
-    "bundleSha256": "5877d697c0e1c43fbc9ffd855bde80d17864f54fa81ee501c801eaf2a99b92e2",
-    "normalThreeMinuteObservation": "BLOCKED_HOST_LOCKED",
-    "sevenExpressionGameSizeReadability": "NOT_VERIFIED; numeric GLB/rig checks only",
-    "normalTwentyMixedTouch": "BLOCKED_HOST_LOCKED",
-    "hatCushionMemoryNaturalness": "BLOCKED_HOST_LOCKED",
+    "status": "BABY_CHARM_REVIEW_READY",
+    "scope": "2026-10-08 current v2 follow-up seven requested product checks; no expansion",
+    "productJudgement": "BABY_USER_REVIEW_PENDING; prior dissatisfaction retained in history",
+    "sourceCheckpoint": "7bf1031c23e376d6db16bfae4b0381eb21635fd9",
+    "build": "reboot-02-baby-v4",
+    "bundleSha256": "1599ee6e5cf7ade77e6a23187bd4c6d36b1023debefa24446e710a3841811329",
+    "runtimeSourceCount": 141,
+    "actualMacAccess": "PASS_CUA_CURRENT_PIXELS_AND_NORMAL_INPUT",
+    "normalThreeMinuteObservation": {
+      "seconds": 180,
+      "completeEpisodes": 13,
+      "families": 6,
+      "evidence": "37-latest-v4-normal-play.mp4;39-v4-scene-index.json",
+      "notActionIdCount": true
+    },
+    "sevenExpressionGameSizeReadability": "SELF_REVIEW_FACE_AND_BODY_OBSERVED; blind44+key; final art pending",
+    "normalTwentyMixedTouch": {
+      "accepted": 21,
+      "head": 7,
+      "body": 14,
+      "styles": 7,
+      "unknown": 0,
+      "evidence": "40/41;21 actual accepted normal touches; fixed late A-B loop"
+    },
+    "hatCushionMemoryNaturalness": "NOT_RETESTED_THIS_NARROW_7_SCOPE; prior v7 history not relabelled v4",
     "sizes": {
       "candidates": [
         1.15,
@@ -2302,20 +2318,85 @@
         1.35
       ],
       "temporaryInitial": 1.25,
+      "restored": 1.25,
       "final": null,
       "approval": "USER_REVIEW_PENDING",
-      "normalThreeScreens": "BLOCKED; +25 static framebuffer only"
+      "normalThreeScreens": "PASS_CURRENT_V4_SAME_CAMERA_AND_LOCATION_46_51",
+      "movementTouch": "ACTUAL_V4_34_35_36; no separate run clip claim",
+      "observation": "+35 slightly improves eyes/mouth while preserving room; not chosen"
     },
-    "blender": "NOT_AVAILABLE; parametric DRAFT/NO_BLEND_SOURCE/NOT_FINAL_ART",
-    "figma": "ACCOUNT_CHOICE_PENDING; NO_ACTUAL_CALL",
-    "ai": "A_DEFAULT; B_NOT_A_GATE; prior research retained",
-    "original30AndAru": "PRESERVED_AT_ACTUAL_CURRENT_BASELINE; 3DBok",
+    "speechHidden": "ACTUAL_NORMAL_INPUT_V4; ON restored",
+    "reviewTool": "hand footer labelled REBOOT comparison; not normal gameplay UI",
+    "minimumRegression": "ACTUAL_V4_MENU_SLEEP_WAKE_TOUCH_REDUCED_ON_OFF; long hibernation/cold/widget tap not rerun",
+    "performance": {
+      "scope": "LATEST_V4_NO_RECORDING_FIXED_60000MS_PROXY",
+      "inputs": 8,
+      "inputToSubmissionP95Ms": 16.725166082382202,
+      "rafIntervalP95Ms": 16.725916862487793,
+      "over500Ms": 0,
+      "submissionHz": 59.96516406581126,
+      "result": "PASS_PROXY",
+      "physicalGpuDisplayedFps": "NOT_RUN"
+    },
+    "tests": "405/405 FRESH_V4 fail0/skip0",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "iosRelease": "EXIT0_INSTALLED_SAME_DB_ACTUAL_NORMAL_UI",
+    "androidJs": "PASS_V4",
+    "iosCng": "23/23 PASS_FRESH",
+    "assets": "BOTH_GENERATORS_CHECK_PASS",
+    "workflow": "42/42 PASS_FRESH_FINAL;55-final-workflow.log",
+    "blender": "NOT_AVAILABLE_PRIOR_SURVEY; parametric DRAFT/NO_BLEND_SOURCE/NOT_FINAL_ART",
+    "figma": "NOT_USED_THIS_NARROW_TASK; prior account-choice pending",
+    "ai": "A_DEFAULT; B_NOT_A_GATE; research retained",
+    "original30AndAru": "ALL_IDENTITIES_ECONOMY_EXP_MEALS_OWNERSHIP_EQUAL;3DBok;64memory",
     "grownEvolvedRework": "DEFERRED_UNTIL_BABY_USER_REVIEW",
     "physicalGpuInput": "NOT_RUN",
+    "funAndFinalArt": "USER_REVIEW_PENDING",
     "newSubagents": 0,
     "review": "SELF_REVIEW",
+    "requestedModel": "GPT-6.1 Sol Max",
     "effectiveModel": "ROUTING_UNVERIFIED",
-    "evidence": "evidence/reboot-02-baby-2026-10-08/",
-    "next": "actual unlocked v2 -> OurKid +15/+25/+35 -> normal3min -> mixed20 head/body/action/repeat -> speech hidden -> hat/cushion -> rest/menu/cold -> current proxy"
-  }
+    "evidence": "evidence/reboot-02-review-2026-10-08/",
+    "next": "USER BABY_CHARM_SIZE_BUBBLE_REVIEW; no scope expansion"
+  },
+  "reboot02History": [
+    {
+      "asOf": "2026-10-08-v2-before-current-ui-resume",
+      "record": {
+        "task": "tasks/REBOOT-02-baby-charm.md",
+        "status": "PARTIAL_WITH_BLOCKERS",
+        "productJudgement": "REWORK_REQUIRED_CHARACTER_MOTION_EXPRESSION_OPEN",
+        "sourceCheckpoint": "9a09f8382da45816f4882d32ca854e6944148abf",
+        "build": "reboot-02-baby-v2",
+        "bundleSha256": "5877d697c0e1c43fbc9ffd855bde80d17864f54fa81ee501c801eaf2a99b92e2",
+        "normalThreeMinuteObservation": "BLOCKED_HOST_LOCKED",
+        "sevenExpressionGameSizeReadability": "NOT_VERIFIED; numeric GLB/rig checks only",
+        "normalTwentyMixedTouch": "BLOCKED_HOST_LOCKED",
+        "hatCushionMemoryNaturalness": "BLOCKED_HOST_LOCKED",
+        "sizes": {
+          "candidates": [
+            1.15,
+            1.25,
+            1.35
+          ],
+          "temporaryInitial": 1.25,
+          "final": null,
+          "approval": "USER_REVIEW_PENDING",
+          "normalThreeScreens": "BLOCKED; +25 static framebuffer only"
+        },
+        "blender": "NOT_AVAILABLE; parametric DRAFT/NO_BLEND_SOURCE/NOT_FINAL_ART",
+        "figma": "ACCOUNT_CHOICE_PENDING; NO_ACTUAL_CALL",
+        "ai": "A_DEFAULT; B_NOT_A_GATE; prior research retained",
+        "original30AndAru": "PRESERVED_AT_ACTUAL_CURRENT_BASELINE; 3DBok",
+        "grownEvolvedRework": "DEFERRED_UNTIL_BABY_USER_REVIEW",
+        "physicalGpuInput": "NOT_RUN",
+        "newSubagents": 0,
+        "review": "SELF_REVIEW",
+        "effectiveModel": "ROUTING_UNVERIFIED",
+        "evidence": "evidence/reboot-02-baby-2026-10-08/",
+        "next": "actual unlocked v2 -> OurKid +15/+25/+35 -> normal3min -> mixed20 head/body/action/repeat -> speech hidden -> hat/cushion -> rest/menu/cold -> current proxy"
+      }
+    }
+  ]
 }

@@ -1,6 +1,14 @@
 # iOS validation history and Release input resume
 
-## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / baby v2
+## 현재 REBOOT-02 — BABY_CHARM_REVIEW_READY / baby v4
+
+현재 Mac 화면/정상입력이 실제 성공했다. v2를 먼저 관찰한 뒤 크기 비교 위치·식물가림·표정 구분·연속터치 A-B고착을 직접 수정/Release/재검증했다. 최신 v4 첫180초 무입력13완료/6생활계열/7표정, 정상21접촉(머리7/몸14/7motor), 말풍선숨김·이동·메뉴닫기·수면/깨우기·reducedON/OFF 최소회귀 관찰. 동일카메라/위치의 세크기는 영상46/이미지51, 후보별 이동·접촉34/35/36. +35읽기성은 조금 낫고 방이남지만 finalSize=null/임시+25복원. **재미·아트·크기USER_REVIEW_PENDING**.
+
+소스7bf1031c23e376d6db16bfae4b0381eb21635fd9, 설치v4 SHA1599ee6e5cf7ade77e6a23187bd4c6d36b1023debefa24446e710a3841811329/141runtime match. 새405/405·lint/typecheck·iOSRelease exit0/install/실제입력·AndroidJS·CNG23/23·assetcheck. 최종 운영검사42/42 PASS(55로그). 녹화OFF60초 정상touch8/입력→제출p9516.725ms/RAF16.726ms/>500gap0/59.965Hz **PASS_PROXY**; 실제GPU·표시FPS·물리입력·실기기·발열/배터리 NOT_RUN. 과거v7성능을신규값으로복사하지않음.
+
+원본30+같은아루/이름·경제·EXP·meal·소유·모자/쿠션rev4·3DBok 보존. 영상37은13:50.498무편집/정상속도,44블라인드표정과39/41trace는같은최신소스. 이전locked/v2/v3실패영상은이력. 모자·쿠션전경로/cold/장기동면/위젯탭을이번7항목에서재시험하지않음. 도구/AI새설치·통합없음, parametric초안/완성아트아님. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. [현재실제결과/한계](REBOOT-02-REPORT.md), [사용자실행/다음평가](NEXT-RESUME.md). feature일반push최종receipt53, main/merge/deploy/건강/결제/보안변경없음.
+
+## Historical — REBOOT-02 / PARTIAL_WITH_BLOCKERS / baby v2
 
 현재feature일반push성공, 첫보고서e5f3032 local/tracking/live 일치. 이전REBOOT01의원격미반영은이번push로해소됐고현재Git최종receipt와별도기록한다. 앱정상입력의Mac잠금은여전히별도BLOCKED이다.
 

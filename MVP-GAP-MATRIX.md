@@ -1,6 +1,22 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / 제품판정 REWORK_REQUIRED OPEN
+## 현재 REBOOT-02 — BABY_CHARM_REVIEW_READY / baby v4 실제 검토
+
+사용자가 좁힌7항목의 검토판이다. 과거제품불충족평가는 보존하고 최종아트/재미/크기승인으로 바꾸지 않는다. [실제영상·수정·SELF_REVIEW](REBOOT-02-REPORT.md).
+
+| 항목 | 최신 실제 결과와 한계 |
+|---|---|
+| 아기/한뿔/얼굴 | 원본 보존한 parametric초안, 최신게임에서 렌더/얼굴·몸 연결 관찰. Blender/.blend/완성아트아님 |
+| +15/+25/+35 | 정상메뉴·동일카메라/위치/세영상·이동/빠른접근/접촉 비교. +35읽기성조금유리/방공간남음; finalSize=null/임시+25 |
+| 자율생활 | 최신3분 무입력13완료/6계열, 실제 관심→접근→장난/놀람/정돈/휴식→다음관심. 단일action ID수아님 |
+| 표정/교감/말풍선 | 7표정원본/이름숨긴비교·21접촉(머리7/몸14/7스타일)/후반A-B고착수정/무언비교·입력유지. 미세표정의최종읽기성은사용자검토 |
+| 저장/최소회귀 | 원본30+아루/경제·EXP·섭취·소유·모자·쿠션rev4보존/3DBok. 최신sleep/wake/접촉·menu/reducedON→OFF 관찰. 장기동면/cold/모자·쿠션전경로/위젯탭은이번7항목에서NOT_RUN |
+| 현재 자동검사/build | 405/405·lint/types·iOSRelease exit0/설치/실제입력·AndroidJS·CNG23/23·assetcheck; 운영42/42 PASS(55로그) |
+| 성능 | 녹화OFF60초touch8·RAF p9516.726ms·입력→제출16.725ms·>500gap0·59.965Hz PASS_PROXY. GPU/물리입력/실기기/발열·배터리/최신AndroidnativeNOT_RUN |
+| 도구/AI/추가제작 | 새 Blender/Figma성공호출없음/기본A·AI연구보존. 성장기/진화형·상점·AI B·전체새Lv1~20 DEFERRED_BY_SCOPE |
+| 최종제품/출시 | 재미·최종아트·세크기 USER_REVIEW_PENDING; 전체MVP/출시완료아님·건강/계정/결제/보안경계유지 |
+
+## Historical — REBOOT-02 최초 v2 / PARTIAL_WITH_BLOCKERS
 
 사용자REBOOT01재미/캐릭터/모션/표정불충족평가가현재기준이다. 아기한마리만수정하며과거기능PASS/READY를제품승인으로쓰지않는다. [실제결과](REBOOT-02-REPORT.md).
 

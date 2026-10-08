@@ -1,6 +1,20 @@
 # Next resume — REBOOT-02 아기
 
-## 현재 REBOOT-02 — PARTIAL_WITH_BLOCKERS / baby v2
+## 현재 REBOOT-02 — BABY_CHARM_REVIEW_READY / baby v4 / 2026-10-08
+
+다음은 **사용자 아기 매력·세 크기·말풍선 평가**다. 새 기능/성장기/진화형/상점/AI B/전체Lv1~20 제작으로 확대하지 않는다. 재미·최종아트·최종크기 **USER_REVIEW_PENDING**. 현재 [실제 보고서](REBOOT-02-REPORT.md)의 최신 절을 읽고 과거잠금/v2이력과 구분한다.
+
+앱 소스 **7bf1031c23e376d6db16bfae4b0381eb21635fd9**, 설치 **reboot-02-baby-v4 Release SHA 1599ee6e5cf7ade77e6a23187bd4c6d36b1023debefa24446e710a3841811329**, 141개 runtime match. `evidence/reboot-02-review-2026-10-08/32-v4-manifest.json`, `52-source-checkpoint-match.json`, 최종Git은 `53-git-final-audit.json`. 같은 소스/해시면 재빌드·재설치·DB초기화하지 않는다. iPhone16e runtime26.3.1/embeddedRelease/Metro불필요. 실제 Mac pixel·정상 메뉴·접촉 접근은 이번에 성공했다.
+
+사용자 실행: 아루 방 **☰→우리 아이→+15/+25/+35**. 마지막은 임시+25·일반motion·말풍선ON으로 복원했고 finalSize=null. 정상 방이면 설정→아기 매력 검토판. 직접 머리/몸 누르기와 무입력 관찰. 하단 손 내밀기는 `REBOOT 교감 비교 도구`이며 일반게임UI가 아니다.
+
+최신 무편집 `37-latest-v4-normal-play.mp4` 첫180초:13완료생활/6계열/7표정, 실제21접촉(머리7/몸14/7스타일). `34/35/36` 크기별 이동/접촉, `46` 선택직후 동일위치 영상, `51` 비교이미지, `44` 이름숨긴7표정/별도key. +35가 얼굴읽기에 조금 유리하고 방공간이 남지만 선택하지 않았다. 크기변경 reset·식물가림·표정조합·연속터치 A-B 고착을 실제 발견/수정하고 v4로 재검증했다. 이전v2/v3영상으로 최신PASS를 만들지 않음.
+
+새405/405·lint/typecheck·iOSRelease exit0/DB유지install/정상화면·AndroidJS·CNG23/23·assetcheck PASS. 최신 녹화OFF60초 touch8, 입력→제출p9516.725ms/RAF간격16.726ms/제출59.965Hz/>500gap0 **PASS_PROXY**. GPU·표시FPS·물리지연·실기기·발열/배터리·최신Androidnative **NOT_RUN**. 최신sleep/wake·접촉/메뉴·reducedON→OFF 최소회귀 관찰, 장기동면/cold/모자·쿠션 전경로·위젯탭은 이번7항목에서 재시험하지 않았다.
+
+원본30개+같은아루/경제·EXP·원장·소유/모자·쿠션rev4/baby/3DBok 보존. Blender/Figma 새호출없음/parametric초안/기본A/과거AI연구보존. 직접개발·SELF_REVIEW·subagent0·effective ROUTING_UNVERIFIED. 다음 사용자피드백에 따른 결함만 정상재현→필요수정/영향검사→Release→같은앱실제확인. featurecheckpoint/일반push만, main/merge/force/deploy/실건강/실결제/보안변경금지.
+
+## Historical — REBOOT-02 / PARTIAL_WITH_BLOCKERS / baby v2
 
 이번feature일반push성공/첫인계e5f3032의로컬·추적·live일치확인. 이전unpublished REBOOT01도반영됐으며최종HEAD/원격/clean은현재evidence/git-final-audit를읽는다. 새재개에서과거push오류를현상으로가정하지않는다.
 
