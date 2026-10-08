@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "scope": "baby gait/face candidate; v4 baby-charm.glb and lineage originals preserved",
+  "authoringTool": "project-local parametric surface mesh; Blender NOT_AVAILABLE",
+  "artStatus": "DRAFT_REVIEW_NOT_FINAL_ART",
+  "bodyRings": 36,
+  "radialSegments": 48,
+  "eyeY": 1.105,
+  "eyeSpacing": 0.208,
+  "eyeWidth": 0.084,
+  "eyeHeight": 0.096,
+  "surfaceOffset": 0.005,
+  "sizeCandidates": [
+    1.15,
+    1.25,
+    1.35
+  ],
+  "sizeApproval": "USER_REVIEW_PENDING",
+  "finalSize": null,
+  "expressions": [
+    "curious",
+    "excited",
+    "playful",
+    "surprised",
+    "content",
+    "embarrassed",
+    "sleepy"
+  ],
+  "visibleFeet": 2,
+  "walkAuthoring": "alternating reference clip plus runtime support/landing",
+  "faceReview": "curved eyes/lids; user approval pending"
+}

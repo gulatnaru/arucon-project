@@ -17,7 +17,7 @@ export function rebootFacing(pose: RebootPose | undefined, position: FloorPoint,
 
 /** Whole attached body motion and facial morphs; no content/DB access. */
 export function applyRebootPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
-  time: number, moving: boolean, reduced: boolean, position?: FloorPoint, facing = 0) {
+  time: number, moving: boolean, reduced: boolean, position?: FloorPoint, facing = 0, groundedBaby = false) {
   orientation.position.set(0, 0, 0); orientation.rotation.set(0, 0, 0); orientation.scale.set(1, 1, 1);
   const front = model.getObjectByName('Foot_R_Front'), left = model.getObjectByName('Foot_L_Front');
   for (const name of ['Foot_R_Front', 'Foot_L_Front', 'Foot_R_Back', 'Foot_L_Back']) model.getObjectByName(name)?.position.set(0, 0, 0);
@@ -26,7 +26,7 @@ export function applyRebootPose(orientation: THREE.Group, model: THREE.Object3D,
   const release = Math.min(1, p / .45), contactWeight = contact ? 1 : recovering ? 1 - release * release * (3 - 2 * release) : 0;
   const contactProgress = contact ? p : pose?.releaseFrom ?? 1;
   const contactPulse = Math.sin(Math.PI * contactProgress) * contactWeight;
-  if (moving && !reduced) {
+  if (moving && !reduced && !groundedBaby) {
     const stride = Math.sin(time * 11);
     front?.position.set(0, Math.max(0, stride) * .12, stride * .10);
     left?.position.set(0, Math.max(0, -stride) * .12, -stride * .10);

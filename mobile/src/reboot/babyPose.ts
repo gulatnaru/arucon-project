@@ -30,7 +30,7 @@ const faceTargets: Record<BabyExpression, Record<string, number>> = {
 
 /** Additive whole attached-body acting and cached facial rig. No SQL/React/random. */
 export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
-  time: number, dt: number, moving: boolean, reduced: boolean) {
+  time: number, dt: number, moving: boolean, reduced: boolean, grounded = false) {
   const rig = rigFor(model), baby = pose?.baby, expression = baby?.beat.expression ?? 'curious';
   const alpha = 1 - Math.exp(-14 * Math.min(.1, Math.max(0, dt))), soft = reduced ? .22 : 1;
   const p = baby?.progress ?? 0, pulse = Math.sin(Math.PI * p), recovering = pose?.phase === 'recover';
@@ -39,11 +39,11 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   const id = baby?.beat.id ?? 'notice';
   const targetPosition = rig.targetPosition.set(0, 0, 0), targetRotation = rig.targetRotation.set(0, 0, 0);
   if (moving) {
-    targetPosition.y = reduced ? 0 : Math.max(0, Math.sin(time * 12)) * .065;
-    targetRotation.z = Math.sin(time * 6) * .04 * soft;
+    targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(time * 12)) * .065;
+    targetRotation.z = grounded ? 0 : Math.sin(time * 6) * .04 * soft;
   } else if (contact || recovering) {
     if (['tiny_hops', 'paw_flick', 'hat_test_step'].includes(id)) {
-      targetPosition.y = reduced ? 0 : Math.max(0, Math.sin(p * Math.PI * 4)) * .13 * weight;
+      targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(p * Math.PI * 4)) * .13 * weight;
       targetRotation.z = Math.sin(p * Math.PI * 2) * .13 * weight * soft;
     } else if (['too_close', 'oops'].includes(id)) {
       targetPosition.z = -.095 * pulse * weight * soft;

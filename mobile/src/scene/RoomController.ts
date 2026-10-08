@@ -5,6 +5,7 @@ import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { RebootDirector } from '../reboot/director';
 import { applyRebootPose, rebootFacing } from '../reboot/pose';
 import { applyBabyPose, resetBabyPose } from '../reboot/babyPose';
+import { BabyGaitRig } from '../reboot/babyGait';
 import { REBOOT_HAND, REBOOT_HAND_HEIGHT, REBOOT_SCALE, type RebootView, type RebootEvent, type RebootStage, type RebootIntent, type TouchRegion } from '../reboot/contracts';
 import { prepareCpuMorphs } from './cpuMorph';
 import { createMorphedAnchor } from './morphedAnchor';
@@ -76,7 +77,7 @@ const REBOOT_ASSETS: Record<RebootStage, number> = {
 };
 // Review-only baby draft. Legacy originals and the other stages stay available.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const BABY_CHARM_ASSET = require('../../assets/reboot-02/baby-charm.glb') as number;
+const BABY_CHARM_ASSET = require('../../assets/reboot-02/baby-gait.glb') as number;
 const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? view.sizeCandidate ?? 1.25 : 1);
 
 export class RoomController {
@@ -172,6 +173,7 @@ export class RoomController {
   private lifePreference?: RoomProps['lifePreference'];
   private onLifeEvent?: (event: LifeEvent) => void;
   private rebootView?: RebootView;
+  private babyGaitRig?: BabyGaitRig;
   private onRebootEvent?: (event: RebootEvent) => void;
   private rebootHandMarker?: THREE.Group;
   private rebootTime = 0;
@@ -320,6 +322,7 @@ export class RoomController {
     const sizeComparisonChanged = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' && oldRebootSize !== this.rebootView.sizeCandidate;
     if (oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm || sizeComparisonChanged) {
       this.reboot.cancel(); this.cancelPet(); this.rebootDockOffset.set(0, 0, 0);
+      this.babyGaitRig?.gait.reset();
       if (this.loadedPet) resetBabyPose(this.loadedPet);
       this.pinComparisonView();
     }
@@ -414,7 +417,7 @@ export class RoomController {
   }
 
   private createRoom() {
-    const balancedLight = this.rendererConfig.id === 'software_balanced';
+    const balancedLight = this.rendererConfig.roomMaterial === 'vertex_lit';
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0xc9b49a, balancedLight ? 1.35 : 2.4));
     const sun = new THREE.DirectionalLight(0xfff3d9, balancedLight ? 1.05 : 2.0);
     sun.position.set(-3, 9, 7); this.scene.add(sun);
@@ -499,7 +502,7 @@ export class RoomController {
       applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial);
       const mouth = loaded.getObjectByName('Mouth');
       this.mealMouth = mouth instanceof THREE.Mesh ? createMorphedAnchor(mouth) : undefined;
-      this.updateCpuMorphs = this.softwareRenderer && ['software_low_resolution', 'software_balanced'].includes(this.rendererConfig.id)
+      this.updateCpuMorphs = this.softwareRenderer && ['software_low_resolution', 'software_balanced', 'software_high_resolution'].includes(this.rendererConfig.id)
         ? prepareCpuMorphs(loaded) : null;
       loaded.scale.setScalar(this.rebootView ? rebootScale(this.rebootView) : 0.62 * growthExpression(this.growthStage).scale);
       const hat = loaded.getObjectByName('RebootHat'); if (hat) hat.visible = !!this.rebootView?.hatWorn;
@@ -512,6 +515,8 @@ export class RoomController {
       }
       this.loadedPet = loaded;
       this.petOrientation.add(loaded);
+      this.babyGaitRig?.dispose();
+      this.babyGaitRig = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' ? new BabyGaitRig(loaded, this.scene) : undefined;
       this.modelReady = true;
       this.frontPaw = this.loadedPet?.getObjectByName('Foot_R_Front');
       this.leftPaw = this.loadedPet?.getObjectByName('Foot_L_Front');
@@ -921,9 +926,9 @@ export class RoomController {
     if (this.livingEnabled || this.comparisonStretchProgress !== undefined) this.applyLifePose();
     if (this.rebootView && this.loadedPet && !this.sleeping) {
       applyRebootPose(this.petOrientation, this.loadedPet, this.reboot.pose, this.rebootTime,
-        !!this.path.length, this.reducedMotion, this.position, this.facing);
+        !!this.path.length, this.reducedMotion, this.position, this.facing, !!this.babyGaitRig);
       if (this.rebootView.babyCharm && this.rebootView.stage === 'baby') applyBabyPose(this.petOrientation, this.loadedPet,
-        this.reboot.pose, this.rebootTime, dt, !!this.path.length, this.reducedMotion);
+        this.reboot.pose, this.rebootTime, dt, !!this.path.length, this.reducedMotion, !!this.babyGaitRig);
       const dock = this.reboot.pose?.dockTarget && ['contact', 'recover'].includes(this.reboot.pose.phase);
       if (dock) {
         const p = this.petOrientation.position;
@@ -938,6 +943,12 @@ export class RoomController {
         this.petOrientation.position.z += p.x * Math.sin(this.facing) + p.z * Math.cos(this.facing);
         this.petOrientation.position.y += p.y;
       }
+    }
+    if (this.babyGaitRig && this.rebootView) {
+      const beat = this.reboot.pose?.phase === 'contact' ? this.reboot.pose.baby : undefined;
+      this.babyGaitRig.apply(this.petOrientation, { position: this.position, facing: this.facing,
+        scale: rebootScale(this.rebootView), dt, moving: !!this.path.length, reduced: this.reducedMotion,
+        hop: beat?.beat.id === 'tiny_hops' || beat?.beat.id === 'hat_test_step' ? beat.progress : undefined }, !this.sleeping);
     }
     const frameSubmitted = this.submissions.shouldSubmit(
       timestamp,
@@ -1020,6 +1031,8 @@ export class RoomController {
     this.petLoadGeneration++;
     this.onPerformanceSummary?.(this.performanceProbe.snapshot());
     this.mixer?.stopAllAction();
+    this.babyGaitRig?.dispose();
+    this.babyGaitRig = undefined;
     disposeSceneObject(this.scene);
     this.renderer.dispose();
   }

@@ -10,6 +10,7 @@ export type RoomRendererProfileId =
   | 'automatic'
   | 'software_legacy_333'
   | 'software_balanced'
+  | 'software_high_resolution'
   | 'software_low_resolution';
 
 export type ResolvedRoomRendererProfile = RoomRendererConfig & {
@@ -79,6 +80,8 @@ export function resolveRoomRendererProfile(
     return { id: 'software_balanced', ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', maxPixelRatio: 1.5, submissionIntervalMs: 0 };
   }
   if (requested === 'software_balanced') return { id: requested, ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', maxPixelRatio: 1.5, submissionIntervalMs: 0 };
+  // Explicit review only. Same materials/MSAA/cadence; resolution is the variable.
+  if (requested === 'software_high_resolution') return { id: requested, ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', maxPixelRatio: 3, submissionIntervalMs: 0 };
   if (requested === 'software_legacy_333') {
     return { id: requested, ...selectRoomRendererConfig(development), submissionIntervalMs: softwareRenderer ? 333 : 0 };
   }

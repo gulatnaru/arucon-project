@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "source": "gait-source.json + generate-reboot-baby-gait.mjs",
+  "originalPreserved": true,
+  "file": "baby-gait.glb",
+  "bytes": 353160,
+  "sha256": "6ae771875c6da450d3f81b7c76985071568e84c504cd18e50ef15d2adcbedeb1",
+  "hornCount": 1,
+  "visibleFeet": 2,
+  "locomotion": "travel-driven support and alternating swing/landing",
+  "face": "smooth body normals; curved eyes/lids with reduced stand-off; v4 preserved",
+  "morphs": [
+    "Blink",
+    "Surprised",
+    "Happy",
+    "Mischief",
+    "Sleepy",
+    "Curious",
+    "Smile",
+    "Open",
+    "Playful",
+    "Bashful"
+  ],
+  "artStatus": "DRAFT_REVIEW_NOT_FINAL_ART",
+  "blender": "NOT_AVAILABLE",
+  "finalSize": null
+}

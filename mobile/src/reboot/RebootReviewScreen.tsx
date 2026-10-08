@@ -30,6 +30,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const [command, setCommand] = useState<RebootCommand>(), [bubble, setBubble] = useState('');
   const [quiet, setQuiet] = useState(false), [reduced, setReduced] = useState(false), [busy, setBusy] = useState(false);
   const [babyReview, setBabyReview] = useState(true), [sizeCandidate, setSizeCandidate] = useState<1.15 | 1.25 | 1.35>(1.25);
+  const [highResolution, setHighResolution] = useState(false);
   const [voice] = useState(() => new BabyLines());
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined), bubbleToken = useRef(0);
   const [error, setError] = useState(''), [captureToken, setCaptureToken] = useState<string>();
@@ -160,7 +161,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-02-baby-v4', review: { babyReview, sizeCandidate, finalSize: null },
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-02-baby-v8', review: { babyReview, sizeCandidate, highResolution, finalSize: null },
       pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
       ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
@@ -188,7 +189,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const viewStage = babyReview ? 'baby' : memory.previewStage;
   const familiarHand = eligibleMemories(memory, 'user:hand').filter(e => now() - e.atMs < 45 * 60_000).at(-1);
   return <View style={styles.root}>
-    <AruconRoom rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
+    <AruconRoom rendererProfileId={highResolution ? 'software_high_resolution' : 'automatic'} rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
       sizeCandidate, familiarHandId: familiarHand?.eventId,
       cushion: memory.cushion, handOffered: hand, command }} onRebootEvent={onEvent}
       livingEnabled={false} tableInstalled={false} toiletInstalled={pet.toiletInstalled} cushionVisible ballVisible={false}
@@ -236,6 +237,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
             <Pressable style={styles.row} accessibilityLabel={babyReview ? '이전 REBOOT-01 세 모습 비교' : 'REBOOT-02 아기 검토로 돌아가기'} onPress={() => { cancel(); setBabyReview(x => !x); setMenu(null); }}><Text>{babyReview ? '이전 세 모습 비교' : '아기 검토로 돌아가기'}</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel={quiet ? '말풍선 켜기' : '말풍선 가리기'} onPress={() => setQuiet(x => !x)}><Text>{quiet ? '말풍선 켜기' : '말풍선 가리기'}</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel={reduced ? '동작 줄이기 끄기' : '동작 줄이기 켜기'} onPress={() => setReduced(x => !x)}><Text>동작 줄이기 {reduced ? '켜짐' : '꺼짐'}</Text></Pressable>
+            {babyReview && <Pressable style={styles.row} accessibilityLabel={highResolution ? '현재 해상도 비교' : '고해상도 비교'} onPress={() => { cancel(); setHighResolution(x => !x); setMenu(null); }}><Text>렌더 비교 · {highResolution ? '현재 1.5×로' : '고해상도 3×로'} (MSAA 0)</Text></Pressable>}
             <Pressable disabled={busy} style={styles.row} accessibilityLabel={rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'} onPress={restAction}><Text>{rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'}</Text></Pressable>
             <Text>{modelStatus}</Text>
             <Pressable style={styles.row} accessibilityLabel={backend === 'A' ? '로컬 검색 B 준비' : '구조화된 기억 A 사용'} onPress={() => { void chooseBackend(); }}><Text>{backend === 'A' ? '로컬 검색 B 준비 / 비교' : '구조화된 기억 A로 비교'}</Text></Pressable>
