@@ -1,6 +1,70 @@
 # REBOOT-02 — 아기 매력 검토 준비
 
-## BABY_CHARM_REVIEW_READY — 최신 v4 실제 검토 / 2026-10-08
+## 아기 얼굴·보행 재평가 후보 v8 — REWORK_REQUIRED 유지 / 2026-10-08
+
+사용자의 v4 영상 평가로 **아트·보행 품질을 다시 열었다**. v4의 기능·저장·성능 증거는 아래 이력으로 보존하며 제품 만족 승인으로 쓰지 않는다. 이번에는 아기 후보 하나의 얼굴·실루엣·보행·렌더 비교만 수정했다. **v8의 기술 수정과 Simulator 실행 검토는 완료했으며, 아트·보행의 사용자 판정은 OPEN/USER_REVIEW_PENDING이다.** 최종 크기·재미·아트를 임의 승인하지 않는다.
+
+이전 후보는 네 발 중 뒷발이 정적이고 walk clip은 `AruconRoot.scale`만 바꿨다. 런타임의 시간 기반 앞발 흔들기·몸 튀기가 겹쳐 실제 이동 거리와 발이 맞지 않았다. 새 후보는 뒤쪽 두 발을 제거하고 앞쪽 두 발의 윗부분을 몸 하단에 겹쳐 연결한다. 걷는 동안 지지발은 바닥의 같은 위치에 남고 반대 발이 들려 옮겨진다. 방향전환에 보폭이 반응하고, 멈출 때 들린 발부터 두 번의 짧은 착지로 정돈한다. 통통 도약은 준비 압축→뜀→착지 압축과 발·그림자를 함께 움직인다. 몸 scale은 착지 보조이며 걷기의 주 표현은 아니다.
+
+기본 얼굴은 눈 폭/높이·간격·얇은 눈꺼풀·몸 곡면과의 간격을 조정했다. 몸 단면을 부드럽게 잇고 이음선 normal을 맞췄다. 호기심의 눈매/시선, 놀람의 열린 눈·입과 물러남, 장난의 윙크/입꼬리·앞발을 실제 정상 장면에서 확인했다. 표정 종류나 대사를 늘리지 않았다. **최종적인 예쁨·리듬·촉감 평가는 여전히 사용자에게 있다.**
+
+### 먼저 볼 실제 전후 자료
+
+모두 로컬 `evidence/reboot-02-gait-2026-10-08/`이며 원본 영상·DB·로그는 Git/외부 업로드 제외다. 정지 그림을 모션 통과로 쓰지 않는다.
+
+- [같은 카메라의 기본 얼굴·크기 전후](evidence/reboot-02-gait-2026-10-08/58-before-after-face-sizes.png): v4 +25 / v8 +25 / v8 +35. 전체 화면을 같은390×844로 축소했고 펫만 따로 확대하지 않았다. v8은 영상34의25.5초,36의45초; v4는 이전 동일 위치 영상46의24초다.
+- [v8 +25 정상 속도 발췌](evidence/reboot-02-gait-2026-10-08/62-v8-size25-excerpt.mp4), [v8 +35 정상 속도 발췌](evidence/reboot-02-gait-2026-10-08/62-v8-size35-excerpt.mp4): 각각39초. 기본 얼굴·자율 도약·직접 바닥 입력·보행/멈춤을 포함한다. **AVFoundation passthrough 발췌**이며 배속/장면 합성 없음. 전체 원본34(352.033초)/36(111.362초), 원래 구간은61-excerpt-ranges.json에 보존했다.
+- [측면 +25](evidence/reboot-02-gait-2026-10-08/62-v8-side25-excerpt.mp4), [측면 +35](evidence/reboot-02-gait-2026-10-08/62-v8-side35-excerpt.mp4): 동일 화면 높이의 바닥을 누른 수평 보행·착지7.5초 발췌. 전체56은215.522초이며 +35→+25 순서다. 정상 사용자 메뉴/바닥 입력이고 강제 clip 재생이 아니다.
+- [자연 도약·착지 원본 프레임](evidence/reboot-02-gait-2026-10-08/60-normal-hop-landing-full-frames.png): +35 원본36의50.10/50.28/50.46/50.82초. 몸이 올라갈 때 발도 뜨고, 내려와 눌린 뒤 복원한다. +25의 같은 자연 `tiny_hops`는 원본34의30.258~31.058초다.
+- [원본 PNG 해상도 비교](evidence/reboot-02-gait-2026-10-08/59-native-resolution-comparison.png):54/55는 영상에서 추출하지 않은1170×2532 native PNG. **검토용 손 교감의 같은 위치 유지 자세**로 화질만 비교한 진단이며 정상 보행 증거를 대신하지 않는다. 기본 얼굴의 동일 위치 저/고해상도는 실제 영상40의32초/57초 근처와 CUA 화면에도 기록했다. 아래 확대 부분은 native pixel detail이며 작은 게임 크기 평가와 구분한다.
+
+- [작은 게임 화면의 호기심·놀람·장난](evidence/reboot-02-gait-2026-10-08/63-three-expressions-game-size.png): 같은 정상 영상36의73.75/74.2/64.05초. A/B/C만 표기하고 별도63-expression-key.json에 대응했다. 고개 회전이 끝나 실제 얼굴이 보이는 프레임을 사용했다.
+
+### 소스·설치·보존
+
+- 착수 HEAD `bad584c2a688399cad546651fc92c5db170d215a`, clean. 설치 v4 SHA1599ee6e…를 직접 확인하고 **먼저 사용자가 지정한35-size25-v4.mp4(110.605초)와 소스**를 대조했다. 원본 영상 SHA `3ef34331d1a8af1d183c31fdb5906f403675e12fd1ed4d0b7d98ace2f88ddac4`. Mac 실제 pixel/입력 접근 성공; 이전 BLOCKED를 복사하지 않았다.
+- 앱 소스 **6529e260fa799269197d1ebd6e77d22b564727d3**, 설치 **reboot-02-baby-v8 / Release**, bundle SHA **6b10525d472662c3b8eaf10462cfe52b69aea7370aa26c654cb4786d82e876a7**.32-v8-manifest.json의153개 입력과 소스 체크포인트 대응은64-source-checkpoint-match.json. 문서 인계 HEAD와 구분한다. 같은 설치 해시면 재빌드/재설치/초기화부터 하지 않는다.
+- macOS15.6 / Xcode26.3(17C529) / iPhone16e Simulator `2170BD93-715C-482E-AD9C-DD7479970003` / iOS26.3.1(label26.3) / Expo55.0.31. embedded Release, Metro 불필요.
+- 별도 `baby-gait.glb`353160bytes + `gait-source.json` + `generate-reboot-baby-gait.mjs`. **기존 GLB12개 byte일치**(`53`), v4 `baby-charm.glb`/기존 계열/일반 앱 자산 보존. 리부트 babyCharm 아기일 때만 새 자산·gait 적용.
+- 원본 일반1+생활29=30개와 같은 아루1개의 이름/형태/personality·food/coin/EXP/시설·meal원장·소유행 일치,3DB integrity ok(`52`). 아루 모자/쿠션rev4/아기preview·bounded64 기억 유지. 정상 시간 경과·수면/깨우기와 실제 교감 기억 외에 DB를 조작하지 않았다. SQLite lane·중복정산·건강OFF·일반 위젯 계약/템플릿은 변경하지 않았다.
+
+### 모델·렌더 원인 구분과 비용
+
+| 구분 | 직접 확인한 것 |
+|---|---|
+| 모델 구조 | v4 Foot4개/정적 후족, walk에 몸scale track만 존재. 새 후보 Foot2개, 좌/우 발 position track과 실제 이동 거리 기반 support/swing. 걸을 때 세계 좌표의 지지발 고정, 정지0.32초 동안 들린 발부터 교대 착지.30/60/120Hz 검사에서도 지지발 미끄러짐을 금지 |
+| geometry/normal | 같은 위치의 중복 seam vertex normal 각도: v4 최대9.631°/평균6.933°, 새 후보0°. body triangles2496→5376. 이 수치는 모델 이음선 진단이며 전체 외형이 예뻐졌다는 증명이 아니다 |
+| 발밑 높이/그림자 | 첫 v5에서 그림자가 러그 아래로 가려지는 문제 관찰. 기존 러그/바닥 상면을 따라 접지/그림자 배치. 이후 v6의 약한 그림자도 실제화면에서 확인하고 v7부터 작은 analytic alpha disc3개로 변경. v8은 정지 시 두 발을 바닥에서 끌어 모으던 계산도 실제 착지 arc로 대체 |
+| DPR/AA | 같은 모델/재질/카메라·MSAA0에서585×1266(1.5×)와1170×2532(3×) 비교.3×에서 눈/외곽선 계단이 줄고,1.5× 원본PNG에도 계단이 보여 영상 축소만의 문제는 아님. **MSAA ON의 독립 효과는 이번에 측정하지 않았으므로 그 효과를 확정하지 않는다** |
+| 영상 축소 | 원본은1170×2532. 보고서의390pt 전체 화면과 native pixel crop을 구분. 인코딩 fps/정지 이미지로 표시 FPS를 추정하지 않음 |
+
+같은 v8·+35·일반 모션·녹화OFF, 컴파일/영상 추출/PNG burst 없이 각60초를 측정했다. 모두 **JS/프레임 제출 proxy**이고 물리 touch-to-photon/GPU time/표시 FPS가 아니다. 실제 정상 접촉은 표본수에 포함된 것만 기록한다.
+
+| 설정 | 입력 표본 | 입력→제출 p95 | RAF 간격 p95 | 제출률 | GL 큐 대기 p95 |
+|---|---:|---:|---:|---:|---:|
+| 1.5× (`39`) | 8 | 17.30ms | 16.72ms | 59.82Hz | 6.37ms |
+| 3× 1차 (`44`) | 4 | **INSUFFICIENT_DATA** | 18.04ms | 59.29Hz | 16.18ms |
+| 3× 재측정 (`46`) | 5 | 31.95ms | 17.73ms | 59.52Hz | 15.84ms |
+
+유효 두 구간은 기존100ms/33.34ms/500ms/30Hz proxy 기준을 충족하며500ms 초과 gap0. 순간 RAF 최대는1.5×89.74ms,3×재측정78.72ms다. 3×는4배 픽셀과 약2.5배 큐 대기로 여유가 줄어 **기본1.5×를 유지**하고3×는 검토 설정으로만 둔다. 자동 생활 장면/표정별 draw27~29·약19.1~19.43k triangles 차이와 호스트 부하가 있으므로 단일 하드웨어 인과/출시 사양으로 확대하지 않는다. 실기기·GPU·물리입력·발열/배터리 **NOT_RUN**.
+
+### 실제 검증과 품질 판정
+
+최신 v8의 정상 바닥 입력으로 정면→측면 이동·방향전환·정지와 자율 도약/착지를 확인했다. 같은 빌드에서 메뉴 닫기·잠자기→수면 자세/UI→깨우기→접촉, 동작 줄이기 ON 이동→OFF 복원도 확인(`47`). 마지막은 **임시 +25,1.5×,일반 모션,말풍선ON,손 거둠**, finalSize=null. 긴 동면/일반 위젯 tap/Android native/물리 기기는 이번 아기 보행 범위에서 재시험하지 않았다.
+
+기술적으로 발 교대와 지지/착지의 구분, 뒷발 제거, 몸의 부드러운 이음선, 가독성 비교가 실제로 연결됐다. 작은 화면의 최종 얼굴 매력·보행 리듬/탄성은 사용자의 영상 평가를 다시 받아야 한다. **SELF_REVIEW를 사용자 아트 승인이나 독립 reviewer 통과로 기록하지 않는다.** 앞선 v4 READY를 재인용해 이번 제품 문제를 닫지 않는다.
+
+새 검사:410/410(fail0/skip0), lint/typecheck PASS, 최종 gait 영향5/5, iOS Release xcodebuild exit0/동일DB install/hash/실제입력, Android JS bundle PASS, iOS CNG23/23, 원본/새 후보 generator3개 `--check` PASS. 로그28~32/48~50. 운영검사42/42 PASS(65로그). 수치가 아트 완료 조건을 대신하지 않는다. 중간 v5/v6/v7과 그 영상은 이력이다.24/26의 이전v6 export cache는 최신v7로 쓰지 않고 명시 거부(`26-stale-exports-rejected.json`); 최종35/37/39/44/46은 실제v8·mtime·설정을 확인했다.41/42 PNG burst는 메뉴만 찍혀 화질 비교에 쓰지 않았다.
+
+Blender 실행 파일/PATH/Applications/Spotlight 및 노출 MCP 경로를 찾지 못했고 **이번 Blender/MCP 사용·설치·.blend 제작은 없다**. 실제 사용한 제작 수단은 기존 로컬 Three.js 생성 코드/GLTFExporter, runtime rig, Xcode/Simulator/CUA/AVFoundation이다. 새 sourceJSON+generator+GLB는 **편집 가능한 게임용 후보**, 완성 전문 아트 납품이 아니다. 새 설치·AI B·성장기/진화형 재제작·상점 확장 없음. SOL_DIRECT/SELF_REVIEW/subagent0, 요청 모델과 effective 확인은 구분하며 effective **ROUTING_UNVERIFIED**.
+
+### 사용자가 다시 보는 방법
+
+현재 Simulator의 아루 방에서 **☰→우리 아이→+25/+35**, 빈 바닥을 좌우로 눌러 보고 잠시 두면 도약/놀람/장난이 나온다. 정상 방이면 설정→아기 매력 검토판. 설정의 **렌더 비교**는1.5×/3× 진단이며, 비교 후1.5×로 돌린 상태다. 하단 손 내밀기는 여전히 REBOOT 검토 도구다. 이번에는 **기본 눈매·뒤/옆 실루엣·발 교대/멈춤/착지**를 중심으로 평가하면 된다. 최종 크기/아트/재미와 아트·보행 판정은 사용자 대기.
+
+feature 소스 checkpoint 6529e26; 문서 인계/일반push 최종 local/tracking/live origin·clean은66-git-final-audit.json과 최종 응답에 남긴다. 비밀/DB/영상/native generated/build/log/cache 제외. main/merge/force/tag/release/deploy/실건강/실결제/보안 설정 변경 없음.
+
+## Historical — v4 기술 검토 / BABY_CHARM_REVIEW_READY / 사용자 아트·보행 평가로 재오픈
 
 아루가 쿠션 가장자리를 살피다가 너무 가까워져 물러서고 몸을 털거나, 앞발로 장난친 뒤 민망해하며 정돈하고 다시 통통 움직이는 장면을 관찰했다. 쿠션을 눌러보고 하품하며 쉬는 시간도 섞인다. 최신 v4의 첫 **180초 무입력**에서 완료된 생활 장면은 **13회·6계열**이었다. 단일 동작/표정 ID 수가 아니라 관심·접근·수행·반응·복귀가 연결된 token을 영상과 trace로 대조했다. 아직 짧은 대표 장면의 반복은 남으며 무한 콘텐츠나 최종 재미 승인을 뜻하지 않는다.
 

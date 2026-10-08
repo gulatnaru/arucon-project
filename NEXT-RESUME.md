@@ -1,6 +1,20 @@
 # Next resume — REBOOT-02 아기
 
-## 현재 REBOOT-02 — BABY_CHARM_REVIEW_READY / baby v4 / 2026-10-08
+## 현재 아기 얼굴·보행 후보 v8 — REWORK_REQUIRED / 사용자 재평가 대기
+
+[현재 보고서](REBOOT-02-REPORT.md) 최상단을 읽는다. 사용자가 v4 아트·보행을 재오픈했고 새 아기 전용 후보를 구현/실제 검토했다. **기술 검사 PASS를 아트/보행 승인으로 쓰지 않는다.** 재미·최종아트·크기 USER_REVIEW_PENDING. 성장기/진화형·상점·AI B로 확대하지 않는다.
+
+앱 소스 **6529e260fa799269197d1ebd6e77d22b564727d3**, 설치 **reboot-02-baby-v8 Release SHA 6b10525d472662c3b8eaf10462cfe52b69aea7370aa26c654cb4786d82e876a7**,153개 입력과 commit 대응64파일. 현재Git/설치를 먼저 읽고 동일하면 재빌드/재설치/DB초기화하지 않는다. Mac실제pixel/입력 성공, 원본30개+같은아루/경제/EXP/섭취·소유/모자·쿠션rev4/3DBok·원본GLB12개보존. macOS15.6/Xcode26.3/iPhone16e iOS26.3.1/embeddedRelease/Metro불필요.
+
+새 `baby-gait.glb`만 뒤쪽 정적 발을 없애고 두 발의 세계 좌표 지지/교대 swing/체중 이동/정지 착지·도약 압축·그림자를 연결했다. 몸 normal seam을 맞추고 기본 눈/간격/곡면/lid를 수정했다. v4 GLB와 성장기/진화형은 byte일치. Blender/MCP/.blend는 미사용/설치없음; editable parametric 후보/완성아트아님.
+
+바로 실행: 아루 방 **☰→우리 아이→+25/+35**, 좌우 빈 바닥 이동. 정상 방이면 설정→아기 매력 검토판. 마지막은 임시+25/1.5×/일반모션/말풍선ON/손거둠, 최종크기미확정. 설정의3×는 비교용. `evidence/reboot-02-gait-2026-10-08/58`전후이미지·`59`nativePNG해상도·`60`자율도약프레임·`62-…`정상속도발췌/원본34·36·56이 사용자 검토 자료다. 손 도구를 일반보행 증거로 쓰지 않는다.
+
+새410/410·lint/types·최종gait영향5/5·iOSRelease exit0/동일DB설치·실제입력·AndroidJS·CNG23/23·generator3개check PASS.1.5×60초 입력8/p9517.30ms/RAF16.72ms/59.82Hz;3×첫입력4미충족 보존, 재측정입력5/p9531.95ms/RAF17.73ms/59.52Hz. 큐p956.37→15.84ms로 기본1.5유지. 모두 proxy, GPU/표시FPS/물리입력/실기기/발열·배터리/최신Androidnative NOT_RUN. 최신sleep/wake·접촉/reducedON→OFF는 실제 확인. 장기동면/위젯tap 이번범위 재시험없음.
+
+다음은 사용자 아기 **얼굴·실루엣·보행 리듬/착지** 재평가다. 추가 명백한 기술결함은 정상재현→수정→영향검사→필요Release→실제재검증. 원본/저장/건강OFF/경제/권한보존. feature checkpoint/일반push만, main/merge/force/deploy금지. 마지막Git은66-git-final-audit.json. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED.
+
+## Historical — REBOOT-02 v4 기술 검토 / 사용자 아트·보행 재오픈 전
 
 다음은 **사용자 아기 매력·세 크기·말풍선 평가**다. 새 기능/성장기/진화형/상점/AI B/전체Lv1~20 제작으로 확대하지 않는다. 재미·최종아트·최종크기 **USER_REVIEW_PENDING**. 현재 [실제 보고서](REBOOT-02-REPORT.md)의 최신 절을 읽고 과거잠금/v2이력과 구분한다.
 

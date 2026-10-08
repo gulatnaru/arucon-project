@@ -1,6 +1,14 @@
 # LIFE-00/01 생활 개편 — 구현 계약
 
-## REBOOT-02 v4 실제 입력 후 좁은 수정
+## REBOOT-02 v8 — 아기 두 발 후보와 접지 계약
+
+`baby-gait.glb`/`gait-source.json`/`generate-reboot-baby-gait.mjs`는 v4 원본을 대체 삭제하지 않는 별도 아기 후보다. 리부트 babyCharm의 아기일 때만 사용한다. 뒤 발 두 개는 새 후보에서만 제거, 앞 두 발 윗볼륨은 몸 하단과 겹친다. body 단면을 smooth lathe로 잇고 실제 곡면에 눈/눈꺼풀/표정 vertex를 붙인다. body normal seam은 동일 위치 중복 vertex로 대조한다.
+
+`BabyGait`의 phase는 실제 이동 거리와 방향 변화로 진행한다. stance는 세계 좌표의 발을 고정, swing은 교대 이동/들림. 정지하면 들린 발부터0.32초 두 단계로 착지하고 바닥 위로 끌어 중립 위치에 모으지 않는다. `tiny_hops`는 준비 압축/포물선 비행/착지 압축이고 scale은 보조다. 부모 몸의 자세/scale을 역변환해 목표 발 위치에 적용한다. 기존 floor/rug의 실제 상면에 접지와 그림자를 맞춘다. 세 작은 analytic alpha plane은 shadow map/postprocess/새texture upload를 요구하지 않는다. sleep/비활성/모델교체/size pin에서 기존취소·reset/dispose 경계를 따른다. DB/EXP/성장/건강에는 접근하지 않는다.
+
+1.5× automatic은 그대로 유지한다. `software_high_resolution`은 같은 vertex_lit/기존MSAA0/cadence에서 maxDPR3만 바꾸는 검토 옵션이다. 크기 후보/해상도 비교는 저장의 성장이나 최종크기를 바꾸지 않는다. 최신60초 비용·nativePNG·정상 보행 영상과 한계는 [현재보고](../REBOOT-02-REPORT.md). 아트·보행 사용자판정REWORK_REQUIRED/승인대기이며 sourceJSON+generator 후보를 Blender 완성아트로 부르지 않는다.
+
+## Historical — REBOOT-02 v4 실제 입력 후 좁은 수정
 
 같은 아기의 크기 변경 때 표현 intent·접촉·잔여 dock만 취소하고(0,1.8)/정면을 맞춘다. GL/카메라/저장 재생성 없음. 식물 접근은 화장실 가림을 피하는x=-.90이며 실제 장소·사물은 유지한다. 장난=한쪽윙크, 만족=열린눈/미소, 졸림=내려간눈/하품 조합을 기존 morph로 조정했다.
 

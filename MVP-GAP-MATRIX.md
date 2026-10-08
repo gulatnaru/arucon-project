@@ -1,6 +1,20 @@
 # SRS MVP gap matrix — fresh iOS validation
 
-## 현재 REBOOT-02 — BABY_CHARM_REVIEW_READY / baby v4 실제 검토
+## 현재 REBOOT-02 아기 아트·보행 — REWORK_REQUIRED / v8 비교 후보
+
+사용자 v4 품질 재평가를 적용한다. [현재 전후·실행 자료](REBOOT-02-REPORT.md). 기술 검사와 실제 관찰은 사용자 최종 아트/보행 승인과 별개다.
+
+| 범위 | 현재 |
+|---|---|
+| 아기 실루엣/기본 얼굴 | 새 별도 GLB의 두 발 연결·기본 눈/간격/lid·곡면/normal 수정. v4 및 원본GLB12개 보존. Blender/.blend 미사용·parametric 후보. 최종아트 USER_REVIEW_PENDING |
+| 기본 보행/도약/회전/정지 | 최신v8 정상 수평/대각 바닥 입력·자율 도약 영상. 거리 기반 지지발 고정/교대 swing/0.32초 착지·체중/그림자. 수치만으로 보행 품질 승인하지 않음 |
+| +25/+35 | 동일카메라/기준위치 기본얼굴·두크기 실제보행/착지 비교. 원본34/36/56·정상속도발췌62. finalSize=null/임시+25 |
+| 렌더원인/비용 | seam normal최대9.63°→0°; MSAA0고정1.5×/3×native비교. 고해상도계단감소/큐p956.37→15.84ms. 기본1.5유지, MSAA독립효과NOT_RUN |
+| 자동/실행/저장 | 새410/410·lint/types·gait영향5/5·iOSRelease/같은DB설치/실제입력·AndroidJS·CNG23/23·3generatorcheck. 원본30+아루/경제·EXP·meal·소유/3DBok. 수면/깨우기/reduced 최소회귀 |
+| 성능/미검증 | 60초proxy유효입력1.5×8/3×5,기존기준PASS_PROXY. 처음3×4개미충족보존. GPU·표시FPS·물리입력·실기기·발열/배터리·최신Androidnative·이번장기동면/위젯tap NOT_RUN |
+| 사용자 판단/후속 | **ART_GAIT_REWORK_OPEN**; 재미/최종아트/크기USER_REVIEW_PENDING. 성장기/진화형·상점·AI B 확장없음. 전체MVP/출시완료아님 |
+
+## Historical — REBOOT-02 v4 기술 검토 / 아트·보행 재오픈 전
 
 사용자가 좁힌7항목의 검토판이다. 과거제품불충족평가는 보존하고 최종아트/재미/크기승인으로 바꾸지 않는다. [실제영상·수정·SELF_REVIEW](REBOOT-02-REPORT.md).
 

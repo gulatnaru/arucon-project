@@ -1,6 +1,16 @@
 # iOS validation history and Release input resume
 
-## 현재 REBOOT-02 — BABY_CHARM_REVIEW_READY / baby v4
+## 현재 아기 얼굴·보행 후보 v8 — REWORK_REQUIRED / 사용자 재평가
+
+사용자 v4 영상 평가에 따라 아트·보행을 재오픈했다. 아기 전용 두 발 후보·거리 기반 지지/교대·정지 착지/도약/그림자·기본 눈과 부드러운 body normal을 직접 수정하고 최신 v8 Release에서 정상 바닥 입력과 자율 장면을 확인했다. [전후 이미지·원본/발췌·현재 한계](REBOOT-02-REPORT.md). **아트·보행 사용자 판정 OPEN, 재미/최종아트/크기USER_REVIEW_PENDING**, 기존v4기술증거는 아래이력이다.
+
+소스6529e260fa799269197d1ebd6e77d22b564727d3/설치v8 SHA6b10525d472662c3b8eaf10462cfe52b69aea7370aa26c654cb4786d82e876a7/153개입력 대응64. 원본30+아루/경제·EXP·섭취·소유/모자·쿠션rev4/3DBok·기존GLB12개 byte일치. 현재+25/1.5×/일반motion/말풍선ON/손거둠 복원. Blender/MCP없음/미사용·설치없음; sourceJSON+generator+GLB 후보이며완성아트아님.
+
+새410/410·lint/typecheck·gait영향5/5·iOSRelease exit0/동일DB설치/정상입력·AndroidJS·CNG23/23·generator3개check. 최종운영42/42 PASS(65로그). 같은+35·녹화OFF60초1.5×입력8/p9517.30ms/RAF16.72ms/59.82Hz,3×재측정입력5/p9531.95ms/RAF17.73ms/59.52Hz. 첫3×입력4는INSUFFICIENT_DATA보존. 큐대기p956.37→15.84ms, 기본1.5유지. GPU·물리지연·표시FPS·실기기·발열/배터리·Androidnative NOT_RUN. 최신수면/깨우기·접촉·reducedON/OFF 최소확인, 장기동면/위젯tap 재시험없음.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 동계열확장·성장/경제/DB재설계/AI B/건강/결제/보안변경없음. source6529e26과문서인계HEAD를구분하고 feature일반push 결과는66최종receipt. main/merge/deploy없음.
+
+## Historical — REBOOT-02 v4 기술 검토 / 아트·보행 재오픈 전
 
 현재 Mac 화면/정상입력이 실제 성공했다. v2를 먼저 관찰한 뒤 크기 비교 위치·식물가림·표정 구분·연속터치 A-B고착을 직접 수정/Release/재검증했다. 최신 v4 첫180초 무입력13완료/6생활계열/7표정, 정상21접촉(머리7/몸14/7motor), 말풍선숨김·이동·메뉴닫기·수면/깨우기·reducedON/OFF 최소회귀 관찰. 동일카메라/위치의 세크기는 영상46/이미지51, 후보별 이동·접촉34/35/36. +35읽기성은 조금 낫고 방이남지만 finalSize=null/임시+25복원. **재미·아트·크기USER_REVIEW_PENDING**.
 
