@@ -22,6 +22,8 @@ export type RoomRuntimeSnapshot = Readonly<{
   pendingLifeToken?: string; lastLifeToken?: string;
   rebootIntent?: Readonly<{ kind: string; phase: string; token: string }> | null;
   rebootPose?: Readonly<{ kind: string; phase: string; progress: number; gazeTarget?: FloorPoint; dockTarget?: FloorPoint }> | null;
+  artCandidate?: string | null;
+  artComparison?: Readonly<{ token: string; angle: string; scene: string; paused: boolean; seconds: number }> | null;
   /** Visual root world coordinates, not a GPU/physical touch measurement. */
   visualRoot?: Readonly<{ x: number; y: number; z: number }>;
 }>;

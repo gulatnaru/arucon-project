@@ -1,4 +1,5 @@
 import type { FloorPoint } from '../scene/types';
+import type { ArtComparison, BabyArt } from './artComparison';
 
 export type RebootStage = 'baby' | 'growing' | 'evolved';
 export type RebootIntent = 'arrival' | 'explore' | 'dash' | 'stretch' | 'rest' | 'company' | 'hand'
@@ -19,7 +20,8 @@ export type RebootEvent = Readonly<{ token: string; kind: RebootIntent; phase: '
   rememberedPosition?: FloorPoint; currentTarget?: FloorPoint; babyMode?: boolean; babyBeat?: string; expression?: BabyExpression; touchRegion?: TouchRegion; memoryIds?: readonly string[] }>;
 export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revision: number;
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand;
-  babyCharm?: boolean; sizeCandidate?: 1.15 | 1.25 | 1.35; familiarHandId?: string }>;
+  babyCharm?: boolean; sizeCandidate?: 1.15 | 1.25 | 1.35; familiarHandId?: string;
+  artCandidate?: BabyArt; artComparison?: ArtComparison }>;
 export const REBOOT_SCALE: Record<RebootStage, number> = { baby: .53, growing: .48, evolved: .43 };
 export const REBOOT_HAND: FloorPoint = Object.freeze({ x: 0, z: 3.35 });
 // Meet the front paws below the face; the old .48 height covered the mouth.

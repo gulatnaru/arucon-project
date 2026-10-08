@@ -64,3 +64,6 @@ mobile/ios/
 
 # macOS
 .DS_Store
+
+# Blender editor backup; editable .blend sources are tracked
+*.blend1

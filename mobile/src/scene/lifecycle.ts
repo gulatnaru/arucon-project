@@ -1,13 +1,16 @@
 import * as THREE from 'three';
 
 export function disposeSceneObject(root: THREE.Object3D) {
+  const skeletons = new Set<THREE.Skeleton>();
   root.traverse((node) => {
     if (node instanceof THREE.Mesh) {
+      if (node instanceof THREE.SkinnedMesh) skeletons.add(node.skeleton);
       node.geometry.dispose();
       const materials = Array.isArray(node.material) ? node.material : [node.material];
       materials.forEach((material) => material.dispose());
     }
   });
+  for (const skeleton of skeletons) skeleton.dispose();
 }
 
 /** A parse finishing after unmount must not attach a model or leak its GPU objects. */

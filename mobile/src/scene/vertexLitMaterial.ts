@@ -13,6 +13,8 @@ export function vertexLitMaterial(color: THREE.ColorRepresentation = 0xffffff, v
       opacity: { value: 1 },
     },
     vertexShader: `
+      #include <common>
+      #include <skinning_pars_vertex>
       uniform vec3 baseColor;
       uniform vec3 groundColor;
       uniform vec3 sunColor;
@@ -22,7 +24,10 @@ export function vertexLitMaterial(color: THREE.ColorRepresentation = 0xffffff, v
         return mix(12.92 * value, 1.055 * pow(value, vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), value));
       }
       void main() {
-        vec3 n = normalize(normalMatrix * normal);
+        #include <skinbase_vertex>
+        vec3 objectNormal = normal;
+        #include <skinnormal_vertex>
+        vec3 n = normalize(normalMatrix * objectNormal);
         vec3 up = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
         vec3 sun = normalize((viewMatrix * vec4(-3.0, 9.0, 7.0, 0.0)).xyz);
         vec3 diffuse = baseColor;
@@ -32,7 +37,9 @@ export function vertexLitMaterial(color: THREE.ColorRepresentation = 0xffffff, v
         vec3 light = mix(groundColor, vec3(1.0), dot(n, up) * 0.5 + 0.5) * 1.9;
         light += sunColor * max(0.0, dot(n, sun)) * 1.45;
         litColor = encodeSRGB(diffuse * light / 3.14159265359);
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vec3 transformed = position;
+        #include <skinning_vertex>
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
       }`,
     fragmentShader: `
       varying vec3 litColor;

@@ -15,7 +15,8 @@ function rigFor(model: THREE.Object3D): Rig {
     cheeks: meshes(['Cheek-1', 'Cheek1']), ears: ['Ear_L', 'Ear_R'].flatMap(name => { const n = model.getObjectByName(name); return n ? [n] : []; }),
     hat: model.getObjectByName('RebootHat'), paw: model.getObjectByName('Foot_R_Front'), leftPaw: model.getObjectByName('Foot_L_Front'), pawLift: 0, leftPawLift: 0, pawReach: 0, position: new THREE.Vector3(), rotation: new THREE.Vector3(),
     targetPosition: new THREE.Vector3(), targetRotation: new THREE.Vector3(), faceNodes: [], weights: {}, lastExpression: 'curious' };
-  rig.faceNodes = [...rig.eyes, ...rig.brows, ...(rig.mouth ? [rig.mouth] : [])].map(mesh => ({ mesh, entries: Object.entries(mesh.morphTargetDictionary ?? {}), eye: rig.eyes.includes(mesh) }));
+  const lids = meshes(['Lid_-1', 'Lid_1']);
+  rig.faceNodes = [...rig.eyes, ...lids, ...rig.cheeks, ...rig.brows, ...(rig.mouth ? [rig.mouth] : [])].map(mesh => ({ mesh, entries: Object.entries(mesh.morphTargetDictionary ?? {}), eye: rig.eyes.includes(mesh) || lids.includes(mesh) }));
   rigs.set(model, rig); return rig;
 }
 const faceTargets: Record<BabyExpression, Record<string, number>> = {
@@ -30,7 +31,7 @@ const faceTargets: Record<BabyExpression, Record<string, number>> = {
 
 /** Additive whole attached-body acting and cached facial rig. No SQL/React/random. */
 export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
-  time: number, dt: number, moving: boolean, reduced: boolean, grounded = false) {
+  time: number, dt: number, moving: boolean, reduced: boolean, grounded = false, neutral = false) {
   const rig = rigFor(model), baby = pose?.baby, expression = baby?.beat.expression ?? 'curious';
   const alpha = 1 - Math.exp(-14 * Math.min(.1, Math.max(0, dt))), soft = reduced ? .22 : 1;
   const p = baby?.progress ?? 0, pulse = Math.sin(Math.PI * p), recovering = pose?.phase === 'recover';
@@ -74,15 +75,15 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   if (rig.paw) { rig.paw.position.y += rig.pawLift; rig.paw.position.z += rig.pawReach; }
   if (rig.leftPaw) rig.leftPaw.position.y += rig.leftPawLift;
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
-  const targets = faceTargets[expression];
+  const targets = neutral ? {} : faceTargets[expression];
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
     rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) - (rig.weights[name] ?? 0)) * alpha;
   const blink = Math.pow(Math.max(0, Math.sin(time * (expression === 'sleepy' ? .7 : 1.3))), 24);
   for (const { mesh, entries, eye } of rig.faceNodes) {
     if (!mesh.morphTargetInfluences) continue;
     for (const [name, index] of entries)
-      mesh.morphTargetInfluences[index] = name === 'Blink' ? Math.max(blink, expression === 'playful' && mesh.name === 'Eye_L' ? .92 : 0)
-        : (rig.weights[name] ?? 0) * (eye ? 1 - Math.max(blink, expression === 'playful' && mesh.name === 'Eye_L' ? .92 : 0) : 1);
+      mesh.morphTargetInfluences[index] = name === 'Blink' ? Math.max(blink, expression === 'playful' && ['Eye_L', 'Lid_-1'].includes(mesh.name) ? .92 : 0)
+        : (rig.weights[name] ?? 0) * (eye ? 1 - Math.max(blink, expression === 'playful' && ['Eye_L', 'Lid_-1'].includes(mesh.name) ? .92 : 0) : 1);
   }
   for (const side of [-1, 1]) {
     const spark = model.getObjectByName('EyeSpark' + side);
@@ -102,7 +103,7 @@ export function resetBabyPose(model: THREE.Object3D) {
   const rig = rigs.get(model); if (!rig) return;
   rig.position.set(0, 0, 0); rig.rotation.set(0, 0, 0); rig.weights = {};
   rig.pawLift = 0; rig.leftPawLift = 0; rig.pawReach = 0;
-  for (const mesh of [...rig.eyes, ...rig.brows, ...(rig.mouth ? [rig.mouth] : [])]) mesh.morphTargetInfluences?.fill(0);
+  for (const { mesh } of rig.faceNodes) mesh.morphTargetInfluences?.fill(0);
   for (const ear of rig.ears) ear.rotation.set(0, 0, 0);
   rig.hat?.rotation.set(0, 0, 0);
 }
