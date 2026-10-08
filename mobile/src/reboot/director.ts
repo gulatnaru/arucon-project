@@ -22,6 +22,7 @@ export class RebootDirector {
   private lastTouchAt = -Infinity;
   private lastTouchRegion: TouchRegion = 'unknown';
   private touchBurst = 0;
+  private recentTouchStyles: string[] = [];
   private touchRegion: TouchRegion = 'unknown';
   private interruptedForTouch?: RebootIntent;
   pose?: RebootPose;
@@ -45,7 +46,8 @@ export class RebootDirector {
     const repeated = command.kind === 'hand' && this.lastTouchRegion === this.touchRegion && sinceTouch >= 0 && sinceTouch < 8_000;
     if (command.kind === 'hand') this.touchBurst = repeated ? this.touchBurst + 1 : 0;
     const baby = this.view?.babyCharm && this.view.stage === 'baby' ? babyPlan(command.kind, this.touchRegion,
-      repeated, interrupted, this.view.familiarHandId, this.touchBurst) : undefined;
+      repeated, interrupted, this.view.familiarHandId, this.touchBurst, this.recentTouchStyles) : undefined;
+    if (baby?.touchStyle) { this.recentTouchStyles.push(baby.touchStyle); this.recentTouchStyles = this.recentTouchStyles.slice(-3); }
     if (command.kind === 'hand') { this.lastTouchAt = this.now(); this.lastTouchRegion = this.touchRegion; }
     this.cancel(); this.intent = { command, phase: 'look', elapsed: 0, automatic, baby, beatIndex: -1, touchRegion: this.touchRegion }; this.emit('start'); this.emit('look');
   }

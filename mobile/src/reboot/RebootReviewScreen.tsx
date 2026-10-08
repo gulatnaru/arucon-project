@@ -160,7 +160,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-02-baby-v2', review: { babyReview, sizeCandidate, finalSize: null },
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-02-baby-v4', review: { babyReview, sizeCandidate, finalSize: null },
       pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
       ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
@@ -207,6 +207,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       <Pressable accessibilityLabel="리부트 메뉴 열기" style={styles.menuButton} onPress={() => { setHand(false); setPlacement(false); setMenu('main'); }}><Text>☰</Text></Pressable>
     </View>
     <View style={[styles.bottom, { bottom: insets.bottom + 10 }]}>
+      <Text style={styles.reviewToolLabel}>REBOOT 교감 비교 도구</Text>
       {rest.mode !== 'awake' ? <Pressable style={styles.action} onPress={restAction} accessibilityLabel={rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}><Text>{rest.label} · {rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}</Text></Pressable>
         : placement ? <Pressable style={styles.action} onPress={() => setPlacement(false)} accessibilityLabel="쿠션 이동 취소"><Text>빈 바닥에 놓기 · 취소</Text></Pressable>
           : <Pressable style={styles.action} accessibilityLabel={hand ? '손 거두기' : '손 내밀기'} onPress={() => setHand(x => !x)}><Text>{hand ? '손 거두기' : '손 내밀기'}</Text></Pressable>}
@@ -256,6 +257,7 @@ const styles = StyleSheet.create({
   track: { width: 104, height: 4, borderRadius: 3, backgroundColor: '#cdd5d8', marginTop: 7 }, progress: { height: 4, borderRadius: 3, backgroundColor: '#869fba' },
   menuButton: { minWidth: 48, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#fffaf0e8' },
   bottom: { position: 'absolute', alignSelf: 'center' }, action: { minHeight: 46, minWidth: 140, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: '#faf6eff0', paddingHorizontal: 16 },
+  reviewToolLabel: { fontSize: 10, color: '#7d776f', textAlign: 'center', marginBottom: 4 },
   bubble: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingLeft: 12, paddingRight: 4, borderRadius: 18, borderWidth: 1, borderColor: '#eaded4', backgroundColor: '#fff9ed', shadowColor: '#655750', shadowOpacity: .08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   bubbleText: { flexShrink: 1, color: '#514658', fontSize: 14, lineHeight: 19 }, bubbleClose: { width: 26, minHeight: 30, alignItems: 'center', justifyContent: 'center' }, bubbleCloseText: { color: '#a4999f', fontSize: 16 },
   backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: '#18203566', paddingHorizontal: 16 }, sheet: { maxHeight: '80%', borderRadius: 22, backgroundColor: '#fffaf2', padding: 18, gap: 14 },

@@ -13,16 +13,25 @@ export function babyTarget(kind: RebootIntent, cushion: FloorPoint, random: () =
   if (kind === 'baby_peek') return { x: .45, z: 2.8 };
   if (kind === 'baby_scout') return { x: cushion.x + (cushion.x >= 0 ? -.95 : .95), z: cushion.z + .1 };
   if (kind === 'baby_discover') return { x: random() * .8 - .4, z: -2.7 };
-  if (kind === 'baby_sneak') return { x: -1.9, z: -2.65 };
+  // Observe the plant from a clear side: the toilet at(-1.95,-1.62)
+  // occluded the actor and face from the unchanged portrait camera at x=-1.9.
+  if (kind === 'baby_sneak') return { x: -.90, z: -2.65 };
   return { x: random() * 2.6 - 1.3, z: random() * 2.0 + .45 };
 }
 
 /** Short causal episodes. Domain clocks, rewards, personality IDs never enter here. */
-export function babyPlan(kind: RebootIntent, region: TouchRegion = 'unknown', repeated = false, interrupted?: RebootIntent, handId?: string, burst = 1): BabyPlan {
+export function babyPlan(kind: RebootIntent, region: TouchRegion = 'unknown', repeated = false, interrupted?: RebootIntent, handId?: string, burst = 1, recentStyles: readonly string[] = []): BabyPlan {
   if (kind === 'hand') {
     const startled = interrupted === 'baby_sneak' || interrupted === 'baby_discover';
-    const style = repeated ? burst === 1 ? 'tickle' : burst % 2 === 0 ? 'side_nuzzle' : 'paw_offer'
+    let style = repeated ? burst === 1 ? 'tickle' : burst % 2 === 0 ? 'side_nuzzle' : 'paw_offer'
       : region === 'head' ? 'head_lean' : startled ? 'startle_then_lean' : handId ? 'familiar_nuzzle' : 'body_wiggle';
+    if (repeated && burst >= 4) {
+      const available = ['tickle', 'side_nuzzle', 'paw_offer', region === 'head' ? 'head_lean' : 'body_wiggle', handId ? 'familiar_nuzzle' : 'lean']
+        .filter(candidate => !recentStyles.slice(-2).includes(candidate));
+      let score = burst * 2654435761;
+      for (const c of region + (interrupted ?? '') + (handId ?? '')) score = Math.imul(score ^ c.charCodeAt(0), 16777619);
+      style = available[(score >>> 0) % available.length] ?? (region === 'head' ? 'head_lean' : 'body_wiggle');
+    }
     const expression = style === 'paw_offer' ? 'curious' : style === 'side_nuzzle' ? 'content' : repeated ? 'playful' : startled ? 'surprised' : region === 'head' ? 'content' : 'excited';
     return { touchStyle: style, rememberedHandId: handId, beats: [beat(style, 2.4, expression)] };
   }

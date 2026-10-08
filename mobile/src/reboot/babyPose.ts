@@ -21,11 +21,11 @@ function rigFor(model: THREE.Object3D): Rig {
 const faceTargets: Record<BabyExpression, Record<string, number>> = {
   curious: { Curious: .9, Lift: .72, Smile: .15 },
   excited: { Happy: .65, Open: .68, Smile: .24, Lift: .35 },
-  playful: { Mischief: .86, Playful: .9 },
+  playful: { Mischief: .12, Playful: .95 },
   surprised: { Surprised: .94, Open: .97, Lift: .95 },
-  content: { Happy: .65, Smile: .8 },
-  embarrassed: { Mischief: .34, Bashful: .88 },
-  sleepy: { Sleepy: .85, Open: .25 },
+  content: { Happy: .22, Smile: .8 },
+  embarrassed: { Mischief: .42, Bashful: .95 },
+  sleepy: { Sleepy: .96, Open: .55 },
 };
 
 /** Additive whole attached-body acting and cached facial rig. No SQL/React/random. */
@@ -81,8 +81,8 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   for (const { mesh, entries, eye } of rig.faceNodes) {
     if (!mesh.morphTargetInfluences) continue;
     for (const [name, index] of entries)
-      mesh.morphTargetInfluences[index] = name === 'Blink' ? Math.max(blink, expression === 'playful' && mesh.name === 'Eye_L' ? .70 : 0)
-        : (rig.weights[name] ?? 0) * (eye ? 1 - Math.max(blink, expression === 'playful' && mesh.name === 'Eye_L' ? .70 : 0) : 1);
+      mesh.morphTargetInfluences[index] = name === 'Blink' ? Math.max(blink, expression === 'playful' && mesh.name === 'Eye_L' ? .92 : 0)
+        : (rig.weights[name] ?? 0) * (eye ? 1 - Math.max(blink, expression === 'playful' && mesh.name === 'Eye_L' ? .92 : 0) : 1);
   }
   for (const side of [-1, 1]) {
     const spark = model.getObjectByName('EyeSpark' + side);

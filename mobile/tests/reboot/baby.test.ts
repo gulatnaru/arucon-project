@@ -60,6 +60,18 @@ test('real head/body cause is retained at completion; pause/clock gap does not s
   w.touching = false; d.update(.1, w); clock += 60_000; w.touching = true; d.update(.1, w);
   assert.equal(d.pose?.baby?.touchStyle, 'head_lean');
 });
+test('long repeated contact cannot get stuck alternating the same two motor responses', () => {
+  const recent: string[] = [];
+  for (const region of ['head','body'] as const) {
+    recent.length = 0;
+    for (let burst=1;burst<=24;burst++) {
+      const style=babyPlan('hand',region,true,'baby_discover','completed-hand:7',burst,recent).touchStyle!;
+      if(burst>=4)assert.ok(!recent.slice(-2).includes(style));
+      recent.push(style);
+    }
+    assert.ok(new Set(recent.slice(3)).size>=4);
+  }
+});
 test('a canceled touch and background cannot complete or revive its old reaction', () => {
   const w = world(), events: RebootEvent[] = [];
   const d = new RebootDirector({ navigate: () => true, stop: () => {}, event: e => events.push(e) });

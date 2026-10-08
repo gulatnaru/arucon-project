@@ -294,6 +294,7 @@ export class RoomController {
   setPresentation(props: RoomProps) {
     const oldRebootStage = this.rebootView?.stage;
     const oldBabyCharm = this.rebootView?.babyCharm;
+    const oldRebootSize = this.rebootView?.sizeCandidate;
     this.rebootView = props.rebootView;
     this.onRebootEvent = props.onRebootEvent;
     this.livingEnabled = !!props.livingEnabled;
@@ -316,7 +317,12 @@ export class RoomController {
     const nextCandidateId = props.characterCandidateId ?? DEFAULT_CHARACTER_CANDIDATE_ID;
     const petAssetChanged = nextFormPresentation.assetKey !== this.formPresentation.assetKey ||
       nextCandidateId !== this.characterCandidateId || oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm;
-    if (oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm) { this.reboot.cancel(); this.cancelPet(); this.pinComparisonView(); }
+    const sizeComparisonChanged = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' && oldRebootSize !== this.rebootView.sizeCandidate;
+    if (oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm || sizeComparisonChanged) {
+      this.reboot.cancel(); this.cancelPet(); this.rebootDockOffset.set(0, 0, 0);
+      if (this.loadedPet) resetBabyPose(this.loadedPet);
+      this.pinComparisonView();
+    }
     this.formPresentation = nextFormPresentation;
     this.characterCandidateId = nextCandidateId;
     this.setComparisonView(props.comparisonCameraAngle);
