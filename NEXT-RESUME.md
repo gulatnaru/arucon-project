@@ -1,4 +1,16 @@
-# Next resume — REBOOT-02 아기
+# Next resume — REBOOT-03 / BLENDER_AB_REVIEW_READY
+
+[현재 보고서](REBOOT-03-REPORT.md). 앱 source **5bb0cc363b612f3093c9e877a7ecded8d0c50871**, 설치 **v5 Release SHA188a9c06010f4fde72610381ab2560a4615ab7d6fc2c5cab0556dc7acb68ace7**, 기본 **A v8**, B는 실제 Blender 제작 비교 후보. 원본13GLB/기존30+아루1 보존. 현재 Git/설치를 직접 대조하고 같으면 재빌드/재설치/DB 초기화하지 않는다.
+
+정상 앱의 리부트 메뉴→우리 아이→A/B→+25/+35→정면/측면/후면/전체방향으로 비교한다. 비교 끝을 누르면 실제 방 입력/생활로 복귀한다. 최신4원본108초·정상B150초·lifecycle120초와60초비용은 로컬 evidence/reboot-03-2026-10-09/. 기능/표현 SELF_REVIEW와 사용자 아트/재미 판단을 구별한다. B수면표시 결함은 v5 보존수면→정상깨우기→이동/접촉에서 수정검증했다.
+
+다음은 사용자 **A/B·크기·아트/모션** 제품 선택이다. 선택을 임의 확정하거나 성장기/진화형/상점/AI로 확대하지 않는다. 직접 개발/SELF_REVIEW·새subagent 기본생성없음·feature checkpoint/일반push만. main/merge/force/tag/deploy/실건강/실결제/보안변경 금지. 실기기/GPU/물리입력/발열/배터리/이번Androidnative NOT_RUN.
+
+아래는 과거 재개/회귀 이력이며 최신 설치 식별을 대신하지 않는다.
+
+---
+
+## Historical — REBOOT-02 아기
 
 ## 현재 아기 얼굴·보행 후보 v8 — REWORK_REQUIRED / 사용자 재평가 대기
 

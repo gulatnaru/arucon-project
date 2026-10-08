@@ -1,5 +1,13 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 현재 REBOOT-03 — Blender/v8 비교 준비 (2026-10-09)
+
+현재 좁은 비교 범위는 **BLENDER_AB_REVIEW_READY**, 전체 MVP/출시 완료가 아니다. [최신 실제 비교](REBOOT-03-REPORT.md). A=v8 기본/원본 보존, B=실제 Blender 제작 아기. 같은 iOS v5 Release에서 A/B +25/+35·정면/측면/후면·표정/보행/도약/착지/접촉/복원·정상 입력/수면 복귀·같은 DB 재실행을 확인했다.
+
+새417/417·lint/typecheck·iOSRelease·AndroidJS·CNG27/27·원본13GLB/31저장보존 PASS. B의 더 높은 변형/대기 비용은60초 proxy로 기록했다. 사용자 v8 개선 평가를 보존하며 B우열·최종아트/재미/크기/채택은 USER_REVIEW_PENDING. 실기기/GPU/물리입력/이번Androidnative NOT_RUN. 건강/법률/계정/결제/배포 기존 경계는 그대로다. 아래는 이전 품질 재오픈/실행 이력이다.
+
+---
+
 ## 현재 REBOOT-02 아기 아트·보행 — REWORK_REQUIRED / v8 비교 후보
 
 사용자 v4 품질 재평가를 적용한다. [현재 전후·실행 자료](REBOOT-02-REPORT.md). 기술 검사와 실제 관찰은 사용자 최종 아트/보행 승인과 별개다.

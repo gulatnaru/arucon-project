@@ -1,5 +1,13 @@
 # iOS validation history and Release input resume
 
+## REBOOT-03 — 2026-10-09 / BLENDER_AB_REVIEW_READY
+
+사용자의 v8 개선 긍정 평가와 기본 A/원본을 보존하고, 실제 Blender .blend/GLB/rig/Shape Key/동작 B를 제작했다. 같은 v5 Release(source5bb0cc3, bundle188a9c06010f4fde72610381ab2560a4615ab7d6fc2c5cab0556dc7acb68ace7)에서 A/B +25/+35·세 방향·8장면 정상속도 비교와 정상 접촉/이동/수면복귀/reduced/실제위젯복귀/cold기본A/기억복원을 확인했다.
+
+새417/417·lint/typecheck·iOSRelease·AndroidJS·CNG27/27·13GLB/31저장감사 PASS. 4개60초 proxy59.85~59.95Hz, B변형/대기 비용 증가 및 호스트부하 변동을 기록했다. 실기기/GPU/물리입력/이번Androidnative NOT_RUN. SELF_REVIEW이며 재미/최종아트/모델/크기 USER_REVIEW_PENDING. [최신 실제 자료와 한계](REBOOT-03-REPORT.md). 아래는 이전 실행 이력이다.
+
+---
+
 ## 현재 아기 얼굴·보행 후보 v8 — REWORK_REQUIRED / 사용자 재평가
 
 사용자 v4 영상 평가에 따라 아트·보행을 재오픈했다. 아기 전용 두 발 후보·거리 기반 지지/교대·정지 착지/도약/그림자·기본 눈과 부드러운 body normal을 직접 수정하고 최신 v8 Release에서 정상 바닥 입력과 자율 장면을 확인했다. [전후 이미지·원본/발췌·현재 한계](REBOOT-02-REPORT.md). **아트·보행 사용자 판정 OPEN, 재미/최종아트/크기USER_REVIEW_PENDING**, 기존v4기술증거는 아래이력이다.
