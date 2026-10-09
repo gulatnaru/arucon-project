@@ -1,0 +1,115 @@
+{
+  "candidate": "C_HYBRID",
+  "blenderVersion": "5.2.0 LTS",
+  "blenderBuildHash": "fbe6228777e7",
+  "source": "art/reboot-03-1/build_hybrid_baby.py",
+  "blend": "art/reboot-03-1/arucon_baby_C.blend",
+  "runtime": "mobile/assets/reboot-03-1/hybrid-baby.glb",
+  "originalV8Imported": true,
+  "sourceV8Sha256": "6ae771875c6da450d3f81b7c76985071568e84c504cd18e50ef15d2adcbedeb1",
+  "importIsReadOnly": true,
+  "skinParts": {
+    "Body": {
+      "vertices": 2642
+    },
+    "PawMesh_L": {
+      "vertices": 423
+    },
+    "PawMesh_R": {
+      "vertices": 423
+    },
+    "EarShell_L": {
+      "vertices": 185
+    },
+    "EarShell_R": {
+      "vertices": 185
+    }
+  },
+  "bodySilhouetteSource": "A unchanged surface samples, welded seam",
+  "defaultModel": "A_V8_UNCHANGED",
+  "finalAdoption": "USER_REVIEW_PENDING",
+  "hornCount": 1,
+  "visiblePaws": 2,
+  "boneNames": [
+    "Root",
+    "BodyBone",
+    "HeadBone",
+    "Paw.L",
+    "Paw.R",
+    "Ear.L",
+    "Ear.R",
+    "HornBone"
+  ],
+  "actions": [
+    "idle_reserved",
+    "idle_expressive",
+    "walk",
+    "baby_hop",
+    "pet_reserved",
+    "pet_expressive",
+    "baby_release",
+    "baby_stop",
+    "sleep"
+  ],
+  "shapeKeys": {
+    "Lid_-1": [
+      "Basis",
+      "Blink",
+      "Surprised",
+      "Curious",
+      "Happy",
+      "Mischief",
+      "Sleepy"
+    ],
+    "Eye_L": [
+      "Basis",
+      "Blink",
+      "Surprised",
+      "Curious",
+      "Happy",
+      "Mischief",
+      "Sleepy"
+    ],
+    "Brow_-1": [
+      "Basis",
+      "Lift",
+      "Mischief"
+    ],
+    "Lid_1": [
+      "Basis",
+      "Blink",
+      "Surprised",
+      "Curious",
+      "Happy",
+      "Mischief",
+      "Sleepy"
+    ],
+    "Eye_R": [
+      "Basis",
+      "Blink",
+      "Surprised",
+      "Curious",
+      "Happy",
+      "Mischief",
+      "Sleepy"
+    ],
+    "Brow_1": [
+      "Basis",
+      "Lift",
+      "Mischief"
+    ],
+    "Mouth": [
+      "Basis",
+      "Smile",
+      "Open",
+      "Playful",
+      "Bashful"
+    ]
+  },
+  "bodyVertices": 2642,
+  "joinedSkinVertices": 3858,
+  "sha256": "20c4a5f902619406a7526698ba66a446b6409397eafd6e16ab162ed9641d7cf8",
+  "bytes": 435016,
+  "rootMotion": "editable guide retained in blend; game uses in-place skeletal clips and common navigation",
+  "runtimeRig": "Paw.L/R bones; engine adds non-rendering Foot_L/R_Front control proxies"
+}

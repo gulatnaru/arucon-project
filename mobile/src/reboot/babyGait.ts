@@ -22,6 +22,7 @@ export class BabyGait {
   private wasMoving = false;
   private settle = 1;
   private firstLanding = 0;
+  get stopProgress() { return this.settle; }
   reset() { this.previous = undefined; this.phase = 0; this.wasMoving = false; this.settle = 1; }
 
   update(input: GaitInput) {

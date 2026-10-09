@@ -1,6 +1,11 @@
 import type { RebootPose } from './director';
 import type { FloorPoint } from '../scene/types';
-export type BabyArt = 'v8' | 'blender';
+export type BabyArt = 'v8' | 'blender' | 'hybrid';
+export const BABY_ART_CHOICES: readonly { id: BabyArt; label: string; accessibility: string }[] = [
+  { id: 'v8', label: 'A · 기존 v8', accessibility: '모델 A v8 선택' },
+  { id: 'blender', label: 'B · Blender 후보', accessibility: '모델 B Blender 선택' },
+  { id: 'hybrid', label: 'C · Hybrid 후보', accessibility: '모델 C Hybrid 선택' },
+];
 export type ArtAngle = 'front' | 'side' | 'back' | 'all';
 export type ArtCase = 'sequence' | 'neutral' | 'curious' | 'playful' | 'surprised' | 'walk' | 'hop' | 'pet' | 'release';
 export type ArtComparison = Readonly<{ token: string; angle: ArtAngle; scene: ArtCase; paused: boolean }>;

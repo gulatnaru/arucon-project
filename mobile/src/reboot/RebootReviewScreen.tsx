@@ -12,7 +12,7 @@ import { projectPetRest } from '../presentation/petRest';
 import { utcFixtureDay } from '../application/devClock';
 import { RebootMemoryStore } from './memory';
 import { eligibleMemories, hatReaction, REBOOT_ITEM, RESUMABLE_REBOOT_INTENTS, type ResumableIntent, type RebootCommand, type RebootEvent, type RebootSnapshot, type RebootStage } from './contracts';
-import { ART_CASES, ART_LABELS, type BabyArt, type ArtComparison } from './artComparison';
+import { ART_CASES, ART_LABELS, BABY_ART_CHOICES, type BabyArt, type ArtComparison } from './artComparison';
 import { BABY_SIZE_CANDIDATES, BabyLines } from './babyLife';
 import type { FloorPoint, RoomRuntimeSnapshot } from '../scene/types';
 import type { RoomPerformanceCapture, RoomPerformanceSummary } from '../scene/performanceProbe';
@@ -163,7 +163,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-blender-ab-v5', review: { babyReview, sizeCandidate, highResolution, artCandidate, artComparison, finalSize: null },
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-1-hybrid-v1', review: { babyReview, sizeCandidate, highResolution, artCandidate, artComparison, reduced, finalSize: null },
       pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
       ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
@@ -211,7 +211,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
     </View>
     <View style={[styles.bottom, { bottom: insets.bottom + 10, width: artComparison ? '92%' : undefined }]}>
       <Text style={styles.reviewToolLabel}>REBOOT 교감 비교 도구</Text>
-      {artComparison && rest.mode === 'awake' ? <View style={{ flexDirection: 'row', gap: 6, width: '100%' }}><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel="A B 같은 장면 다시 재생" onPress={() => setArtComparison({ ...artComparison, token: token('art'), paused: false })}><Text>다시 재생</Text></Pressable><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel={artComparison.paused ? '비교 장면 계속' : '비교 장면 멈춤'} onPress={() => setArtComparison({ ...artComparison, paused: !artComparison.paused })}><Text>{artComparison.paused ? '계속' : '멈춤'}</Text></Pressable><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel="A B 비교 끝내기" onPress={() => { cancel(); setArtComparison(undefined); }}><Text>비교 끝</Text></Pressable></View> : rest.mode !== 'awake' ? <Pressable style={styles.action} onPress={restAction} accessibilityLabel={rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}><Text>{rest.label} · {rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}</Text></Pressable>
+      {artComparison && rest.mode === 'awake' ? <View style={{ flexDirection: 'row', gap: 6, width: '100%' }}><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel="A B C 같은 장면 다시 재생" onPress={() => setArtComparison({ ...artComparison, token: token('art'), paused: false })}><Text>다시 재생</Text></Pressable><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel={artComparison.paused ? '비교 장면 계속' : '비교 장면 멈춤'} onPress={() => setArtComparison({ ...artComparison, paused: !artComparison.paused })}><Text>{artComparison.paused ? '계속' : '멈춤'}</Text></Pressable><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel="A B C 비교 끝내기" onPress={() => { cancel(); setArtComparison(undefined); }}><Text>비교 끝</Text></Pressable></View> : rest.mode !== 'awake' ? <Pressable style={styles.action} onPress={restAction} accessibilityLabel={rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}><Text>{rest.label} · {rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}</Text></Pressable>
         : placement ? <Pressable style={styles.action} onPress={() => setPlacement(false)} accessibilityLabel="쿠션 이동 취소"><Text>빈 바닥에 놓기 · 취소</Text></Pressable>
           : <Pressable style={styles.action} accessibilityLabel={hand ? '손 거두기' : '손 내밀기'} onPress={() => setHand(x => !x)}><Text>{hand ? '손 거두기' : '손 내밀기'}</Text></Pressable>}
     </View>
@@ -222,11 +222,11 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
         <ScrollView contentContainerStyle={{ gap: 10 }}>
           {menu === 'main' && <>{(['pet', 'objects', 'settings'] as const).map((x, i) => <Pressable key={x} style={styles.row} accessibilityLabel={['우리 아이', '상점·꾸미기', '리부트 설정'][i]} onPress={() => setMenu(x)}><Text>{['우리 아이', '상점·꾸미기', '설정'][i]}</Text></Pressable>)}</>}
           {menu === 'pet' && babyReview && <>
-            <Text>REBOOT-03 · A는 기존 v8, B는 Blender 제작 후보예요. 최종 채택 전이며 저장·성장·경제를 바꾸지 않아요.</Text>
-            {(['v8', 'blender'] as const).map((id, i) => <Pressable key={id} accessibilityLabel={i ? '모델 B Blender 선택' : '모델 A v8 선택'} style={styles.row} onPress={() => { cancel(); setArtCandidate(id); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null); }}><Text>{i ? 'B · Blender 후보' : 'A · 기존 v8'}{artCandidate === id ? ' · 비교 중' : ''}</Text></Pressable>)}
+            <Text>REBOOT-03.1 · 선호한 A의 디자인에 Blender 리깅을 더한 C를 비교해요. 기본은 A이며 최종 채택 전이에요.</Text>
+            {BABY_ART_CHOICES.map(({ id, label, accessibility }) => <Pressable key={id} accessibilityLabel={accessibility} style={styles.row} onPress={() => { cancel(); setArtCandidate(id); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null); }}><Text>{label}{artCandidate === id ? ' · 비교 중' : ''}</Text></Pressable>)}
             <Text>아래는 같은 동작의 읽기 전용 비교예요. 모자는 화면에서만 잠시 가리며 경험·보상을 기록하지 않아요.</Text>
-            {(['all', 'front', 'side', 'back'] as const).map((angle, i) => <Pressable key={angle} accessibilityLabel={`A B ${['전체 방향', '정면', '측면', '후면'][i]} 비교`} style={styles.row} onPress={() => { cancel(); setArtComparison({ token: token('art'), angle, scene: angle === 'all' ? 'sequence' : artComparison?.scene ?? 'neutral', paused: false }); setMenu(null); }}><Text>{['전체 방향', '정면', '측면', '후면'][i]} 비교</Text></Pressable>)}
-            {ART_CASES.map(scene => <Pressable key={scene} accessibilityLabel={`A B ${ART_LABELS[scene]} 비교`} style={styles.row} onPress={() => { cancel(); setArtComparison({ token: token('art'), angle: artComparison?.angle ?? 'front', scene, paused: false }); setMenu(null); }}><Text>{ART_LABELS[scene]}</Text></Pressable>)}
+            {(['all', 'front', 'side', 'back'] as const).map((angle, i) => <Pressable key={angle} accessibilityLabel={`A B C ${['전체 방향', '정면', '측면', '후면'][i]} 비교`} style={styles.row} onPress={() => { cancel(); setArtComparison({ token: token('art'), angle, scene: angle === 'all' ? 'sequence' : artComparison?.scene ?? 'neutral', paused: false }); setMenu(null); }}><Text>{['전체 방향', '정면', '측면', '후면'][i]} 비교</Text></Pressable>)}
+            {ART_CASES.map(scene => <Pressable key={scene} accessibilityLabel={`A B C ${ART_LABELS[scene]} 비교`} style={styles.row} onPress={() => { cancel(); setArtComparison({ token: token('art'), angle: artComparison?.angle ?? 'front', scene, paused: false }); setMenu(null); }}><Text>{ART_LABELS[scene]}</Text></Pressable>)}
 <Text>아기 아루의 얼굴·움직임 초안이에요. 세 크기는 같은 방에서 비교하며 최종 선택은 아직 하지 않았어요.</Text>
             {BABY_SIZE_CANDIDATES.map(size => <Pressable key={size} accessibilityLabel={`화면 크기 +${Math.round((size - 1) * 100)}% 비교`} style={styles.row} onPress={() => { cancel(); setSizeCandidate(size); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null); }}><Text>+{Math.round((size - 1) * 100)}%{sizeCandidate === size ? ' · 비교 중' : ''}</Text></Pressable>)}
             <Text>실제로 함께한 경험은 같은 아루에게 남아요. 크기 비교는 이름·성격·EXP를 바꾸지 않아요.</Text>

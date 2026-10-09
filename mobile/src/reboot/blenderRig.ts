@@ -5,12 +5,12 @@ import * as THREE from 'three';
  */
 export class BlenderBabyRig {
   private paws: { control: THREE.Group; bone: THREE.Bone; rest: THREE.Vector3 }[] = [];
-  private ears: { control: THREE.Group; bone: THREE.Bone }[] = [];
+  private ears: { control: THREE.Group; bone: THREE.Bone; rest: THREE.Quaternion }[] = [];
   private faces: THREE.Mesh[] = [];
   private target = new THREE.Vector3();
   private inverse = new THREE.Matrix4();
   private delta = new THREE.Quaternion();
-  constructor(private model: THREE.Object3D) {
+  constructor(private model: THREE.Object3D, private staticEarRest = false) {
     model.traverse(n => { if (n instanceof THREE.Mesh && n.morphTargetInfluences?.length) this.faces.push(n); });
     for (const [i, side] of ['L', 'R'].entries()) {
       const bone = model.getObjectByName(`Paw${side}`);
@@ -19,7 +19,7 @@ export class BlenderBabyRig {
       const control = new THREE.Group(); control.name = `Foot_${side}_Front`; model.add(control);
       this.paws.push({ control, bone, rest: new THREE.Vector3(i ? .265 : -.265, .21, .10) });
       const earControl = new THREE.Group(); earControl.name = `Ear_${side}`; model.add(earControl);
-      this.ears.push({ control: earControl, bone: ear });
+      this.ears.push({ control: earControl, bone: ear, rest: ear.quaternion.clone() });
     }
   }
   /** Call after the authored mixer and the shared gait/morph controls. */
@@ -40,7 +40,12 @@ export class BlenderBabyRig {
       this.inverse.copy(bone.parent!.matrixWorld).invert();
       bone.position.copy(this.target.applyMatrix4(this.inverse));
     }
-    for (const { control, bone } of this.ears) bone.quaternion.multiply(this.delta.setFromEuler(control.rotation));
+    for (const { control, bone, rest } of this.ears) {
+      // C omits never-changing ear animation tracks; its control delta must not
+      // accumulate each frame. B retains its original fully sampled track path.
+      if (this.staticEarRest) bone.quaternion.copy(rest);
+      bone.quaternion.multiply(this.delta.setFromEuler(control.rotation));
+    }
     this.model.updateWorldMatrix(true, true);
   }
 }

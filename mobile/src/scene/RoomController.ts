@@ -82,6 +82,9 @@ const REBOOT_ASSETS: Record<RebootStage, number> = {
 const BABY_CHARM_ASSET = require('../../assets/reboot-02/baby-gait.glb') as number;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const BLENDER_BABY_ASSET = require('../../assets/reboot-03/blender-baby.glb') as number;
+// C is separate; A/B asset bytes and the default A selection stay unchanged.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const HYBRID_BABY_ASSET = require('../../assets/reboot-03-1/hybrid-baby.glb') as number;
 const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? view.sizeCandidate ?? 1.25 : 1);
 
 export class RoomController {
@@ -478,7 +481,7 @@ export class RoomController {
   }
 
   private petAsset() {
-    if (this.rebootView?.babyCharm && this.rebootView.stage === 'baby') return this.rebootView.artCandidate === 'blender' ? BLENDER_BABY_ASSET : BABY_CHARM_ASSET;
+    if (this.rebootView?.babyCharm && this.rebootView.stage === 'baby') return this.rebootView.artCandidate === 'hybrid' ? HYBRID_BABY_ASSET : this.rebootView.artCandidate === 'blender' ? BLENDER_BABY_ASSET : BABY_CHARM_ASSET;
     if (this.rebootView) return REBOOT_ASSETS[this.rebootView.stage];
     return this.formPresentation.formId !== 'arucon' || this.characterCandidateId === DEFAULT_CHARACTER_CANDIDATE_ID
       ? FORM_ASSETS[this.formPresentation.assetKey]
@@ -516,7 +519,7 @@ export class RoomController {
       loaded.scale.setScalar(this.rebootView ? rebootScale(this.rebootView) : 0.62 * growthExpression(this.growthStage).scale);
       const hat = loaded.getObjectByName('RebootHat'); if (hat) hat.visible = !!this.rebootView?.hatWorn;
       const firstModel = !this.loadedPet;
-      const blenderRig = this.rebootView?.babyCharm && this.rebootView.artCandidate === 'blender' ? new BlenderBabyRig(loaded) : undefined;
+      const blenderRig = this.rebootView?.babyCharm && ['blender', 'hybrid'].includes(this.rebootView.artCandidate ?? '') ? new BlenderBabyRig(loaded, this.rebootView.artCandidate === 'hybrid') : undefined;
       this.petOrientation.rotation.y = this.comparisonMode ? comparisonCameraYaw(this.comparisonCameraAngle) : 0;
       this.mixer?.stopAllAction();
       if (this.loadedPet) {
@@ -945,7 +948,8 @@ export class RoomController {
     const hop = art ? art.hop : pose?.phase === 'contact' && ['tiny_hops', 'hat_test_step'].includes(pose.baby?.beat.id ?? '') ? pose.baby?.progress : undefined;
     if (this.blenderRig || art) {
       const name = this.sleeping ? 'sleep' : moving ? 'walk' : hop !== undefined ? 'baby_hop'
-        : pose?.kind === 'hand' ? pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}` : `idle_${this.profile}`;
+        : pose?.kind === 'hand' ? pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}`
+          : this.rebootView?.artCandidate === 'hybrid' && this.babyGaitRig?.gait.active ? 'baby_stop' : `idle_${this.profile}`;
       this.selectClip(name);
     }
     this.mixer?.update(comparison?.paused ? 0 : dt);
@@ -983,6 +987,7 @@ export class RoomController {
       if (moving && this.babyGaitRig) this.activeAction.time = (this.babyGaitRig.gait.phase % 1) * clip.duration;
       else if (hop !== undefined) this.activeAction.time = hop * clip.duration;
       else if (pose?.kind === 'hand') this.activeAction.time = Math.min(.99999, pose.progress) * clip.duration;
+      else if (clip.name === 'baby_stop' && this.babyGaitRig) this.activeAction.time = this.babyGaitRig.gait.stopProgress * clip.duration;
       this.mixer?.update(0);
       this.blenderRig.apply(this.sleeping);
     }
