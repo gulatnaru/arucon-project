@@ -1,5 +1,23 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 현재 REBOOT-03.2 — 전체 렌더 비교판 / 2026-10-10
+
+현재좁은범위 **VISUAL_QUALITY_REVIEW_READY**. [실제화면/전체비용/환경예외](REBOOT-03-2-REPORT.md). 전체MVP/출시/아트재미승인과다르다.
+
+| 항목 | 최신실제결과·남은범위 |
+|---|---|
+| 전체방/5DPR | 같은v5 native1170×2532원본,실제buffer585/780/878/975/1170width. 내부확대/24분할polygon/AA원인분리; 원본보정/축소없음 |
+| 방곡면·normal/재질 | 기존구성/색/크기/충돌보존,큰rug96/cushion64/leaf32/facility48·finite analytic normal. 동일225 legacy/refined실제곡선차이;software재질한계/아트최종판단분리 |
+| A/B/C/눈 | 15개동일조건native·기본눈raw정합성/idleCurious비대칭수정·실제세모델윙크유지. 원본48파일같은SHA,최종모델/아트/크기USER_REVIEW_PENDING |
+| AA지원/비용 | actualMSAA요청2/4모두4;FXAA프로젝트FBO호환수정후GL0 · 실제화면. 최종native4/FXAA프레임실패로자동채택안함 |
+| 성능 | fresh같은v5 7×60초/각input9.5해상도AA0 PASS_PROXY;3×이번51.87Hz/이전실패이력보존. 실제GPU/표시FPS/물리입력/발열배터리NOT_RUN |
+| 실제입력/보존 | 이동/교감/menu/sleepwake/reduced/위젯실제탭/cold같은DB복원.31pets · 경제/EXP/meal/소유/기억 · 3DBok.디스크환경Code14/relaunch실제쓰기복귀이력보존 |
+| 자동/플랫폼 | 새428/428 · 영향109/109 · lint/types · iOSv5Release실제입력/설치hash · AndroidJS/CNG27static PASS.이번Androidnative/UI NOT_RUN |
+| 실기기/출시/외부 | devicectl기기없음/physical NOT_RUN. 건강OFF/계정/결제/법률/배포 기존경계유지/전체MVP미완료 |
+| 다음선택 | render2~2.25AA0추천출발점이나최종미확정.기본정책A/자동1.5AA0/+25유지・현재검토만A/+35·3×AA0.재미 · 아트 · 크기 · C채택 USER_REVIEW_PENDING |
+
+---
+
 ## 현재 REBOOT-03.1 — Hybrid C 비교 준비 (2026-10-09)
 
 좁은 아기 A/B/C 비교 범위 **HYBRID_C_REVIEW_READY**. [실제 자료와 한계](REBOOT-03-1-REPORT.md). 전체MVP/출시완료·사용자아트승인이 아니다.

@@ -1,4 +1,20 @@
-# Next resume — REBOOT-03.1 / HYBRID_C_REVIEW_READY
+# Next resume — REBOOT-03.2 / VISUAL_QUALITY_REVIEW_READY
+
+[현재 렌더 비교 보고서](REBOOT-03-2-REPORT.md). 소스 **a6218d4c056ed43dcded7a64adbbfaa3288e7554**, 설치 **visual-v5 Release SHA d177cca9d46e279503a0ce6eb3d9a5ab4661386ac05bd1db14d0b88939395de9** / 209빌드입력 일치. 같으면 재빌드/재설치/DB 초기화하지 않는다. 기본A·기존30+같은아루1·원본48개·경제/성장/소유/meal·3DBok·모자/쿠션/기억 보존.
+
+현재 검토 창은 **A/+35·3×AA0/일반모션/말풍선ON/awake/비교종료·정상입력**. 영구 채택은null이며 cold 재실행시 기존자동1.5×MSAA0/+25로 복원된다. 방 곡면과 기본idle눈 처리는 개선됐으나 **최종 렌더 설정·아트·재미·크기·C채택 USER_REVIEW_PENDING**. 다음 한 작업은 같은 앱의 **☰→설정→렌더 품질 비교→1.5/2/2.25/2.5/3** 원본을 사용자와 비교하는 것이다. 우리아이→A/B/C로 같은방에서 확인한다. 성장기/진화형/상점/AI/경제로 확대하지 않는다.
+
+최종 v5로15개 native1170×2532 원본/원본pixel crop/legacy곡면/AA/세모델윙크·정상 입력/수면깨우기/reduced/Home실제일반위젯탭/cold동일저장을 확인했다. `evidence/reboot-03-2-2026-10-10/`에119.62초/99.645초 실제1× 영상·nativePNG·GL지원·fresh7×60초·저장감사가 있다. 렌더고해상도이미지를축소/보정하지않았고상태판/진단재생을정상생활로세지않는다.
+
+최종5해상도AA0 proxy/입력PASS,3×51.87Hz/RAF21.37/입력27.05ms. v4의3×32.56/RAF37.22FAIL은다른이력으로보존,호스트/워밍업변동을코드이득으로단정하지않는다. 실제MSAA는요청2/4모두4샘플/최종27.92Hz(FRAMEFAIL),FXAA는프로젝트FBO경계수정뒤GL0지만7.76Hz/입력198.02ms(FAIL)라자동채택하지않는다. 출발추천은이Simulator의2~2.25×AA0이며최종미확정. GPU/표시FPS/물리입력/실기기/발열배터리 NOT_RUN,devicectl기기없음. Android JS/CNG27static PASS·이번Androidnative/UI NOT_RUN.
+
+새428/428·영향109/109·lint/types·v5xcodebuild exit0·같은DB설치/실제입력 PASS. SDK패치/새패키지/전역설치/보안변경없음. Software CPU path/queue 보존,실제floor입력계측과동일결과거리순경로탐색,FXAA BACK→managedCOLOR_ATTACHMENT0 프로젝트전용경계. 디스크127MiB/화면오류/SQLCode14발생이력과3DBok·같은앱relaunch후write revision복귀를보고서에보존했다. 재발하면실제환경/오류를보존하며DB를초기화하지않는다.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. source/handoff와설치SHA를구별한다. feature checkpoint/일반push만, main/merge/force/tag/deploy/실건강/실결제/보안변경/미디어외부업로드 금지.
+
+---
+
+## Historical — REBOOT-03.1 / HYBRID_C_REVIEW_READY
 
 [현재 보고서](REBOOT-03-1-REPORT.md). 앱 소스 **d5591958a0009c725b959383b189ddf82d92d51d**, 설치 **Hybrid C v1 Release SHA7c1d9e6e4ee61dbaaff872a115340e0cce47d1114b89e063b8ddcee93fdb0f40**. 기본 **A**, B/C 별도 후보. 206개 빌드 입력/25개 원본/일반30+같은아루1/3DB 보존을 실제 대조했다. 현재 Git/설치가 같으면 재빌드/재설치/DB 초기화하지 않는다.
 

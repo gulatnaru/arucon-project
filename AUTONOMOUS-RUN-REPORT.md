@@ -1,5 +1,17 @@
 # iOS validation history and Release input resume
 
+## REBOOT-03.2 — 2026-10-10 / VISUAL_QUALITY_REVIEW_READY
+
+방전체선명도/계단을실제내부buffer·AA·곡면·normal/재질과구분했다. 현재1.5×585×1266→native1170×2532 확대와24분할rug곡면이주요원인,같은2.25×legacy/refined원본에서외곽곡선개선확인. 큰곡면만세분화/기본idleCurious비대칭제거/명시wink보존. A/B/C모델·48원본/기존30+아루1/경제·성장·소유·meal·3DBok 유지. 최종렌더/아트/재미/크기/모델채택미확정.
+
+소스 **a6218d4**, 설치 **visual-v5 Release SHA d177cca9d46e279503a0ce6eb3d9a5ab4661386ac05bd1db14d0b88939395de9**,209입력일치. 같은v5 15native원본·7×60초·실제세모델장난/정상접촉/이동/수면복귀/reducedON/OFF/Home일반위젯실제탭/cold복원. 새428/428·영향109/109·lint/types·iOSRelease·AndroidJS·CNG27static PASS. [최신원본·비용·예외·SELF_REVIEW](REBOOT-03-2-REPORT.md).
+
+최종5DPR AA0 proxy/입력PASS,3×51.87Hz;이전유효v4의3×실패는이력이며호스트변동을코드효과로단정하지않는다. MSAA요청2/4모두native4(최종27.92Hz FRAMEFAIL),FXAA프로젝트FBO경계수정GL0/7.76Hz · 198ms FAIL. 모두CPU/RAF/제출/queue proxy,실GPU/표시FPS/물리입력/실기기미실행. devicectl기기없음. 소프트웨어결과로iPhone불가능/출시성능을선언하지않는다.
+
+디스크127MiB/화면오류/SQLCode14환경예외를그대로보존하고3DB무결성확인,DB초기화/복원없이같은앱relaunch후실제write revision13215→13227과새접촉복귀확인. SDK/vendor패치·새서비스·경제/수면/저장엔진변경없음. SOL_DIRECT/SELF_REVIEW/subagent0/ROUTING_UNVERIFIED. 아래과거증거와판정은이력이다.
+
+---
+
 ## REBOOT-03.1 — 2026-10-09 / HYBRID_C_REVIEW_READY
 
 사용자가 선호한 A+35의 낮고 둥근 모찌 몸·얼굴·큰 앞발을 보존해 별도 C를 실제 Blender에서 제작했다. 새 곡면/눈꺼풀/Shape Key·8bone normalized skin·국소 체중/정지 연기와 덜 무거운 export다. A/B 25원본SHA와 기존30+같은아루1/3DB/경제·성장·섭취·소유를 보존하며 기본A를 유지한다. C가 A보다 더 좋다고 가정하지 않는다.
