@@ -1,5 +1,21 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 현재 REBOOT-03.1 — Hybrid C 비교 준비 (2026-10-09)
+
+좁은 아기 A/B/C 비교 범위 **HYBRID_C_REVIEW_READY**. [실제 자료와 한계](REBOOT-03-1-REPORT.md). 전체MVP/출시완료·사용자아트승인이 아니다.
+
+| 범위 | 현재 결과 / 남은 항목 |
+|---|---|
+| A 디자인·별도 C | 실제 Blender .blend/GLB/제작소스·얼굴/keys/skin/weight/stop 제작. A/B25원본해시동일/기본A유지. 사용자A+35선호보존 |
+| 동일게임 A/B/C +25/+35 | 최신동일Release 6영상·정면/측면/후면/8표현 비교. A35후면마지막복원22초별도보완. 확대와게임점유율구분 |
+| 정상입력/rest/lifecycle | C 직접접촉·이동/변경·손복원·수면깨우기·reducedON/OFF·실제Home위젯탭복귀·cold기본A/같은아루복원. 이번장기동면UI재시험NOT_RUN |
+| 저장/경제/회귀 | 새422/422·lint/types·iOSRelease·AndroidJS·CNG27/27 STATIC. 원래30+아루1·경제/EXP/소유/meal·3DBok·206빌드입력일치 |
+| 비용 | 동일6×60초proxy C변형/queue는B보다낮고A보다높음. CPU/RAF/제출proxy PASS; 통제비교입력p95미충족, 실GPU/표시FPS/물리입력/실기기/발열배터리NOT_RUN |
+| 최종선택/후속 | 재미·최종아트·크기·C채택 USER_REVIEW_PENDING. C기본교체안함. 다음계열/상점/AI/전체성장 확장없음 |
+| 플랫폼/외부 | 이번Androidnative/UI NOT_RUN. 건강OFF·법률/실계정/결제/배포 기존경계 유지 |
+
+---
+
 ## 현재 REBOOT-03 — Blender/v8 비교 준비 (2026-10-09)
 
 현재 좁은 비교 범위는 **BLENDER_AB_REVIEW_READY**, 전체 MVP/출시 완료가 아니다. [최신 실제 비교](REBOOT-03-REPORT.md). A=v8 기본/원본 보존, B=실제 Blender 제작 아기. 같은 iOS v5 Release에서 A/B +25/+35·정면/측면/후면·표정/보행/도약/착지/접촉/복원·정상 입력/수면 복귀·같은 DB 재실행을 확인했다.

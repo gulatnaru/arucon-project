@@ -1,4 +1,18 @@
-# Next resume — REBOOT-03 / BLENDER_AB_REVIEW_READY
+# Next resume — REBOOT-03.1 / HYBRID_C_REVIEW_READY
+
+[현재 보고서](REBOOT-03-1-REPORT.md). 앱 소스 **d5591958a0009c725b959383b189ddf82d92d51d**, 설치 **Hybrid C v1 Release SHA7c1d9e6e4ee61dbaaff872a115340e0cce47d1114b89e063b8ddcee93fdb0f40**. 기본 **A**, B/C 별도 후보. 206개 빌드 입력/25개 원본/일반30+같은아루1/3DB 보존을 실제 대조했다. 현재 Git/설치가 같으면 재빌드/재설치/DB 초기화하지 않는다.
+
+사용자는 A+35의 둥근 몸·얼굴·큰 앞발을 선호했다. C는 그 A 표면을 유지한 실제 Blender 편집 원본/스킨·Shape Key·국소 체중 연기 후보다. **C 기본채택·최종크기·재미·아트는 USER_REVIEW_PENDING**. 다음 한 작업은 사용자 A/B/C 제품 비교이며 승인 없이 다음 계열/상점/AI/성장 전체로 확대하지 않는다.
+
+바로 비교: 현재 아루 방 **☰→우리 아이→A/B/C→+25/+35→같은장면/방향→닫기**. 비교 끝으로 정상 생활/입력에 복귀한다. 로컬 `evidence/reboot-03-1-2026-10-09/`에 실제 전체방/얼굴/측면 비교 이미지, 6개 정상속도 영상, A35 마지막후면복원22초 보완, 정상C150초/lifecycle100초·위젯실제탭·cold복원 증거와6×60초 녹화OFF 비용이 있다. 마지막은 기본A/임시+25/1.5×/일반모션/말풍선ON/비교종료이다.
+
+새422/422·영향45/45·lint/types·iOSRelease exit0/같은DB설치·실제입력/수면복귀/reducedON→OFF·AndroidJS·CNG27/27 STATIC PASS. C morph p95 약.69ms/B1.32ms/A.63ms, C queue8.57~9.93ms/B12.40~12.59ms/A6.28~6.32ms. 모두Simulator 제출/RAF/CPU/queue proxy이며 GPU/표시FPS/물리입력/실기기/발열·배터리/이번Androidnative NOT_RUN. 통제 비교의 입력p95 INSUFFICIENT_DATA. 과거값을 최신으로 복사하지 않는다.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 실제 Blender5.2.0 `bpy` 제작, MCP/GUI손조형 미사용. 원본을 보존하고 명백한 기술 결함만 영향검사→필요Release→실제재검증한다. feature checkpoint/일반push만, main/merge/force/tag/deploy/실건강/실결제/보안변경/영상외부업로드 금지.
+
+---
+
+## Historical — REBOOT-03 / BLENDER_AB_REVIEW_READY
 
 [현재 보고서](REBOOT-03-REPORT.md). 앱 source **5bb0cc363b612f3093c9e877a7ecded8d0c50871**, 설치 **v5 Release SHA188a9c06010f4fde72610381ab2560a4615ab7d6fc2c5cab0556dc7acb68ace7**, 기본 **A v8**, B는 실제 Blender 제작 비교 후보. 원본13GLB/기존30+아루1 보존. 현재 Git/설치를 직접 대조하고 같으면 재빌드/재설치/DB 초기화하지 않는다.
 

@@ -1,5 +1,17 @@
 # iOS validation history and Release input resume
 
+## REBOOT-03.1 — 2026-10-09 / HYBRID_C_REVIEW_READY
+
+사용자가 선호한 A+35의 낮고 둥근 모찌 몸·얼굴·큰 앞발을 보존해 별도 C를 실제 Blender에서 제작했다. 새 곡면/눈꺼풀/Shape Key·8bone normalized skin·국소 체중/정지 연기와 덜 무거운 export다. A/B 25원본SHA와 기존30+같은아루1/3DB/경제·성장·섭취·소유를 보존하며 기본A를 유지한다. C가 A보다 더 좋다고 가정하지 않는다.
+
+소스 **d559195**, 설치 **Hybrid C v1 Release SHA7c1d9e6e4ee61dbaaff872a115340e0cce47d1114b89e063b8ddcee93fdb0f40**, 206개입력 일치. 같은Release의6개 +25/+35 3방향/8장면 정상속도영상·전체방/얼굴/측면이미지·A35복원보완·실제C접촉/이동/손/sleep→wake/reduced·Home/일반위젯탭/cold기본A/같은저장복원 확인. 통제비교를 자율생활/보상증거로 쓰지 않는다.
+
+새422/422·영향45/45·lint/typecheck·iOSRelease exit0·AndroidJS·CNG27/27 STATIC PASS. fresh6×60초 녹화OFF에서 C morph~.69ms/B~1.32/A~.63, C queue8.57~9.93ms/B12.40~12.59/A6.28~6.32. C는B보다비용감소/A보다증가, GPU인과측정아님. GPU/표시FPS/물리입력/실기기/발열배터리/이번Androidnative NOT_RUN. 재미/최종아트/크기/C채택 USER_REVIEW_PENDING.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. [최신 실제 비교와 한계](REBOOT-03-1-REPORT.md). 보고서 작성/기술PASS는 사용자아트승인이 아니다. 다음계열/상점/AI/성장확대없음. 아래과거Astra/Sol의완료증거와제품평가를보존한다.
+
+---
+
 ## REBOOT-03 — 2026-10-09 / BLENDER_AB_REVIEW_READY
 
 사용자의 v8 개선 긍정 평가와 기본 A/원본을 보존하고, 실제 Blender .blend/GLB/rig/Shape Key/동작 B를 제작했다. 같은 v5 Release(source5bb0cc3, bundle188a9c06010f4fde72610381ab2560a4615ab7d6fc2c5cab0556dc7acb68ace7)에서 A/B +25/+35·세 방향·8장면 정상속도 비교와 정상 접촉/이동/수면복귀/reduced/실제위젯복귀/cold기본A/기억복원을 확인했다.
