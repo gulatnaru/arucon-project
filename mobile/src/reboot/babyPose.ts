@@ -75,7 +75,9 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   if (rig.paw) { rig.paw.position.y += rig.pawLift; rig.paw.position.z += rig.pawReach; }
   if (rig.leftPaw) rig.leftPaw.position.y += rig.leftPawLift;
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
-  const targets = neutral ? {} : faceTargets[expression];
+  // An awake idle is not a perpetual asymmetric Curious expression. Explicit
+  // curiosity/play/wink scenes keep their authored asymmetry on all three rigs.
+  const targets = neutral || !baby ? {} : faceTargets[expression];
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
     rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) - (rig.weights[name] ?? 0)) * alpha;
   const blink = Math.pow(Math.max(0, Math.sin(time * (expression === 'sleepy' ? .7 : 1.3))), 24);

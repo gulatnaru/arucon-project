@@ -1,0 +1,15 @@
+# REBOOT-03.2 — GLOBAL VISUAL QUALITY
+
+2026-10-10 · SOL_DIRECT / SELF_REVIEW. 사용자 요청의 현재 범위.
+
+방 전체와 캐릭터의 선명도·픽셀 계단·층져 보이는 곡면·기본 눈 균형을 개선한다. A 기본/B/C 후보와 원본·저장·경제·성장·수면/동면·AI는 보존한다.
+
+1. GLView 내부 buffer와 native 표시 해상도/확대를 실제 확인한다. raster/AA/geometry/normal/material 원인을 분리한다.
+2. 같은 Release·방·카메라·조명·캐릭터에서 DPR1.5/2/2.25/2.5/3 native PNG를 확보한다. 원본을 축소·보정해 개선을 과장하지 않는다.
+3. Expo55/expo-gl55.0.18의 공식 문서와 설치 소스로 MSAA/후처리 지원을 확인하고 실제 성공한 방식만 비교한다. 얼굴 흐림/비용을 함께 평가한다. blur/upscale filter는 해결이 아니다.
+4. 러그/쿠션/식물의 곡면·normal을 필요한 만큼 개선하며 방 디자인/소품은 늘리지 않는다.
+5. 기본 idle 눈의 크기/높이/간격/lid 균형을 확인한다. 의도된 wink/playful 비대칭은 유지한다. 모든 A/B/C에서 공통 렌더 경로를 확인한다.
+6. 각 해상도에서 동일60초 조건의 RAF/제출/GL대기/CPU morph·draw/입력→제출 proxy를 fresh 측정한다. 과거 수치와 합치지 않는다. 실제GPU/물리입력/실기기는 별도NOT_RUN이다.
+7. 실제 전체 화면의 개선과 품질/성능 비교를 제공한다. 결과 없이 최종 렌더 설정을 고정하지 않는다. feature 체크포인트·일반push만, main/merge/배포/실건강/실결제/보안변경 금지.
+
+비교 설정은 격리 검토 메뉴에 두고 사용자 채택 전 기존 자동 해상도/AA 정책을 유지한다. 원본 PNG/로컬 영상/60초 capture/실행 환경과 source/bundle 식별을 보고서에 연결한다. 재미/최종아트/크기/렌더 채택 USER_REVIEW_PENDING.

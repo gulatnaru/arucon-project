@@ -78,9 +78,12 @@ export function route(start: FloorPoint, requested: FloorPoint, options: Navigat
     nodes.push(isFree(p, options) ? p : null);
   }
   const closest = (p: FloorPoint) => {
-    let index = -1; let distance = Infinity;
-    nodes.forEach((n, i) => { if (n && clearLine(p, n, options)) { const d = Math.hypot(n.x - p.x, n.z - p.z); if (d < distance) { distance = d; index = i; } } });
-    return index;
+    // Same nearest visible node and stable index tie-break as the exhaustive
+    // scan. Avoid tracing hundreds of long lines before checking their distance.
+    const candidates = nodes.flatMap((n, i) => n ? [{ i, distance: Math.hypot(n.x - p.x, n.z - p.z) }] : []);
+    candidates.sort((a, b) => a.distance - b.distance || a.i - b.i);
+    for (const { i } of candidates) if (clearLine(p, nodes[i]!, options)) return i;
+    return -1;
   };
   const source = closest(start), target = closest(goal);
   if (source < 0 || target < 0) return [];

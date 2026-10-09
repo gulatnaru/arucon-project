@@ -16,12 +16,13 @@ import { ART_CASES, ART_LABELS, BABY_ART_CHOICES, type BabyArt, type ArtComparis
 import { BABY_SIZE_CANDIDATES, BabyLines } from './babyLife';
 import type { FloorPoint, RoomRuntimeSnapshot } from '../scene/types';
 import type { RoomPerformanceCapture, RoomPerformanceSummary } from '../scene/performanceProbe';
+import { VISUAL_QUALITY_CHOICES, type RoomRendererProfileId } from '../scene/rendererConfig';
 import { RebootSemanticQueue } from './semantic';
 import { nativeEmbeddingPort } from './nativeEmbedding';
 
 const PET_ID = 'reboot-01:main';
 const stageName: Record<RebootStage, string> = { baby: '아기', growing: '성장기', evolved: '1차 진화 후' };
-type Menu = 'main' | 'pet' | 'objects' | 'settings' | null;
+type Menu = 'main' | 'pet' | 'objects' | 'settings' | 'render' | null;
 type CommandResult = { state?: PetState; memory?: RebootSnapshot; command?: RebootCommand };
 
 export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
@@ -32,7 +33,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const [quiet, setQuiet] = useState(false), [reduced, setReduced] = useState(false), [busy, setBusy] = useState(false);
   const [babyReview, setBabyReview] = useState(true), [sizeCandidate, setSizeCandidate] = useState<1.15 | 1.25 | 1.35>(1.25);
   const [artCandidate, setArtCandidate] = useState<BabyArt>('v8'), [artComparison, setArtComparison] = useState<ArtComparison>();
-  const [highResolution, setHighResolution] = useState(false);
+  const [renderProfile, setRenderProfile] = useState<RoomRendererProfileId>('automatic');
   const [voice] = useState(() => new BabyLines());
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined), bubbleToken = useRef(0);
   const [error, setError] = useState(''), [captureToken, setCaptureToken] = useState<string>();
@@ -163,7 +164,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-1-hybrid-v1', review: { babyReview, sizeCandidate, highResolution, artCandidate, artComparison, reduced, finalSize: null },
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-2-visual-v5', review: { babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
       pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
       ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
@@ -191,7 +192,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const viewStage = babyReview ? 'baby' : memory.previewStage;
   const familiarHand = eligibleMemories(memory, 'user:hand').filter(e => now() - e.atMs < 45 * 60_000).at(-1);
   return <View style={styles.root}>
-    <AruconRoom rendererProfileId={highResolution ? 'software_high_resolution' : 'automatic'} rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
+    <AruconRoom rendererProfileId={renderProfile} rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
       sizeCandidate, artCandidate, artComparison: artComparison ? { ...artComparison, paused: artComparison.paused || menu !== null } : undefined, familiarHandId: familiarHand?.eventId,
       cushion: memory.cushion, handOffered: hand, command }} onRebootEvent={onEvent}
       livingEnabled={false} tableInstalled={false} toiletInstalled={pet.toiletInstalled} cushionVisible ballVisible={false}
@@ -218,7 +219,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
     {!!error && <View style={[styles.error, { bottom: insets.bottom + 76 }]}><Text accessibilityRole="alert">{error}</Text><Pressable accessibilityLabel="저장 다시 시도" onPress={() => { if (retry.current) void run(retry.current); }}><Text>다시 저장</Text></Pressable></View>}
     <Modal visible={menu !== null} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
       <View style={[styles.backdrop, { paddingTop: insets.top + 14, paddingBottom: insets.bottom + 14 }]}><View accessibilityViewIsModal style={styles.sheet}>
-        <View style={styles.sheetHeading}><Text style={styles.heading}>{menu === 'pet' ? '우리 아이' : menu === 'objects' ? '상점·꾸미기' : menu === 'settings' ? '설정' : '우리 방'}</Text><Pressable accessibilityLabel="리부트 패널 닫기" onPress={() => setMenu(null)} style={styles.menuButton}><Text>닫기</Text></Pressable></View>
+        <View style={styles.sheetHeading}><Text style={styles.heading}>{menu === 'pet' ? '우리 아이' : menu === 'objects' ? '상점·꾸미기' : menu === 'settings' ? '설정' : menu === 'render' ? '렌더 비교' : '우리 방'}</Text><Pressable accessibilityLabel="리부트 패널 닫기" onPress={() => setMenu(null)} style={styles.menuButton}><Text>닫기</Text></Pressable></View>
         <ScrollView contentContainerStyle={{ gap: 10 }}>
           {menu === 'main' && <>{(['pet', 'objects', 'settings'] as const).map((x, i) => <Pressable key={x} style={styles.row} accessibilityLabel={['우리 아이', '상점·꾸미기', '리부트 설정'][i]} onPress={() => setMenu(x)}><Text>{['우리 아이', '상점·꾸미기', '설정'][i]}</Text></Pressable>)}</>}
           {menu === 'pet' && babyReview && <>
@@ -241,11 +242,20 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
             <Pressable disabled={busy || rest.mode !== 'awake'} style={styles.row} accessibilityLabel={memory.hatWorn ? '검토 모자 벗기' : '검토 모자 쓰기'} onPress={wear}><Text>{memory.hatWorn ? '모자 벗기' : '모자 쓰기'}</Text></Pressable>
             <Pressable disabled={rest.mode !== 'awake'} style={styles.row} accessibilityLabel="쿠션 옮기기" onPress={() => { setMenu(null); setPlacement(true); }}><Text>쿠션 옮기기</Text></Pressable>
           </>}
+          {menu === 'render' && <>
+            <Text>같은 방·빛·카메라의 검토 설정이에요. 최종 설정은 아직 선택하지 않았어요.</Text>
+            {VISUAL_QUALITY_CHOICES.filter(x => !x.samples || (runtime.current?.renderer?.maxSamples ?? 0) >= x.samples).map(x => <Pressable key={x.id}
+              style={styles.row} accessibilityLabel={`렌더 ${x.id} 선택`} onPress={() => {
+                cancel(); capture.current = undefined; perf.current = undefined; runtime.current = undefined;
+                setRenderProfile(x.id); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null);
+              }}><Text>{x.label}{renderProfile === x.id ? ' · 비교 중' : ''}</Text></Pressable>)}
+            <Pressable style={styles.row} accessibilityLabel="자동 렌더 설정 복원" onPress={() => { cancel(); capture.current = undefined; setRenderProfile('automatic'); setMenu(null); }}><Text>기존 자동 설정으로 돌아가기</Text></Pressable>
+          </>}
           {menu === 'settings' && <><Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 일반 방과 저장이 분리돼요.</Text>
             <Pressable style={styles.row} accessibilityLabel={babyReview ? '이전 REBOOT-01 세 모습 비교' : 'REBOOT-02 아기 검토로 돌아가기'} onPress={() => { cancel(); setArtComparison(undefined); setBabyReview(x => !x); setMenu(null); }}><Text>{babyReview ? '이전 세 모습 비교' : '아기 검토로 돌아가기'}</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel={quiet ? '말풍선 켜기' : '말풍선 가리기'} onPress={() => setQuiet(x => !x)}><Text>{quiet ? '말풍선 켜기' : '말풍선 가리기'}</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel={reduced ? '동작 줄이기 끄기' : '동작 줄이기 켜기'} onPress={() => setReduced(x => !x)}><Text>동작 줄이기 {reduced ? '켜짐' : '꺼짐'}</Text></Pressable>
-            {babyReview && <Pressable style={styles.row} accessibilityLabel={highResolution ? '현재 해상도 비교' : '고해상도 비교'} onPress={() => { cancel(); setHighResolution(x => !x); setMenu(null); }}><Text>렌더 비교 · {highResolution ? '현재 1.5×로' : '고해상도 3×로'} (MSAA 0)</Text></Pressable>}
+            {babyReview && <Pressable style={styles.row} accessibilityLabel="렌더 품질 비교" onPress={() => setMenu('render')}><Text>렌더 품질 비교</Text></Pressable>}
             <Pressable disabled={busy} style={styles.row} accessibilityLabel={rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'} onPress={restAction}><Text>{rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'}</Text></Pressable>
             <Text>{modelStatus}</Text>
             <Pressable style={styles.row} accessibilityLabel={backend === 'A' ? '로컬 검색 B 준비' : '구조화된 기억 A 사용'} onPress={() => { void chooseBackend(); }}><Text>{backend === 'A' ? '로컬 검색 B 준비 / 비교' : '구조화된 기억 A로 비교'}</Text></Pressable>

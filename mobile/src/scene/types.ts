@@ -12,6 +12,10 @@ import type { RebootEvent, RebootView } from '../reboot/contracts';
 export type { ComparisonCameraAngle, RoomPresentationBatch, RoomVisualCommand } from './presentationBridge';
 
 export type RoomRuntimeSnapshot = Readonly<{
+  renderer?: Readonly<{ profileId: string; requestedDpr: number; logicalWidth: number; logicalHeight: number;
+    identity?: Readonly<{ renderer: string; vendor: string; version: string }>; cpuMorphs?: boolean;
+    deviceDpr: number; bufferWidth: number; bufferHeight: number; requestedMsaa: number; postprocessAa: string;
+    roomCurves: string; maxSamples?: number; sampleBuffers?: number; samples?: number; framebufferStatus?: number; error?: number }>;
   restMode: PetRestMode; sleeping: boolean; interactionEnabled: boolean;
   interaction: RoomInteraction; clip: string | null; paused: boolean;
   blockedBy: 'background' | 'panel' | 'sleeping' | 'hibernating' | 'committed_cue' | null;

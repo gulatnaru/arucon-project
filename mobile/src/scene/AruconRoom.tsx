@@ -146,6 +146,7 @@ export function AruconRoom(props: RoomProps) {
   }, [props.interactionEnabled]);
 
   const onFloor = (x: number, y: number) => {
+    const inputStartedAtMs = performance.now();
     if (!(latest.current.interactionEnabled ?? true)) return;
     const room = controller.current;
     if (!room) return;
@@ -156,7 +157,7 @@ export function AruconRoom(props: RoomProps) {
       room.runLife({ token: `roll:${performance.now()}`, kind: 'roll', target: floor });
       return;
     }
-    const target = room.moveTo(floor);
+    const target = room.moveTo(floor, inputStartedAtMs);
     if (target) {
       latest.current.onInteractionIntent?.('move');
       latest.current.onMove?.(target);

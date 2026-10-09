@@ -13,7 +13,7 @@ import { prepareCpuMorphs } from './cpuMorph';
 import { createMorphedAnchor } from './morphedAnchor';
 import { File, Paths } from 'expo-file-system';
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
-import { Platform } from 'react-native';
+import { PixelRatio, Platform } from 'react-native';
 import * as THREE from 'three';
 import { FLOOR, MEAL_BOWL, TOILET_SPOT, isFree, localDockOffset, nearestFree, route, type NavigationOptions } from './navigation';
 import { MOTION, advanceWalk, springStep, shouldPauseDecorativeMotion, reducedPoseTime, cueDuration } from './motion';
@@ -28,7 +28,10 @@ import {
 import { COMMON_PREVIEW_ASSET_KEY, selectFormPresentation, type FormPresentation } from './formPresentation';
 import { holdReducedPose } from './clipPresentation';
 import { parseGlb } from './gltfRuntime';
-import { isAppleSoftwareRenderer, resolveRoomRendererProfile, type ResolvedRoomRendererProfile, type RoomRendererProfileId } from './rendererConfig';
+import { isAppleSoftwareRenderer, resolveRoomRendererProfile, needsSoftwareCpuMorphs, type ResolvedRoomRendererProfile, type RoomRendererProfileId, type RoomRendererIdentity } from './rendererConfig';
+import { roomCurveGeometry, type RoomCurveRole } from './roomCurves';
+import { createRoomFxaa } from './roomAa';
+import { expoRenderContext } from './expoRenderContext';
 import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
 import type { FloorPoint, RoomProps, RoomRuntimeSnapshot } from './types';
 import { RoomPerformanceProbe, type RoomPerformanceCapture, type RoomPerformanceSummary } from './performanceProbe';
@@ -105,9 +108,12 @@ export class RoomController {
   private readonly furniture: Partial<Record<HitName, THREE.Object3D>> = {};
   private readonly rendererConfig: ResolvedRoomRendererProfile;
   private readonly softwareRenderer: boolean;
+  private readonly rendererIdentity?: RoomRendererIdentity;
   private readonly submissionIntervalMs: number;
   private readonly submissions: FrameSubmissionGate;
   private readonly performanceProbe: RoomPerformanceProbe;
+  private readonly fxaa?: ReturnType<typeof createRoomFxaa>;
+  private glValidation?: { maxSamples: number; sampleBuffers: number; samples: number; framebufferStatus: number; error: number };
   private onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
   private onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
   private onRuntimeSnapshot?: (snapshot: RoomRuntimeSnapshot) => void;
@@ -254,9 +260,10 @@ export class RoomController {
     } : undefined;
     this.rendererConfig = resolveRoomRendererProfile(rendererProfileId, __DEV__, Platform.OS, rendererIdentity);
     this.softwareRenderer = isAppleSoftwareRenderer(Platform.OS, rendererIdentity);
+    this.rendererIdentity = rendererIdentity;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      context: gl as unknown as WebGLRenderingContext,
+      context: expoRenderContext(gl, Platform.OS === 'ios' && this.rendererConfig.postprocessAa === 'fxaa') as unknown as WebGLRenderingContext,
       antialias: this.rendererConfig.contextAntialias,
     });
     this.submissionIntervalMs = this.rendererConfig.submissionIntervalMs;
@@ -273,6 +280,8 @@ export class RoomController {
     // Expo GL already supplies a device-resolution drawing buffer.
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight, false);
+    this.renderer.info.autoReset = false;
+    if (this.rendererConfig.postprocessAa === 'fxaa') this.fxaa = createRoomFxaa(gl.drawingBufferWidth, gl.drawingBufferHeight);
     this.renderer.setClearColor(0xf2ebdc);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.scene.background = new THREE.Color(0xf2ebdc);
@@ -423,8 +432,8 @@ export class RoomController {
     mesh.position.set(...at); parent.add(mesh); return mesh;
   }
 
-  private addSphere(parent: THREE.Object3D, color: number, scale: [number, number, number], at: [number, number, number]) {
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), this.material(color));
+  private addSphere(parent: THREE.Object3D, color: number, scale: [number, number, number], at: [number, number, number], role?: RoomCurveRole) {
+    const mesh = new THREE.Mesh(roomCurveGeometry(role, this.rendererConfig.id === 'quality_225_legacy'), this.material(color));
     mesh.scale.set(...scale); mesh.position.set(...at); parent.add(mesh); return mesh;
   }
 
@@ -442,8 +451,8 @@ export class RoomController {
     this.addBox(this.scene, 0xcde2e4, [2.05, 2.45, 0.04], [-0.45, 2.2, -4.84]);
     this.addBox(this.scene, 0xf7f3e9, [0.07, 2.45, 0.07], [-0.45, 2.2, -4.79]);
     this.addBox(this.scene, 0xf7f3e9, [2.05, 0.07, 0.07], [-0.45, 2.0, -4.78]);
-    this.addSphere(this.scene, 0xd2be9c, [2.67, 0.02, 1.89], [0, 0.015, 1.7]);
-    this.addSphere(this.scene, 0xeee2c8, [2.58, 0.015, 1.82], [0, 0.037, 1.7]);
+    this.addSphere(this.scene, 0xd2be9c, [2.67, 0.02, 1.89], [0, 0.015, 1.7], 'rug');
+    this.addSphere(this.scene, 0xeee2c8, [2.58, 0.015, 1.82], [0, 0.037, 1.7], 'rug');
     const table = new THREE.Group(); table.position.set(2.28, 0, 0.1);
     for (const x of [-0.42, 0.42]) for (const z of [-0.27, 0.27]) this.addBox(table, 0xbe9b75, [0.1, 0.37, 0.1], [x, 0.22, z]);
     this.addSphere(table, 0xcdac87, [0.72, 0.1, 0.52], [0, 0.44, 0]);
@@ -455,15 +464,15 @@ export class RoomController {
     this.foodBite = this.addSphere(new THREE.Group(), 0xa87748, [.065, .05, .065], [0, 0, 0]);
     this.foodBite.visible = false; this.scene.add(this.foodBite);
     const cushion = new THREE.Group(); cushion.position.set(-2.05, 0, 0.2);
-    this.addSphere(cushion, 0xb1a0ba, [0.91, 0.14, 0.68], [0, 0.12, 0]);
-    this.addSphere(cushion, 0xc9bad0, [0.85, 0.22, 0.63], [0, 0.25, 0]);
+    this.addSphere(cushion, 0xb1a0ba, [0.91, 0.14, 0.68], [0, 0.12, 0], 'cushion');
+    this.addSphere(cushion, 0xc9bad0, [0.85, 0.22, 0.63], [0, 0.25, 0], 'cushion');
     this.scene.add(cushion); this.furniture.cushion = cushion;
     const plant = new THREE.Group(); plant.position.set(-2.8, 0, -3.65);
     this.addBox(plant, 0xd5b69b, [0.48, 0.42, 0.48], [0, 0.23, 0]);
-    for (let i = 0; i < 6; i++) this.addSphere(plant, 0x92a080, [0.13, 0.29, 0.08], [(i % 2 ? 1 : -1) * 0.22, 0.75 + i * 0.12, 0]);
+    for (let i = 0; i < 6; i++) this.addSphere(plant, 0x92a080, [0.13, 0.29, 0.08], [(i % 2 ? 1 : -1) * 0.22, 0.75 + i * 0.12, 0], 'leaf');
     this.scene.add(plant);
     const toilet = new THREE.Group(); toilet.position.set(TOILET_SPOT.x, 0, TOILET_SPOT.z);
-    this.addSphere(toilet, 0x9fac96, [0.52, 0.52, 0.44], [0, 0.42, 0]);
+    this.addSphere(toilet, 0x9fac96, [0.52, 0.52, 0.44], [0, 0.42, 0], 'facility');
     this.scene.add(toilet); this.furniture.toilet = toilet;
     const ball = new THREE.Group(); ball.position.set(1.35, 0.2, 3.1);
     this.addSphere(ball, 0xdca28c, [0.22, 0.22, 0.22], [0, 0, 0]);
@@ -514,7 +523,7 @@ export class RoomController {
       applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial);
       const mouth = loaded.getObjectByName('Mouth');
       this.mealMouth = mouth instanceof THREE.Mesh ? createMorphedAnchor(mouth) : undefined;
-      this.updateCpuMorphs = this.softwareRenderer && ['software_low_resolution', 'software_balanced', 'software_high_resolution'].includes(this.rendererConfig.id)
+      this.updateCpuMorphs = needsSoftwareCpuMorphs(this.rendererConfig.id, this.softwareRenderer)
         ? prepareCpuMorphs(loaded) : null;
       loaded.scale.setScalar(this.rebootView ? rebootScale(this.rebootView) : 0.62 * growthExpression(this.growthStage).scale);
       const hat = loaded.getObjectByName('RebootHat'); if (hat) hat.visible = !!this.rebootView?.hatWorn;
@@ -731,7 +740,13 @@ export class RoomController {
   private runtimeSnapshot(): RoomRuntimeSnapshot {
     const interaction = this.currentInteraction();
     const visual = this.petOrientation.getWorldPosition(new THREE.Vector3());
-    return { restMode: this.restMode, sleeping: this.sleeping, interactionEnabled: this.interactionEnabled,
+    return { renderer: { profileId: this.rendererConfig.id, requestedDpr: this.rendererConfig.maxPixelRatio,
+      identity: this.rendererIdentity, cpuMorphs: !!this.updateCpuMorphs,
+      logicalWidth: this.width, logicalHeight: this.height, deviceDpr: PixelRatio.get(),
+      bufferWidth: this.gl.drawingBufferWidth, bufferHeight: this.gl.drawingBufferHeight,
+      requestedMsaa: this.rendererConfig.msaaSamples, postprocessAa: this.fxaa ? 'fxaa' : 'none',
+      roomCurves: this.rendererConfig.id === 'quality_225_legacy' ? 'legacy24' : 'refined', ...this.glValidation },
+      restMode: this.restMode, sleeping: this.sleeping, interactionEnabled: this.interactionEnabled,
       interaction, clip: this.activeAction?.getClip().name ?? null,
       blockedBy: !this.frames.running ? 'background' : interaction === 'panel' ? 'panel'
         : this.sleeping ? this.restMode as 'sleeping' | 'hibernating'
@@ -779,11 +794,14 @@ export class RoomController {
     return { x: hit.x, z: hit.z };
   }
 
-  moveTo(raw: FloorPoint): FloorPoint | null {
+  moveTo(raw: FloorPoint, inputStartedAtMs?: number): FloorPoint | null {
     if (!this.interactionEnabled || !canStartRoomInteraction(this.currentInteraction(), 'move')) return null;
     if (this.livingEnabled) this.life.cancel();
     if (this.rebootView) this.reboot.cancel();
-    return this.navigateTo(raw);
+    const target = this.navigateTo(raw);
+    // Autonomous navigation omits this argument and never becomes an input sample.
+    if (target && inputStartedAtMs !== undefined) this.performanceProbe.recordInputHandled(inputStartedAtMs);
+    return target;
   }
 
   private navigateTo(raw: FloorPoint): FloorPoint | null {
@@ -1002,7 +1020,9 @@ export class RoomController {
       this.updateCpuMorphs?.();
       const drawStart = performance.now();
       this.performanceProbe.recordPhase('morph', drawStart - morphStart);
-      this.renderer.render(this.scene, this.camera);
+      this.renderer.info.reset();
+      if (this.fxaa) this.fxaa.render(this.renderer, this.scene, this.camera);
+      else this.renderer.render(this.scene, this.camera);
       this.performanceProbe.recordPhase('draw', performance.now() - drawStart);
       this.performanceProbe.recordRenderWorkload(this.renderer.info.render);
       this.gl.endFrameEXP();
@@ -1012,6 +1032,9 @@ export class RoomController {
       if (this.updateCpuMorphs) this.gl.flushEXP();
       this.performanceProbe.recordPhase('queueDrain', performance.now() - drainStart);
       this.performanceProbe.recordSubmission(performance.now());
+      if (!this.glValidation) this.glValidation = { maxSamples: Number(this.gl.getParameter(this.gl.MAX_SAMPLES)),
+        sampleBuffers: Number(this.gl.getParameter(this.gl.SAMPLE_BUFFERS)), samples: Number(this.gl.getParameter(this.gl.SAMPLES)),
+        framebufferStatus: this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER), error: this.gl.getError() };
     }
     const now = Date.now();
     if (shouldPublishProjection(
@@ -1077,6 +1100,7 @@ export class RoomController {
     this.babyGaitRig?.dispose();
     this.babyGaitRig = undefined;
     disposeSceneObject(this.scene);
+    this.fxaa?.dispose();
     this.renderer.dispose();
   }
 

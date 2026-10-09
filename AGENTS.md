@@ -3,6 +3,7 @@
 제품 기준은 `docs/arucon-SRS.md` v1.9다. 2026-09-19 사용자 승인 여섯 MVP 기본 정책과 가역 config/ADR 위임을 적용한다. **2026-10-04 현재 직접 개발 책임자의 요청 모델은 GPT-6.1 Sol Max이며 SOL_DIRECT / AUTONOMOUS PRODUCT HARDENING으로 운영한다.** 직접 설계·구현·디버깅·실제 앱 검증과 SELF_REVIEW를 책임지고 새 subagent를 기본적으로 생성하지 않는다. 설정의 요청 모델과 실제 effective model 확인은 구분한다. 2026-09-28 이후 ASTRA_DIRECT의 완료 증거·과거 ENG-03 역할 설정·결정 이력은 보존한다.
 
 ## 현재 제품 품질 강화
+- 2026-10-10 REBOOT-03.2는 `tasks/REBOOT-03-2-global-visual-quality.md`다. 전체 방/캐릭터의 실제 native 해상도·AA·곡면/normal/기본 눈 균형을 분리해 개선하고 DPR1.5/2/2.25/2.5/3·지원AA·fresh60초 proxy를 비교한다. A/B/C·기존 저장/정책을 보존하고 최종 렌더 채택은 사용자 검토 전 확정하지 않는다.
 - 2026-10-09 REBOOT-03.1 현재 범위는 `tasks/REBOOT-03-1-hybrid-baby-c.md`다. 사용자 A +35의 낮고 둥근 모찌 실루엣/얼굴/큰 앞발 선호를 기준으로 Blender C 한 후보를 별도 제작한다. A/B 및 원본 .blend/GLB를 보존하고 기본 A를 유지한다. A/B/C +25/+35 실제 동일조건 비교·정상속도 영상·CPU morph/GL 대기/제출 비용을 검증한다. 최종 채택·아트·재미·크기 미확정, 성장기/진화형/상점/AI/경제/저장 확장 없음.
 - 2026-10-09 현재 범위는 `tasks/REBOOT-03-blender-baby-ab.md`다. 사용자 v8 외형·표정·움직임 개선의 긍정 평가를 보존한다. A=v8 기본값/원본을 유지하고 B=실제 Blender 제작 아기 한 종류를 같은 앱·조건에서 비교한다. Blender 미설치 시 명시적 설치 승인을 먼저 받으며 MCP 없이 Blender Python 제작이 가능하다. 성장기/진화형·경제·수면/동면·AI 확장 없음. 최종 A/B 채택·아트·재미·크기는 사용자 판단이며 재내보내기만으로 Blender 제작 완료를 주장하지 않는다.
 - 2026-10-08 REBOOT-02는 `tasks/REBOOT-02-baby-charm.md`가 현재 범위다. 사용자 판정 REWORK_REQUIRED — CHARACTER/MOTION/EXPRESSION을 적용하고 아기 한 마리의 얼굴·연결된 자율 생활·상황별 교감·작은 말풍선·+15/+25/+35% 실제 크기 비교만 진행한다. REBOOT-01 READY는 과거 기능 검토이며 제품 만족 승인이 아니다. 성장기/진화형 대량 제작은 아기 검토 뒤로 미룬다. 저장·경제·성장·수면/동면 엔진을 다시 만들지 않고 최종 크기·아트·재미를 임의 승인하지 않는다.

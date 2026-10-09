@@ -4,14 +4,29 @@ export type RoomRendererConfig = {
   maxPixelRatio: number;
   roomMaterial: 'standard' | 'lambert' | 'basic' | 'vertex_lit';
   petMaterial: 'source' | 'lambert' | 'vertex_lit';
+  postprocessAa?: 'fxaa';
 };
+
+/** Isolated visual comparison only; automatic/hardware defaults are unchanged. */
+export const VISUAL_QUALITY_CHOICES = [
+  { id: 'quality_150', label: 'DPR 1.5 · AA 없음', dpr: 1.5, samples: 0 },
+  { id: 'quality_200', label: 'DPR 2.0 · AA 없음', dpr: 2, samples: 0 },
+  { id: 'quality_225', label: 'DPR 2.25 · AA 없음', dpr: 2.25, samples: 0 },
+  { id: 'quality_250', label: 'DPR 2.5 · AA 없음', dpr: 2.5, samples: 0 },
+  { id: 'quality_300', label: 'DPR 3.0 · AA 없음', dpr: 3, samples: 0 },
+  { id: 'quality_225_msaa2', label: 'DPR 2.25 · MSAA 2', dpr: 2.25, samples: 2 },
+  { id: 'quality_225_msaa4', label: 'DPR 2.25 · MSAA 4', dpr: 2.25, samples: 4 },
+  { id: 'quality_225_fxaa', label: 'DPR 2.25 · FXAA', dpr: 2.25, samples: 0 },
+  { id: 'quality_225_legacy', label: 'DPR 2.25 · 이전 방 곡면', dpr: 2.25, samples: 0 },
+] as const;
 
 export type RoomRendererProfileId =
   | 'automatic'
   | 'software_legacy_333'
   | 'software_balanced'
   | 'software_high_resolution'
-  | 'software_low_resolution';
+  | 'software_low_resolution'
+  | typeof VISUAL_QUALITY_CHOICES[number]['id'];
 
 export type ResolvedRoomRendererProfile = RoomRendererConfig & {
   id: RoomRendererProfileId;
@@ -75,6 +90,10 @@ export function resolveRoomRendererProfile(
   platform: string,
   identity?: RoomRendererIdentity,
 ): ResolvedRoomRendererProfile {
+  const quality = VISUAL_QUALITY_CHOICES.find(x => x.id === requested);
+  if (quality) return { id: requested, ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit',
+    maxPixelRatio: quality.dpr, msaaSamples: quality.samples, submissionIntervalMs: 0,
+    ...(requested === 'quality_225_fxaa' ? { postprocessAa: 'fxaa' as const } : {}) };
   const softwareRenderer = isAppleSoftwareRenderer(platform, identity);
   if (requested === 'automatic' && softwareRenderer) {
     return { id: 'software_balanced', ...SOFTWARE_LOW_RESOLUTION, roomMaterial: 'vertex_lit', petMaterial: 'vertex_lit', maxPixelRatio: 1.5, submissionIntervalMs: 0 };
@@ -112,4 +131,9 @@ export function isAppleSoftwareRenderer(platform: string, identity?: RoomRendere
     identity.vendor === 'Apple Inc.' &&
     identity.version.startsWith('OpenGL ES 3.0 APPLE-');
   return platform === 'ios' && appleSoftwareRenderer;
+}
+
+/** Every resolution/AA candidate must keep the same working software morph and queue path. */
+export function needsSoftwareCpuMorphs(id: RoomRendererProfileId, softwareRenderer: boolean) {
+  return softwareRenderer && (['software_low_resolution', 'software_balanced', 'software_high_resolution'].includes(id) || id.startsWith('quality_'));
 }
