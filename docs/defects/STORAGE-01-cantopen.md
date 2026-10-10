@@ -44,3 +44,17 @@ REBOOT-03.2 시각 검토 판정과 별개의 저장 결함이다. 디스크127M
 `validation/audit_local_artifacts.py --require-free-gib 4`는 읽기 전용 프로젝트 점유/여유 사전 검사다.4GiB는 빌드·영상 준비용 가역 기술 여유값이며 앱의 섭취/경제 정책이 아니다. 자동 삭제·정리·전역설정 변경을 하지 않는다. 새 큰 빌드/영상 전에 이 검사를 사용하고 공간이 부족하면 같은 산출물을 반복 생성하지 않는다.
 
 측정상 evidence 약7.52GiB, 프로젝트Blender도구1.21GiB, node_modules.48GiB, ios.37GiB, 이 앱의 XcodeDerivedData1.08GiB. 큰 부분은 보존한AI모델/venv·DB백업·영상이다. Xcode/Pods/node_modules/생성 bundle은 재생성 가능한 분류이고 영상/원본/DB는 보호한다. 파일논리크기와du/APFS할당량은 다르며 프로젝트 밖 캐시/다른 앱/스왑이 원사건을 만들었다고 단정하지 않는다. 사용자 확인 없이 지우지 않았다.
+
+## 재개 2026-10-10 — 진단 보존 결함 수정 / 원사건 OPEN
+
+현재 b58967e/소스d714e24와 설치 followup-v2를 직접 대조했다. 실제 Mac 화면/입력 접근 성공. 기존 캐시4건과 같은 설치본의 live export0건을 확인해 **DIAG_RESTART_HISTORY_LOSS**를 별도 재현했다. 최초 SQLite14의 원인이라고 쓰지 않는다.
+
+- 수정: 시작 때 최신 유효 진단 파일을 복원; 두 cache 슬롯을 generation으로 교대 저장하고 읽기 검증한다. 중간쓰기/읽기 오류·손상된 슬롯에서 마지막 정상본을 선택한다. 최대8건/cleanup4개,1MiB파일 읽기 한계와 엄격한 타입/필드 검사. 현재 기록 세션과 이전 세션을 분리하고 불러온 기록은 봉인한다. 앱 재실행 후 connection/transaction 번호 재사용으로 과거 오류를 새 복구로 바꾸지 않는다.
+- 진단 캐시를 game DB로 취급하거나 보상 명령을 재생하지 않는다. 새 파일은 `arucon-storage-incidents-backup.json`, 기존 주파일과 함께 읽는다. 데이터 삭제/스키마 변경/SDK 패치/재시도시간 연장 없음. OS 캐시 삭제/전원 손실까지 영구 보존한다고 주장하지 않는다.
+- 최종 설치 **storage-v4 Release**, SHA `f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6`,213입력 fingerprint `85e7a73fb528d61b8416ce2e26b89384c5e6eec9b71483e4f235ffcf1d28b4b5`. v3는 선행 실행이며 v4와 구별한다.
+- 실제 v4: 기존6건 복원 → 별도 실제 native14/13 실패와 중복없는20재시도 복구 → 진단8건 → cold재실행 → 새session/8건전체 동일 → 정상 이동·직접 교감/메뉴복귀. 같은 petId/아루/EXP0/food0/coin0/awake. 일반 저장의 새로운 SQL실패는 관찰되지 않았다.
+- 실제 native 파일 I/O: 별도 `storage-diagnostic-check-*` 디렉터리에 합성 incident를 저장하고 **합성 중단/짧은쓰기**를 주입했다. 최신 정상checkpoint와 첫기록이 보존되고, silently 짧은쓰기 성공은 검증에서 거부됐다. 호스트 디스크를 채우거나 일반 진단파일/DB를 손상시키지 않았다. 실제 파일 I/O와 합성 장애를 분리한다.
+- 원본31저장/48제작파일/재화·EXP·소유·섭취원장/3DB integrityok 보존. 최종439/439·영향46/46·lints/types·Release PASS. v3의 선행60초proxy는 별도 이력이며 v4 성능 실측으로 재표기하지 않는다. 원래14의 VFS 경로/errno는 여전히 없어 **OPEN_ORIGINAL_VFS_CAUSE_UNCONFIRMED**.
+- 연결된 실제 iOS기기0/AndroidSDK·adb없음. 실기기/GPU/물리입력 NOT_RUN/BLOCKED_ENV_NO_CONNECTED_DEVICE. 기본렌더 미확정/기존A/B/C·경제·성장·수면정책·건강OFF 유지.
+
+증거는 `evidence/storage-01-resume-2026-10-10/`: `before-live-v2.json`(0)/`before-persisted-incidents.json`(4), `warm-v3-restored.json`, `native-v3-reliability.json`, `after-cold-v3.json`, 최종 `warm-v4.json`/`native-v4-reliability.json`/`before-cold-v4.json`/`after-cold-v4.json`(8건정확히같음), native원본영상/metadata, 보존감사. 구현의 가역적 선택은 [ADR-015 추가절](../adr/ADR-015-sqlite-access-and-growth-playthrough.md)에 기록했다.

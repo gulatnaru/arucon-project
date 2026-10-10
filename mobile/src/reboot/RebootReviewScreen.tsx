@@ -168,7 +168,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-2-followup-v2', review: { babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-2-storage-v4', review: { babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
       pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
       storage: storageDiagnosticsSnapshot(),
       ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }

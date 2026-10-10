@@ -14,20 +14,31 @@ export function sqliteResourceCode(error: unknown): number | null {
 export type StorageEnvironment = Readonly<{ availableBytes: number | null; mainUri: string;
   mainExists: boolean | null; parentExists: boolean | null; journalExists: boolean | null; walExists: boolean | null;
   tempDirectoryExists: boolean | null; attemptedVfsPath: 'NOT_EXPOSED_BY_EXPO'; note: string }>;
-export type StorageIncident = { first: SqlAccessTrace; code: number; environment: StorageEnvironment;
+export type StorageIncident = { sessionId?: string; first: SqlAccessTrace; code: number; environment: StorageEnvironment;
   cleanup: SqlAccessTrace[]; recovery?: SqlAccessTrace };
 /** First failure survives the ordinary256-entry ring. No SQL/parameters/pet snapshots. */
 export class StorageIncidentRecorder {
   private incidents: StorageIncident[] = [];
+  private active = new Set<StorageIncident>();
+  constructor(readonly sessionId = `${Date.now()}-${Math.random().toString(36).slice(2)}`) {}
+  /** Loaded history is sealed: connection/transaction/trace IDs are local to a process. */
+  restore(incidents: readonly StorageIncident[]) {
+    this.active.clear();
+    this.incidents = incidents.slice(-8).map(x => ({ ...x, sessionId: x.sessionId ?? 'legacy',
+      first: { ...x.first }, environment: { ...x.environment }, cleanup: x.cleanup.map(c => ({ ...c })),
+      ...(x.recovery ? { recovery: { ...x.recovery } } : {}) }));
+  }
   observe(entry: SqlAccessTrace, environment: () => StorageEnvironment) {
     let changed = false;
     const code = sqliteResourceCode(entry.error);
-    if (entry.status === 'failed' && code !== null && !this.incidents.some(x => x.first.file === entry.file && x.code === code && !x.recovery)) {
-      this.incidents.push({ first: { ...entry }, code, environment: environment(), cleanup: [] });
+    if (entry.status === 'failed' && code !== null && !this.incidents.some(x => this.active.has(x) && x.first.file === entry.file && x.code === code && !x.recovery)) {
+      const incident = { sessionId: this.sessionId, first: { ...entry }, code, environment: environment(), cleanup: [] };
+      this.incidents.push(incident); this.active.add(incident);
       changed = true;
-      if (this.incidents.length > 8) this.incidents.shift();
+      if (this.incidents.length > 8) this.active.delete(this.incidents.shift()!);
     }
     for (const incident of this.incidents) {
+      if (!this.active.has(incident)) continue;
       if (incident.first.file !== entry.file) continue;
       if (entry.status === 'cleanup_failed' && entry.transactionId === incident.first.transactionId && incident.cleanup.length < 4) { incident.cleanup.push({ ...entry }); changed = true; }
       if (!incident.recovery && entry.operation === 'TRANSACTION' && entry.status === 'complete' && entry.id > incident.first.id) { incident.recovery = { ...entry }; changed = true; }

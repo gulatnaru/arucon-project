@@ -34,3 +34,15 @@ Before/after preview changes only presentation props and suppresses memory write
 Audit files are local under `evidence/life-02-context7-sqlite-2026-10-06/`. Documentation/tool availability is not completion of LIFE-02.
 
 Current automated results, actual Release build identity, native contention reproduction/retest, normal-input growth video, time/save/input regressions, measurement limits and tool availability are recorded in `../../GROWTH-PLAYTHROUGH-REPORT.md`. Node tests are not native/visual PASS. SELF_REVIEW is not independent review.
+
+## 2026-10-10 — first-error diagnostic archive persistence
+
+A separate STORAGE-01 diagnostic defect was reproduced in the installed v2: four incidents existed on disk but a cold process exported zero. A subsequent failure could overwrite that history. This is not evidence of the original CANTOPEN cause.
+
+Choose two bounded local cache checkpoints with a generation number and verified readback. Restore the newest complete one before observing SQL. On failure or truncated write, preserve the other complete checkpoint. Import only validated fields; seal loaded incidents so process-local connection/transaction/trace IDs cannot label an old failure as a new recovery. Keep at most eight incidents, four cleanup entries each; reject oversized/invalid metadata. This is best-effort diagnostic persistence, not an authoritative ledger, power-loss/fsync guarantee or a DB recovery policy. OS cache eviction is still possible.
+
+Alternatives: one overwritten file (history/readback failure); unbounded per-event files (disk growth); adding telemetry writes to the game DB (extra failure/transaction coupling). The two cache slots keep the existing SQLite lane, schema7, primary-error and retry contracts unchanged. No player DB, cache deletion, SDK patch or external upload is used.
+
+SDK55's public [FileSystem API](https://docs.expo.dev/versions/v55.0.0/sdk/filesystem/) and the installed expo-file-system55.0.26 were checked. Its iOS string-write implementation explicitly uses `atomically:false`; do not assume public `File.write` is atomic. Existing package.json/lock/installed Expo55.0.31 and SQLite55.0.20 agree. Context7 plugin resolve+query succeeded for `/websites/expo_dev_versions_v55_0_0` with public library queries only; this is current evidence and does not rewrite the earlier unavailable-tool audit.
+
+Node checks cover interrupted and silent partial writes, malformed types, old/new session ID reuse and bounded history. Native QA uses separate retained files with **synthetic interruption/incident metadata** and actual File IO. SQLite14/13 are tested separately through actual native statements. Current build identities, cold restoration and actual normal input are in [STORAGE-01](../defects/STORAGE-01-cantopen.md) and the latest REBOOT-03.2 report. Original VFS cause remains OPEN.
