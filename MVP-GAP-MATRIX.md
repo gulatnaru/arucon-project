@@ -1,5 +1,25 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 최신 REBOOT-04 대표 3종 검토 — 2026-10-10
+
+| 범위 | 판정 | 실제 근거 / 남은 범위 |
+|---|---|---|
+| 네 연속축·16조합 확장 기반 | PASS_SCOPED_IMPLEMENTATION | version1·안정 잠재축·완료 경험·성장 interface; 전체16종 미구현 |
+| 대표3종 생활·표정·교감 | PASS_SIMULATOR / SELF_REVIEW | 같은 quad/+35/2.5AA0·v4·정상 메뉴/2분 자유 생활/비언어 접촉; 최종 성격 표현은 사용자 대기 |
+| 소품 기억·독립 저장·cold | PASS_NATIVE_SCOPED | 옛/현재 쿠션 위치 구분·같은petId·3개 snapshot/축/RNG 정확 보존 |
+| 입력·취소·수면·일반 위젯 | PASS_SIMULATOR_SCOPED | 짧은탭/배치 경합 수정, 수면·깨우기/reduced, 실제 App Group 누락→ad hoc 복원/위젯 표시·탭 |
+| 자동·빌드 회귀 | PASS | fresh448/lint/types/iOSRelease/AndroidJS/CNG27static; 이번 Androidnative/UI NOT_RUN |
+| 프레임·입력 proxy | PARTIAL / RAF_TAIL_FAIL_OPEN | ON180 frame PASS; OFF60 입력·제출 PASS, 장난/도도 RAF95 37.07/47.18>33.34ms |
+| 실기기/GPU/물리 지연 | NEEDS_DEVICE_VALIDATION / NOT_RUN | Simulator 결과로 대체하지 않음 |
+| 원본·경제·진단 보존 | PASS_PRESERVATION | 기존31+검토3·48원본·원장·진단8·3DBok; 기존main의 자연 rest19/64한계 정리는 별도 보고 |
+| CANTOPEN 정확한 VFS 원인 | OPEN / EVIDENCE_REQUIRED | STORAGE-01을 성격 작업으로 닫지 않음 |
+| 재미·최종 아트·크기·성격 | USER_REVIEW_PENDING | 3종 검토 전 8/16종·성장/진화/상점/AI 확장 없음 |
+
+[상세 결과](REBOOT-04-REPORT.md). 전체 SRS MVP/출시 완료 판정은 유지되지 않았으며 현재도 MVP_NOT_COMPLETE다.
+
+### Historical — STORAGE-01과 이전 검증
+
+
 ## 최신 STORAGE-01 재개 — 2026-10-10
 
 | 항목 | 현재 판정 | 근거 / 남은 범위 |

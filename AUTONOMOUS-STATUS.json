@@ -2,13 +2,13 @@
   "schemaVersion": 6,
   "runDate": "2026-10-10",
   "timezone": "Asia/Seoul",
-  "status": "VISUAL_QUALITY_REVIEW_READY",
+  "status": "PERSONALITY_3_REVIEW_READY",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "Scoped STORAGE-01 first-error diagnostic persistence hardening; original VFS cause and physical render validation pending",
-  "reason": "Actual installedv2 disk4/live0 diagnostic history loss corrected; finalv4 actual native recovery and8 exact records through cold restart pass. Original CANTOPEN VFS cause remains OPEN; physical devices unavailable.",
-  "sourceBaseline": "b58967ec7d805d8c3142c16bdb7ff1ee630a66d4",
-  "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
-  "currentLivingReport": "REBOOT-03-2-REPORT.md",
+  "definition": "REBOOT-04 scoped isolated representative personality comparison; overall MVP and performance sign-off incomplete",
+  "reason": "Three actual behavior/touch/memory profiles verified; short-tap/placement and Simulator entitlement defects corrected. Two OFF RAF p95 gates remain failed, physical/GPU not run, product selection pending.",
+  "sourceBaseline": "f707c465885f8be370fbb457c2d311153277c3e7",
+  "sourceCheckpoint": "8f0602ad72ab675cc7d28030cfc8b079034e8b39",
+  "currentLivingReport": "REBOOT-04-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
     "baselineCommit": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
@@ -3450,5 +3450,51 @@
     "healthRead": "OFF",
     "evidence": "evidence/reboot-03-2-2026-10-10/"
   },
-  "historicalSourceBaselineBeforeStorage53b9061": "a0c75f13a642dbc076e76d301516a2d57aa95ef2"
+  "historicalSourceBaselineBeforeStorage53b9061": "a0c75f13a642dbc076e76d301516a2d57aa95ef2",
+  "priorScopedCheckpoints": [
+    {
+      "status": "VISUAL_QUALITY_REVIEW_READY",
+      "definition": "Scoped STORAGE-01 first-error diagnostic persistence hardening; original VFS cause and physical render validation pending",
+      "reason": "Actual installedv2 disk4/live0 diagnostic history loss corrected; finalv4 actual native recovery and8 exact records through cold restart pass. Original CANTOPEN VFS cause remains OPEN; physical devices unavailable.",
+      "sourceBaseline": "b58967ec7d805d8c3142c16bdb7ff1ee630a66d4",
+      "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
+      "currentLivingReport": "REBOOT-03-2-REPORT.md"
+    }
+  ],
+  "personalityFoundation": {
+    "status": "PERSONALITY_3_REVIEW_READY",
+    "report": "REBOOT-04-REPORT.md",
+    "sourceCheckpoint": "8f0602ad72ab675cc7d28030cfc8b079034e8b39",
+    "build": "reboot-04-personality-v4 Release arm64 Simulator adhoc",
+    "jsBundleSha256": "88f355ddaaced224a7d90aec870d57332e59aeaff0632f691ef0a50da40c9951",
+    "nativeExecutableSha256": "6667f8a8309beb7830d670103cc1c7aec596c5a80078d454bc77dc098c2a424e",
+    "sourceFingerprint": "fd6c7fce800a9838421717b690baa21684df6e0c9dd9b72de39d98769c205757",
+    "axesVersion": 1,
+    "representatives": [
+      "playful",
+      "warm",
+      "poised"
+    ],
+    "full16": "NOT_IMPLEMENTED_THIS_SCOPE",
+    "growth": "INTERFACE_AND_REPRESENTATIVE_DESIGN_ONLY",
+    "commonArt": "NEW_ISOLATED_QUAD_CANDIDATE; ABC_ORIGINALS_PRESERVED",
+    "tests": "448/448 FRESH; FAIL0/SKIP0; reachability8/8; impact54/54",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "iosRelease": "PASS_XCODEBUILD_EXIT0_ACTUAL_SIMULATOR_INPUT",
+    "android": "JS_BUNDLE_PASS; NATIVE_EMULATOR_NOT_RUN",
+    "CNG": "27/27 STATIC PASS",
+    "performance": "ON180 frame proxies PASS; OFF60 all inputs6 PASS and rates>=30; playful/poised RAF95 FAIL; actual GPU/physical NOT_RUN",
+    "storage": "ORIGINAL31_PLUS_REVIEW3; ORIGINAL_ECONOMIC_LEDGERS_AND48_ASSETS_AND8_INCIDENTS_PRESERVED; CANTOPEN_VFS_OPEN",
+    "legacyMemory": "PREPARATION_REAL_REST19; bounded64 pruning19; source ownership/stage unchanged; beforeDB retained",
+    "cold": "ALL3_SNAPSHOTS_AXES_RNG_CUSHION_EXACTLY_EQUAL_IMMEDIATELY_AFTER_RELAUNCH",
+    "review": "SELF_REVIEW",
+    "requestedModel": "GPT-6.1 Sol Max",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "subagents": 0,
+    "healthAndPayments": "OFF",
+    "funArtSizePersonality": "USER_REVIEW_PENDING",
+    "evidence": "evidence/reboot-04-2026-10-10/",
+    "nextScope": "NO8_16_GROWTH_SHOP_AI_WITHOUT_USER_REVIEW"
+  }
 }

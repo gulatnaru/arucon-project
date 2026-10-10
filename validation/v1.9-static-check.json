@@ -1,22 +1,42 @@
 {
   "version": "v1.9",
-  "passed": 38,
-  "total": 38,
+  "passed": 42,
+  "total": 42,
   "checks": [
     {
       "name": "AGENTS under 32KiB",
       "ok": true,
-      "detail": "4614"
+      "detail": "10892"
     },
     {
-      "name": "AGENTS says Astra not default worker",
+      "name": "SOL_DIRECT product hardening explicit in root instructions",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "root Astra",
+      "name": "project subagents disabled for direct mode",
       "ok": true,
-      "detail": "gpt-6-astra"
+      "detail": ""
+    },
+    {
+      "name": "self review is not independent review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "requested root GPT-6.1 Sol",
+      "ok": true,
+      "detail": "gpt-6.1-sol"
+    },
+    {
+      "name": "requested root Max effort",
+      "ok": true,
+      "detail": "max"
+    },
+    {
+      "name": "requested plan Max effort",
+      "ok": true,
+      "detail": "max"
     },
     {
       "name": "arucon_builder.toml exists",
@@ -159,6 +179,16 @@
       "detail": ""
     },
     {
+      "name": "APP-05-sleep-shop-widget-scaffold.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "APP-03-life-room-integration.md has role hints",
+      "ok": true,
+      "detail": ""
+    },
+    {
       "name": "APP-01-mobile-shell.md has role hints",
       "ok": true,
       "detail": ""
@@ -169,22 +199,12 @@
       "detail": ""
     },
     {
-      "name": "APP-03-life-room-integration.md has role hints",
+      "name": "APP-06-integration-qa.md has role hints",
       "ok": true,
       "detail": ""
     },
     {
       "name": "APP-04-onboarding-activity-adapter.md has role hints",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "name": "APP-05-sleep-shop-widget-scaffold.md has role hints",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "name": "APP-06-integration-qa.md has role hints",
       "ok": true,
       "detail": ""
     },

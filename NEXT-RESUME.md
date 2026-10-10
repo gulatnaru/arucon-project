@@ -1,3 +1,25 @@
+# Next resume — REBOOT-04 대표 3종 검토판
+
+[최신 실제 보고](REBOOT-04-REPORT.md) / [계약·도달표](docs/personality-foundation.md). 소스 **8f0602a**, 설치 **reboot-04-personality-v4 Release arm64 / Simulator ad hoc**, JS SHA `88f355ddaaced224a7d90aec870d57332e59aeaff0632f691ef0a50da40c9951`, nativeSHA `6667f8a8309beb7830d670103cc1c7aec596c5a80078d454bc77dc098c2a424e`, 입력fingerprint `fd6c7fce800a9838421717b690baa21684df6e0c9dd9b72de39d98769c205757`. 현재 Git/설치 해시를 먼저 대조하고 같으면 재빌드/재설치/DB 초기화하지 않는다. 최종 handoff/remote는 로컬 git-final-audit.json과 현재 Git에서 확인한다.
+
+현재 검토 창은 도도·호기심 / 같은 아루 Lv1 / 공통quad / +35 / DPR2.5-AA0 / 일반 모션 / awake / 메뉴 닫힘이다. 사용자 실행: 일반 방 ☰→설정→REBOOT-04 성격 검토판, 검토 방 ☰→우리 아이→3종. 말풍선 가리기와 손 제안은 검토 도구다. 각 petId와 실제 기억/RNG/쿠션을 보존한다. 원본31저장·48원본·경제 원장·진단8건이 보존됐고 전체34개다.
+
+성격 비교 범위 PERSONALITY_3_REVIEW_READY, 재미·아트·크기·표현 최종선택 USER_REVIEW_PENDING. **다음 한 작업은 이 3종의 사용자 제품 비교 또는 남은 RAF 꼬리 원인 분리다.** 8/16종·새 성장/진화형·상점·AI로 확대하지 않는다. 인터페이스만 있는 성장 표현을 구현 완료라고 부르지 않는다.
+
+v4 정상 영상3개/첫120초 자유 관찰·머리/몸/해제/취소·쿠션·cold exact3·수면/깨우기/reduced·같은JS 최종서명 위젯/3종 최소회귀는 evidence/reboot-04-2026-10-10/에 있다. 영상마다 실제 PTS/범위가 다르므로 report의 안내를 따른다. Source v1/2/3 실패 자료는 이력이다. 최종448/448·도달8/8·영향54/54·lint/types·Release/AndroidJS/CNG27static PASS.
+
+**성능 전체 PASS는 아니다.** ON180 frame proxy 통과, OFF60 6입력씩 p9538.20/53.13/47.75ms 통과/제출≥30Hz. OFF 장난/도도 RAF p9537.07/47.18ms는 기준33.34ms FAIL이다. CPU보다 GL 대기 비용이 크며 quiet 조건/실기기 계측과 구분해야 한다. 반복해 PASS만 고르거나 렌더/동작을 낮추지 않는다. GPU/표시FPS/물리 지연/실기기/발열·배터리/큰글자·이번Androidnative UI NOT_RUN. 기존 선택된 렌더·크기와 A/B/C 기본을 유지한다.
+
+Simulator 빌드에는 기존 App Group `group.com.arucon.dev.widget`가 필요하다. xcodebuild Release/arm64에서 `CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`로 계정 없는 기존 ad hoc 서명을 사용한다. NO이면 실제 simulated entitlement가 빠져 위젯 fallback이 생긴 사례를 이번에 고쳤다. codesign 출력만으로 판단하지 말고 simulated entitlement와 실제 위젯을 확인한다. CNG config/plugin/template은 소스이며 generated ios/android를 stage하지 않는다.
+
+**STORAGE-01의 정확한 CANTOPEN VFS 원인은 OPEN**이다. 재발 시 원상태/최초오류와 두 cache 진단을 보존한다. 이번 정상3종 저장·서명 복원·새 테스트로 원사건을 닫지 않는다. 기존 main은 준비 중 실제 rest19건과 기존64한계 정리가 있었고 이전 DB 백업도 유지했다. 원본/영상/DB를 삭제하지 않는다. 디스크 약26GiB, 큰 산출물 전 audit_local_artifacts.py를 따른다.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. feature checkpoint/일반push만 허용, main/merge/force/tag/release/deploy/실건강/실결제/보안/외부영상업로드 금지. 사용자가 3종을 평가한 뒤 승인 범위에서만 표현 보완이나 다음 확장을 진행한다.
+
+---
+
+## Historical — STORAGE-01
+
 # Next resume — STORAGE-01 진단 보존 수정 완료 / 원사건 OPEN
 
 [최신 실제 보고](REBOOT-03-2-REPORT.md) / [저장 결함](docs/defects/STORAGE-01-cantopen.md). 소스 **53b9061445a405a691d318e446245f66292aa480**, 설치 **storage-v4 Release SHA `f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6`**,213입력fingerprint `85e7a73fb528d61b8416ce2e26b89384c5e6eec9b71483e4f235ffcf1d28b4b5`. 동일하면불필요재빌드/재설치/DB초기화하지않는다. feature/source/handoff는 `evidence/storage-01-resume-2026-10-10/git-final-audit.json`과현재Git에서직접확인한다.

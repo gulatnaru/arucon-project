@@ -1,3 +1,15 @@
+# 최신 실행 — REBOOT-04 대표 3종 / 2026-10-10
+
+[실제 결과](REBOOT-04-REPORT.md), [성격·기억 계약](docs/personality-foundation.md). 장난은 통통·앞발 장난·돌아보기, 다정은 눈맞춤·기대기, 도도는 긴 살핌·자기 템포·시선 회피를 같은 공통 네발 후보에서 비교했다. 성격 검토 범위는 PERSONALITY_3_REVIEW_READY이며 사용자 재미·아트·크기·성격 채택은 대기한다. 전체 MVP와 성능 sign-off는 미완료다.
+
+소스8f0602a/v4/JS88f355ddaaced224a7d90aec870d57332e59aeaff0632f691ef0a50da40c9951. 실제 2분 자유 관찰, 머리/몸 접촉·후속 동작·취소·생활 복귀, 쿠션 옛/현재 위치, cold 직후 세 개체 기억/축/RNG/쿠션 완전 동일, 수면/깨우기·reducedON→OFF를 확인했다. 짧은 탭과 배치 revision 경합을 고쳤다. unsigned wrapper의 App Group 누락도 확인해 기존 Simulator ad hoc 서명으로 복원했고 동일 JS/DB에서 일반 위젯 표시·탭·세 개체 최소 입력을 다시 확인했다.
+
+새448/448·도달성8/8·영향54/54·lint/typecheck·iOSRelease exit0·AndroidJS·CNG27 STATIC PASS. ON180 제출41.92/42.14/43.48Hz와 RAF 통과, OFF60 입력6개씩 p9538.20/53.13/47.75ms 통과. OFF 장난/도도 RAF p9537.07/47.18ms는 기존33.34ms 기준 FAIL로 유지한다. GPU/물리 지연/실기기는 NOT_RUN이다. 원본31+검토3·48원본·기존 경제/EXP/소유/섭취 원장·3DBok·진단8건 보존. CANTOPEN 정확한 VFS 원인은 OPEN이다. 자체 검토 SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 일반 저장 성격·경제/성장·원본 아트의 기본채택 변경 없음.
+
+---
+
+## Historical — STORAGE-01
+
 # 최신 실행 — STORAGE-01 진단 보존 수정 / 2026-10-10
 
 b58967e/followup-v2를보존한채live진단0/디스크4로복원누락을직접재현했다. 두cache슬롯/generation·readback·엄격타입검사·세션봉인으로수정. 최종소스53b9061445a405a691d318e446245f66292aa480/storage-v4 SHA `f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6`/213입력일치. 실제격리native14/13 실패원자성·동일20재시도meal1/EXP15씩과별도native파일의합성중단·짧은쓰기복구PASS. 기존6건→8건→cold새session/8건정확히동일→정상이동·교감·메뉴복귀를같은v4영상147.975초/trace로확인했다.

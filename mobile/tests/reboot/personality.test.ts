@@ -16,6 +16,17 @@ test('each representative has six distinct causal episodes, six touch primitives
  for(const k of reach.autonomous){const p=personalityPlan(id,k as RebootIntent,'unknown',[])!;assert.ok(p.beats.length>=3);plans.add(p.beats.map(b=>b.id).join('>'));p.beats.forEach(b=>faces.add(b.expression));}
  for(const region of ['head','body']as const)for(const context of ['baby_scout','baby_discover','rest']as const)personalityPlan(id,'hand',region,[],context,'owned-hand')!.beats.forEach(b=>faces.add(b.expression));
  assert.equal(plans.size,6);assert.ok(faces.size>=6,`${id}:${[...faces]}`);
+ // Exercise ordinary context/region/history selection; a listed primitive alone
+ // is not proof that normal user inputs can ever select it.
+ let seed=42; const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+ const selected=new Set<string>(), contexts=[undefined,'hand',...reach.autonomous] as (RebootIntent|undefined)[];
+ let recent:string[]=[];
+ for(let i=0;i<600;i++){
+  const region=(['head','body','unknown'] as const)[Math.floor(rand()*3)];
+  const p=personalityPlan(id,'hand',region,recent,contexts[Math.floor(rand()*contexts.length)],rand()>.3?'owned-hand':undefined)!;
+  assert.ok(!recent.slice(-2).includes(p.touchStyle!));selected.add(p.touchStyle!);recent=[...recent,p.touchStyle!].slice(-3);
+ }
+ assert.deepEqual([...selected].sort(),[...reach.touch].sort());
  }
  assert.notDeepEqual(personalityPlan('playful','baby_scout','head',[]),personalityPlan('warm','baby_scout','head',[]));
  assert.notDeepEqual(personalityPlan('warm','hand','body',[],'baby_scout'),personalityPlan('poised','hand','body',[],'baby_scout'));
