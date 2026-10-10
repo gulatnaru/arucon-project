@@ -67,6 +67,7 @@ import { APPROVED_GROWTH_POLICY, projectGrowth } from './src/progression/project
 import { openReactionFixtureMemoryRepository, openReactionMemoryRepository } from './src/storage/reactionMemory';
 import type { RoomPerformanceCapture, RoomPerformanceSummary } from './src/scene/performanceProbe';
 import type { RoomRendererProfileId } from './src/scene/rendererConfig';
+import type { PersonalityId } from './src/reboot/personality';
 import { RebootReviewScreen } from './src/reboot/RebootReviewScreen';
 import { installStorageDiagnostics, storageDiagnosticsSnapshot } from './src/storage/nativeStorageDiagnostics';
 import { runRequestedNativeProbe } from './src/reboot/nativeEmbedding';
@@ -1152,6 +1153,7 @@ function AppContent({ profile, onProfile: requestProfile }: { profile: RoomProfi
               {(['ball', 'cushion', 'table'] as const).map((id, i) => <Pressable key={id} accessibilityRole="button" disabled={busy} style={styles.menuItem} onPress={() => { if (serviceRef.current) doShopPurchase(serviceRef.current, pet, id); }}><Text>{['공', '쿠션', '식탁'][i]} · {APPROVED_MVP_POLICY.shop.items.find(item => item.id === id)?.coinPrice}코인</Text></Pressable>)}
             </>}
             {menu === 'settings' && <>
+              <Pressable accessibilityRole="button" accessibilityLabel="REBOOT-04 personality review" style={styles.menuItem} onPress={() => onProfile('personality_playful')}><Text>REBOOT-04 성격 검토판</Text></Pressable>
               <Pressable accessibilityRole="button" style={styles.menuItem} onPress={() => onProfile('reboot_review')}><Text>아기 매력 검토판</Text></Pressable>
               <Pressable accessibilityRole="switch" accessibilityState={{ checked: reducedMotion }} style={styles.menuItem} onPress={() => setReducedMotion(value => !value)}><Text>동작 줄이기 {reducedMotion ? '켜짐' : '꺼짐'}</Text></Pressable>
               <Pressable accessibilityRole="switch" accessibilityState={{ checked: reduceDialogue }} style={styles.menuItem} onPress={() => setReduceDialogue(value => !value)}><Text>자동 말걸기 줄이기 {reduceDialogue ? '켜짐' : '꺼짐'}</Text></Pressable>
@@ -1253,7 +1255,7 @@ export default function App() {
   }, []);
   return <SafeAreaProvider>
     <StatusBar barStyle="dark-content" backgroundColor="#f2ebdc" />
-    {ready && (profile === 'reboot_review' ? <RebootReviewScreen onExit={() => changeProfile('original')} /> : <AppContent key={profile} profile={profile} onProfile={changeProfile} />)}
+    {ready && (profile.startsWith('personality_') ? <RebootReviewScreen key={profile} personalityReview={profile.replace('personality_','') as PersonalityId} onPersonality={id => changeProfile(`personality_${id}`)} onExit={() => changeProfile('original')} /> : profile === 'reboot_review' ? <RebootReviewScreen onExit={() => changeProfile('original')} /> : <AppContent key={profile} profile={profile} onProfile={changeProfile} />)}
     {profileError && <View style={styles.errorBox}><Text accessibilityRole="alert">{profileError}</Text></View>}
   </SafeAreaProvider>;
 }

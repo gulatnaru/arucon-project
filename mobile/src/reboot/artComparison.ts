@@ -1,6 +1,6 @@
 import type { RebootPose } from './director';
 import type { FloorPoint } from '../scene/types';
-export type BabyArt = 'v8' | 'blender' | 'hybrid';
+export type BabyArt = 'v8' | 'blender' | 'hybrid' | 'quad';
 export const BABY_ART_CHOICES: readonly { id: BabyArt; label: string; accessibility: string }[] = [
   { id: 'v8', label: 'A · 기존 v8', accessibility: '모델 A v8 선택' },
   { id: 'blender', label: 'B · Blender 후보', accessibility: '모델 B Blender 선택' },

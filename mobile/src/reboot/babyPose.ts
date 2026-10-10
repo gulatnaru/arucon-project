@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { RebootPose } from './director';
 import type { BabyExpression } from './contracts';
+import { personalityPoseStyle } from './personality';
 
 type Rig = { eyes: THREE.Mesh[]; mouth?: THREE.Mesh; brows: THREE.Mesh[]; cheeks: THREE.Mesh[];
   ears: THREE.Object3D[]; hat?: THREE.Object3D; paw?: THREE.Object3D; leftPaw?: THREE.Object3D; pawLift: number; leftPawLift: number; pawReach: number; position: THREE.Vector3; rotation: THREE.Vector3;
@@ -33,6 +34,7 @@ const faceTargets: Record<BabyExpression, Record<string, number>> = {
 export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
   time: number, dt: number, moving: boolean, reduced: boolean, grounded = false, neutral = false) {
   const rig = rigFor(model), baby = pose?.baby, expression = baby?.beat.expression ?? 'curious';
+  const style = pose?.personalityId ? personalityPoseStyle(pose.personalityId, expression) : undefined;
   const alpha = 1 - Math.exp(-14 * Math.min(.1, Math.max(0, dt))), soft = reduced ? .22 : 1;
   const p = baby?.progress ?? 0, pulse = Math.sin(Math.PI * p), recovering = pose?.phase === 'recover';
   const contact = pose?.phase === 'contact';
@@ -66,6 +68,15 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     } else if (id === 'yawn') targetRotation.x = -.085 * pulse * weight * soft;
     else if (id === 'look_back' || id === 'hat_show') targetRotation.z = .07 * pulse * weight * soft;
   } else if (pose?.phase === 'look') targetRotation.y = Math.sin(time * 4.5) * .16 * soft;
+  if (style) {
+    targetPosition.multiplyScalar(style.bodyAmplitude); targetRotation.multiplyScalar(style.bodyAmplitude);
+    if (pose?.phase === 'look') targetRotation.y += style.gazeAside;
+    if ((contact || recovering) && pose?.kind === 'hand') {
+      if (pose.personalityId === 'warm') { targetPosition.z += .075 * weight; targetRotation.z -= .05 * weight; }
+      if (pose.personalityId === 'poised') { targetRotation.y += .19 * weight; targetPosition.x += .04 * weight; }
+      if (pose.personalityId === 'playful' && recovering) { targetRotation.y -= .22 * pulse; targetPosition.x += .07 * pulse; }
+    }
+  }
   rig.position.lerp(targetPosition, alpha); rig.rotation.lerp(targetRotation, alpha);
   const pawTarget = (id === 'paw_offer' ? .18 : id === 'paw_flick' ? .22 * Math.max(0, Math.sin(p * Math.PI * 2))
     : id === 'cushion_knead' ? .10 * Math.max(0, Math.sin(p * Math.PI * 4)) : id === 'sneak' ? .12 * pulse : 0) * weight * soft;
@@ -77,7 +88,9 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
   // An awake idle is not a perpetual asymmetric Curious expression. Explicit
   // curiosity/play/wink scenes keep their authored asymmetry on all three rigs.
-  const targets = neutral || !baby ? {} : faceTargets[expression];
+  const targets: Record<string, number> = neutral || !baby ? {} : { ...faceTargets[expression], ...(style ? {
+    Smile: style.smile, Happy: Math.max(faceTargets[expression].Happy ?? 0, style.happy),
+    Mischief: Math.max(faceTargets[expression].Mischief ?? 0, style.mischief) } : {}) };
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
     rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) - (rig.weights[name] ?? 0)) * alpha;
   const blink = Math.pow(Math.max(0, Math.sin(time * (expression === 'sleepy' ? .7 : 1.3))), 24);

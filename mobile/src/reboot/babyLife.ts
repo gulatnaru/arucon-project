@@ -1,5 +1,6 @@
 import type { BabyExpression, RebootIntent, TouchRegion } from './contracts';
 import type { FloorPoint } from '../scene/types';
+import type { PersonalityId } from './personality';
 
 export const BABY_SIZE_CANDIDATES = [1.15, 1.25, 1.35] as const;
 export const BABY_SIZE_APPROVAL = { finalSize: null, status: 'USER_REVIEW_PENDING' } as const;
@@ -88,10 +89,22 @@ export class BabyLines {
   private lastAutoAt = -Infinity;
   private lastToken = '';
   private lastSpokenAt = -Infinity;
-  select(key: string, token: string, automatic: boolean, atMs: number): { lineId: string; text: string } | null {
-    const choices = lines[key];
+  select(key: string, token: string, automatic: boolean, atMs: number, personality?: PersonalityId): { lineId: string; text: string } | null {
+    const contextual: Record<PersonalityId, readonly string[]> = {
+      playful: key === 'look_back' ? ['봤지?', '이번엔 저쪽!', '내가 먼저 갔다!', '한 번 더 볼래.']
+        : key === 'paw_offer' ? ['내 차례!', '발도 인사할래.', '요렇게 잡아 봐.', '히히, 닿았다.']
+          : ['히히, 간질간질.', '손이랑 장난칠래.', '여기로 와 봐.', '나 먼저 갈래.'],
+      warm: key === 'look_back' ? ['여기 같이 있을래.', '옆이 폭신해.', '잠깐 기대도 되지?', '너도 봤구나.']
+        : key === 'paw_offer' ? ['내 발도 잡아 봐.', '손이 따뜻해.', '조금 더 가까이.', '천천히 인사할래.']
+          : ['손이 포근해.', '이쪽으로 기대 볼게.', '잠깐 같이 쉬자.', '옆에 앉아도 돼?'],
+      poised: key === 'look_back' ? ['난 저쪽도 볼래.', '잠깐만 보고 올게.', '나도 봤어.', '여기까진 같이 와.']
+        : key === 'paw_offer' ? ['발은 여기까지만.', '살짝만 닿아 봐.', '네 손, 알아.', '먼저 봤거든.']
+          : ['거기, 조금만.', '손은 따뜻하네.', '보고 있던 거 마저 볼게.', '여기 기대는 건 괜찮아.'],
+    };
+    const choices = personality && ['look_back', 'paw_offer', 'head_lean', 'side_nuzzle', 'familiar_nuzzle', 'body_wiggle', 'tickle', 'startle_then_lean', 'lean'].includes(key)
+      ? contextual[personality] : lines[key];
     if (!choices || automatic && atMs - this.lastAutoAt < 9_000 || !automatic && token === this.lastToken && atMs - this.lastSpokenAt < 2_300) return null;
-    const fresh = choices.map((text, i) => ({ text, lineId: key + ':' + i })).filter(x => !this.recent.slice(-3).includes(x.lineId));
+    const fresh = choices.map((text, i) => ({ text, lineId: (personality ? personality + ':' : '') + key + ':' + i })).filter(x => !this.recent.slice(-3).includes(x.lineId));
     if (!fresh.length) return null;
     let hash = 2166136261; for (const c of token + key) hash = Math.imul(hash ^ c.charCodeAt(0), 16777619);
     const selected = fresh[(hash >>> 0) % fresh.length]; this.recent.push(selected.lineId); this.recent = this.recent.slice(-12);

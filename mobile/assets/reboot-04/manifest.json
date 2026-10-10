@@ -1,0 +1,23 @@
+{
+  "blender": "5.2.0 LTS",
+  "sourceCsha": "e44d4cef93c5e57a7af3705dea3aedc6d4c17294675973a57c3f1f87dcaf3ffe",
+  "singleHorn": true,
+  "paws": 4,
+  "bones": [
+    "Root",
+    "BodyBone",
+    "HeadBone",
+    "Ear.L",
+    "Ear.R",
+    "HornBone",
+    "Paw.L",
+    "Paw.R",
+    "PawBack.L",
+    "PawBack.R"
+  ],
+  "vertices": 4996,
+  "bytes": 504552,
+  "sha256": "ce26ac9cd08eb3a0363542ce21cdb5ccfbbf43d78430ad35324586a62c843bce",
+  "approval": "USER_REVIEW_PENDING",
+  "scope": "one common baby for three review personalities; originals untouched"
+}

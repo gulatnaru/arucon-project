@@ -3,6 +3,9 @@ import type { FloorPoint } from '../scene/types';
 
 export type GaitInput = { position: FloorPoint; facing: number; scale: number; dt: number; moving: boolean; reduced: boolean; hop?: number };
 type Foot = { x: number; y: number; z: number; planted: boolean; phase: number; fromX: number; fromZ: number; stopX: number; stopY: number; stopZ: number };
+type PawLayout = { x: number; z: number; phase: number };
+const TWO_PAWS: readonly PawLayout[] = [{x:-.265,z:.10,phase:0},{x:.265,z:.10,phase:.5}];
+const FOUR_PAWS: readonly PawLayout[] = [...TWO_PAWS,{x:-.265,z:-.34,phase:.5},{x:.265,z:-.34,phase:0}];
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 /** Top of the existing room floor/rug meshes; no collision or ownership change. */
@@ -15,7 +18,8 @@ export function babyGroundHeight(x: number, z: number) {
 
 /** Distance advances a stride; a supporting paw retains its world position. */
 export class BabyGait {
-  readonly feet: Foot[] = [-1, 1].map(() => ({ x: 0, y: 0, z: 0, planted: true, phase: 0, fromX: 0, fromZ: 0, stopX: 0, stopY: 0, stopZ: 0 }));
+  readonly feet: Foot[];
+  constructor(readonly layout: readonly PawLayout[] = TWO_PAWS){ this.feet=layout.map(() => ({ x: 0, y: 0, z: 0, planted: true, phase: 0, fromX: 0, fromZ: 0, stopX: 0, stopY: 0, stopZ: 0 })); }
   phase = 0; height = 0; compression = 0; roll = 0; pitch = 0; active = false;
   private previous?: FloorPoint;
   private yaw = 0;
@@ -56,11 +60,11 @@ export class BabyGait {
       this.height = hopHeight; this.pitch = -.045 * Math.sin(h * Math.PI * 2) * soft;
     }
     this.feet.forEach((foot, index) => {
-      const side = index ? 1 : -1;
-      const lateral = side * .265 * scale;
-      const nominalX = p.x + lateral * Math.cos(yaw) + .10 * scale * Math.sin(yaw);
-      const nominalZ = p.z - lateral * Math.sin(yaw) + .10 * scale * Math.cos(yaw);
-      const phase = (this.phase + index * .5) % 1;
+      const lateral = this.layout[index].x * scale;
+      const depth = this.layout[index].z;
+      const nominalX = p.x + lateral * Math.cos(yaw) + depth * scale * Math.sin(yaw);
+      const nominalZ = p.z - lateral * Math.sin(yaw) + depth * scale * Math.cos(yaw);
+      const phase = (this.phase + this.layout[index].phase) % 1;
       if (reset || (!moving && this.settle >= 1) || input.hop !== undefined) {
         foot.x = nominalX; foot.z = nominalZ; foot.y = hopHeight;
         foot.planted = hopHeight <= .001; foot.phase = phase;
@@ -89,7 +93,7 @@ export class BabyGait {
 
 /** Model-only rig. Foot endpoints are transformed back through the posed root. */
 export class BabyGaitRig {
-  readonly gait = new BabyGait();
+  readonly gait: BabyGait;
   private inverse = new THREE.Matrix4();
   private target = new THREE.Vector3();
   private scale = new THREE.Vector3();
@@ -99,7 +103,9 @@ export class BabyGaitRig {
   private soleShadows: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>[];
   private footprint = new THREE.Vector3();
   constructor(private model: THREE.Object3D, scene: THREE.Scene) {
-    this.footMeshes = ['Foot_L_Front','Foot_R_Front'].map(name => model.getObjectByName(name)!);
+    const quad=model.getObjectByName('PawBackL') instanceof THREE.Bone;
+    this.gait=new BabyGait(quad?FOUR_PAWS:TWO_PAWS);
+    this.footMeshes = (quad?['Foot_L_Front','Foot_R_Front','Foot_L_Back','Foot_R_Back']:['Foot_L_Front','Foot_R_Front']).map(name => model.getObjectByName(name)!);
     this.shadow=new THREE.Group(); scene.add(this.shadow);
     // A tiny analytic disc: no texture upload, shadow map or postprocess pass.
     const make = () => {
@@ -113,7 +119,7 @@ export class BabyGaitRig {
       const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),material);
       m.rotation.x=-Math.PI/2;this.shadow.add(m);return m;
     };
-    this.bodyShadow=make();this.soleShadows=[make(),make()];
+    this.bodyShadow=make();this.soleShadows=this.footMeshes.map(()=>make());
   }
   apply(orientation: THREE.Group, input: GaitInput, enabled: boolean) {
     this.shadow.visible=enabled;
@@ -130,13 +136,13 @@ export class BabyGaitRig {
     const root=this.footMeshes[0].parent!;
     this.inverse.copy(root.matrixWorld).invert(); root.getWorldScale(this.scale);
     this.footMeshes.forEach((foot,index) => {
-      const side=index?1:-1, plant=g.feet[index];
+      const layout=g.layout[index], plant=g.feet[index];
       if (g.active) {
         this.target.set(plant.x, dockHeight + (onObject?0:babyGroundHeight(plant.x,plant.z)) + plant.y + .21*this.scale.y, plant.z).applyMatrix4(this.inverse);
-        foot.position.set(this.target.x-side*.265,this.target.y-.21,this.target.z-.10);
+        foot.position.set(this.target.x-layout.x,this.target.y-.21,this.target.z-layout.z);
       }
       foot.updateWorldMatrix(true,false);
-      this.footprint.set(side*.265,.0,.10).applyMatrix4(foot.matrixWorld);
+      this.footprint.set(layout.x,.0,layout.z).applyMatrix4(foot.matrixWorld);
       const ground=babyGroundHeight(this.footprint.x,this.footprint.z);
       const shadow=this.soleShadows[index];shadow.position.set(this.footprint.x,ground+.004,this.footprint.z);
       shadow.scale.set(.39*input.scale,.38*input.scale,1);

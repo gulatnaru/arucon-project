@@ -21,6 +21,7 @@ export class BlenderBabyRig {
       const earControl = new THREE.Group(); earControl.name = `Ear_${side}`; model.add(earControl);
       this.ears.push({ control: earControl, bone: ear, rest: ear.quaternion.clone() });
     }
+    for(const [side,x]of [['L',-.265],['R',.265]]as const){const bone=model.getObjectByName(`PawBack${side}`);if(bone instanceof THREE.Bone){const control=new THREE.Group();control.name=`Foot_${side}_Back`;model.add(control);this.paws.push({control,bone,rest:new THREE.Vector3(x,.21,-.34)});}}
   }
   /** Call after the authored mixer and the shared gait/morph controls. */
   apply(resting = false) {

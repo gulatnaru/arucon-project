@@ -1,9 +1,11 @@
 import type { FloorPoint } from '../scene/types';
 import { REBOOT_HAND, RESUMABLE_REBOOT_INTENTS, type RebootCommand, type RebootEvent, type RebootIntent, type RebootStage, type RebootView, type TouchRegion } from './contracts';
+import { personalityPlan, personalitySelection, personalityPoseStyle, type PersonalityId } from './personality';
 import { BABY_AUTONOMOUS, babyPlan, babyTarget, currentBabyBeat, type BabyPlan, type BabyBeat } from './babyLife';
 
 export type RebootWorld = { enabled: boolean; awake: boolean; moving: boolean; touching: boolean; position: FloorPoint; view: RebootView; touchRegion?: TouchRegion; interruptedForTouch?: RebootIntent };
 export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number; gazeTarget?: FloorPoint; dockTarget?: FloorPoint;
+  personalityId?: PersonalityId;
   baby?: Readonly<{ beat: BabyBeat; progress: number; touchStyle?: string; rememberedHandId?: string }> };
 type Intent = { command: RebootCommand; phase: RebootEvent['phase']; elapsed: number; automatic: boolean; releaseFrom?: number; baby?: BabyPlan; beatIndex?: number; touchRegion?: TouchRegion };
 let sessionSequence = 0;
@@ -25,13 +27,20 @@ export class RebootDirector {
   private recentTouchStyles: string[] = [];
   private touchRegion: TouchRegion = 'unknown';
   private interruptedForTouch?: RebootIntent;
+  private randomState?: number;
+  private selectionReason?: string;
+  private initializedPersonality?: string;
+  private draw() {
+    if(this.randomState===undefined)return this.random();
+    let x=this.randomState; x^=x<<13; x^=x>>>17; x^=x<<5; this.randomState=x>>>0;return this.randomState/4294967296;
+  }
   pose?: RebootPose;
   constructor(private readonly ports: { navigate: (p: FloorPoint) => boolean; stop: () => void; event: (e: RebootEvent) => void }, private random = Math.random, private now = Date.now) {}
   get current() { return this.intent ? { kind: this.intent.command.kind, phase: this.intent.phase, token: this.intent.command.token } : null; }
   private emit(phase: RebootEvent['phase']) {
     if (!this.intent || !this.view) return;
     const baby = this.intent.baby ? currentBabyBeat(this.intent.baby, this.intent.elapsed) : undefined;
-    this.ports.event({ ...this.intent.command, phase, automatic: this.intent.automatic, stage: this.view.stage,
+    this.ports.event({ ...this.intent.command, ...(this.view.personality ? { personalityId: this.view.personality.foundation.profileId, selectionReason: this.selectionReason, randomState: this.randomState } : {}), phase, automatic: this.intent.automatic, stage: this.view.stage,
       ...(this.intent.baby ? { babyMode: true } : {}),
       ...(this.intent.command.kind === 'hand' ? { touchRegion: this.intent.touchRegion } : {}),
       ...(baby && phase === 'contact' ? { babyBeat: baby.beat.id, expression: baby.beat.expression,
@@ -45,7 +54,7 @@ export class RebootDirector {
     const sinceTouch = this.now() - this.lastTouchAt;
     const repeated = command.kind === 'hand' && this.lastTouchRegion === this.touchRegion && sinceTouch >= 0 && sinceTouch < 8_000;
     if (command.kind === 'hand') this.touchBurst = repeated ? this.touchBurst + 1 : 0;
-    const baby = this.view?.babyCharm && this.view.stage === 'baby' ? babyPlan(command.kind, this.touchRegion,
+    const baby = this.view?.babyCharm && this.view.stage === 'baby' ? (this.view.personality ? personalityPlan(this.view.personality.foundation.profileId, command.kind, this.touchRegion, this.recentTouchStyles, interrupted, this.view.familiarHandId) : undefined) ?? babyPlan(command.kind, this.touchRegion,
       repeated, interrupted, this.view.familiarHandId, this.touchBurst, this.recentTouchStyles) : undefined;
     if (baby?.touchStyle) { this.recentTouchStyles.push(baby.touchStyle); this.recentTouchStyles = this.recentTouchStyles.slice(-3); }
     if (command.kind === 'hand') { this.lastTouchAt = this.now(); this.lastTouchRegion = this.touchRegion; }
@@ -62,7 +71,9 @@ export class RebootDirector {
     if (phase === 'contact') this.intent.beatIndex = 0;
   }
   update(dt: number, w: RebootWorld) {
-    this.view = w.view; this.touchRegion = w.touching ? w.touchRegion ?? 'unknown' : 'unknown'; this.interruptedForTouch = w.touching ? w.interruptedForTouch : undefined;
+    this.view = w.view;
+    if(w.view.personality && this.initializedPersonality !== w.view.personality.foundation.petId){this.initializedPersonality=w.view.personality.foundation.petId;this.randomState=w.view.personality.randomState;}
+    this.touchRegion = w.touching ? w.touchRegion ?? 'unknown' : 'unknown'; this.interruptedForTouch = w.touching ? w.interruptedForTouch : undefined;
     if (!w.awake) { if (this.intent) this.cancel(); this.hand = false; this.touching = false; return; }
     if (!w.enabled) return;
     if (w.view.command && w.view.command.token !== this.lastCommand) {
@@ -79,7 +90,7 @@ export class RebootDirector {
       this.touching = w.touching;
       if (w.touching) {
         const prior = this.intent; this.begin({ token: `${this.session}:touch:${++this.token}`, kind: 'hand', sourceRevision: w.view.revision }, false); this.touched = prior; this.transition('contact');
-      } else if (this.intent?.command.kind === 'hand') this.transition('recover');
+      } else if (this.intent?.command.kind === 'hand' && !w.view.personality) this.transition('recover');
     }
     if (!this.intent) {
       if (w.moving) return;
@@ -88,10 +99,12 @@ export class RebootDirector {
       const choices: readonly RebootIntent[] = w.view.babyCharm && w.view.stage === 'baby' ? BABY_AUTONOMOUS
         : ['explore', 'stretch', 'company', 'rest', ...(w.view.stage === 'baby' ? [] : ['dash' as const])];
       const fresh = choices.filter(x => !this.recent.slice(-2).includes(x));
-      const kind = fresh[Math.floor(this.random() * fresh.length)] ?? 'explore';
-      const target = w.view.babyCharm && w.view.stage === 'baby' ? babyTarget(kind, w.view.cushion, this.random)
+      const choice = w.view.personality ? personalitySelection(w.view.personality.foundation.profileId, this.recent, this.draw(), w.view.cushion, w.view.personality.axes) : undefined;
+      this.selectionReason = choice?.reason;
+      const kind = choice?.kind ?? fresh[Math.floor(this.draw() * fresh.length)] ?? 'explore';
+      const target = choice?.target ?? (w.view.babyCharm && w.view.stage === 'baby' ? babyTarget(kind, w.view.cushion, () => this.draw())
         : kind === 'rest' ? w.view.cushion : kind === 'company' ? { x: .6, z: 3.1 }
-        : { x: this.random() * 3.0 - 1.5, z: this.random() * 3 - .5 };
+        : { x: this.draw() * 3.0 - 1.5, z: this.draw() * 3 - .5 });
       this.begin({ token: `${this.session}:auto:${++this.token}`, kind, target, sourceRevision: w.view.revision,
         ...(kind === 'rest' ? { itemRevision: w.view.cushion.revision } : {}) }, true);
     }
@@ -104,7 +117,7 @@ export class RebootDirector {
     const contactDuration = i.baby ? i.baby.beats.reduce((sum, b) => sum + b.seconds, 0) : this.contactDuration(i.command.kind);
     const currentBeat = i.baby ? currentBabyBeat(i.baby, i.elapsed) : undefined;
     if (currentBeat && i.phase === 'contact' && i.beatIndex !== currentBeat.index) { i.beatIndex = currentBeat.index; this.emit('contact'); }
-    this.pose = { kind: i.command.kind, phase: i.phase,
+    this.pose = { ...(w.view.personality ? { personalityId: w.view.personality.foundation.profileId } : {}), kind: i.command.kind, phase: i.phase,
       progress: Math.min(1, i.elapsed / (i.phase === 'recover' ? recoveryDuration : contactDuration)),
       releaseFrom: i.releaseFrom, stage: w.view.stage, held: this.touching || this.hand,
       ...(currentBeat ? { baby: { beat: i.phase === 'approach' ? { id: 'travel', seconds: 1, expression: 'excited' as const }
@@ -117,7 +130,7 @@ export class RebootDirector {
       ...(['rest', 'cushion_changed'].includes(i.command.kind) ? { dockTarget: w.view.cushion } : {}) };
     if (i.baby && ['contact', 'recover'].includes(i.phase) && i.command.kind !== 'hand') this.pose.gazeTarget = { x: 0, z: 4.3 };
     // Remembered coordinates are a glance only; route/dock always use current truth.
-    const lookDuration = i.command.kind === 'cushion_changed' ? 1.1 : w.view.stage === 'baby' ? .65 : .30;
+    const lookDuration = i.command.kind === 'cushion_changed' ? 1.1 : w.view.personality ? personalityPoseStyle(w.view.personality.foundation.profileId, 'curious').lookSeconds : w.view.stage === 'baby' ? .65 : .30;
     if (i.phase === 'look' && i.elapsed >= lookDuration) {
       const handOffset = w.view.babyCharm ? .64 * .53 * (w.view.sizeCandidate ?? 1.25) + .205 : .48;
       const target = i.command.kind === 'hand' ? { x: REBOOT_HAND.x, z: REBOOT_HAND.z - handOffset }
@@ -136,7 +149,7 @@ export class RebootDirector {
       const done = i.command, resume = done.resume ?? (done.kind === 'hand' ? this.touched?.command.kind : undefined);
       const resumeTarget = done.resumeTarget ?? this.touched?.command.target ?? { x: .8, z: 1 };
       this.emit('complete'); this.recent.push(done.kind); this.recent = this.recent.slice(-4);
-      this.intent = undefined; this.pose = undefined; this.touched = undefined; this.idle = 3.5 + this.random() * 3;
+      this.intent = undefined; this.pose = undefined; this.touched = undefined; this.idle = (w.view.personality ? personalityPoseStyle(w.view.personality.foundation.profileId, 'content').pauseSeconds : 3.5) + this.draw() * 3;
       if (resume && (RESUMABLE_REBOOT_INTENTS as readonly string[]).includes(resume)) this.begin({ token: `${this.session}:resume:${++this.token}`,
         kind: resume as RebootIntent, sourceRevision: w.view.revision, target: resumeTarget }, true);
     }
