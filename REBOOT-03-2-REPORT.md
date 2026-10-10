@@ -1,3 +1,65 @@
+# REBOOT-03.2 후속 마무리 — VISUAL_QUALITY_REVIEW_READY / STORAGE-01 OPEN
+
+2026-10-10 · SOL_DIRECT / SELF_REVIEW · subagent0 · 요청GPT-6.1 Sol Max / effective **ROUTING_UNVERIFIED**.
+
+## 실제 플레이 결과
+
+같은 아루·A/+35에서 주변을 살피고, 조심스럽게 다가가고, 장난스러운 몸짓 뒤 쿠션에서 쉬는 생활이 이어졌다. 정상 바닥 입력으로 연속 목적지를 바꾸고 펫을 직접 누르면 말캉한 접촉·표정·말풍선 뒤 다시 생활로 돌아왔다.2.5/3.0 모두 메뉴/입력 잠금이나 저장 오류를 관찰하지 않았다. 숨긴 강제 장면이나 상태값만으로 생활 통과를 표시하지 않았다.
+
+사용자의 **화면 전체 선명도 개선** 평가를 보존한다. **iOS Simulator 우선 검토2.5/AA0**,3.0은 고품질 비교,2.25는 성능 여유 비교다. 제품/실기기 기본값은 미확정이다. 현재 창은A/+35·2.5/AA0·일반모션·말풍선ON·awake·정상생활이고 영구선택null. 실제 cold 실행에서 기존 automatic1.5/AA0/+25로 돌아온 뒤 입력이 작동하는 것을 확인했다. 기존A/B/C/아트/경제/성장/수면/동면은 변경하지 않았다.
+
+## 같은 최종 Release의 실제 증거
+
+출발 HEAD/추적/실제origin **6ce22c0**, clean; 소스 **d714e24e0d880740ac579cb3432a6a986ca30842**. 설치 **REBOOT-03.2 followup-v2 Release SHA `b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941`**, 212빌드입력 fingerprint `b9851582316199faad077a43c0d139720dc966eacfa7ca307863b1b663887df0`과 실제 설치해시가 일치한다. 문서만 저장한 최종 인계 SHA는 `git-final-audit.json`과 현재 Git에서 읽는다. 수정한 diagnostics/격리QA/180초계측 때문에 새 Release를 같은DB에 업데이트했다. UI QA의 초기 오류8을 고친 뒤 이 v2에서 모든 최종 네이티브/플레이/성능 증거를 다시 확보했다.
+
+환경: macOS15.6/Xcode26.3/arm64, iPhone16e Simulator26.3.1,390×844pt/native1170×2532, Apple Software Renderer/GLES3.0 APPLE-23.0.2. Expo55.0.31/SQLite55.0.20/GL55.0.18. 실제 Mac 접근은 성공했다. 과거잠금/BLOCKED를 복사하지 않았다.
+
+로컬 `evidence/reboot-03-2-followup-2026-10-10/`:
+
+- `A35-250-play-v2.mp4` **214.583초**, `A35-300-play-v2.mp4` **214.628초**: 무편집 정상속도 실제 앱. 초반 설정 진입 뒤 무입력 생활, 후반 연속 이동8회+직접접촉1회, 창이 끝난 뒤 추가 이동/접촉/메뉴 저장. 녹화 인코딩FPS를 앱FPS로 사용하지 않는다.
+- 2.5 영상 약13~22초 장난,38~48초 살금살금 접근,53~63초 두리번거림,68~76초 쿠션쉼,120~127초 탐색,161~163초 직접접촉,166~176초 자율쉼.3.0 영상 약21~28초 관심대상탐색,35~44초 장난,49~56초 주변확인,75~85초 쉼,147~149초 접촉과복원,152~163초 다시접근. 시각은 record요청 시계와 trace를 대응한 근사 구간이며 실제PTS는 `250-frames/metadata.json`/`300-frames/metadata.json`로 별도 제공한다.
+- `250-video-trace.json`, `300-video-trace.json`: 같은 일반 경로의 start/complete/cancel/발화/실제완료기억을 연결한다. 두 영상의 자연 생활 순서가 완전히 같은 대본이라고 주장하지 않는다.
+- `A35-250-matched-native.png`, `A35-300-matched-native.png`: 같은 방/카메라/빛/위치/크기의 정면idle **통제비교**. 생활 영상과 구별. 원본1170×2532를 축소/보정하지 않았다. `250-vs-300-*-native-pixels.png`는 crop/paste/라벨만; 샤픈·blur·리사이즈없음. 눈blink위상은다르므로 이쌍으로눈매/표정디자인변화를주장하지않고 몸·방 외곽의 raster차이를 본다.
+- `250/300-play-samples.png`는 영상의 원본pixel 장면crop이며 전체 정상속도 움직임은 원본영상으로 확인한다. 이번에 새 캐릭터/모델 제작은 하지 않았다.
+- `sleep-v2-native.png`, `cold-state-v2.json`, `after-preservation-audit.json`, `final-250-native.png`: 정상수면/깨우기→이동접촉, 메뉴복귀, Home/실제일반위젯탭, cold동일아루/원본보존. 긴동면시간 경계의 GUI 전수검사를 새로 했다고 쓰지 않는다. 기존 일반Sim의 동면은 그대로였다.
+
+## fresh180초 성능 / 녹화ON/OFF 순서 교차
+
+모든 창은같은v2 Release/A/+35/방/카메라/빛/AA0/일반모션/현재아루다. 순서 **ON2.5→ON3→OFF3→OFF2.5**,각180000ms완료/누락버퍼없음, 각9개 실제 touch입력/GL0. 초반무입력,후반같은8바닥+1접촉 절차. 인코딩 시작·저장 패널 등은 측정창과 구별한다. 비교 중 build/전체suite는 실행하지 않았다. 호스트 첫load값은 각before/after JSON에 기록됐고 자연생활·호스트부하·워밍업 변동이 남아 있다. 통계적 인과 실험이나GPU측정으로 주장하지 않는다.
+
+| DPR / 녹화 | 제출 Hz | RAF p95 / max ms | morph / draw / GL대기 p95 ms | 입력→제출 p95 ms | 기준 |
+|---|---:|---:|---:|---:|---|
+| 2.5 / ON | 58.40 | 19.98 / 56.64 | 0.748 / 0.988 / 17.52 | 28.44 | PASS_PROXY |
+| 3 / ON | 40.84 | 30.78 / 121.54 | 0.762 / 1.094 / 28.14 | 49.00 | PASS_PROXY |
+| 3 / OFF | 43.17 | 29.14 / 108.34 | 0.780 / 1.004 / 25.33 | 36.56 | PASS_PROXY |
+| 2.5 / OFF | 56.42 | 22.36 / 80.76 | 0.806 / 1.057 / 19.57 | 36.18 | PASS_PROXY |
+
+네 창 모두RAF500ms초과0. 기존최소제출30Hz/RAFp9533.34ms/입력p95100ms/긴gap500ms 기준유지. 실제버퍼2.5=975×2110/3=1170×2532, 양쪽MSAA0/FXAA없음.3의pixel부하는2.5보다44%많다.2.5는58.40/56.42Hz,3는40.84/43.17Hz로 이번환경에서2.5여유가더크다.3이최소기준을통과했어도60Hz를지속했다고하지않는다. ON/OFF차이가일관된방향이아니므로녹화만성능원인으로확정하지않는다. 과거7×60초와합산하지않았다.
+
+원본pixel비교에서3은 쿠션/러그/몸 외곽의 작은계단이더줄고2.5는방과얼굴이선명하면서이번proxy여유가더크다. 전체화면시각/입력 **PASS_SIMULATOR_VISUAL / ACTUAL_INPUT**과계측 **PASS_PROXY**를분리한다. 실제GPU실행/화면표시FPS/물리터치지연/실기기/발열배터리 **NOT_RUN**. Simulator결과로iPhone의최종DPR을정하지않는다.
+
+## 저장 신뢰성 / 디스크
+
+별도 결함 **[STORAGE-01](docs/defects/STORAGE-01-cantopen.md) — OPEN_ORIGINAL_VFS_CAUSE_UNCONFIRMED**. 원사건의최초관찰SQL은UPDATEpet_snapshot/execute14지만실제VFS xOpen파일·extended code/errno가보존되지않았다.127MiB만으로FULL13과같은원인이라단정하지않는다. 이번착수부터약32GiB였고현재약30GiB이며이번삭제/정리없음.
+
+같은v2의독립격리DB에서실제14execute→finalize14,실제13execute→finalize13을발생시켰다. 실패snapshot전체동일/같은요청20회복구→meal1/EXP15씩/integrityok. FULL시험은snapshot·meal변경뒤commandledger삽입을실패시켜원자성을확인했다. 별도150개경합/직접30재요청→meal1/자동meal1/깨우기replay동일/EXP30도확인했다. 처음부모이동실험은READONLY8이었고실패로보존,원본파일을옮기거나호스트디스크를채우지않는저널blocker방식으로정정했다.
+
+추가한로컬진단은최초file/phase/connection/transaction/availableBytes/본체·부모·저널·WAL·tmp상태와cleanup/후속transaction완료를분리한다. VFS실제시도경로는NOT_EXPOSED_BY_EXPO. bind/건강원본/snapshot을외부로그로보내지않고 진단쓰기실패가SQL실패를덮지않는다. txn쿼리/공통per-file lane/statement정리/기존BUSY재시도시간을유지했다. 자동 DB초기화·삭제·보상재생 없음. **원사건원인 CLOSED가 아니다.**
+
+원본일반1+기존체험29+같은아루1, 이름/형태/personality/재화/EXP/시설/소유/섭취원장,48개제작원본 보존.3DB integrityok/DELETE. 일반meal3·기존체험1155·검토아루0 그대로. 정상생활기억/시간revision은진행하며DB바이트전체가정지했다고주장하지않는다.
+
+읽기전용점유감사: evidence7.52GiB/프로젝트Blender도구1.21GiB/node_modules.48GiB/ios.37GiB/앱DerivedData1.08GiB. 모델/venv·DB백업·영상이큰부분이다. 생성build/cache와보존할원본/영상/DB를분류했고임의삭제없음. 파일논리크기와du/APFS할당량은다르다. 향후큰작업전 `python validation/audit_local_artifacts.py --require-free-gib 4` 실행;공간부족이면반복생성하지않고정리대상을구체적으로검토한다.4GiB는가역개발사전검사값이며앱경제정책이아니다.
+
+## 자동 검사 / 종료 범위
+
+새최종432/432(fail0/skip0), 영향39/39,lint/typecheck PASS, v2xcodebuild exit0/동일DB설치/실제hash확인,AndroidJS bundle PASS,CNG27/27 STATIC,운영42/42 PASS. 기본python은tomllib없는버전이어서초기운영검사실패를남겼고,설치된번들Python으로42/42를확인했다. 영상원본decode도sandbox의AVFoundation권한제한실패를보존하고정상승인된로컬읽기로원본PTS/frame을확인했다. 환경도구의실패를앱실패로꾸미지않았다. 이번Androidnative/UI와실기기/GPU는NOT_RUN.
+
+이번6항목후속실행은완료했다. 전체렌더비교판준비상태는유지하되 **저장원사건의정확한VFS원인은OPEN**이다. 최종렌더/실기기출시성능·재미·아트·모델·크기는미승인. 새아트/성장기/진화형/상점/AI/가격개발없음. source와최종인계를feature논리체크포인트에보존하고일반push후localHEAD/tracking/live일치와clean을 `git-final-audit.json`에남긴다. main/merge/force/tag/배포/실건강/결제/보안변경/미디어외부업로드없음.
+
+---
+
+## Historical — visual-v5 첫 전체 비교
+
 # REBOOT-03.2 — GLOBAL VISUAL QUALITY / VISUAL_QUALITY_REVIEW_READY
 
 2026-10-10 · SOL_DIRECT / SELF_REVIEW. 좁은 **iOS Simulator 전체 렌더 비교판** 준비 상태이며 전체 MVP/출시/실기기 완료가 아니다. 최종 렌더 채택·A/B/C·크기·아트·재미는 **USER_REVIEW_PENDING**.

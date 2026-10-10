@@ -1,5 +1,24 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 최신 제한된 후속 — 2026-10-10
+
+| 항목 | 현재 판정 | 실제 근거 / 남은 범위 |
+|---|---|---|
+| 2.5/AA0 연속자율생활·이동·교감 | PASS_SIMULATOR_VISUAL / ACTUAL_INPUT | followup-v2/같은A+35/214.58초 정상영상·생활trace |
+| 같은조건3.0 비교 | PASS_SIMULATOR_VISUAL / PASS_PROXY | 214.63초 영상·native원본쌍·4×180초ON/OFF;2.5여유가더크며3도최소proxy통과 |
+| 렌더 최종채택 | NEEDS_DEVICE_VALIDATION | Simulator2.5우선/3고품질/2.25여유,영구기본미확정 |
+| STORAGE-01 원사건원인 | IMPLEMENTABLE_NOW / OPEN | 당시최초UPDATEexecute14,VFS실제경로/extendederrno없음. 향후최초오류진단구현,재발원본보존필요 |
+| 삭제없는복구·중복정산방지 | PASS_NATIVE_ISOLATED | 같은Release실제14/13·전체실패snapshot동일/20재시도meal1/EXP15씩;150경합/자동/wake replay |
+| 기존저장·A/B/C·정책 | PASS_PRESERVATION | 31저장/48원본/이름·경제·EXP·섭취·소유/3DBok |
+| 개발산출물점유 | PASS_READ_ONLY_AUDIT | 약30GiB여유/점유분류·4GiB사전검사,임의삭제없음 |
+| 실기기/GPU/물리입력/발열배터리 | NOT_RUN / NEEDS_DEVICE_VALIDATION | Simulatorproxy로대체하지않음 |
+| 재미·최종아트·크기 | USER_REVIEW_PENDING | 사용자선택을대신하지않음 |
+
+소스d714e24/followup-v2 `b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941`,새432검사/27CNG/42운영PASS. [최신상세](REBOOT-03-2-REPORT.md) / [별도저장결함](docs/defects/STORAGE-01-cantopen.md). 전체MVP/출시완료를새로선언하지않는다.
+
+### Historical — 앞선 전체 렌더 비교
+
+
 ## 현재 REBOOT-03.2 — 전체 렌더 비교판 / 2026-10-10
 
 현재좁은범위 **VISUAL_QUALITY_REVIEW_READY**. [실제화면/전체비용/환경예외](REBOOT-03-2-REPORT.md). 전체MVP/출시/아트재미승인과다르다.

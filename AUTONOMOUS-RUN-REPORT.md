@@ -1,3 +1,17 @@
+# 최신 실행 — REBOOT-03.2 제한된 후속 / 2026-10-10
+
+사용자선명도긍정평가/Simulator2.5AA0우선추천을보존했다. 같은A+35·아루의실제자율생활/연속목적지변경/교감을2.5와3에서새정상영상으로확인했다.4×180초ON2.5→ON3→OFF3→OFF2.5 전proxy PASS,제출58.40/40.84/43.17/56.42Hz/각입력9/긴gap0.3은미세계단이더줄지만비용증가,2.5여유가더크다. 최종기본은실기기전미확정,3/2.25옵션과A/B/C유지.
+
+소스d714e24e0d880740ac579cb3432a6a986ca30842,followup-v2 Release SHA `b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941`/212입력일치. 기존31저장/48원본/경제·성장·소유·meal보존/3DBok. 정상수면깨우기·메뉴·일반위젯탭·cold실제입력확인. 새432/432/영향39/39/lint/types/iOSRelease/AndroidJS/CNG27/운영42PASS;실기기/GPU/표시FPS/물리지연/발열배터리/이번Androidnative/UI NOT_RUN.
+
+**STORAGE-01 OPEN_ORIGINAL_VFS_CAUSE_UNCONFIRMED**:127MiB시점의UPDATEexecute14 최초VFS경로가없어서단정하지않는다. 실제격리저널열기14·pagequota13/rollback원자성/20동일재요청→meal1/EXP15씩,150native경합/자동meal1/같은wake replay를확인했다. 최초오류/cleanup/연결·transaction/여유/후보경로의로컬진단을추가했다. 초기QA부모이동은READONLY8실패로보존하고저널blocker방법으로수정했다. 원본DB삭제나hostdisk채우기없음. 현재약30GiB,artifact읽기전용분류만실행·영상/DB/원본삭제없음.
+
+SELF_REVIEW/SOL_DIRECT/subagent0/effective ROUTING_UNVERIFIED. [최신 실제자료](REBOOT-03-2-REPORT.md) / [저장결함](docs/defects/STORAGE-01-cantopen.md). 재미/최종아트 USER_REVIEW_PENDING. Git최종receipt를보존하고feature일반push만진행한다. 아래는이전완료증거이며최신실행횟수로재사용하지않는다.
+
+---
+
+## Historical — 이전 실행 보고
+
 # iOS validation history and Release input resume
 
 ## REBOOT-03.2 — 2026-10-10 / VISUAL_QUALITY_REVIEW_READY

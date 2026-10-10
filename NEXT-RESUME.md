@@ -1,3 +1,19 @@
+# Next resume — REBOOT-03.2 후속 완료 / STORAGE-01 OPEN
+
+[최신 결과](REBOOT-03-2-REPORT.md). 소스 **d714e24e0d880740ac579cb3432a6a986ca30842**, 설치 **followup-v2 Release SHA `b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941`**,212빌드입력fingerprint `b9851582316199faad077a43c0d139720dc966eacfa7ca307863b1b663887df0`. 동일하면재빌드/재설치/DB초기화하지않는다. 최종인계/원격은 `evidence/reboot-03-2-followup-2026-10-10/git-final-audit.json`과현재Git을대조한다. 기존30+같은아루1/48원본/경제·EXP·소유·meal/3DB 보존.
+
+현재창A/+35·DPR2.5/AA0·일반모션·말풍선ON·awake·정상생활. 사용자는2.5를Simulator우선검토로추천했고3고품질/2.25여유비교보존. 영구채택null이며cold는기존automatic1.5/AA0/+25; 실제cold입력도확인했다. 최종기본렌더는실기기전미확정. 새아트/성장기/진화형/상점/AI/경제확대없음.
+
+최신같은빌드4×180초ON2.5→ON3→OFF3→OFF2.5: 제출58.40/40.84/43.17/56.42Hz,RAFp9519.98/30.78/29.14/22.36ms,각입력9/500초과gap0/전proxy PASS. 원본214.58초/214.63초정상영상과native원본pixel쌍,selection trace,환경을보존했다. 실GPU/표시FPS/물리지연/실기기/발열배터리/이번Androidnative/UI NOT_RUN.
+
+**다음한작업은[STORAGE-01](docs/defects/STORAGE-01-cantopen.md)의원사건원인추적 또는 실제기기의렌더비교다.** 이번일반저장은정상이고삭제없는격리14/13복구·20동일요청→각meal1/EXP15,150경합/자동meal1/wake replay동일을실행했다. 원사건UPDATE/execute14의VFS실제파일/extendederrno는없어서OPEN;127MiB만으로인과확정하지않는다. 재발하면원상태/오류화면부터보존하고새최초오류로컬진단(cache/arucon-storage-incidents.json,실제VFS NOT_EXPOSED_BY_EXPO)을복사한다. DB삭제/원본시간·재화변경·무작정재시도/재설치금지. 실제저장실패안내를숨기지않는다.
+
+현재여유약30GiB. 개발산출물은읽기전용목록만만들었고삭제없음. 큰build/video전 `python validation/audit_local_artifacts.py --require-free-gib 4`; DB/원본/영상은보존한다. 새432/432·39/39영향·lint/types·iOSRelease·AndroidJS·CNG27·운영42 PASS. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. Feature checkpoint/일반push만;main/merge/force/tag/deploy/건강/결제/보안/외부영상업로드금지. 사용자재미/최종아트 USER_REVIEW_PENDING.
+
+---
+
+## Historical — visual-v5 첫 비교 인계
+
 # Next resume — REBOOT-03.2 / VISUAL_QUALITY_REVIEW_READY
 
 [현재 렌더 비교 보고서](REBOOT-03-2-REPORT.md). 소스 **a6218d4c056ed43dcded7a64adbbfaa3288e7554**, 설치 **visual-v5 Release SHA d177cca9d46e279503a0ce6eb3d9a5ab4661386ac05bd1db14d0b88939395de9** / 209빌드입력 일치. 같으면 재빌드/재설치/DB 초기화하지 않는다. 기본A·기존30+같은아루1·원본48개·경제/성장/소유/meal·3DBok·모자/쿠션/기억 보존.
