@@ -109,6 +109,7 @@ export function AruconRoom(props: RoomProps) {
     props.performanceCaptureToken,
     props.performanceCaptureDurationMs,
     props.onPerformanceCapture,
+    props.onComparisonWindow,
     props.onRuntimeSnapshot,
     props.rebootView,
     props.onRebootEvent,

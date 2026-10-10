@@ -11,7 +11,7 @@ export type TouchRegion = 'head' | 'body' | 'unknown';
 export const RESUMABLE_REBOOT_INTENTS = ['explore', 'dash', 'stretch', 'baby_scout', 'baby_discover', 'baby_sneak', 'baby_silly', 'baby_peek'] as const;
 export type ResumableIntent = typeof RESUMABLE_REBOOT_INTENTS[number];
 export type RebootFact = Readonly<{ eventId: string; petId: string; kind: 'hat_used' | 'cushion_used' | 'hand' | 'personality_scene';
-  itemId: string; atMs: number; completed: true; stage: RebootStage; context?: RebootIntent; itemRevision?: number; position?: FloorPoint; touchRegion?: TouchRegion }>;
+  itemId: string; atMs: number; completed: true; stage: RebootStage; context?: RebootIntent; itemRevision?: number; position?: FloorPoint; touchRegion?: TouchRegion; origin?: 'synthetic_comparison' }>;
 export type RebootSnapshot = { schemaVersion: 1; petId: string; revision: number; hatWorn: boolean;
   cushion: FloorPoint & { revision: number }; previewStage: RebootStage; events: RebootFact[];
   personality?: PersonalityFoundation; randomState?: number };
@@ -25,6 +25,9 @@ export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revisi
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand;
   babyCharm?: boolean; sizeCandidate?: 1.15 | 1.25 | 1.35; familiarHandId?: string;
   artCandidate?: BabyArt; artComparison?: ArtComparison;
+  comparisonProtocol?: { token: string; warmupMs: 30000; captureMs: 60000; pacing: 'tail' | 'ahead' };
+  comparisonHold?: boolean;
+  comparisonHullCulling?: boolean;
   personality?: { foundation: PersonalityFoundation; axes: PersonalityAxes; randomState: number; evidenceIds: readonly string[] } }>;
 export const REBOOT_SCALE: Record<RebootStage, number> = { baby: .53, growing: .48, evolved: .43 };
 export const REBOOT_HAND: FloorPoint = Object.freeze({ x: 0, z: 3.35 });

@@ -28,7 +28,7 @@ export type RoomPerformanceSummary = {
   capturedAtMs: number;
   profileId: RoomRendererProfileId;
   proxyNotice: string;
-  phaseCost: Record<'morph' | 'draw' | 'queueDrain', MetricSummary>;
+  phaseCost: Record<'decision' | 'pose' | 'morph' | 'draw' | 'present' | 'queueDrain' | 'frameWork' | 'frameIdle', MetricSummary>;
   budgetSource: 'LIFE-00-13';
   inputMeasurementWindowMs: number;
   frameMeasurementWindowMs: number;
@@ -123,7 +123,7 @@ function thresholdStatus(value: number | null, maximum: number, count: number): 
 }
 
 export class RoomPerformanceProbe {
-  private readonly phaseCost: Record<'morph' | 'draw' | 'queueDrain', RingBuffer<TimedSample>>;
+  private readonly phaseCost: Record<keyof RoomPerformanceSummary['phaseCost'], RingBuffer<TimedSample>>;
   private capture?: { probe: RoomPerformanceProbe; start: number; end: number };
   private readonly inputHandlerDurationMs: RingBuffer<TimedSample>;
   private readonly inputSources: RingBuffer<Readonly<{ source: RoomInputSource; atMs: number }>>;
@@ -148,7 +148,9 @@ export class RoomPerformanceProbe {
     capacity = 240,
     private readonly measurementWindowMs = FUN01_MEASUREMENT_WINDOW_MS,
   ) {
-    this.phaseCost = { morph: new RingBuffer(capacity), draw: new RingBuffer(capacity), queueDrain: new RingBuffer(capacity) };
+    this.phaseCost = { decision: new RingBuffer(capacity), pose: new RingBuffer(capacity), morph: new RingBuffer(capacity),
+      draw: new RingBuffer(capacity), present: new RingBuffer(capacity), queueDrain: new RingBuffer(capacity),
+      frameWork: new RingBuffer(capacity), frameIdle: new RingBuffer(capacity) };
     this.inputHandlerDurationMs = new RingBuffer(capacity);
     this.inputSources = new RingBuffer(capacity);
     this.inputToNextRafMs = new RingBuffer(capacity);
@@ -302,8 +304,8 @@ export class RoomPerformanceProbe {
       budgetSource: 'LIFE-00-13',
       inputMeasurementWindowMs: inputWindow,
       frameMeasurementWindowMs: this.measurementWindowMs,
-      phaseCost: { morph: summarize(this.windowValues(this.phaseCost.morph, capturedAtMs)),
-        draw: summarize(this.windowValues(this.phaseCost.draw, capturedAtMs)), queueDrain: summarize(this.windowValues(this.phaseCost.queueDrain, capturedAtMs)) },
+      phaseCost: Object.fromEntries(Object.entries(this.phaseCost).map(([phase, buffer]) =>
+        [phase, summarize(this.windowValues(buffer, capturedAtMs))])) as RoomPerformanceSummary['phaseCost'],
       proxyNotice: 'input-to-RAF, input-to-endFrameEXP and RAF-gap values are timing proxies; they do not measure touch-to-photon latency, native-thread lock or visible FPS',
       budgets: FUN01_PERFORMANCE_BUDGET,
       inputSamplesBySource,

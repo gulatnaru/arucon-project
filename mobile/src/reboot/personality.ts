@@ -16,10 +16,14 @@ export const hashPersonality = (id: string) => { let n = 2166136261; for (const 
 export function newPersonality(id: PersonalityId): PersonalityFoundation {
   const p = PERSONALITY_PROFILES[id]; return { version: 1, petId: p.petId, profileId: id, latent: { ...p.axes }, seed: hashPersonality(p.petId) };
 }
+export function personalityOwnsPet(id: PersonalityId, petId: string) {
+  return PERSONALITY_PROFILES[id].petId === petId ||
+    new RegExp(`^reboot-04:compare:[a-z0-9]{8,20}:${id}$`, 'u').test(petId);
+}
 export function validPersonality(x: unknown, petId: string): x is PersonalityFoundation {
   if (!x || typeof x !== 'object') return false;
   const a = x as PersonalityFoundation;
-  return a.version === 1 && PERSONALITY_IDS.includes(a.profileId) && a.petId === petId && PERSONALITY_PROFILES[a.profileId].petId === petId
+  return a.version === 1 && PERSONALITY_IDS.includes(a.profileId) && a.petId === petId && personalityOwnsPet(a.profileId, petId)
     && Number.isSafeInteger(a.seed) && a.seed >= 0 && a.seed <= 0xffffffff && !!a.latent &&
     ['approach', 'play', 'company', 'novelty'].every(k => { const n = a.latent[k as keyof PersonalityAxes]; return typeof n === 'number' && Number.isFinite(n) && Math.abs(n) <= 1; });
 }

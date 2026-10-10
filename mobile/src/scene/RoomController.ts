@@ -35,6 +35,7 @@ import { expoRenderContext } from './expoRenderContext';
 import { projectedHitsEqual, type HitName, type ProjectedHits } from './projectedHits';
 import type { FloorPoint, RoomProps, RoomRuntimeSnapshot } from './types';
 import { RoomPerformanceProbe, type RoomPerformanceCapture, type RoomPerformanceSummary } from './performanceProbe';
+import { ComparisonWindow } from './comparisonWindow';
 import { canStartRoomInteraction, resolveRoomInteraction } from './interactionLifecycle';
 import type { PetRestMode } from '../presentation/petRest';
 import { applyPetMaterialProfile } from './rendererMaterials';
@@ -114,6 +115,9 @@ export class RoomController {
   private readonly submissionIntervalMs: number;
   private readonly submissions: FrameSubmissionGate;
   private readonly performanceProbe: RoomPerformanceProbe;
+  private comparisonWindow?: ComparisonWindow;
+  private lastFrameEndMs?: number;
+  private onComparisonWindow?: RoomProps['onComparisonWindow'];
   private readonly fxaa?: ReturnType<typeof createRoomFxaa>;
   private glValidation?: { maxSamples: number; sampleBuffers: number; samples: number; framebufferStatus: number; error: number };
   private onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
@@ -361,6 +365,9 @@ export class RoomController {
     this.restMode = nextRestMode;
     this.onPerformanceSummary = props.onPerformanceSummary;
     this.onPerformanceCapture = props.onPerformanceCapture;
+    this.onComparisonWindow = props.onComparisonWindow;
+    const protocol = this.rebootView?.comparisonProtocol;
+    if (protocol && protocol.token !== this.comparisonWindow?.token) this.comparisonWindow = new ComparisonWindow(protocol.token, protocol.warmupMs, protocol.captureMs);
     this.onRuntimeSnapshot = props.onRuntimeSnapshot;
     if (props.performanceCaptureToken && props.performanceCaptureToken !== this.lastPerformanceCaptureToken) {
       this.lastPerformanceCaptureToken = props.performanceCaptureToken;
@@ -523,7 +530,8 @@ export class RoomController {
       const gltf = await parseGlb(data);
       const loaded = retainLoadedModel(gltf.scene, this.disposed || generation !== this.petLoadGeneration);
       if (!loaded) return;
-      applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial);
+      loaded.updateMatrixWorld(true);
+      applyPetMaterialProfile(loaded, this.rendererConfig.petMaterial, !!this.rebootView?.comparisonHullCulling);
       const mouth = loaded.getObjectByName('Mouth');
       this.mealMouth = mouth instanceof THREE.Mesh ? createMorphedAnchor(mouth) : undefined;
       this.updateCpuMorphs = needsSoftwareCpuMorphs(this.rendererConfig.id, this.softwareRenderer)
@@ -798,6 +806,7 @@ export class RoomController {
   }
 
   moveTo(raw: FloorPoint, inputStartedAtMs?: number): FloorPoint | null {
+    if (this.rebootView?.comparisonHold || this.comparisonWindow?.phase === 'warmup') return null;
     if (!this.interactionEnabled || !canStartRoomInteraction(this.currentInteraction(), 'move')) return null;
     if (this.livingEnabled) this.life.cancel();
     if (this.rebootView) this.reboot.cancel();
@@ -829,6 +838,7 @@ export class RoomController {
   }
 
   beginPet(inputStartedAtMs = performance.now(), region: TouchRegion = 'unknown') {
+    if (this.rebootView?.comparisonHold || this.comparisonWindow?.phase === 'warmup') return false;
     if (!this.canStartPet()) return false;
     if (this.livingEnabled) this.life.cancel();
     this.rebootInterruptedForTouch = this.reboot.current?.kind; this.rebootTouchRegion = region;
@@ -844,7 +854,8 @@ export class RoomController {
   }
 
   canStartPet() {
-    return this.interactionEnabled && canStartRoomInteraction(this.currentInteraction(), 'pet');
+    return !this.rebootView?.comparisonHold && this.comparisonWindow?.phase !== 'warmup' &&
+      this.interactionEnabled && canStartRoomInteraction(this.currentInteraction(), 'pet');
   }
 
   beginAccessiblePet(inputStartedAtMs: number) {
@@ -878,13 +889,24 @@ export class RoomController {
 
   private tick = (timestamp: number) => {
     if (this.disposed) return;
+    const frameStart = performance.now();
+    if (this.lastFrameEndMs !== undefined) this.performanceProbe.recordPhase('frameIdle', frameStart - this.lastFrameEndMs);
     this.performanceProbe.recordRaf(timestamp);
+    const stage = this.comparisonWindow?.step(frameStart, Date.now(), this.modelReady, this.interactionEnabled && !this.sleeping);
+    if (stage?.phase === 'measure') this.performanceProbe.beginCapture(60_000);
+    if (stage) { this.onComparisonWindow?.(stage); if (stage.phase === 'interrupted') { const aborted = this.performanceProbe.finishCaptureIfDue(true); if (aborted) this.onPerformanceCapture?.(aborted); } }
+    const ahead = this.rebootView?.comparisonProtocol?.pacing === 'ahead';
+    if (ahead) this.frames.schedule(this.tick);
     const dt = Math.min(MOTION.maxCatchupSeconds, this.clock.getDelta());
     this.rebootTime += dt;
-    if (this.rebootView && this.modelReady && !this.rebootView.artComparison) this.reboot.update(dt, { enabled: this.interactionEnabled,
+    const decisionStart = performance.now();
+    if (this.rebootView && this.modelReady && !this.rebootView.artComparison) this.reboot.update(dt, {
       awake: !this.sleeping, moving: !!this.path.length, touching: this.touchHolding || this.petPulseRemaining > 0,
-      position: this.position, view: this.rebootView, touchRegion: this.rebootTouchRegion, interruptedForTouch: this.rebootInterruptedForTouch });
+      position: this.position, view: this.rebootView, touchRegion: this.rebootTouchRegion, interruptedForTouch: this.rebootInterruptedForTouch,
+      enabled: this.interactionEnabled && !this.rebootView.comparisonHold && (!this.comparisonWindow || this.comparisonWindow.actorEnabled) });
     if (this.livingEnabled) this.life.update(dt, this.lifeWorld());
+    this.performanceProbe.recordPhase('decision', performance.now() - decisionStart);
+    const poseStart = performance.now();
     if (this.cueRemaining > 0) {
       this.cueRemaining = Math.max(0, this.cueRemaining - dt);
       if (this.cueRemaining === 0) {
@@ -1014,6 +1036,7 @@ export class RoomController {
     }
     const reviewHat = this.loadedPet?.getObjectByName('RebootHat');
     if (reviewHat) reviewHat.visible = !!this.rebootView?.hatWorn && !art;
+    this.performanceProbe.recordPhase('pose', performance.now() - poseStart);
     const frameSubmitted = this.submissions.shouldSubmit(
       timestamp,
       this.modelReady || this.submissionIntervalMs === 0,
@@ -1028,7 +1051,8 @@ export class RoomController {
       else this.renderer.render(this.scene, this.camera);
       this.performanceProbe.recordPhase('draw', performance.now() - drawStart);
       this.performanceProbe.recordRenderWorkload(this.renderer.info.render);
-      this.gl.endFrameEXP();
+      const presentStart = performance.now(); this.gl.endFrameEXP();
+      this.performanceProbe.recordPhase('present', performance.now() - presentStart);
       // Expo's public queue barrier prevents software GL from accumulating old
       // poses behind current UI input. Never patch the SDK or use this on hardware.
       const drainStart = performance.now();
@@ -1049,13 +1073,15 @@ export class RoomController {
       this.publishProjection();
     }
     const capture = this.performanceProbe.finishCaptureIfDue();
-    if (capture) this.onPerformanceCapture?.(capture);
+    if (capture) { this.onPerformanceCapture?.(capture); const finished = this.comparisonWindow?.finish(Date.now()); if (finished) this.onComparisonWindow?.(finished); }
     if (this.onPerformanceSummary && timestamp - this.lastPerformancePublishMs >= 1_000) {
       this.lastPerformancePublishMs = timestamp;
       this.onPerformanceSummary(this.performanceProbe.snapshot());
       this.onRuntimeSnapshot?.(this.runtimeSnapshot());
     }
-    this.frames.schedule(this.tick);
+    this.performanceProbe.recordPhase('frameWork', performance.now() - frameStart);
+    this.lastFrameEndMs = performance.now();
+    if (!ahead) this.frames.schedule(this.tick);
   };
 
   resume() {
@@ -1080,6 +1106,8 @@ export class RoomController {
   }
 
   pause() {
+    this.lastFrameEndMs = undefined;
+    const interrupted = this.comparisonWindow?.interrupt(Date.now()); if (interrupted) this.onComparisonWindow?.(interrupted);
     const capture = this.performanceProbe.finishCaptureIfDue(true);
     if (capture) this.onPerformanceCapture?.(capture);
     this.clearTransientAction();

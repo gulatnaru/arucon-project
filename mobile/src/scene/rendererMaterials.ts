@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { vertexLitMaterial } from './vertexLitMaterial';
+import { canCullOpaqueHull } from './opaqueHull';
 
 function lowCostMaterial(source: THREE.Material): THREE.Material {
   if (!(source instanceof THREE.MeshStandardMaterial)) return source;
@@ -31,7 +32,7 @@ function lowCostMaterial(source: THREE.Material): THREE.Material {
  * transparency and animation while replacing its expensive PBR fragment
  * material. Hardware and legacy comparison profiles keep source materials.
  */
-export function applyPetMaterialProfile(root: THREE.Object3D, profile: 'source' | 'lambert' | 'vertex_lit') {
+export function applyPetMaterialProfile(root: THREE.Object3D, profile: 'source' | 'lambert' | 'vertex_lit', closedHullCulling = false) {
   if (profile === 'source') return;
   root.traverse(node => {
     if (!(node instanceof THREE.Mesh)) return;
@@ -40,7 +41,8 @@ export function applyPetMaterialProfile(root: THREE.Object3D, profile: 'source' 
       const material = vertexLitMaterial(source.color, source.vertexColors);
       material.name = source.name;
       material.uniforms.opacity.value = source.opacity;
-      material.transparent = source.transparent; material.side = source.side;
+      material.transparent = source.transparent;
+      material.side = closedHullCulling && canCullOpaqueHull(node.geometry, source) && node.matrixWorld.determinant() > 0 ? THREE.FrontSide : source.side;
       material.depthTest = source.depthTest; material.depthWrite = source.depthWrite;
       source.dispose();
       return material;

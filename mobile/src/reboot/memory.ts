@@ -1,6 +1,6 @@
 import type { SqlConnection } from '../storage/sqlite';
 import type { FloorPoint } from '../scene/types';
-import { newPersonality, validPersonality, type PersonalityId } from './personality';
+import { newPersonality, validPersonality, personalityOwnsPet, type PersonalityId } from './personality';
 import { type RebootFact, type RebootSnapshot, type RebootStage } from './contracts';
 
 /** Keep first/latest completed experience per object within the same 64-fact budget.
@@ -21,8 +21,9 @@ function retainExperience(events: RebootFact[]): RebootFact[] {
 
 /** Auxiliary experience state; no economic migration and no raw SQLite handle. */
 export class RebootMemoryStore {
-  constructor(private readonly db: SqlConnection, readonly petId: string, private readonly personalityId?: PersonalityId) {
-    if (!(personalityId ? /^reboot-04:(playful|warm|poised)$/u : /^reboot-01:[a-z0-9-]{1,40}$/u).test(petId)) throw new Error('Reboot memory requires an isolated pet');
+  constructor(private readonly db: SqlConnection, readonly petId: string, private readonly personalityId?: PersonalityId, private readonly comparisonSeed?: RebootSnapshot) {
+    if (!(personalityId ? personalityOwnsPet(personalityId, petId) : /^reboot-01:[a-z0-9-]{1,40}$/u.test(petId))) throw new Error('Reboot memory requires an isolated pet');
+    if (comparisonSeed && (!petId.startsWith('reboot-04:compare:') || comparisonSeed.petId !== petId)) throw Error('Synthetic seeds require new comparison owners');
   }
   private validate(x: RebootSnapshot) {
     if (x.schemaVersion !== 1 || x.petId !== this.petId || !Number.isSafeInteger(x.revision) || x.revision < 0 ||
@@ -35,7 +36,8 @@ export class RebootMemoryStore {
         !(this.personalityId ? ['review:pearl-beret', 'review:rest-cushion', 'user:hand', 'review:personality'] : ['review:pearl-beret', 'review:rest-cushion', 'user:hand']).includes(e.itemId) ||
         e.position && (!Number.isFinite(e.position.x) || !Number.isFinite(e.position.z)) ||
         typeof e.eventId !== 'string' || e.eventId.length > 120 || !['baby', 'growing', 'evolved'].includes(e.stage) ||
-        e.touchRegion !== undefined && !['head', 'body', 'unknown'].includes(e.touchRegion))) {
+        e.touchRegion !== undefined && !['head', 'body', 'unknown'].includes(e.touchRegion) ||
+        e.origin !== undefined && (e.origin !== 'synthetic_comparison' || !this.petId.startsWith('reboot-04:compare:')))) {
       throw new Error('기억 형식을 확인할 수 없어 저장을 보존했어요.');
     }
   }
@@ -44,7 +46,13 @@ export class RebootMemoryStore {
     const row = await this.db.getFirstAsync<{ snapshot: string }>('SELECT snapshot FROM reboot_review_memory WHERE pet_id=?', [this.petId]);
     const value = row ? (() => { if (row.snapshot.length > 32768) throw new Error('기억이 너무 커 원본을 보존했어요.'); return JSON.parse(row.snapshot); })()
       : this.initial();
-    this.validate(value); return value;
+    this.validate(value);
+    if (!row && this.comparisonSeed) return this.db.withExclusiveTransactionAsync(async tx => {
+      const existing = await tx.getFirstAsync<{ snapshot: string }>('SELECT snapshot FROM reboot_review_memory WHERE pet_id=?', [this.petId]);
+      if (existing) { const restored = JSON.parse(existing.snapshot) as RebootSnapshot; this.validate(restored); return restored; }
+      await tx.runAsync('INSERT INTO reboot_review_memory VALUES (?,?)', [this.petId, JSON.stringify(value)]); return value;
+    });
+    return value;
   }
   private async mutate(work: (snapshot: RebootSnapshot) => RebootSnapshot): Promise<RebootSnapshot> {
     return this.db.withExclusiveTransactionAsync(async tx => {
@@ -57,7 +65,8 @@ export class RebootMemoryStore {
       return next;
     });
   }
-  private initial(): RebootSnapshot { return { schemaVersion: 1, petId: this.petId, revision: 0,
+  private initial(): RebootSnapshot { if (this.comparisonSeed) return JSON.parse(JSON.stringify(this.comparisonSeed)) as RebootSnapshot;
+    return { schemaVersion: 1, petId: this.petId, revision: 0,
     hatWorn: false, cushion: { x: -1.6, z: .2, revision: 0 }, previewStage: 'baby', events: [],
     ...(this.personalityId ? { personality: newPersonality(this.personalityId), randomState: newPersonality(this.personalityId).seed } : {}) }; }
   wear(worn: boolean, expectedRevision?: number) { return this.mutate(x => x.hatWorn === worn || expectedRevision !== undefined && x.revision !== expectedRevision ? x : { ...x, hatWorn: worn, revision: x.revision + 1 }); }

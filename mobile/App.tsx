@@ -69,6 +69,7 @@ import type { RoomPerformanceCapture, RoomPerformanceSummary } from './src/scene
 import type { RoomRendererProfileId } from './src/scene/rendererConfig';
 import type { PersonalityId } from './src/reboot/personality';
 import { RebootReviewScreen } from './src/reboot/RebootReviewScreen';
+import { ComparisonReviewScreen } from './src/reboot/ComparisonReviewScreen';
 import { installStorageDiagnostics, storageDiagnosticsSnapshot } from './src/storage/nativeStorageDiagnostics';
 import { runRequestedNativeProbe } from './src/reboot/nativeEmbedding';
 
@@ -1255,7 +1256,7 @@ export default function App() {
   }, []);
   return <SafeAreaProvider>
     <StatusBar barStyle="dark-content" backgroundColor="#f2ebdc" />
-    {ready && (profile.startsWith('personality_') ? <RebootReviewScreen key={profile} personalityReview={profile.replace('personality_','') as PersonalityId} onPersonality={id => changeProfile(`personality_${id}`)} onExit={() => changeProfile('original')} /> : profile === 'reboot_review' ? <RebootReviewScreen onExit={() => changeProfile('original')} /> : <AppContent key={profile} profile={profile} onProfile={changeProfile} />)}
+    {ready && (profile === 'personality_comparison' ? <ComparisonReviewScreen onExit={() => changeProfile('original')} /> : profile.startsWith('personality_') ? <RebootReviewScreen key={profile} personalityReview={profile.replace('personality_','') as PersonalityId} onComparison={() => changeProfile('personality_comparison')} onPersonality={id => changeProfile(`personality_${id}`)} onExit={() => changeProfile('original')} /> : profile === 'reboot_review' ? <RebootReviewScreen onExit={() => changeProfile('original')} /> : <AppContent key={profile} profile={profile} onProfile={changeProfile} />)}
     {profileError && <View style={styles.errorBox}><Text accessibilityRole="alert">{profileError}</Text></View>}
   </SafeAreaProvider>;
 }

@@ -1,6 +1,7 @@
 import type { FormId } from '../domain/model';
 import type { ReactNode } from 'react';
 import type { RoomPerformanceCapture, RoomPerformanceSummary } from './performanceProbe';
+import type { ComparisonWindowEvent } from './comparisonWindow';
 import type { RoomRendererProfileId } from './rendererConfig';
 import type { CharacterCandidateId } from './characterCandidates';
 import type { ComparisonCameraAngle, RoomPresentationBatch } from './presentationBridge';
@@ -91,6 +92,7 @@ export type RoomProps = {
   performanceCaptureToken?: string;
   performanceCaptureDurationMs?: 60_000 | 180_000;
   onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
+  onComparisonWindow?: (event: ComparisonWindowEvent) => void;
   /** Bounded local diagnostics; not a UI state update or a GPU measurement. */
   onRuntimeSnapshot?: (snapshot: RoomRuntimeSnapshot) => void;
 };
