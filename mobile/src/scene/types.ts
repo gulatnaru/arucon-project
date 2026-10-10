@@ -89,6 +89,7 @@ export type RoomProps = {
   onStatus?: (message: string) => void;
   onPerformanceSummary?: (summary: RoomPerformanceSummary) => void;
   performanceCaptureToken?: string;
+  performanceCaptureDurationMs?: 60_000 | 180_000;
   onPerformanceCapture?: (capture: RoomPerformanceCapture) => void;
   /** Bounded local diagnostics; not a UI state update or a GPU measurement. */
   onRuntimeSnapshot?: (snapshot: RoomRuntimeSnapshot) => void;

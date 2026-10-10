@@ -3,7 +3,7 @@ import type { GameConfig } from '../domain/config';
 import type { Command, PetState, Transition } from '../domain/model';
 import type { WriterIdentity } from '../sync/contracts';
 import type { SQLiteDatabase } from 'expo-sqlite';
-import { inSqliteLane, nativeStatement, traceTransaction } from './sqliteAccess';
+import { inSqliteLane, nativeStatement, traceTransaction, endTransactionTrace } from './sqliteAccess';
 import { validateLocalSyncRegistration } from './syncRegistration';
 
 /** Minimal async surface implemented by Expo SQLite and by the Node test adapter. */
@@ -78,13 +78,15 @@ export function expoSqliteConnection(database: SQLiteDatabase): SqlConnection {
             try { result = await work(executor(tx)); completed = true; }
             catch (error) { primary = error; throw error; }
           });
+          if (!completed) throw new Error('SQLite transaction did not complete');
+          traceTransaction(database, 'complete');
         } catch (error) {
           traceTransaction(database, 'failed', primary ?? error);
           if (primary && primary !== error) traceTransaction(database, 'cleanup_failed', error);
           throw primary ?? error;
+        } finally {
+          endTransactionTrace(database);
         }
-        if (!completed) throw new Error('SQLite transaction did not complete');
-        traceTransaction(database, 'complete');
         return result as T;
       }));
     },

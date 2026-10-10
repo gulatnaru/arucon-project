@@ -107,6 +107,7 @@ export function AruconRoom(props: RoomProps) {
     props.hungry,
     props.mealAvailability,
     props.performanceCaptureToken,
+    props.performanceCaptureDurationMs,
     props.onPerformanceCapture,
     props.onRuntimeSnapshot,
     props.rebootView,

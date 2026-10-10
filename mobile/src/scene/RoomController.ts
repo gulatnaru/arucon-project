@@ -362,7 +362,8 @@ export class RoomController {
     this.onRuntimeSnapshot = props.onRuntimeSnapshot;
     if (props.performanceCaptureToken && props.performanceCaptureToken !== this.lastPerformanceCaptureToken) {
       this.lastPerformanceCaptureToken = props.performanceCaptureToken;
-      this.performanceProbe.beginCapture();
+      if(props.performanceCaptureDurationMs===180_000)this.performanceProbe.beginExtendedCapture();
+      else this.performanceProbe.beginCapture();
     }
     const nextInteractionEnabled = props.interactionEnabled ?? true;
     const wasReduced = this.reducedMotion;

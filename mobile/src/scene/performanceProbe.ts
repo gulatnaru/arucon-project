@@ -238,6 +238,14 @@ export class RoomPerformanceProbe {
   /** Explicit local QA run; normal rolling probes retain their existing cost/capacity. */
   beginCapture(durationMs = 60_000) {
     if (!Number.isFinite(durationMs) || durationMs <= 0 || durationMs > 60_000) throw new Error('Capture duration must be within sixty seconds');
+    return this.startBoundedCapture(durationMs);
+  }
+  /** Explicit continuous-play QA only; existing sixty-second API contract stays intact. */
+  beginExtendedCapture(durationMs = 180_000) {
+    if (!Number.isFinite(durationMs) || durationMs < 60_000 || durationMs > 180_000) throw new Error('Extended capture must be between sixty and180 seconds');
+    return this.startBoundedCapture(durationMs);
+  }
+  private startBoundedCapture(durationMs: number) {
     if (this.capture) return false;
     const start = this.now();
     const probe = new RoomPerformanceProbe(this.profileId, this.now, Math.ceil(durationMs / 1_000 * 120) + 1, durationMs);
@@ -264,9 +272,10 @@ export class RoomPerformanceProbe {
   }
 
   snapshot(capturedAtMs = this.now()): RoomPerformanceSummary {
-    const handler = summarize(this.windowValues(this.inputHandlerDurationMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
-    const inputRaf = summarize(this.windowValues(this.inputToNextRafMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
-    const inputSubmission = summarize(this.windowValues(this.inputToNextSubmissionMs, capturedAtMs, INPUT_MEASUREMENT_WINDOW_MS));
+    const inputWindow = Math.max(INPUT_MEASUREMENT_WINDOW_MS, this.measurementWindowMs);
+    const handler = summarize(this.windowValues(this.inputHandlerDurationMs, capturedAtMs, inputWindow));
+    const inputRaf = summarize(this.windowValues(this.inputToNextRafMs, capturedAtMs, inputWindow));
+    const inputSubmission = summarize(this.windowValues(this.inputToNextSubmissionMs, capturedAtMs, inputWindow));
     const rafValues = this.windowValues(this.rafIntervalsMs, capturedAtMs);
     const raf = summarize(rafValues);
     const submissionValues = this.windowValues(this.submissionIntervalsMs, capturedAtMs);
@@ -275,7 +284,7 @@ export class RoomPerformanceProbe {
     const windowSubmissionTimestamps = this.submissionTimestampsMs.values()
       .filter(timestamp => timestamp >= earliest && timestamp <= capturedAtMs);
     const inputSamplesBySource = this.inputSources.values()
-      .filter(sample => sample.atMs >= capturedAtMs - INPUT_MEASUREMENT_WINDOW_MS && sample.atMs <= capturedAtMs)
+      .filter(sample => sample.atMs >= capturedAtMs - inputWindow && sample.atMs <= capturedAtMs)
       .reduce<Record<RoomInputSource, number>>((counts, sample) => {
         counts[sample.source]++;
         return counts;
@@ -291,7 +300,7 @@ export class RoomPerformanceProbe {
       capturedAtMs,
       profileId: this.profileId,
       budgetSource: 'LIFE-00-13',
-      inputMeasurementWindowMs: INPUT_MEASUREMENT_WINDOW_MS,
+      inputMeasurementWindowMs: inputWindow,
       frameMeasurementWindowMs: this.measurementWindowMs,
       phaseCost: { morph: summarize(this.windowValues(this.phaseCost.morph, capturedAtMs)),
         draw: summarize(this.windowValues(this.phaseCost.draw, capturedAtMs)), queueDrain: summarize(this.windowValues(this.phaseCost.queueDrain, capturedAtMs)) },

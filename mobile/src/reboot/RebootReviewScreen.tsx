@@ -19,6 +19,7 @@ import type { RoomPerformanceCapture, RoomPerformanceSummary } from '../scene/pe
 import { VISUAL_QUALITY_CHOICES, type RoomRendererProfileId } from '../scene/rendererConfig';
 import { RebootSemanticQueue } from './semantic';
 import { nativeEmbeddingPort } from './nativeEmbedding';
+import { installStorageDiagnostics, storageDiagnosticsSnapshot } from '../storage/nativeStorageDiagnostics';
 
 const PET_ID = 'reboot-01:main';
 const stageName: Record<RebootStage, string> = { baby: '아기', growing: '성장기', evolved: '1차 진화 후' };
@@ -37,8 +38,10 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const [voice] = useState(() => new BabyLines());
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined), bubbleToken = useRef(0);
   const [error, setError] = useState(''), [captureToken, setCaptureToken] = useState<string>();
+  const [captureDuration, setCaptureDuration] = useState<60_000|180_000>(60_000);
   const [backend, setBackend] = useState<'A' | 'B'>('A'), [modelStatus, setModelStatus] = useState('A · 구조화된 실제 기억');
   const [evidenceStatus, setEvidenceStatus] = useState('');
+  const [storageCheckRunning,setStorageCheckRunning]=useState(false), storageCheckActive=useRef(false);
   const backendRef = useRef<'A' | 'B'>('A');
   const service = useRef<ApprovedMvpService | null>(null), memories = useRef<RebootMemoryStore | null>(null);
   const latest = useRef({ pet, memory }), alive = useRef(true), sequence = useRef(0), epoch = useRef(0);
@@ -68,6 +71,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
   const cancel = useCallback(() => { epoch.current++; semantic.current.cancel(); ++bubbleToken.current; clearTimeout(bubbleTimer.current); setHand(false); setCommand(undefined); setBubble(''); }, []);
   useEffect(() => {
     alive.current = true;
+    const stopStorageDiagnostics=installStorageDiagnostics();
     const requestEpoch = epoch, modelQueue = semantic.current;
     void run(async () => {
       const db = expoSqliteConnection(await openAruconDatabase('arucon-reboot-review.db'));
@@ -84,7 +88,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
     const tick = setInterval(() => {
       if (AppState.currentState === 'active' && service.current) void run(async () => ({ state: await service.current!.advanceForeground(now()) }));
     }, 30_000);
-    return () => { alive.current = false; requestEpoch.current++; modelQueue.cancel(); clearTimeout(bubbleTimer.current); subscription.remove(); clearInterval(tick); };
+    return () => { alive.current = false; requestEpoch.current++; modelQueue.cancel(); clearTimeout(bubbleTimer.current); subscription.remove(); clearInterval(tick); stopStorageDiagnostics(); };
   }, [cancel, now, run]);
 
   const onEvent = useCallback((event: RebootEvent) => {
@@ -164,8 +168,9 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = () => {
-    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-2-visual-v5', review: { babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, 'arucon-reboot-evidence.json').write(JSON.stringify({ build: 'reboot-03-2-followup-v2', review: { babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
       pet: latest.current.pet, memory: latest.current.memory, trace: trace.current, performance: perf.current, capture: capture.current, runtime: runtime.current,
+      storage: storageDiagnosticsSnapshot(),
       ai: { backend: backendRef.current, status: modelStatus, realVectorsUsed: trace.current.some(x => 'decision' in x && (x as { decision?: { backend?: string } }).decision?.backend === 'B_REAL') } }, null, 2)); setEvidenceStatus('검토 기록을 기기 안에 저장했어요.'); }
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
   };
@@ -204,7 +209,7 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
       onStatus={setBubble} onFurnitureHit={kind => { if (kind === 'cushion') setCommand({ token: token('rest'), kind: 'rest', sourceRevision: memory.revision, target: memory.cushion, itemRevision: memory.cushion.revision }); }}
       reactionBubbleWidth={babyReview ? 164 : undefined} reactionBubbleHeadClearance={babyReview ? 50 : undefined}
       reactionBubble={!quiet && bubble ? <View style={styles.bubble}><Text style={styles.bubbleText}>{bubble}</Text><Pressable accessibilityLabel="말풍선 닫기" hitSlop={9} onPress={() => { ++bubbleToken.current; clearTimeout(bubbleTimer.current); setBubble(''); }} style={styles.bubbleClose}><Text style={styles.bubbleCloseText}>×</Text></Pressable></View> : undefined}
-      onPerformanceSummary={x => { perf.current = x; }} performanceCaptureToken={captureToken} onPerformanceCapture={x => { capture.current = x; }}
+      onPerformanceSummary={x => { perf.current = x; }} performanceCaptureToken={captureToken} performanceCaptureDurationMs={captureDuration} onPerformanceCapture={x => { capture.current = x; }}
       onRuntimeSnapshot={x => { runtime.current = x; }} />
     <View pointerEvents="box-none" style={[styles.header, { top: insets.top + 8 }]}>
       <View><Text style={styles.name}>{pet.givenName}</Text><Text style={styles.level}>Lv.{growth.level}</Text><View style={styles.track}><View style={[styles.progress, { width: `${Math.max(0, Math.min(100, (growth.atFinalLevel ? 1 : growth.expIntoLevelUnits / Math.max(1, growth.expIntoLevelUnits + (growth.expToNextLevelUnits ?? 0))) * 100))}%` }]} /></View></View>
@@ -246,10 +251,10 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
             <Text>같은 방·빛·카메라의 검토 설정이에요. 최종 설정은 아직 선택하지 않았어요.</Text>
             {VISUAL_QUALITY_CHOICES.filter(x => !x.samples || (runtime.current?.renderer?.maxSamples ?? 0) >= x.samples).map(x => <Pressable key={x.id}
               style={styles.row} accessibilityLabel={`렌더 ${x.id} 선택`} onPress={() => {
-                cancel(); capture.current = undefined; perf.current = undefined; runtime.current = undefined;
+                cancel(); setCaptureToken(undefined); capture.current = undefined; perf.current = undefined; runtime.current = undefined;
                 setRenderProfile(x.id); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null);
               }}><Text>{x.label}{renderProfile === x.id ? ' · 비교 중' : ''}</Text></Pressable>)}
-            <Pressable style={styles.row} accessibilityLabel="자동 렌더 설정 복원" onPress={() => { cancel(); capture.current = undefined; setRenderProfile('automatic'); setMenu(null); }}><Text>기존 자동 설정으로 돌아가기</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel="자동 렌더 설정 복원" onPress={() => { cancel(); setCaptureToken(undefined); capture.current = undefined; setRenderProfile('automatic'); setMenu(null); }}><Text>기존 자동 설정으로 돌아가기</Text></Pressable>
           </>}
           {menu === 'settings' && <><Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 일반 방과 저장이 분리돼요.</Text>
             <Pressable style={styles.row} accessibilityLabel={babyReview ? '이전 REBOOT-01 세 모습 비교' : 'REBOOT-02 아기 검토로 돌아가기'} onPress={() => { cancel(); setArtComparison(undefined); setBabyReview(x => !x); setMenu(null); }}><Text>{babyReview ? '이전 세 모습 비교' : '아기 검토로 돌아가기'}</Text></Pressable>
@@ -259,7 +264,14 @@ export function RebootReviewScreen({ onExit }: { onExit: () => void }) {
             <Pressable disabled={busy} style={styles.row} accessibilityLabel={rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'} onPress={restAction}><Text>{rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'}</Text></Pressable>
             <Text>{modelStatus}</Text>
             <Pressable style={styles.row} accessibilityLabel={backend === 'A' ? '로컬 검색 B 준비' : '구조화된 기억 A 사용'} onPress={() => { void chooseBackend(); }}><Text>{backend === 'A' ? '로컬 검색 B 준비 / 비교' : '구조화된 기억 A로 비교'}</Text></Pressable>
-            <Pressable style={styles.row} accessibilityLabel="60초 리부트 성능 측정" onPress={() => { setCaptureToken(token('performance')); setMenu(null); }}><Text>60초 검토 성능 기록</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel="60초 리부트 성능 측정" onPress={() => { setCaptureDuration(60_000); setCaptureToken(token('performance')); setMenu(null); }}><Text>60초 검토 성능 기록</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel="180초 연속 플레이 성능 측정" onPress={() => { setCaptureDuration(180_000); setCaptureToken(token('performance')); setMenu(null); }}><Text>3분 연속 플레이 기록</Text></Pressable>
+            <Pressable disabled={storageCheckRunning} style={styles.row} accessibilityLabel="격리 저장 신뢰성 검사" onPress={() => { if(storageCheckActive.current)return;storageCheckActive.current=true;setStorageCheckRunning(true);setEvidenceStatus('격리 저장 복구 검사 중이에요.');void import('../storage/nativeReliabilityCheck').then(x=>x.checkNativeReliability()).then(x=>{
+              new File(Paths.cache,'arucon-storage-reliability.json').write(JSON.stringify(x,null,2));setEvidenceStatus('격리 저장 복구 검사를 마쳤어요. 일반 저장은 유지돼요.');
+            }).catch(e=>{setError(`격리 저장 검사 실패: ${String(e)}`);setEvidenceStatus(`격리 저장 검사 실패: ${String(e)}`);}).finally(()=>{storageCheckActive.current=false;setStorageCheckRunning(false);}); }}><Text>격리 저장 복구 검사</Text></Pressable>
+            <Pressable disabled={storageCheckRunning} style={styles.row} accessibilityLabel="격리 기존 저장 경합 검사" onPress={() => { if(storageCheckActive.current)return;storageCheckActive.current=true;setStorageCheckRunning(true);setEvidenceStatus('격리 경합 검사 중이에요.');void import('../storage/nativeContentionCheck').then(x=>x.checkNativeContention()).then(x=>{
+              new File(Paths.cache,'arucon-storage-contention.json').write(JSON.stringify(x,null,2));setEvidenceStatus('격리 경합 검사를 마쳤어요. 일반 저장은 유지돼요.');
+            }).catch(e=>{setError(`격리 경합 검사 실패: ${String(e)}`);setEvidenceStatus(`격리 경합 검사 실패: ${String(e)}`);}).finally(()=>{storageCheckActive.current=false;setStorageCheckRunning(false);}); }}><Text>격리 기존 경합 검사</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel="리부트 검토 기록 저장" onPress={exportEvidence}><Text>검토 기록 저장</Text></Pressable>
             {!!evidenceStatus && <Text accessibilityLiveRegion="polite">{evidenceStatus}</Text>}
             <Pressable disabled={busy} style={styles.row} accessibilityLabel="원래 방으로 돌아가기" onPress={() => { cancel(); onExit(); }}><Text>원래 방으로 돌아가기</Text></Pressable>

@@ -7,8 +7,17 @@ const lanes = new Map<string, Lane>();
 const anonymous = new WeakMap<SQLiteDatabase, Lane>();
 type Phase = 'prepare' | 'execute' | 'read' | 'finalize' | 'transaction';
 export type SqlAccessTrace = Readonly<{ id: number; file: string; operation: string;
-  phase: Phase; status: 'start' | 'complete' | 'failed' | 'cleanup_failed'; atMs: number; waiting: number; error?: string }>;
+  phase: Phase; status: 'start' | 'complete' | 'failed' | 'cleanup_failed'; atMs: number; waiting: number; error?: string;
+  connectionId: number; transactionId?: number }>;
 let sequence = 0;
+let connectionSequence = 0, transactionSequence = 0;
+const connectionIds = new WeakMap<SQLiteDatabase, number>();
+const transactionIds = new Map<string, number>();
+const observers = new Set<(db: SQLiteDatabase, entry: SqlAccessTrace) => void>();
+export function observeSqliteAccess(observer: (db: SQLiteDatabase, entry: SqlAccessTrace) => void) {
+  observers.add(observer); return () => { observers.delete(observer); };
+}
+export function endTransactionTrace(db: SQLiteDatabase) { transactionIds.delete(db.databasePath); }
 const trace: SqlAccessTrace[] = [];
 export const sqliteAccessTrace = () => trace.map(entry => ({ ...entry }));
 function laneFor(db: SQLiteDatabase): Lane {
@@ -27,10 +36,14 @@ function operation(sql: string) {
   return `${verb}${table ? ` ${table}` : ''}`;
 }
 function record(db: SQLiteDatabase, sql: string, phase: Phase, status: SqlAccessTrace['status'], error?: unknown) {
-  trace.push({ id: ++sequence, file: db.databasePath?.split('/').pop() ?? 'test', operation: operation(sql),
+  let connectionId = connectionIds.get(db); if (!connectionId) { connectionId = ++connectionSequence; connectionIds.set(db, connectionId); }
+  const entry: SqlAccessTrace = { id: ++sequence, file: db.databasePath?.split('/').pop() ?? 'test', operation: operation(sql),
     phase, status, atMs: Date.now(), waiting: laneFor(db).waiting,
-    ...(error ? { error: error instanceof Error ? error.message : String(error) } : {}) });
+    connectionId, ...(transactionIds.has(db.databasePath) ? { transactionId: transactionIds.get(db.databasePath) } : {}),
+    ...(error ? { error: error instanceof Error ? error.message : String(error) } : {}) };
+  trace.push(entry);
   if (trace.length > 256) trace.splice(0, trace.length - 256);
+  for (const observer of observers) { try { observer(db, entry); } catch { /* Telemetry cannot replace a SQL failure/result. */ } }
 }
 export function inSqliteLane<T>(db: SQLiteDatabase, work: () => Promise<T>): Promise<T> {
   const lane = laneFor(db); lane.waiting++;
@@ -71,5 +84,6 @@ export async function nativeStatement<T>(db: SQLiteDatabase, sql: string,
   record(db, sql, 'finalize', 'complete'); return value as T;
 }
 export function traceTransaction(db: SQLiteDatabase, status: SqlAccessTrace['status'], error?: unknown) {
+  if (status === 'start') transactionIds.set(db.databasePath, ++transactionSequence);
   record(db, 'TRANSACTION', 'transaction', status, error);
 }

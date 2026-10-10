@@ -68,11 +68,12 @@ import { openReactionFixtureMemoryRepository, openReactionMemoryRepository } fro
 import type { RoomPerformanceCapture, RoomPerformanceSummary } from './src/scene/performanceProbe';
 import type { RoomRendererProfileId } from './src/scene/rendererConfig';
 import { RebootReviewScreen } from './src/reboot/RebootReviewScreen';
+import { installStorageDiagnostics, storageDiagnosticsSnapshot } from './src/storage/nativeStorageDiagnostics';
 import { runRequestedNativeProbe } from './src/reboot/nativeEmbedding';
 
 const PET_ID = 'dev-local-pet-1';
 function saveStorageFailureTrace(context: string) {
-  try { new File(Paths.cache, 'arucon-sql-failure.json').write(JSON.stringify({ context, atMs: Date.now(), trace: sqliteAccessTrace() }, null, 2)); }
+  try { new File(Paths.cache, 'arucon-sql-failure.json').write(JSON.stringify({ context, atMs: Date.now(), trace: sqliteAccessTrace(), storage: storageDiagnosticsSnapshot() }, null, 2)); }
   catch { /* Diagnostic export must not replace the actual save error. */ }
 }
 const PREVIEW_ACCOUNT_ID = 'dev-preview-account';
@@ -119,6 +120,7 @@ function growthSummary(view: Awaited<ReturnType<ApprovedMvpService['readGrowthVi
 }
 
 function AppContent({ profile, onProfile: requestProfile }: { profile: RoomProfile; onProfile: (value: RoomProfile) => void }) {
+  useEffect(installStorageDiagnostics, []);
   const experience = profile !== 'original';
   const selected = parseExperienceProfile(profile);
   const scenario = selected?.scenario ?? 'normal';
