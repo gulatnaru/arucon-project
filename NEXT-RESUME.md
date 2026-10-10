@@ -1,3 +1,19 @@
+# Next resume — STORAGE-01 진단 보존 수정 완료 / 원사건 OPEN
+
+[최신 실제 보고](REBOOT-03-2-REPORT.md) / [저장 결함](docs/defects/STORAGE-01-cantopen.md). 소스 **53b9061445a405a691d318e446245f66292aa480**, 설치 **storage-v4 Release SHA `f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6`**,213입력fingerprint `85e7a73fb528d61b8416ce2e26b89384c5e6eec9b71483e4f235ffcf1d28b4b5`. 동일하면불필요재빌드/재설치/DB초기화하지않는다. feature/source/handoff는 `evidence/storage-01-resume-2026-10-10/git-final-audit.json`과현재Git에서직접확인한다.
+
+이번실제작업: v2의live진단0/디스크4로진단복원누락재현→두cache슬롯/엄격한검증·session봉인→같은DBv4설치→기존6건복원→실제격리14/13/20동일요청meal1씩→진단8건→cold/새session/8건정확히같음→이동·직접교감·메뉴복귀.439/439/영향46/46/lint/types/Release/AndroidJS/CNG27/운영42 PASS. 원본31저장/48원본/경제·성장·소유·meal/3DBok 보존. 동일v4정상영상147.975초/실제PTS 보존. v3성능41.79Hz/29.20ms/48.94ms는선행v3로보존하고v4fresh성능으로쓰지않는다.
+
+현재창A/+35·2.5/AA0·일반모션·말풍선ON·awake·정상생활,영구선택null/cold기존자동1.5-AA0/+25.3고품질/2.25여유옵션보존. 아트/계열/성장기/진화형/상점/AI로확대하지않는다.
+
+**다음한작업**: 원사건재발시최초화면/원상태/현재저장과cache의 `arucon-storage-incidents.json`/`arucon-storage-incidents-backup.json`을복사해VFS원인을추적하거나,연결된실기기렌더검증을진행한다. 현재일반저장은정상/재발없음,원래127MiB사건의실제VFS파일·extendederrno는없어OPEN이다. 합성QA로CLOSED하지않는다. 과거오류를새session회복으로오인하지않고DB삭제/시간·재화변경/호스트disk채움/무작정재시도금지. 진단은cache라OSpurge/전원손실영구보존을보장하지않는다.
+
+현재실제iPhone0/AndroidSDK·adb없음. 실기기/GPU/표시FPS/물리입력/발열배터리 NOT_RUN/BLOCKED_ENV_NO_CONNECTED_DEVICE. 연결된iPhone이생기면스스로탐색하되실계정·서명·권한경계는유지한다. 여유약25.6GiB/4GiBbuild사전검사PASS,사용자영상/DB/원본임의삭제없음. Context7plugin공개SDK55문서실제조회성공/프로젝트data전송·새설치·중복등록없음. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 재미/최종아트 USER_REVIEW_PENDING;feature checkpoint/일반push만,main/merge/force/tag/deploy/건강/결제/보안변경금지.
+
+---
+
+## Historical — 앞선 followup-v2 인계
+
 # Next resume — REBOOT-03.2 후속 완료 / STORAGE-01 OPEN
 
 [최신 결과](REBOOT-03-2-REPORT.md). 소스 **d714e24e0d880740ac579cb3432a6a986ca30842**, 설치 **followup-v2 Release SHA `b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941`**,212빌드입력fingerprint `b9851582316199faad077a43c0d139720dc966eacfa7ca307863b1b663887df0`. 동일하면재빌드/재설치/DB초기화하지않는다. 최종인계/원격은 `evidence/reboot-03-2-followup-2026-10-10/git-final-audit.json`과현재Git을대조한다. 기존30+같은아루1/48원본/경제·EXP·소유·meal/3DB 보존.

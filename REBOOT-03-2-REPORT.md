@@ -1,3 +1,49 @@
+# STORAGE-01 재개 결과 — 진단 보존 수정 확인 / 원사건 OPEN
+
+2026-10-10 · SOL_DIRECT / SELF_REVIEW · subagent0 · effective ROUTING_UNVERIFIED.
+
+최신 실제 앱에서도 같은 아루가 생활하고 정상 바닥 이동·직접 접촉·말풍선·메뉴 닫기·cold 복원이 이어졌다. 이번 작업은 새 개편이 아닌 **오류 진단의 보존 결함 수정**이다. A/B/C·아트·경제·성장·수면/동면·SQLite schema/lane/재시도 정책은 보존했다. 렌더는Simulator우선검토2.5/AA0·3고품질·2.25여유옵션 그대로이며 실기기전최종기본값은미확정이다.
+
+## 실제 원인과 수정 범위
+
+출발Git/추적/원격 b58967e, clean. 설치followup-v2 SHA b132…32941/212입력 일치. 실제Mac접근성/스크린샷/정상입력 성공. 디스크캐시4건인데같은cold프로세스live진단0건을실제로확인했다. 캐시를읽지않고새오류에서그파일을덮는경로였다. **DIAG_RESTART_HISTORY_LOSS / INTERRUPTED_DIAGNOSTIC_WRITE는수정검증완료**이며과거CANTOPEN의인과원인이아니다.
+
+최신유효checkpoint를읽어복원하고generation과두cache슬롯을사용한다. 쓰기실패/짧은쓰기/손상된한파일이마지막정상본을덮지않게하고readback으로검증한다. 불러온과거기록은봉인해재실행시connection/transaction/trace번호가재사용돼도새복구로오인하지않는다. 최대8건/cleanup4·파일읽기한계/엄격한타입·필드검사. 게임DB수정/스키마변경/보상재생/삭제/SDK패치/재시도연장없음. OS캐시삭제·power-loss/fsync까지영구보존을보장하지않는다. [ADR-015 추가절](docs/adr/ADR-015-sqlite-access-and-growth-playthrough.md).
+
+## 같은 최종 설치본의 증거
+
+소스 **53b9061445a405a691d318e446245f66292aa480** / 설치 **REBOOT-03.2 storage-v4 Release** SHA `f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6`,213입력fingerprint `85e7a73fb528d61b8416ce2e26b89384c5e6eec9b71483e4f235ffcf1d28b4b5`. v3는선행수정본이며그성능값/영상을v4로표기하지않는다. 데이터초기화없이같은앱에업데이트설치했다. Mac15.6/Xcode26.3/iPhone16e Simulator26.3.1/native1170×2532/Expo55.0.31/SQLite55.0.20/FileSystem55.0.26.
+
+1. v4가v3에서보존된기존6건을정확히복원.
+2. 별도DB에서실제nativeUPDATEexecute14/finalize14,별도pagequotaINSERTexecute13/finalize13. 각실패snapshot전체동일/각동일command20회→meal1/EXP15/integrityok. 원본DB나호스트디스크를손상시키지않음.
+3. 같은검사에서별도retained파일에 **합성incident/합성중단·짧은쓰기**와실제nativeFileIO를사용. 마지막정상checkpoint/첫기록보존, silently짧은쓰기검증거부. 이것을실제기기의디스크Full사건이라고하지않음.
+4. 진단8건→cold재실행→새session/8건전체내용정확히같음. 같은reboot-01:main/아루/Lv1/EXP0/food0/coin0/awake 복원. 실제 이동·목적지변경·직접접촉/메뉴복귀. 일반저장의새로운SQL실패는관찰되지않음.
+5. 최종검토A/+35·2.5/AA0·일반모션·말풍선ON·정상생활로복원. 영구선택null/cold자동1.5-AA0/+25 유지. 수면/동면의장시간GUI전수검사나네진화재시험을새로했다고기록하지않음.
+
+로컬 `evidence/storage-01-resume-2026-10-10/`: 최초v2live0/디스크4, `warm-v4.json`(6)/`native-v4-reliability.json`/`before-cold-v4.json`/`after-cold-v4.json`(8정확히동일),`after-preservation-audit.json`,releasemanifest와실행로그. 최종 **`v4-native-cold-and-input.mp4` 147.975초**,무편집정상속도동일v4의격리검사→cold→정상입력/메뉴저장. 원본PTS/프레임은 `v4-frames/metadata.json`. cold 전환의120초 부근에는 GL 방이 아직 나오지 않은 시작 프레임도 보존했고121초 원본프레임에서방과펫복원을확인했다. `v4-cold-detail/`의밀집프레임과정상복원후입력을구분하며즉시렌더/실제표시지연을측정했다고하지않는다. 앞선v3영상189.520초/84.473초는선행v3증거로보존.
+
+## 성능·자동 검사·보존
+
+439/439(fail0/skip0),영향46/46,lint/typecheck PASS. v4xcodebuild exit0/설치bundlehash/213runtime입력일치. 최종AndroidJS bundle PASS,CNG27/27 STATIC·운영42/42 확인. 실제Androidnative/UI는환경미설치로NOT_RUN.
+
+**이번v3의선행60초영향**: A/+35·2.5/AA0·녹화ON·입력9,제출41.79Hz/RAFp9529.20ms/max55.39ms/입력→제출p9548.94ms/500ms초과0,기존proxy기준PASS. 호스트load5.72→6.97. v4는진단metadata타입검사만추가보강했으며v4fresh성능계측은NOT_RUN. 과거v2의4×180초결과와합산하거나원인비교하지않는다. 실제GPU/표시FPS/물리터치/실기기/발열배터리NOT_RUN. 자동검사/정지화면을실제모션이나GPU측정으로대체하지않음.
+
+원본일반1+기존체험29+같은아루1,48개제작원본,이름·형태·personality·재화·EXP·시설·소유·섭취원장/3DBintegrityok 보존. 일반meal3/체험1155/검토0 그대로. 기존사용자원본/영상/DB 삭제없음. 현재약25.6GiB여유/4GiB사전검사PASS;개발build/cache증가는읽기전용목록으로기록. 실제Health읽기OFF.
+
+Context7은현재**plugin형실제resolve+query성공**,SDK55공식URL/설치55.0.26을대조했다. 공개라이브러리질문만전송했고프로젝트데이터외부전송/중복등록/설치없음. [공식FileSystem55](https://docs.expo.dev/versions/v55.0.0/sdk/filesystem/)와설치iOS string-write의atomically:false를확인했고publicwrite의원자성을가정하지않았다. 별도의호스트감사명령은처음상대출력경로로실패해정정했고실제앱SQLite재현으로세지않음.
+
+## 남은 것
+
+- **[STORAGE-01](docs/defects/STORAGE-01-cantopen.md) 원사건OPEN**:127MiB때의실제VFS파일/extendederrno가없다. 이번진단보존수정/합성재현으로원인을확정하거나CLOSED하지않음. 재발하면오류화면/현재저장/두진단슬롯부터보존하고원본DB를초기화하지않는다.
+- 실제iPhone0개,AndroidSDK/adb미설치.실기기검증 **BLOCKED_ENV_NO_CONNECTED_DEVICE / NOT_RUN**. 데이터USB로iPhone연결/잠금해제/신뢰와개발가능상태확인이필요하다. 실제계정/서명/관리자권한이필요하면그경계는별도로멈춘다.
+- 최종렌더설정·실기기성능·재미·최종아트/크기는사용자검토대기. 다음아트/계열/상점/AI/성장확대없음.
+
+feature의소스/인계checkpoint와일반push만진행하고실제local/tracking/origin일치/clean을 `git-final-audit.json`에보존한다. main/merge/force/tag/deploy/실건강/실결제/보안설정변경없음. 아래는과거완료증거이며최신v4검사횟수/시각검증으로재사용하지않는다.
+
+---
+
+## Historical — REBOOT-03.2 followup-v2
+
 # REBOOT-03.2 후속 마무리 — VISUAL_QUALITY_REVIEW_READY / STORAGE-01 OPEN
 
 2026-10-10 · SOL_DIRECT / SELF_REVIEW · subagent0 · 요청GPT-6.1 Sol Max / effective **ROUTING_UNVERIFIED**.

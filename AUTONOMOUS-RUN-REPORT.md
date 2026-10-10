@@ -1,3 +1,15 @@
+# 최신 실행 — STORAGE-01 진단 보존 수정 / 2026-10-10
+
+b58967e/followup-v2를보존한채live진단0/디스크4로복원누락을직접재현했다. 두cache슬롯/generation·readback·엄격타입검사·세션봉인으로수정. 최종소스53b9061445a405a691d318e446245f66292aa480/storage-v4 SHA `f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6`/213입력일치. 실제격리native14/13 실패원자성·동일20재시도meal1/EXP15씩과별도native파일의합성중단·짧은쓰기복구PASS. 기존6건→8건→cold새session/8건정확히동일→정상이동·교감·메뉴복귀를같은v4영상147.975초/trace로확인했다.
+
+439/439/영향46/46/lint/types/Release/AndroidJS/CNG27/운영42PASS;31저장/48원본/경제·성장·소유·섭취/3DBok 보존. v3선행60초proxy는별도이며v4fresh성능/GPU로쓰지않는다. 2.5AA0우선검토·3고품질·2.25여유/기본A/최종렌더미확정유지.25.6GiB여유/삭제없음. Context7 plugin실제SDK55공개문서조회성공/신규설치·프로젝트외부전송없음.
+
+**원래CANTOPEN의VFS인과원인은OPEN**,진단보존결함만수정확인. 실제iPhone0/AndroidSDK·adb없음→실기기/GPU/물리입력NOT_RUN/BLOCKED_ENV. 재미·최종아트 USER_REVIEW_PENDING. [상세현재결과](REBOOT-03-2-REPORT.md)/[별도결함](docs/defects/STORAGE-01-cantopen.md).SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. Feature소스/보고checkpoint·일반push만;main/merge/deploy/실건강/실결제/보안변경없음. 아래과거결과를최신실행으로재사용하지않는다.
+
+---
+
+## Historical — 앞선 제한된 렌더 후속
+
 # 최신 실행 — REBOOT-03.2 제한된 후속 / 2026-10-10
 
 사용자선명도긍정평가/Simulator2.5AA0우선추천을보존했다. 같은A+35·아루의실제자율생활/연속목적지변경/교감을2.5와3에서새정상영상으로확인했다.4×180초ON2.5→ON3→OFF3→OFF2.5 전proxy PASS,제출58.40/40.84/43.17/56.42Hz/각입력9/긴gap0.3은미세계단이더줄지만비용증가,2.5여유가더크다. 최종기본은실기기전미확정,3/2.25옵션과A/B/C유지.

@@ -1,5 +1,22 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 최신 STORAGE-01 재개 — 2026-10-10
+
+| 항목 | 현재 판정 | 근거 / 남은 범위 |
+|---|---|---|
+| 재실행 후 최초 진단 보존 | PASS_NATIVE_FILE_IO / CLOSED_DIAGNOSTIC_DEFECT | 설치v2의0대4재현→v4두슬롯/세션봉인→8건cold완전동일 |
+| 진단파일 중단·손상 복구 | PASS_NATIVE_WITH_SYNTHETIC_FAULT | 별도실제파일IO/합성중단/짧은쓰기/정상본유지,OSpurge·powerloss영구보장아님 |
+| nativeSQLite14/13 원자성·중복방지 | PASS_NATIVE_ISOLATED | 최종v4/실제execute오류/전체snapshot동일/20재시도각meal1/EXP15 |
+| 정상 앱 입력·cold·보존 | PASS_SIMULATOR / PASS_PRESERVATION | 같은v4/이동·직접접촉·메뉴/31저장48원본/경제·EXP·원장/3DBok |
+| 원래127MiB CANTOPEN 인과원인 | OPEN / EVIDENCE_REQUIRED | 당시VFS실제파일·extendederrno없음.재발원본진단필요,합성검사로종결하지않음 |
+| 실기기/GPU/물리입력 | BLOCKED_ENV / NOT_RUN | 현재실제iPhone0/AndroidSDK·adb없음 |
+| 렌더/아트/재미/최종크기 | NEEDS_DEVICE_VALIDATION / USER_REVIEW_PENDING | 2.5우선/3고품질/2.25여유유지,기본미확정/새아트없음 |
+
+소스53b9061/storage-v4/439검사46영향·Release/AndroidJS/CNG27/운영42PASS. v3의선행성능과v4를구분한다. [현재보고](REBOOT-03-2-REPORT.md).
+
+### Historical — 앞선 제한된 후속
+
+
 ## 최신 제한된 후속 — 2026-10-10
 
 | 항목 | 현재 판정 | 실제 근거 / 남은 범위 |

@@ -4,10 +4,10 @@
   "timezone": "Asia/Seoul",
   "status": "VISUAL_QUALITY_REVIEW_READY",
   "overallGate": "MVP_NOT_COMPLETE",
-  "definition": "REBOOT-03.2 scoped continuous2.5/3 review and separate STORAGE-01 reliability investigation",
-  "reason": "Fresh same followup-v2 Release4x180s actual normal life/input and ON/OFF proxies pass; native isolated14/13 atomic recovery/dedup pass. Original127MiB CANTOPEN VFS cause remains OPEN; final device render pending.",
-  "sourceBaseline": "a0c75f13a642dbc076e76d301516a2d57aa95ef2",
-  "sourceCheckpoint": "d714e24e0d880740ac579cb3432a6a986ca30842",
+  "definition": "Scoped STORAGE-01 first-error diagnostic persistence hardening; original VFS cause and physical render validation pending",
+  "reason": "Actual installedv2 disk4/live0 diagnostic history loss corrected; finalv4 actual native recovery and8 exact records through cold restart pass. Original CANTOPEN VFS cause remains OPEN; physical devices unavailable.",
+  "sourceBaseline": "b58967ec7d805d8c3142c16bdb7ff1ee630a66d4",
+  "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
   "currentLivingReport": "REBOOT-03-2-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
@@ -545,34 +545,36 @@
     ]
   },
   "lastValidation": {
-    "scope": "REBOOT-03.2 final native global visual comparison and minimal input/rest/lifecycle regression",
-    "sourceCheckpoint": "a6218d4c056ed43dcded7a64adbbfaa3288e7554",
-    "sourceManifest": "evidence/reboot-03-2-2026-10-10/release-v5-manifest.json",
+    "scope": "STORAGE-01 finalv4 native diagnostic recovery/cold restoration and normal actual input",
+    "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
+    "sourceManifest": "evidence/storage-01-resume-2026-10-10/release-v4-manifest.json",
     "mobileTests": {
-      "passed": 428,
-      "total": 428,
+      "passed": 439,
+      "total": 439,
       "failed": 0,
       "skipped": 0
     },
-    "impactTests": "109/109 current scene+reboot",
-    "lint": "PASS_FRESH_V5",
-    "typecheck": "PASS_FRESH_V5",
-    "iOSReleaseCompile": "exit0_V5",
-    "iOSInstallLaunch": "PASS_SAME_DB_INSTALL_HASH_ACTUAL_SIMULATOR_INPUT",
-    "androidJsBundle": "PASS_FRESH_V5",
+    "impactTests": "46/46 fresh storage/performance tests",
+    "lint": "PASS_FRESH_V4",
+    "typecheck": "PASS_FRESH_V4",
+    "iOSReleaseCompile": "exit0_V4",
+    "iOSInstallLaunch": "PASS_SAME_DB_HASH213_ACTUAL_SIMULATOR",
+    "androidJsBundle": "PASS_FRESH_V4",
     "cng": "27/27_STATIC_PASS",
     "workflow": "42/42_FRESH_PASS",
-    "actualNormalUiInput": "PASS_V5_MOVE_TOUCH_REST_WAKE_REDUCED_HOME_WIDGET_COLD",
-    "performance": "SameV5_5DPR_AA0_PROXY_PASS; native4/FXAA FRAME_FAIL; physical/GPU_NOT_RUN; history separated",
-    "originalPreservation": "48 original files and31pets;3DBok; all identity/economy/growth/ownership/activity/meal fields equal;209 build inputs match",
+    "actualNormalUiInput": "PASS_V4_MOVE_DIRECT_TOUCH_MENU_COLD_SAMEPET",
+    "diagnosticPersistence": "PASS_V4_6_TO8_COLD_EXACT_EQUAL",
+    "originalCantopenCause": "OPEN_VFS_EVIDENCE_MISSING",
+    "performance": "V4_NOT_RUN;V3_60s_SCOPED_HISTORY;physicalGPU_NOT_RUN",
+    "originalPreservation": "48 original files/31pets/3DBok/identityeconomyEXPownershipmeals unchanged",
     "healthRead": "OFF",
-    "evidence": "evidence/reboot-03-2-2026-10-10/"
+    "evidence": "evidence/storage-01-resume-2026-10-10/"
   },
   "environment": {
     "host": "macOS 15.6",
-    "node": "26.7.0",
+    "node": "v26.7.0",
     "npm": "11.19.0",
-    "androidToolchain": "NOT_INSPECTED_CURRENT_SCOPE; prior inventory retained in historicalLife01Oct02BeforeRestDefect",
+    "androidToolchain": "BLOCKED_ENV: noANDROID_HOME/SDK_ROOT;standardSDK/adbmissing",
     "androidAvd": "preserved historical Windows AVD",
     "healthAccess": "OFF",
     "hostGpu": "Apple Software Renderer",
@@ -580,17 +582,40 @@
     "hostLocked": false,
     "iosRuntime": "26.3.1",
     "xcode": "26.3",
-    "configuration": "REBOOT-03.2 visual-v5 embedded Release;Metro not required",
+    "configuration": "REBOOT-03.2 storage-v4 embedded Release;Metro not required",
     "contentSize": "Preserved normal size; no new large-text matrix this scope",
-    "currentRendererSnapshot": "Current review only A/+35/DPR3AA0/refined/awake/input enabled; cold default A automatic1.5/+25 verified",
+    "currentRendererSnapshot": {
+      "profileId": "quality_250",
+      "requestedDpr": 2.5,
+      "identity": {
+        "renderer": "Apple Software Renderer",
+        "vendor": "Apple Inc.",
+        "version": "OpenGL ES 3.0 APPLE-23.0.2"
+      },
+      "cpuMorphs": true,
+      "logicalWidth": 390,
+      "logicalHeight": 844,
+      "deviceDpr": 3,
+      "bufferWidth": 975,
+      "bufferHeight": 2110,
+      "requestedMsaa": 0,
+      "postprocessAa": "none",
+      "roomCurves": "refined",
+      "maxSamples": 9,
+      "sampleBuffers": 0,
+      "samples": 0,
+      "framebufferStatus": 36053,
+      "error": 0
+    },
     "iosRuntimeLabel": "26.3",
     "iosRuntimeBuild": "23D8133",
     "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
     "isolatedReplayDevice": "FE2B778D-B598-45F3-BE4F-0E1BB3F76A5B",
     "blender": "PROJECT_LOCAL5.2.0_LTS_ACTUAL_BPY_CREATION",
     "figma": "TOOLS_EXPOSED; ACCOUNT_CHOICE_PENDING; NO_SUCCESSFUL_CALL_OR_ARTIFACT",
-    "physicalIosInventory": "devicectl no devices found",
-    "transientDiskPressure": "127MiB coincided with actual capture/storage errors; headroom recovered and same-app native write restored; exact first internal cause not asserted"
+    "physicalIosInventory": "currentdevicectl no devices found",
+    "transientDiskPressure": "127MiB coincided with actual capture/storage errors; headroom recovered and same-app native write restored; exact first internal cause not asserted",
+    "reviewSelection": "A/+35/DPR2.5AA0/awake/inputenabled/normalmotion; cold default A automatic1.5/+25 verified"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
@@ -973,13 +998,13 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "sourceCheckpoint": "d714e24e0d880740ac579cb3432a6a986ca30842",
-    "initialHead": "6ce22c0adf91d374576ea18bd25d1f9b670bfc5f",
+    "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
+    "initialHead": "b58967ec7d805d8c3142c16bdb7ff1ee630a66d4",
     "initialHeadTrackingLiveMatch": true,
     "initialClean": true,
     "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
-    "verificationEvidence": "evidence/reboot-03-2-followup-2026-10-10/git-final-audit.json",
-    "publicationRecordScope": "Limited REBOOT-03.2 follow-up source/report checkpoints, feature only; receipt records final actual publish",
+    "verificationEvidence": "evidence/storage-01-resume-2026-10-10/git-final-audit.json",
+    "publicationRecordScope": "STORAGE-01 diagnostic preservation source/report checkpoints, feature only",
     "publicationState": "Final publication receipt after ordinary push is authoritative",
     "mainPushMergeDeploy": false
   },
@@ -1049,7 +1074,7 @@
       }
     }
   },
-  "evidenceDirectory": "evidence/reboot-03-2-followup-2026-10-10/",
+  "evidenceDirectory": "evidence/storage-01-resume-2026-10-10/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -1785,7 +1810,7 @@
     },
     "evidenceDirectory": "evidence/product-hardening-sol-unlocked-2026-10-04/"
   },
-  "implementedScope": "Global renderer diagnostics, bounded room curve tessellation, neutral idle eyes and same-path input timing/navigation performance; no game/storage/growth/rest/AI expansion",
+  "implementedScope": "Bounded two-slot diagnostic archive/cold restoration/sealed sessions; no art/renderer/game/economy/growth/rest/schema changes",
   "historicalLife02At3a7a6c1": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
     "reason": "Actual current Mac access succeeded. Preserved Rumi20 normal-menu/cold resume passed. A distinct Mori started at EXP0 and reached Lv20 through374 automatic synthetic-fed meals/6150EXP, one real Lv16 mono evolution and20 sequential checkpoints. Latest v5 native150 contention requests and replay protection passed; normal original/profile/input/restore and fixed60-second proxy gates passed. No app change, rebuild, reinstall or DB reset. Physical/GPU/physical latency and fun/final-art approval remain separate.",
@@ -2889,217 +2914,58 @@
   },
   "reboot032": {
     "status": "VISUAL_QUALITY_REVIEW_READY",
-    "sourceCommit": "d714e24e0d880740ac579cb3432a6a986ca30842",
-    "build": "REBOOT-03.2 followup-v2 Release",
-    "bundleSha256": "b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941",
-    "sourceFingerprint": "b9851582316199faad077a43c0d139720dc966eacfa7ca307863b1b663887df0",
-    "baselineSource": "a6218d4",
-    "initialHead": "6ce22c0",
-    "default": "A / automatic DPR1.5-AA0 policy unchanged; cold verified",
-    "reviewSelection": "A/+35/DPR2.5/AA0/awake/normal motion/bubblesON/no forced comparison",
-    "renderRecommendation": "User Simulator priority2.5;3 highquality;2.25 margin retained",
+    "sourceCommit": "53b9061445a405a691d318e446245f66292aa480",
+    "build": "REBOOT-03.2 storage-v4 Release",
+    "bundleSha256": "f63d79852b811c9c6d8971bcf7c6ea06de24e76b768ac66082e0822bc6b086f6",
+    "sourceFingerprint": "85e7a73fb528d61b8416ce2e26b89384c5e6eec9b71483e4f235ffcf1d28b4b5",
+    "baseline": "b58967e / d714e24 / followup-v2",
+    "reviewSelection": "A/+35/DPR2.5/AA0/normal motion/bubblesON/awake/no forced comparison",
+    "default": "A; automatic DPR1.5-AA0/+25 on cold unchanged",
     "finalRenderAdoption": "NEEDS_DEVICE_VALIDATION / UNDECIDED",
     "funFinalArtSize": "USER_REVIEW_PENDING",
-    "performance": [
-      {
-        "profile": "250",
-        "recording": "on",
-        "durationMs": 180000,
-        "rate": 58.397952413266125,
-        "rafP95": 19.979374885559082,
-        "rafMax": 56.63866710662842,
-        "longGaps": 0,
-        "inputP95": 28.437124967575073,
-        "inputCount": 9,
-        "morphP95": 0.7480409145355225,
-        "drawP95": 0.9882919788360596,
-        "queueP95": 17.522624969482422,
-        "gate": [
-          "pass",
-          "pass",
-          "pass",
-          "pass"
-        ],
-        "hostBefore": {
-          "atMs": 1791603905124.776,
-          "load": [
-            4.92138671875,
-            5.08837890625,
-            6.12548828125
-          ],
-          "freeBytes": 32385638400
-        },
-        "hostAfter": {
-          "atMs": 1791604111756.8882,
-          "load": [
-            5.01611328125,
-            5.1025390625,
-            5.904296875
-          ],
-          "freeBytes": 32303824896
-        },
-        "buffer": [
-          975,
-          2110
-        ]
-      },
-      {
-        "profile": "300",
-        "recording": "on",
-        "durationMs": 180000,
-        "rate": 40.83715195553044,
-        "rafP95": 30.776750087738037,
-        "rafMax": 121.5401668548584,
-        "longGaps": 0,
-        "inputP95": 48.99524998664856,
-        "inputCount": 9,
-        "morphP95": 0.7617080211639404,
-        "drawP95": 1.0935001373291016,
-        "queueP95": 28.139957904815674,
-        "gate": [
-          "pass",
-          "pass",
-          "pass",
-          "pass"
-        ],
-        "hostBefore": {
-          "atMs": 1791604156121.6829,
-          "load": [
-            4.86865234375,
-            5.04296875,
-            5.84375
-          ],
-          "freeBytes": 32297267200
-        },
-        "hostAfter": {
-          "atMs": 1791604375342.041,
-          "load": [
-            4.4072265625,
-            4.60986328125,
-            5.453125
-          ],
-          "freeBytes": 32268009472
-        },
-        "buffer": [
-          1170,
-          2532
-        ]
-      },
-      {
-        "profile": "300",
-        "recording": "off",
-        "durationMs": 180000,
-        "rate": 43.1741614411018,
-        "rafP95": 29.14079189300537,
-        "rafMax": 108.34112501144409,
-        "longGaps": 0,
-        "inputP95": 36.56495904922485,
-        "inputCount": 9,
-        "morphP95": 0.7797081470489502,
-        "drawP95": 1.0040829181671143,
-        "queueP95": 25.32604193687439,
-        "gate": [
-          "pass",
-          "pass",
-          "pass",
-          "pass"
-        ],
-        "hostBefore": {
-          "atMs": 1791604400647.76,
-          "load": [
-            4.76611328125,
-            4.6728515625,
-            5.4501953125
-          ],
-          "freeBytes": 32267776000
-        },
-        "hostAfter": {
-          "atMs": 1791604616391.4338,
-          "load": [
-            6.55078125,
-            5.23193359375,
-            5.482421875
-          ],
-          "freeBytes": 32269815808
-        },
-        "buffer": [
-          1170,
-          2532
-        ]
-      },
-      {
-        "profile": "250",
-        "recording": "off",
-        "durationMs": 180000,
-        "rate": 56.41662277307309,
-        "rafP95": 22.363291025161743,
-        "rafMax": 80.75824999809265,
-        "longGaps": 0,
-        "inputP95": 36.17683291435242,
-        "inputCount": 9,
-        "morphP95": 0.8055000305175781,
-        "drawP95": 1.0568749904632568,
-        "queueP95": 19.566833019256592,
-        "gate": [
-          "pass",
-          "pass",
-          "pass",
-          "pass"
-        ],
-        "hostBefore": {
-          "atMs": 1791604640939.863,
-          "load": [
-            6.5537109375,
-            5.3271484375,
-            5.50830078125
-          ],
-          "freeBytes": 32267407360
-        },
-        "hostAfter": {
-          "atMs": 1791604844475.807,
-          "load": [
-            4.30078125,
-            4.8623046875,
-            5.26904296875
-          ],
-          "freeBytes": 32185323520
-        },
-        "buffer": [
-          975,
-          2110
-        ]
-      }
-    ],
-    "performanceScope": "fresh4x180s ON2.5 ON3 OFF3 OFF2.5; JS/CPU submission only; no actual GPU/display/physical latency",
-    "iosActualRegression": "normal life/movement/direct touch/menu/sleep-wake/background-widgettap/cold samepet PASS_SIMULATOR",
     "storageReliability": {
-      "defect": "docs/defects/STORAGE-01-cantopen.md",
-      "status": "OPEN_ORIGINAL_VFS_CAUSE_UNCONFIRMED",
-      "originalFirstKnownFailure": "UPDATE pet_snapshot / execute /14",
-      "originalAttemptedVfsPath": "NOT_CAPTURED",
-      "newDiagnosticVfsScope": "NOT_EXPOSED_BY_EXPO; candidates and connection/transaction/space captured",
-      "nativeResourceRecovery": "PASS_ISOLATED_14_AND_13;failedsnapshotfull_equal;20same_request_to_one_meal15EXP_each",
-      "nativeContention": "PASS150_DIRECT30_TO1_AUTO1_WAKE_REPLAY_EQUAL",
-      "ordinaryIncidentThisRun": "NOT_OBSERVED",
-      "dataResetDeletionRestore": "NONE"
+      "originalStatus": "OPEN_ORIGINAL_VFS_CAUSE_UNCONFIRMED",
+      "diagnosticPersistence": "CLOSED_VERIFIED_V4_NATIVE_AND_COLD",
+      "actualRepro": "v2 persisted4/live0; no prior cache hydration",
+      "fix": "two bounded checkpoints; readback; typed metadata; imported session histories sealed",
+      "nativeCases": "actual native14/13 failure unchanged;20 same requests->one meal15EXP each",
+      "fileCase": "actual nativeFileIO with explicitlySYNTHETIC partial/interrupted write; complete checkpoint retained; no general DB touched",
+      "cold": "prior6 preserved;8 records exact equal after new session",
+      "currentOrdinarySqlErrors": "NOT_OBSERVED",
+      "authoritativeDbSchemaRetryLane": "UNCHANGED",
+      "deletionResetRestore": "NONE",
+      "vfsAttemptedPath": "NOT_EXPOSED_BY_EXPO",
+      "cachePurgePowerLoss": "NOT_GUARANTEED"
     },
-    "preservation": "31pets/48original_inputs/names_forms_personality_economy_exp_ownership_meals/3DB_integrityok",
-    "tests": "432/432 fresh final fail0 skip0;39/39 impact",
+    "preservation": "31pets/48original_inputs/names_forms_personality_economy_exp_ownership_meals/3DBok",
+    "tests": "439/439 final fresh fail0 skip0;46/46 impact",
     "lint": "PASS",
     "typecheck": "PASS",
-    "iosRelease": "PASS_xcodebuild_exit0_sameDB_install_hash",
-    "androidJs": "PASS",
+    "iosRelease": "PASS_exit0_install_sameDB_hash213inputs",
+    "androidJs": "PASS_V4",
     "cng": "27/27 STATIC",
     "workflow": "42/42",
-    "physicalGpuDisplayLatencyHeatBattery": "NOT_RUN",
+    "performanceV3HistoricalImpact": {
+      "scope": "v3 only; not currentv4 measurement; recordingON60sec",
+      "submittedHz": 41.78635282688765,
+      "rafP95": 29.201916933059692,
+      "inputP95": 48.940500020980835,
+      "inputCount": 9,
+      "longGaps": 0,
+      "gate": "PASS_PROXY"
+    },
+    "performanceV4": "NOT_RUN; existing renderer/motion unchanged; no carry-forward current measurement claim",
+    "physicalDevice": "BLOCKED_ENV_NO_CONNECTED_DEVICE; iOS0;AndroidSDKadb_missing",
+    "gpuDisplayFpsPhysicalLatencyHeatBattery": "NOT_RUN",
     "androidNativeUi": "NOT_RUN",
-    "artifactAudit": "READ_ONLY_NO_DELETION;~30GiBfree;evidence7.52/tools1.21/DerivedData1.08GiB;logical/APFS distinction",
-    "mode": "SOL_DIRECT / SELF_REVIEW",
+    "artifactAudit": "READ_ONLY_NO_DELETION;~25.6GiBfree;4GiB preflight PASS",
+    "tools": "Context7 plugin resolve/query SUCCESS forpublicExpoSDK55 docs; noprojectdata/noinstall",
     "requestedModel": "GPT-6.1 Sol Max",
     "effectiveModel": "ROUTING_UNVERIFIED",
     "subagents": 0,
+    "mode": "SOL_DIRECT / SELF_REVIEW",
     "report": "REBOOT-03-2-REPORT.md",
-    "evidence": "evidence/reboot-03-2-followup-2026-10-10/"
+    "evidence": "evidence/storage-01-resume-2026-10-10/"
   },
   "historicalReboot032V5At6ce22c0": {
     "status": "VISUAL_QUALITY_REVIEW_READY",
@@ -3321,5 +3187,268 @@
     "evidence": "evidence/reboot-03-2-2026-10-10/",
     "reviewSelection": "TEMPORARY_A/+35/DPR3/AA0/NORMAL_MOTION/AWAKE/NO_PANEL_OR_REPLAY; final adoption remains null; cold defaults A automatic1.5/+25",
     "glMeasurementScope": "Context first-frame parameters/error, not a continuous GPU error monitor; actual loaded model and images checked separately"
-  }
+  },
+  "historicalStorageFollowupV2AtB58967e": {
+    "status": "VISUAL_QUALITY_REVIEW_READY",
+    "sourceCommit": "d714e24e0d880740ac579cb3432a6a986ca30842",
+    "build": "REBOOT-03.2 followup-v2 Release",
+    "bundleSha256": "b132a81e013c61e4bad7033f48d51e660ce73099d95691f36541f58975232941",
+    "sourceFingerprint": "b9851582316199faad077a43c0d139720dc966eacfa7ca307863b1b663887df0",
+    "baselineSource": "a6218d4",
+    "initialHead": "6ce22c0",
+    "default": "A / automatic DPR1.5-AA0 policy unchanged; cold verified",
+    "reviewSelection": "A/+35/DPR2.5/AA0/awake/normal motion/bubblesON/no forced comparison",
+    "renderRecommendation": "User Simulator priority2.5;3 highquality;2.25 margin retained",
+    "finalRenderAdoption": "NEEDS_DEVICE_VALIDATION / UNDECIDED",
+    "funFinalArtSize": "USER_REVIEW_PENDING",
+    "performance": [
+      {
+        "profile": "250",
+        "recording": "on",
+        "durationMs": 180000,
+        "rate": 58.397952413266125,
+        "rafP95": 19.979374885559082,
+        "rafMax": 56.63866710662842,
+        "longGaps": 0,
+        "inputP95": 28.437124967575073,
+        "inputCount": 9,
+        "morphP95": 0.7480409145355225,
+        "drawP95": 0.9882919788360596,
+        "queueP95": 17.522624969482422,
+        "gate": [
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "hostBefore": {
+          "atMs": 1791603905124.776,
+          "load": [
+            4.92138671875,
+            5.08837890625,
+            6.12548828125
+          ],
+          "freeBytes": 32385638400
+        },
+        "hostAfter": {
+          "atMs": 1791604111756.8882,
+          "load": [
+            5.01611328125,
+            5.1025390625,
+            5.904296875
+          ],
+          "freeBytes": 32303824896
+        },
+        "buffer": [
+          975,
+          2110
+        ]
+      },
+      {
+        "profile": "300",
+        "recording": "on",
+        "durationMs": 180000,
+        "rate": 40.83715195553044,
+        "rafP95": 30.776750087738037,
+        "rafMax": 121.5401668548584,
+        "longGaps": 0,
+        "inputP95": 48.99524998664856,
+        "inputCount": 9,
+        "morphP95": 0.7617080211639404,
+        "drawP95": 1.0935001373291016,
+        "queueP95": 28.139957904815674,
+        "gate": [
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "hostBefore": {
+          "atMs": 1791604156121.6829,
+          "load": [
+            4.86865234375,
+            5.04296875,
+            5.84375
+          ],
+          "freeBytes": 32297267200
+        },
+        "hostAfter": {
+          "atMs": 1791604375342.041,
+          "load": [
+            4.4072265625,
+            4.60986328125,
+            5.453125
+          ],
+          "freeBytes": 32268009472
+        },
+        "buffer": [
+          1170,
+          2532
+        ]
+      },
+      {
+        "profile": "300",
+        "recording": "off",
+        "durationMs": 180000,
+        "rate": 43.1741614411018,
+        "rafP95": 29.14079189300537,
+        "rafMax": 108.34112501144409,
+        "longGaps": 0,
+        "inputP95": 36.56495904922485,
+        "inputCount": 9,
+        "morphP95": 0.7797081470489502,
+        "drawP95": 1.0040829181671143,
+        "queueP95": 25.32604193687439,
+        "gate": [
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "hostBefore": {
+          "atMs": 1791604400647.76,
+          "load": [
+            4.76611328125,
+            4.6728515625,
+            5.4501953125
+          ],
+          "freeBytes": 32267776000
+        },
+        "hostAfter": {
+          "atMs": 1791604616391.4338,
+          "load": [
+            6.55078125,
+            5.23193359375,
+            5.482421875
+          ],
+          "freeBytes": 32269815808
+        },
+        "buffer": [
+          1170,
+          2532
+        ]
+      },
+      {
+        "profile": "250",
+        "recording": "off",
+        "durationMs": 180000,
+        "rate": 56.41662277307309,
+        "rafP95": 22.363291025161743,
+        "rafMax": 80.75824999809265,
+        "longGaps": 0,
+        "inputP95": 36.17683291435242,
+        "inputCount": 9,
+        "morphP95": 0.8055000305175781,
+        "drawP95": 1.0568749904632568,
+        "queueP95": 19.566833019256592,
+        "gate": [
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "hostBefore": {
+          "atMs": 1791604640939.863,
+          "load": [
+            6.5537109375,
+            5.3271484375,
+            5.50830078125
+          ],
+          "freeBytes": 32267407360
+        },
+        "hostAfter": {
+          "atMs": 1791604844475.807,
+          "load": [
+            4.30078125,
+            4.8623046875,
+            5.26904296875
+          ],
+          "freeBytes": 32185323520
+        },
+        "buffer": [
+          975,
+          2110
+        ]
+      }
+    ],
+    "performanceScope": "fresh4x180s ON2.5 ON3 OFF3 OFF2.5; JS/CPU submission only; no actual GPU/display/physical latency",
+    "iosActualRegression": "normal life/movement/direct touch/menu/sleep-wake/background-widgettap/cold samepet PASS_SIMULATOR",
+    "storageReliability": {
+      "defect": "docs/defects/STORAGE-01-cantopen.md",
+      "status": "OPEN_ORIGINAL_VFS_CAUSE_UNCONFIRMED",
+      "originalFirstKnownFailure": "UPDATE pet_snapshot / execute /14",
+      "originalAttemptedVfsPath": "NOT_CAPTURED",
+      "newDiagnosticVfsScope": "NOT_EXPOSED_BY_EXPO; candidates and connection/transaction/space captured",
+      "nativeResourceRecovery": "PASS_ISOLATED_14_AND_13;failedsnapshotfull_equal;20same_request_to_one_meal15EXP_each",
+      "nativeContention": "PASS150_DIRECT30_TO1_AUTO1_WAKE_REPLAY_EQUAL",
+      "ordinaryIncidentThisRun": "NOT_OBSERVED",
+      "dataResetDeletionRestore": "NONE"
+    },
+    "preservation": "31pets/48original_inputs/names_forms_personality_economy_exp_ownership_meals/3DB_integrityok",
+    "tests": "432/432 fresh final fail0 skip0;39/39 impact",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "iosRelease": "PASS_xcodebuild_exit0_sameDB_install_hash",
+    "androidJs": "PASS",
+    "cng": "27/27 STATIC",
+    "workflow": "42/42",
+    "physicalGpuDisplayLatencyHeatBattery": "NOT_RUN",
+    "androidNativeUi": "NOT_RUN",
+    "artifactAudit": "READ_ONLY_NO_DELETION;~30GiBfree;evidence7.52/tools1.21/DerivedData1.08GiB;logical/APFS distinction",
+    "mode": "SOL_DIRECT / SELF_REVIEW",
+    "requestedModel": "GPT-6.1 Sol Max",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "subagents": 0,
+    "report": "REBOOT-03-2-REPORT.md",
+    "evidence": "evidence/reboot-03-2-followup-2026-10-10/"
+  },
+  "historicalEnvironmentBeforeStorage53b9061": {
+    "host": "macOS 15.6",
+    "node": "26.7.0",
+    "npm": "11.19.0",
+    "androidToolchain": "NOT_INSPECTED_CURRENT_SCOPE; prior inventory retained in historicalLife01Oct02BeforeRestDefect",
+    "androidAvd": "preserved historical Windows AVD",
+    "healthAccess": "OFF",
+    "hostGpu": "Apple Software Renderer",
+    "softwareEmulator": "software_balanced, 1.5 DPR, vertex-lit material, sparse CPU morph, public flushEXP queue barrier; no fixed frame cap",
+    "hostLocked": false,
+    "iosRuntime": "26.3.1",
+    "xcode": "26.3",
+    "configuration": "REBOOT-03.2 visual-v5 embedded Release;Metro not required",
+    "contentSize": "Preserved normal size; no new large-text matrix this scope",
+    "currentRendererSnapshot": "Current review only A/+35/DPR3AA0/refined/awake/input enabled; cold default A automatic1.5/+25 verified",
+    "iosRuntimeLabel": "26.3",
+    "iosRuntimeBuild": "23D8133",
+    "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
+    "isolatedReplayDevice": "FE2B778D-B598-45F3-BE4F-0E1BB3F76A5B",
+    "blender": "PROJECT_LOCAL5.2.0_LTS_ACTUAL_BPY_CREATION",
+    "figma": "TOOLS_EXPOSED; ACCOUNT_CHOICE_PENDING; NO_SUCCESSFUL_CALL_OR_ARTIFACT",
+    "physicalIosInventory": "devicectl no devices found",
+    "transientDiskPressure": "127MiB coincided with actual capture/storage errors; headroom recovered and same-app native write restored; exact first internal cause not asserted"
+  },
+  "historicalValidationBeforeStorage53b9061": {
+    "scope": "REBOOT-03.2 final native global visual comparison and minimal input/rest/lifecycle regression",
+    "sourceCheckpoint": "a6218d4c056ed43dcded7a64adbbfaa3288e7554",
+    "sourceManifest": "evidence/reboot-03-2-2026-10-10/release-v5-manifest.json",
+    "mobileTests": {
+      "passed": 428,
+      "total": 428,
+      "failed": 0,
+      "skipped": 0
+    },
+    "impactTests": "109/109 current scene+reboot",
+    "lint": "PASS_FRESH_V5",
+    "typecheck": "PASS_FRESH_V5",
+    "iOSReleaseCompile": "exit0_V5",
+    "iOSInstallLaunch": "PASS_SAME_DB_INSTALL_HASH_ACTUAL_SIMULATOR_INPUT",
+    "androidJsBundle": "PASS_FRESH_V5",
+    "cng": "27/27_STATIC_PASS",
+    "workflow": "42/42_FRESH_PASS",
+    "actualNormalUiInput": "PASS_V5_MOVE_TOUCH_REST_WAKE_REDUCED_HOME_WIDGET_COLD",
+    "performance": "SameV5_5DPR_AA0_PROXY_PASS; native4/FXAA FRAME_FAIL; physical/GPU_NOT_RUN; history separated",
+    "originalPreservation": "48 original files and31pets;3DBok; all identity/economy/growth/ownership/activity/meal fields equal;209 build inputs match",
+    "healthRead": "OFF",
+    "evidence": "evidence/reboot-03-2-2026-10-10/"
+  },
+  "historicalSourceBaselineBeforeStorage53b9061": "a0c75f13a642dbc076e76d301516a2d57aa95ef2"
 }
