@@ -1,5 +1,23 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 최신 REBOOT-04 동일 조건 재감사 — 2026-10-11
+
+| 범위 | 판정 | 실제 근거 / 남은 범위 |
+|---|---|---|
+| 같은 조건3종 제품 비교 | PREPARED / PASS_SIMULATOR_SCOPED | v6·같은초기상태/4합성경험/RNG/쿠션·quad+35/2.5AA0·라벨/대사숨김 정상영상3개 |
+| 시선·접근·체중/발·머무름·후속생활 | SELF_REVIEW / USER_REVIEW_PENDING | 정상손연결 차이확인, 정지얼굴만구별은약함; 유형판독/선호는사용자대기 |
+| 프레임 안정성 | OPEN / FAIL_EXISTING_BUDGET | 동일30준비/60OFF/6입력/역순6회 RAF모두FAIL, GL대기지배·host변동; v6 hull진단혼합결과·기본채택없음 |
+| 입력→제출·긴gap | PASS_PROXY_SCOPED | 표준12창 각6입력/100ms이내/500ms초과0; GPU/표시/물리지연아님 |
+| 시간·수면/동면·경제·저장 보존 | PASS_REGRESSION_AND_PRESERVATION | 새456검사·기존34저장/5원장/48원본/진단8/3DBok; 신규합성18경제0; native장기경계이번미실행 |
+| CANTOPEN 원래VFS 원인 | OPEN | 정상저장/성격비교로닫지않음 |
+| 현재플랫폼 | iOS_SIMULATOR_SCOPED / Android_JS_PASS | v6Releaseexit0·실제입력·CNG27static; Androidnative/UI·기기/GPU이번NOT_RUN |
+| 성장에따른성격형성/16종/성장형/상점/AI | NOT_COMPLETED / OUT_OF_SCOPE | 기존interface보존; 사용자성격평가전확대없음 |
+| 재미·최종아트·크기·성격표현 | USER_REVIEW_PENDING | 현재비교준비와사용자승인분리 |
+
+[후속보고](REBOOT-04-REPORT.md) / [PERF-01](docs/defects/PERF-01-personality-raf.md). **전체MVP/성능READY 아님.** 아래v4결과는당시증거로보존한다.
+
+### Historical — 2026-10-10 대표3종
+
 ## 최신 REBOOT-04 대표 3종 검토 — 2026-10-10
 
 | 범위 | 판정 | 실제 근거 / 남은 범위 |

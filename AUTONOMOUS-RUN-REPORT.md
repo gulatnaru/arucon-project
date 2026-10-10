@@ -1,3 +1,15 @@
+# 최신 실행 — REBOOT-04 동일 조건 비교·성능 추적 / 2026-10-11
+
+[실제 결과](REBOOT-04-REPORT.md), [PERF-01](docs/defects/PERF-01-personality-raf.md). 소스ecd62de/설치comparison-v6/220manifest입력·JS/native 직접 대조. 원래3종 경험을 초기화하지 않고 같은상태/4합성경험/가구/RNG/quad+35/2.5AA0인 새비교개체에서 이름/대사를 가린 정상 관찰→손 제안→접촉→해제→생활복귀 영상3개를 남겼다. 성장에 따른 형성 완료가 아니며 정지얼굴만의 구별은약하다. 사용자 성격/재미/아트 평가는대기.
+
+성격 비교준비 PREPARED, **성능 OPEN**. 준비30/측정60/6입력/OFF의P W D D W P에서 RAF p9536.64/41.87/41.57/44.27/42.23/43.41 모두기준FAIL. GL동기대기가주요측정비용, 호스트부하/압축메모리도변동. 같은v6 hull뒷면제외 실험은혼합결과라기본채택없음;tail/원래양면·해상도/표정/행동/기준유지. 입력p95/gap통과를전체성능통과로바꾸지않고GPU/표시FPS/물리지연/실기기NOT_RUN.
+
+새456/456·영향78/78/lint/types/v6Release exit0/AndroidJS/CNG27static PASS. 기존34저장/48원본/경제5원장/진단8/3DBok, 도도만착수당시정상완료4건/64한계정리. 새합성18의경제/EXP/meal0. CANTOPEN VFS원인OPEN. 실제소스/문서 체크포인트와일반push는feature안에서만. 8/16유형·성장형·상점·AI·새아트확대없음. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 최종운영42/42·validator직접회귀1/1 PASS, Git동기화는후속audit에기록.
+
+---
+
+## Historical — 2026-10-10 대표3종
+
 # 최신 실행 — REBOOT-04 대표 3종 / 2026-10-10
 
 [실제 결과](REBOOT-04-REPORT.md), [성격·기억 계약](docs/personality-foundation.md). 장난은 통통·앞발 장난·돌아보기, 다정은 눈맞춤·기대기, 도도는 긴 살핌·자기 템포·시선 회피를 같은 공통 네발 후보에서 비교했다. 성격 검토 범위는 PERSONALITY_3_REVIEW_READY이며 사용자 재미·아트·크기·성격 채택은 대기한다. 전체 MVP와 성능 sign-off는 미완료다.

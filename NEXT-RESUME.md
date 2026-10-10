@@ -1,3 +1,23 @@
+# Next resume — REBOOT-04 동일 조건 비교 / 성능 OPEN
+
+[최신 보고](REBOOT-04-REPORT.md), [PERF-01](docs/defects/PERF-01-personality-raf.md). 소스 **ecd62de** / 설치 **reboot-04-comparison-v6 Release arm64 Simulator ad hoc**. JS `76c65a6aab58e73cf40c48f2e8471a8811dce3c69a490880ab9a51a754bf82e8`, native `8d9eb22e3d9d59d220c2694a6797fae537dcc398747113634b82169052ccec38`, 220입력 fingerprint `89ddabb443be94a050a05fc908dcfe6b741fde8f59ee377352dd075763a0fdf7`. 실제 HEAD/dirty/원격/설치 해시를 먼저 직접 대조하고 같으면 재빌드·재설치·DB 초기화하지 않는다. 최종 handoff는 현재Git과 후속 evidence의 git-final-audit.json을 따른다.
+
+동일 조건3종 비교 PREPARED / 실제 정상 입력 영상3개와 비언어 연결 확인. **PERF-01 OPEN / 전체 프레임 기준 미달**. 원래 렌더 v5 6×60초 역순 반복 RAF 모두FAIL; 같은v6 hull 실험은 일관 이득이 없어 채택하지 않았다. 기본tail/원래양면·2.5AA0/일반표정·행동·기준 유지. 입력6회 p95≤100ms/gap>500ms0은 프레임PASS의 대체가 아니다. 실기기/GPU/표시FPS/물리 지연/발열·배터리 NOT_RUN.
+
+사용자 비교: 일반 방 ☰→설정→REBOOT-04 성격 검토판→우리 아이→합성 동일조건 성격 비교→3종 선택→동일 조건 비교 시작. asset-ready/30초 준비 뒤 정상 선택. 말풍선/성격명은 방에서 숨김. 손 내밀기/거두기는 검토도구다. 같은4개 합성 seed와 고정 경제시계로 새 소유자만 만들고 원래3종 기억은 그대로다. 실제 관찰/입력 지연·위치 변화는 trace/PTS에 표시하며 밀리초까지 같은 자극이라고 주장하지 않는다. 성장에 따른 형성 완료가 아니다.
+
+후속 증거: evidence/reboot-04-followup-2026-10-11/의 matched-*-v6.mp4(각약130초)/P,W,D frames/native metadata/matched-flow-summary.json/performance-summary.json/각host/보존감사. 영상 제품 흐름과 OFF 성능6입력은 별도다. 과거v4 수치/영상이나 최근10초live값을 최신60초 결과로 재사용하지 않는다. 정지 얼굴만의3종 구별은 약하며 최종 성격·재미·아트·크기는 USER_REVIEW_PENDING.
+
+기존34저장/48원본/경제5원장/진단8/3DBok 보존. main/playful/warm 기억 exact, 기존 도도의 정상자율4건/revision900→904/64한계 정리만 별도 기록했다. 새합성18은coin/food/EXP/meal0. 원래DB와 앞뒤백업 보존. **STORAGE-01 정확한 CANTOPEN VFS 원인 OPEN**. 건강·결제OFF/일반위젯 보존, 새로운 실제위젯탭/장기native시간검증은 이번NOT_RUN. 자동456/456·영향78/78/lint/types/v6Release/AndroidJS/CNG27static PASS; 최종운영42/42·validator직접회귀1/1 PASS.
+
+**다음 한 작업:** 사용자에게3종 동일조건 영상을 보여주고 성격 표현을 평가하거나, 동등한 조건의 호스트 안정 반복/연결된 기기에서 PERF-01 병목을 분리한다. 확인되지 않은 CPU/예약 원인을 임의 수정하지 않는다. 해상도/행동을 줄이거나 좋았던 구간만 선택하지 않는다. 기존 입력/수면/동면/저장서비스를 다시 만들지 않는다. 사용자 평가 전8/16·새성장/진화·상점·AI 확대 없음.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. feature 체크포인트/일반push만, main/merge/force/tag/release/deploy/실건강/실결제/보안/외부영상업로드 금지.
+
+---
+
+## Historical — 2026-10-10 v4 인계
+
 # Next resume — REBOOT-04 대표 3종 검토판
 
 [최신 실제 보고](REBOOT-04-REPORT.md) / [계약·도달표](docs/personality-foundation.md). 소스 **8f0602a**, 설치 **reboot-04-personality-v4 Release arm64 / Simulator ad hoc**, JS SHA `88f355ddaaced224a7d90aec870d57332e59aeaff0632f691ef0a50da40c9951`, nativeSHA `6667f8a8309beb7830d670103cc1c7aec596c5a80078d454bc77dc098c2a424e`, 입력fingerprint `fd6c7fce800a9838421717b690baa21684df6e0c9dd9b72de39d98769c205757`. 현재 Git/설치 해시를 먼저 대조하고 같으면 재빌드/재설치/DB 초기화하지 않는다. 최종 handoff/remote는 로컬 git-final-audit.json과 현재 Git에서 확인한다.
