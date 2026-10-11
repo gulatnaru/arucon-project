@@ -6,7 +6,7 @@
     {
       "name": "AGENTS under 32KiB",
       "ok": true,
-      "detail": "11861"
+      "detail": "12054"
     },
     {
       "name": "SOL_DIRECT product hardening explicit in root instructions",

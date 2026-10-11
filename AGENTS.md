@@ -19,6 +19,7 @@
 - 실기기·GPU·물리 입력 성능 NOT_RUN, 재미·최종 아트 USER_REVIEW_PENDING을 유지한다. 기존 feature checkpoint/일반 push만 허용하며 main/merge/deploy/실건강/실결제 권한은 확대하지 않는다.
 
 ## 안내판
+- UI·플레이 변경의 사용자 검토 완료 보고에는 `docs/remote-video-delivery.md`의 실제 MP4 전달 절차와 VIDEO_READY/DELIVERY_SENT/휴대폰 확인 구분을 적용한다.
 - LIFE-01 실행 이력: `tasks/LIFE-01-autonomous-growth-resume.md` — 화면 복구 후 자율 생활·성장·발견을 검증했다. 당시 ASTRA_DIRECT/SELF_REVIEW 증거는 보존하며 현재 운영은 SOL_DIRECT를 따른다.
 - LIFE-00 개편 이력: `tasks/LIFE-00-living-pet-overhaul.md` — 2026-09-29 ASTRA_DIRECT 직접 구현·검증. FUN의 관련 UX·행동·아트 기준과 과거 증거를 계승하며 현재 운영은 SOL_DIRECT다. 재미·최종 아트는 USER_REVIEW_PENDING이다.
 - FUN-00 개편: `tasks/FUN-00-overhaul.md`, `docs/fun-first-plan.md` — 기존 저장/정책/원본을 보존한 플레이 개편. 체형 두 후보 제작은 허용하며 최종 재미·아트는 USER_REVIEW_PENDING이다.

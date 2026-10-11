@@ -3816,5 +3816,23 @@
     "notes": "Existing normal review memory retention retired31 playful/16 poised old events; before backups preserved; current moved cushion fact restored. Normal service sleep/hibernate recovery, no direct DB state edits.",
     "workflow": "42/42 PASS",
     "workflowValidatorDirect": "1/1 PASS"
+  },
+  "videoDelivery": {
+    "rule": "docs/remote-video-delivery.md",
+    "videoStatus": "VIDEO_READY",
+    "deliveryStatus": "DELIVERY_BLOCKED",
+    "mobilePlayback": "NOT_VERIFIED",
+    "build": "reboot-04-emotion-v10",
+    "source": "ef32ac36c0532d83120636bedb1fea2fe4e4e503",
+    "fileName": "arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
+    "localManifest": "evidence/remote-delivery-v10/delivery-manifest.json",
+    "durationSeconds": 124,
+    "bytes": 19791087,
+    "sha256": "1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4",
+    "actualUpload": false,
+    "approvedPrivateRoute": null,
+    "routeConfirmationRequestedOnce": true,
+    "directAttachmentBlock": "No exposed MP4 chat attachment tool; actual Codex UI access rejected by CUA safety policy",
+    "rebuildReinstallDbReset": "NONE"
   }
 }

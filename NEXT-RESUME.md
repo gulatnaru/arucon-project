@@ -1,3 +1,24 @@
+# Next resume — v10 MP4 원격 전달 대기
+
+[전달 규칙](docs/remote-video-delivery.md)을 앞으로 UI·플레이 사용자 검토 완료 보고에 적용한다. 앱은 기존 **reboot-04-emotion-v10 / 소스 ef32ac3**와 설치 해시가 일치한다. 이번 작업은 기존 영상 포장만 했으며 앱/DB 변경·재빌드·재설치가 없다.
+
+- 파일: `evidence/remote-delivery-v10/arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4`
+- 생성: **VIDEO_READY** / 실제 전송: **DELIVERY_BLOCKED** / 휴대폰 재생: **NOT_VERIFIED**.
+- 124초(2:04), 19,791,087bytes(18.87MiB), native1170×2532/H.264 8-bit YUV420/fast-start. 전체 7,646프레임 decode PASS, 무음 원본이므로 음성 추가 없음. 정상속도 passthrough 편집, 원본 보존.
+- SHA256 `1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4`. `delivery-manifest.json`에 모든 컷/원본 시간/빌드/디코딩 근거가 있다.
+- 0:00 장난 대사ON/접촉/복원; 0:33 다정 기대기/대사; 0:53 같은 다정 긴 유지의 끝으로 컷(원본85→179초,94초 생략)/메뉴 취소; 1:04 도도 접촉/해제/생활; 1:44 쿠션 이동/사용/대사.
+- 원본: speech-objects-v10 136–169초, warm-speech-v10 65–85초 및179–190초, poised-speech-v10 14–54초, speech-objects-v10 212–232초. 합본은 무편집 연속 검증이 아니다. 다정 끝은 취소이며 완료 복원으로 표현하지 않는다.
+
+현재 도구 목록에는 대화 MP4 직접첨부 도구가 없다. PR 첨부·이미지 전용 도구를 MP4로 오용하지 않았다. 실제 Codex 첨부 UI를 확인하려고 CUA getApp을 호출했으나 com.openai.codex 접근이 도구 안전 정책으로 거부됐다. 사용자 Mac 보안 설정을 바꾸거나 UI 우회를 하지 않았다. Pages 파일업로드는 승인된 대상 Page가 필요하고10MiB 제한이 있어 직접 대화 첨부 대체로 사용하지 않았다. Google Drive/Dropbox는 검색 가능하지만 현재 미설치·미연결이다.
+
+**다음 한 작업:** 사용자가 한 번 요청받은 개인 비공개 서비스/폴더와 대상 계정을 승인하면, 그 경로의 권한과 실제 업로드/동기화를 확인하고 이 MP4만 전달한다. 승인된 경로는 이후 같은 목적에 재사용한다. 현재 승인 경로는 없음이며 질문은 이미 제시했으므로 중복 질문하지 않는다. 공개 업로드·터널·포트개방·회사 계정·영상 Git 추가 금지. 새 경로 승인이 없으면 DELIVERY_BLOCKED 유지. 전송 성공만으로 휴대폰 재생을 승인하지 않는다.
+
+기존 아래 로컬 review.html/localhost/절대경로는 Mac 위치 안내이며 원격 전달 완료가 아니다. 폰 재생을 사용자가 확인한 경우에만 MOBILE_CONFIRMED로 바꾼다.
+
+---
+
+## Historical — v10 개발 인계
+
 # Next resume — REBOOT-04 감정·방 후속 v10
 
 [최신 보고](REBOOT-04-REPORT.md), [사용자 전체 지시](tasks/REBOOT-04-emotion-room-followup.md). 소스 **ef32ac3**, 설치 **reboot-04-emotion-v10 Release arm64 Simulator ad hoc**. 시작0eb1156, 원격/현재HEAD는 직접 조회한다. 현재 소스227입력 fingerprint `eb87ef1fd1983a566c4adcbc947ad202e2e40abef27718184887617a134992e4`, JS `13468021d564af51f4a6fadd9284aa4772780428736daa77e1a7d3664a5c9bb7`, native `aa2bbafad29819da70a6271959fb742d70ea5bb87778a4c5b3904883d311ffd2`. 설치/소스가 같으면 재빌드·재설치·DB 초기화하지 않는다.
