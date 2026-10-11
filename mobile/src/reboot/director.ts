@@ -43,11 +43,12 @@ export class RebootDirector {
   private emit(phase: RebootEvent['phase']) {
     if (!this.intent || !this.view) return;
     const baby = this.intent.baby ? currentBabyBeat(this.intent.baby, this.intent.elapsed) : undefined;
+    const handActing = this.intent.handPlan && phase === 'contact' ? sampleHandContact(this.intent.handPlan, this.intent.elapsed) : undefined;
     this.ports.event({ ...this.intent.command, ...(this.view.personality ? { personalityId: this.view.personality.foundation.profileId, selectionReason: this.selectionReason, randomState: this.randomState } : {}), phase, automatic: this.intent.automatic, stage: this.view.stage,
       ...(this.intent.baby ? { babyMode: true } : {}),
       ...(this.intent.command.kind === 'hand' ? { touchRegion: this.intent.touchRegion } : {}),
-      ...(this.intent.handPlan && phase === 'contact' ? { handActing: sampleHandContact(this.intent.handPlan, this.intent.elapsed), handContext: this.intent.handPlan.context, handStyle: this.intent.handPlan.style } : {}),
-      ...(baby && phase === 'contact' ? { babyBeat: baby.beat.id, expression: baby.beat.expression,
+      ...(handActing ? { handActing, handContext: this.intent.handPlan!.context, handStyle: this.intent.handPlan!.style } : {}),
+      ...(baby && phase === 'contact' ? { babyBeat: handActing?.beat ?? baby.beat.id, expression: handActing?.expression ?? baby.beat.expression,
         touchRegion: this.intent.touchRegion, memoryIds: this.intent.baby?.rememberedHandId ? [this.intent.baby.rememberedHandId] : [] } : {}),
       ...(['rest', 'cushion_changed'].includes(this.intent.command.kind) ? { currentTarget: this.view.cushion } : {}),
       ...(this.intent.command.kind === 'cushion_changed' && this.intent.command.target ? { rememberedPosition: this.intent.command.target } : {}) });
@@ -130,7 +131,7 @@ export class RebootDirector {
     const currentBeat = i.baby ? currentBabyBeat(i.baby, i.elapsed) : undefined;
     const handActing = i.handPlan && i.phase === 'contact' ? sampleHandContact(i.handPlan, i.elapsed)
       : i.handPlan && i.releaseHand && i.phase === 'recover' ? sampleHandRelease(i.handPlan, i.releaseHand, i.elapsed) : undefined;
-    if (currentBeat && i.phase === 'contact' && (i.beatIndex !== currentBeat.index || handActing && i.handBeat !== handActing.beat)) {
+    if (currentBeat && i.phase === 'contact' && (handActing ? i.handBeat !== handActing.beat : i.beatIndex !== currentBeat.index)) {
       i.beatIndex = currentBeat.index; i.handBeat = handActing?.beat; this.emit('contact');
     }
     this.pose = { ...(w.view.personality ? { personalityId: w.view.personality.foundation.profileId } : {}), kind: i.command.kind, phase: i.phase,
@@ -142,10 +143,15 @@ export class RebootDirector {
             : i.phase === 'recover' ? { id: 'look_back', seconds: recoveryDuration, expression: 'content' as const } : currentBeat.beat,
         progress: i.phase === 'contact' ? currentBeat.progress : Math.min(1, i.elapsed / recoveryDuration), touchStyle: i.baby?.touchStyle,
         rememberedHandId: i.baby?.rememberedHandId } } : {}),
-      ...(i.command.kind === 'hand' && i.command.target ? { gazeTarget: i.command.target } : {}),
-      ...(i.command.kind === 'cushion_changed' && i.phase === 'look' ? { gazeTarget: i.command.target ?? w.view.cushion } : {}),
+      ...(i.command.target && (i.phase === 'look' || i.command.kind === 'hand') ? { gazeTarget: i.command.target } : {}),
+      ...(i.command.kind === 'cushion_changed' && i.phase === 'look' ? { gazeTarget: i.command.observation === 'witnessed' ? w.view.cushion : i.command.target ?? w.view.cushion } : {}),
       ...(['rest', 'cushion_changed'].includes(i.command.kind) ? { dockTarget: w.view.cushion } : {}) };
-    if (i.baby && ['contact', 'recover'].includes(i.phase) && i.command.kind !== 'hand') this.pose.gazeTarget = { x: 0, z: 4.3 };
+    if (i.baby && ['contact', 'recover'].includes(i.phase) && i.command.kind !== 'hand') {
+      // Attend to the actual object first; checking the user is a finishing
+      // beat, not the same compulsory camera-facing pose throughout a scene.
+      this.pose.gazeTarget = ['look_back', 'paw_offer', 'lean', 'side_nuzzle'].includes(currentBeat?.beat.id ?? '') || i.phase === 'recover'
+        ? { x: 0, z: 4.3 } : i.command.kind === 'cushion_changed' ? w.view.cushion : i.command.target;
+    }
     if (i.handPlan?.profile === 'poised' && i.phase === 'recover' && i.elapsed > .25 && this.touched?.command.target)
       this.pose.gazeTarget = this.touched.command.target;
     // Remembered coordinates are a glance only; route/dock always use current truth.

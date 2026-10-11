@@ -35,13 +35,18 @@ test('owned Expo iOS postprocess facade maps WebGL BACK to the managed FBO color
  const calls:number[][]=[];const gl={BACK:1029,COLOR_ATTACHMENT0:36064,id:7,drawBuffers(xs:number[]){assert.equal(this,gl);calls.push(xs);},getId(){assert.equal(this,gl);return this.id;}};
  assert.equal(expoRenderContext(gl,false),gl);const c=expoRenderContext(gl,true);c.drawBuffers([c.BACK]);c.drawBuffers([c.COLOR_ATTACHMENT0]);assert.deepEqual(calls,[[36064],[36064]]);assert.equal(c.getId(),7);assert.equal(c.getId,c.getId);assert.notEqual(c,gl);
 });
-test('all A/B/C neutral idle returns equal eyes while explicit playful keeps the intended wink',async()=>{
+test('all A/B/C neutral idle returns equal eyes; a short paw gesture can wink and playful alone cannot lock it',async()=>{
  for(const f of ['reboot-02/baby-gait.glb','reboot-03/blender-baby.glb','reboot-03-1/hybrid-baby.glb']){
   const b=await readFile(new NodeURL('../../assets/'+f,import.meta.url));const {scene:m}=await parseGlb(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)as ArrayBuffer);
   const root=new THREE.Group();const playful=sampleArtComparison('playful','front',1.5).pose;
   for(let i=0;i<60;i++)applyBabyPose(root,m,playful,0,1/60,false,false,true);
   const l=m.getObjectByName('Eye_L')as THREE.Mesh,r=m.getObjectByName('Eye_R')as THREE.Mesh;
-  assert.equal(l.morphTargetInfluences![l.morphTargetDictionary!.Blink],.92);assert.equal(r.morphTargetInfluences![r.morphTargetDictionary!.Blink],0);
+  assert.equal(l.morphTargetInfluences![l.morphTargetDictionary!.Blink],0);assert.equal(r.morphTargetInfluences![r.morphTargetDictionary!.Blink],0);
+  const gesture={...playful!,baby:{...playful!.baby!,beat:{id:'paw_flick',seconds:1,expression:'playful' as const},progress:.30}};
+  applyBabyPose(root,m,gesture,0,1/60,false,false,true);
+  assert.ok(l.morphTargetInfluences![l.morphTargetDictionary!.Blink]>.85);assert.equal(r.morphTargetInfluences![r.morphTargetDictionary!.Blink],0);
+  applyBabyPose(root,m,{...gesture,baby:{...gesture.baby,progress:.6}},0,1/60,false,false,true);
+  assert.equal(l.morphTargetInfluences![l.morphTargetDictionary!.Blink],0);
   for(let i=0;i<90;i++)applyBabyPose(root,m,undefined,0,1/60,false,false,true);
   for(const eye of [l,r])assert.ok(eye.morphTargetInfluences!.every(w=>Math.abs(w)<1e-7));
   // BufferGeometry.computeBoundingBox includes all morph target extremes; that

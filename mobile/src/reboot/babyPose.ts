@@ -21,7 +21,9 @@ function rigFor(model: THREE.Object3D): Rig {
   rigs.set(model, rig); return rig;
 }
 const faceTargets: Record<BabyExpression, Record<string, number>> = {
-  curious: { Curious: .9, Lift: .72, Smile: .15 },
+  // The archived C Curious key deliberately enlarges only the left eye. Shared
+  // interest uses the existing symmetric open-eye key; a wink is a brief act.
+  curious: { Surprised: .34, Lift: .58, Smile: .15 },
   excited: { Happy: .65, Open: .68, Smile: .24, Lift: .35 },
   playful: { Mischief: .12, Playful: .95 },
   surprised: { Surprised: .94, Open: .97, Lift: .95 },
@@ -70,7 +72,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
       targetRotation.y = .32 * Math.sin(p * Math.PI * 2) * weight * soft;
     } else if (id === 'yawn') targetRotation.x = -.085 * pulse * weight * soft;
     else if (id === 'look_back' || id === 'hat_show') targetRotation.z = .07 * pulse * weight * soft;
-  } else if (pose?.phase === 'look') targetRotation.y = Math.sin(time * 4.5) * .16 * soft;
+  } else if (pose?.phase === 'look') targetRotation.x = -.035 * soft;
   if (style && !hand) {
     targetPosition.multiplyScalar(style.bodyAmplitude); targetRotation.multiplyScalar(style.bodyAmplitude);
     if (pose?.phase === 'look') targetRotation.y += style.gazeAside;
@@ -89,15 +91,16 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   if (rig.paw) { rig.paw.position.y += rig.pawLift; rig.paw.position.z += rig.pawReach; }
   if (rig.leftPaw) rig.leftPaw.position.y += rig.leftPawLift;
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
-  // An awake idle is not a perpetual asymmetric Curious expression. Explicit
-  // curiosity/play/wink scenes keep their authored asymmetry on all three rigs.
+  // An awake idle is neutral. Authored asymmetric keys remain in original assets.
   const targets: Record<string, number> = neutral || !baby ? {} : { ...faceTargets[expression], ...(style && !hand ? {
     Smile: style.smile, Happy: Math.max(faceTargets[expression].Happy ?? 0, style.happy),
     Mischief: Math.max(faceTargets[expression].Mischief ?? 0, style.mischief) } : {}) };
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
     rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) * (hand?.faceStrength ?? 1) - (rig.weights[name] ?? 0)) * alpha;
   const blink = Math.pow(Math.max(0, Math.sin(time * (expression === 'sleepy' ? .7 : 1.3))), 24);
-  const wink = hand ? hand.wink : expression === 'playful' ? .92 : 0;
+  const beatSeconds = p * (baby?.beat.seconds ?? 0);
+  const wink = hand ? hand.wink : contact && id === 'paw_flick' && beatSeconds > .18 && beatSeconds < .42
+    ? .9 * Math.sin((beatSeconds - .18) / .24 * Math.PI) : 0;
   for (const { mesh, entries, eye } of rig.faceNodes) {
     if (!mesh.morphTargetInfluences) continue;
     for (const [name, index] of entries)
@@ -108,7 +111,20 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     const spark = model.getObjectByName('EyeSpark' + side);
     if (spark) spark.visible = blink < .5 && ['curious', 'surprised'].includes(expression);
   }
-  rig.ears.forEach((ear, i) => { ear.rotation.z = (i ? -1 : 1) * (.05 * Math.sin(time * 3) + (expression === 'excited' ? .08 : expression === 'embarrassed' ? -.06 : 0)) * soft; });
+  // Event-linked ear tension: attend, lift, relax, startle, then settle. No
+  // free-running flap oscillator. The Blender bridge applies these deltas at
+  // the real ear rest bones, so their skin remains attached to the head.
+  const attending = pose?.phase === 'look' || pose?.phase === 'approach';
+  const earSpread = neutral || !baby ? 0 : attending ? .14 :
+    expression === 'curious' ? .15 : expression === 'excited' ? .23 : expression === 'surprised' ? .30 :
+      expression === 'content' ? -.13 : expression === 'embarrassed' ? -.18 : expression === 'sleepy' ? -.23 : .09;
+  const earForward = neutral || !baby ? 0 : attending ? -.13 : expression === 'content' || expression === 'sleepy' ? .10 : -.08;
+  const earCheck = hand ? Math.sin(hand.yaw) * .10 : id === 'look_back' ? .045 * pulse : 0;
+  rig.ears.forEach((ear, i) => {
+    const sign = i ? -1 : 1;
+    ear.rotation.z += (sign * (earSpread + sign * earCheck) * soft - ear.rotation.z) * alpha;
+    ear.rotation.x += (earForward * soft - ear.rotation.x) * alpha;
+  });
   for (const cheek of rig.cheeks) {
     const material = cheek.material;
     if (!Array.isArray(material) && 'color' in material && material.color instanceof THREE.Color)
@@ -125,4 +141,12 @@ export function resetBabyPose(model: THREE.Object3D) {
   for (const { mesh } of rig.faceNodes) mesh.morphTargetInfluences?.fill(0);
   for (const ear of rig.ears) ear.rotation.set(0, 0, 0);
   rig.hat?.rotation.set(0, 0, 0);
+}
+
+/** Low-frequency review snapshot of final controls, never a GPU/display metric. */
+export function babyExpressionSnapshot(model: THREE.Object3D) {
+  const rig = rigs.get(model); if (!rig) return undefined;
+  return { expression: rig.lastExpression,
+    eyes: rig.eyes.map(eye => ({ name: eye.name, weights: Object.fromEntries(Object.entries(eye.morphTargetDictionary ?? {}).map(([name, i]) => [name, eye.morphTargetInfluences?.[i] ?? 0])) })),
+    ears: rig.ears.map(ear => ({ name: ear.name, x: ear.rotation.x, z: ear.rotation.z })) };
 }

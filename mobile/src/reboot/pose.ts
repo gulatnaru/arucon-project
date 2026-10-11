@@ -33,7 +33,7 @@ export function applyRebootPose(orientation: THREE.Group, model: THREE.Object3D,
     orientation.rotation.z = stride * .025;
   }
   if (pose) {
-    if (pose.phase === 'look') orientation.rotation.y = Math.sin(time * 3) * .12 * soft;
+    if (pose.phase === 'look') orientation.rotation.x = -.025 * soft;
     if (pose.kind === 'hand' && !pose.handActing && (contact || recovering)) {
       const ease = Math.min(1, contactProgress * 3) * contactWeight;
       orientation.position.z = (.10 + maturity * .065) * ease;

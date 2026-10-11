@@ -4,7 +4,7 @@ import { growthExpression } from '../living/growthExpression';
 import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { RebootDirector } from '../reboot/director';
 import { applyRebootPose, rebootFacing } from '../reboot/pose';
-import { applyBabyPose, resetBabyPose } from '../reboot/babyPose';
+import { applyBabyPose, resetBabyPose, babyExpressionSnapshot } from '../reboot/babyPose';
 import { BabyGaitRig } from '../reboot/babyGait';
 import { BlenderBabyRig } from '../reboot/blenderRig';
 import { sampleArtComparison } from '../reboot/artComparison';
@@ -772,6 +772,7 @@ export class RoomController {
         pendingToken: this.pendingMealToken, lastToken: this.lastMealToken },
       pendingLifeToken: this.pendingLifeCommand?.token, lastLifeToken: this.lastPropLifeToken,
       ...(this.rebootView ? { rebootIntent: this.reboot.current, rebootPose: this.reboot.pose ? { ...this.reboot.pose } : null,
+        babyExpression: this.loadedPet ? babyExpressionSnapshot(this.loadedPet) : undefined,
         artCandidate: this.loadedPetKey ?? null, artComparison: this.rebootView.artComparison ? { ...this.rebootView.artComparison, seconds: this.artTime } : null,
         visualRoot: { x: visual.x, y: visual.y, z: visual.z } } : {}) };
   }

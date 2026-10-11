@@ -29,9 +29,9 @@ export function sampleHandContact(plan: HandActingPlan, elapsed: number): HandAc
     const wink = pulse(t, 1.2, .23) * .93, wriggle = plan.style === 'body_wiggle' ? pulse(t, .1, .6) : 0;
     return { beat: t < .4 ? 'peek' : t < 1.45 ? 'paw_offer' : t < 3.3 ? 'paw_flick' : glance ? 'look_back' : 'hand_breathe',
       expression: t < 1.45 ? 'excited' : t < 2.8 ? 'playful' : glance ? 'curious' : 'content', seconds: t,
-      x: side * (.14 * check + .025 * enter), z: .025 * enter - .065 * check,
+      x: side * (.18 * check + .025 * enter), z: .025 * enter - .09 * check,
       yaw: side * (.36 * check + .10 * enter - .11 * glance), roll: side * (.085 * tap + .07 * wriggle), pitch: -.035 * tap,
-      compression: .018 * tap, pawLift: .11 * tap, pawReach: .21 * tap, supportX: -.115 * pulse(t, .18, 1.5),
+      compression: .018 * tap, pawLift: .14 * tap, pawReach: .24 * tap, supportX: -.115 * pulse(t, .18, 1.5),
       wink, faceStrength: t < 3.3 ? .8 : .32 + glance * .2 };
   }
   if (plan.profile === 'warm') {
@@ -39,8 +39,8 @@ export function sampleHandContact(plan: HandActingPlan, elapsed: number): HandAc
     const cheek = plan.style === 'head_lean' ? .78 : 1;
     return { beat: t < .5 ? 'head_lean' : t < 2.1 ? 'side_nuzzle' : glance ? 'look_back' : 'hand_breathe',
       expression: glance ? 'curious' : 'content', seconds: t,
-      x: side * (.10 * settle + .025 * nuzzle) * cheek, z: (.145 + (plan.familiar ? .015 : 0)) * settle + breath * settle,
-      yaw: -side * .30 * settle + .07 * glance, roll: -side * .15 * settle, pitch: .035 * settle,
+      x: side * (.12 * settle + .025 * nuzzle) * cheek, z: (.17 + (plan.familiar ? .015 : 0)) * settle + breath * settle,
+      yaw: -side * .30 * settle + .07 * glance, roll: -side * .17 * settle, pitch: .035 * settle,
       compression: .042 * settle, pawLift: .035 * pulse(t, .2, .8), pawReach: .025 * enter, supportX: -.07 * pulse(t, .05, 1.05),
       wink: 0, faceStrength: .72 - .14 * settle + .14 * glance };
   }
@@ -48,7 +48,7 @@ export function sampleHandContact(plan: HandActingPlan, elapsed: number): HandAc
   const startle = plan.style === 'startle_then_lean' ? pulse(t, 0, .45) : 0;
   return { beat: t < .8 ? 'scan' : t < 1.55 ? 'paw_offer' : t < 3.1 ? 'look_back' : glance ? 'scan' : 'hand_breathe',
     expression: startle > .3 ? 'surprised' : t < .8 || check > .2 || glance > .1 ? 'curious' : 'content', seconds: t,
-    x: side * .065 * contact, z: .035 * contact - .035 * startle, yaw: side * (.42 * contact + .09 * inspect - .13 * check + .10 * glance),
+    x: side * .08 * contact, z: .035 * contact - .035 * startle - .018 * ease((t - 2.7) / .7), yaw: side * (.54 * contact + .09 * inspect - .18 * check + .10 * glance),
     roll: .012 * side * contact, pitch: .018 * inspect - .045 * startle, compression: .008 * contact,
     pawLift: .065 * pulse(t, .7, .75), pawReach: .11 * pulse(t, .7, .75), supportX: -.10 * pulse(t, .45, 1.15), wink: 0,
     faceStrength: .56 + .22 * Math.max(inspect, check, glance) };

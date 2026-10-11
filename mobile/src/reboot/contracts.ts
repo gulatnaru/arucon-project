@@ -17,10 +17,10 @@ export type RebootSnapshot = { schemaVersion: 1; petId: string; revision: number
   cushion: FloorPoint & { revision: number }; previewStage: RebootStage; events: RebootFact[];
   personality?: PersonalityFoundation; randomState?: number };
 export type RebootCommand = Readonly<{ token: string; kind: RebootIntent; sourceRevision: number;
-  target?: FloorPoint; resume?: ResumableIntent; resumeTarget?: FloorPoint; itemRevision?: number }>;
+  target?: FloorPoint; resume?: ResumableIntent; resumeTarget?: FloorPoint; itemRevision?: number; observation?: 'witnessed' | 'remembered' }>;
 export type RebootEvent = Readonly<{ token: string; kind: RebootIntent; phase: 'start' | 'look' | 'approach' | 'contact' | 'recover' | 'complete' | 'cancel';
   automatic: boolean; stage: RebootStage; sourceRevision: number; itemRevision?: number; target?: FloorPoint;
-  rememberedPosition?: FloorPoint; currentTarget?: FloorPoint; babyMode?: boolean; babyBeat?: string; expression?: BabyExpression; touchRegion?: TouchRegion; memoryIds?: readonly string[];
+  rememberedPosition?: FloorPoint; currentTarget?: FloorPoint; observation?: 'witnessed' | 'remembered'; babyMode?: boolean; babyBeat?: string; expression?: BabyExpression; touchRegion?: TouchRegion; memoryIds?: readonly string[];
   personalityId?: PersonalityId; selectionReason?: string; randomState?: number; handActing?: HandActingPose; handContext?: RebootIntent; handStyle?: string }>;
 export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revision: number;
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand;

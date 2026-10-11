@@ -69,9 +69,9 @@ const lines: Record<string, readonly string[]> = {
   look_back: ['나 봤어?', '여기도 좋네.', '이제 알겠어.', '다른 데도 볼래.'],
   yawn: ['하아암.', '잠깐 폭신하게.', '조금만 쉬자.', '여기 편해.'],
   head_lean: ['거기, 좋아.', '손이 폭신해.', '조금 더 가까이.', '머리가 간질간질.'],
-  body_wiggle: ['간질간질!', '몸이 먼저 움직여.', '손 따라 갈래.', '히히, 여기!'],
+  body_wiggle: ['간질간질!', '앗, 거기!', '조금 더!', '히히, 여기!'],
   tickle: ['또 간지러워!', '이번엔 이쪽!', '꼼지락, 꼼지락.', '나도 움직일래.'],
-  side_nuzzle: ['이쪽도 기대 볼래.', '몸을 바꿔 봤어.', '이번엔 살짝.', '옆으로 폭신하게.'],
+  side_nuzzle: ['이쪽도 좋아.', '여기 포근해.', '조금만 이렇게.', '응, 편하다.'],
   paw_offer: ['내 발도 볼래?', '이렇게 해 볼까?', '나도 손 내밀게.', '이번엔 내가 먼저!'],
   startle_then_lean: ['앗, 네 손이구나.', '구경하다 놀랐네.', '여기 기대도 돼?', '이제 가까이 갈래.'],
   familiar_nuzzle: ['아까 그 손!', '여기 또 기대 볼래.', '이번엔 먼저 갈래.', '그 느낌, 알아.'],
@@ -79,7 +79,8 @@ const lines: Record<string, readonly string[]> = {
   hat_recognize: ['아, 이 모자!', '이번엔 바로 쓸래.', '이제 잘 맞네.', '전에 써 봤지!'],
   hat_show: ['잘 썼지?', '한 번 움직여 봤어.', '히히, 이대로 갈래.', '나 좀 봐!'],
   hat_quick_check: ['잠깐 쓰고 갈게.', '구경하던 데로!', '금방 확인했어.', '이번엔 빨리!'],
-  cushion_knead: ['폭신한지 볼래.', '여기 눌러 봤어.', '발이 쏙 들어가.', '여기 자리 잡을래.'],
+  cushion_knead: ['폭신해!', '여기 좋다.', '폭 들어갈래.', '잠깐 쉬어야지.'],
+  cushion_seen: ['여기로 왔네.', '새 자리도 좋다.', '나도 이쪽!', '여기서 쉬어 볼까?'],
   cushion_changed: ['어, 저기였는데!', '이쪽으로 왔네.', '새 자리도 볼래.', '다시 찾아왔어.'],
 };
 
@@ -89,26 +90,37 @@ export class BabyLines {
   private lastAutoAt = -Infinity;
   private lastToken = '';
   private lastSpokenAt = -Infinity;
+  private recentText: string[] = [];
+  lastDecision = 'NOT_SELECTED';
   select(key: string, token: string, automatic: boolean, atMs: number, personality?: PersonalityId): { lineId: string; text: string } | null {
+    // A free-life lean has no physical hand to describe.
+    if (automatic && ['head_lean', 'side_nuzzle', 'lean', 'body_wiggle', 'paw_offer'].includes(key)) key = 'look_back';
     const contextual: Record<PersonalityId, readonly string[]> = {
       playful: key === 'look_back' ? ['봤지?', '이번엔 저쪽!', '내가 먼저 갔다!', '한 번 더 볼래.']
         : key === 'paw_offer' ? ['내 차례!', '발도 인사할래.', '요렇게 잡아 봐.', '히히, 닿았다.']
           : ['히히, 간질간질.', '손이랑 장난칠래.', '여기로 와 봐.', '나 먼저 갈래.'],
-      warm: key === 'look_back' ? ['여기 같이 있을래.', '옆이 폭신해.', '잠깐 기대도 되지?', '너도 봤구나.']
+      warm: key === 'look_back' ? ['여기 같이 있을래.', '여기도 궁금해.', '같이 보자.', '너도 볼래?']
         : key === 'paw_offer' ? ['내 발도 잡아 봐.', '손이 따뜻해.', '조금 더 가까이.', '천천히 인사할래.']
           : ['손이 포근해.', '이쪽으로 기대 볼게.', '잠깐 같이 쉬자.', '옆에 앉아도 돼?'],
       poised: key === 'look_back' ? ['난 저쪽도 볼래.', '잠깐만 보고 올게.', '나도 봤어.', '여기까진 같이 와.']
-        : key === 'paw_offer' ? ['발은 여기까지만.', '살짝만 닿아 봐.', '네 손, 알아.', '먼저 봤거든.']
+        : key === 'paw_offer' ? ['발은 여기까지만.', '살짝만.', '한 번 볼까.', '먼저 봤거든.']
           : ['거기, 조금만.', '손은 따뜻하네.', '보고 있던 거 마저 볼게.', '여기 기대는 건 괜찮아.'],
     };
-    const choices = personality && ['look_back', 'paw_offer', 'head_lean', 'side_nuzzle', 'familiar_nuzzle', 'body_wiggle', 'tickle', 'startle_then_lean', 'lean'].includes(key)
+    const handLines: Record<PersonalityId, readonly string[]> = {
+      playful: ['내가 먼저!', '이번엔 이쪽!', '히히, 잡았지.', '나도 해 볼래!'],
+      warm: ['여기 좋다.', '포근해.', '조금만 이렇게.', '옆에 있을래.'],
+      poised: ['살짝만.', '음, 따뜻하네.', '잠깐 들른 거야.', '이 정도면 됐어.'],
+    };
+    const choices = key.startsWith('hand_') ? key === 'hand_silent' || !personality ? undefined : handLines[personality] : personality && ['look_back', 'paw_offer', 'head_lean', 'side_nuzzle', 'familiar_nuzzle', 'body_wiggle', 'tickle', 'startle_then_lean', 'lean'].includes(key)
       ? contextual[personality] : lines[key];
-    if (!choices || automatic && atMs - this.lastAutoAt < 9_000 || !automatic && token === this.lastToken && atMs - this.lastSpokenAt < 2_300) return null;
-    const fresh = choices.map((text, i) => ({ text, lineId: (personality ? personality + ':' : '') + key + ':' + i })).filter(x => !this.recent.slice(-3).includes(x.lineId));
-    if (!fresh.length) return null;
+    if (!choices) { this.lastDecision = 'NONVERBAL_BEAT'; return null; }
+    if (automatic && atMs - this.lastAutoAt < 9_000 || !automatic && token === this.lastToken && (key.startsWith('hand_') || atMs - this.lastSpokenAt < 2_300)) { this.lastDecision = 'RECENT_SPEECH'; return null; }
+    const fresh = choices.map((text, i) => ({ text, lineId: (personality ? personality + ':' : '') + key + ':' + i })).filter(x => !this.recent.slice(-3).includes(x.lineId) && !this.recentText.slice(-3).includes(x.text));
+    if (!fresh.length) { this.lastDecision = 'RECENT_MEANING'; return null; }
     let hash = 2166136261; for (const c of token + key) hash = Math.imul(hash ^ c.charCodeAt(0), 16777619);
     const selected = fresh[(hash >>> 0) % fresh.length]; this.recent.push(selected.lineId); this.recent = this.recent.slice(-12);
     if (automatic) this.lastAutoAt = atMs;
+    this.recentText.push(selected.text); this.recentText = this.recentText.slice(-3); this.lastDecision = 'SELECTED';
     this.lastToken = token; this.lastSpokenAt = atMs;
     return selected;
   }

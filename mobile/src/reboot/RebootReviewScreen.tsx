@@ -115,8 +115,12 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       if (activeIntent.current?.token === event.token) activeIntent.current = null;
     }
     if (event.phase === 'contact' && event.babyBeat) {
-      const key = event.kind === 'cushion_changed' && event.babyBeat === 'cushion_knead' ? 'cushion_changed' : event.babyBeat;
-      const spoken = voice.select(key, event.token, event.automatic, Date.now(), personalityReview);
+      const key = event.kind === 'cushion_changed' && event.babyBeat === 'cushion_knead'
+        ? event.observation === 'witnessed' ? 'cushion_seen' : 'cushion_changed'
+        : event.handActing ? ['paw_offer', 'paw_flick', 'side_nuzzle'].includes(event.babyBeat) ? `hand_${event.babyBeat}` : 'hand_silent'
+          : event.babyBeat;
+      const spoken = quiet ? null : voice.select(key, event.token, event.automatic, Date.now(), personalityReview);
+      trace.current.push({ speechDecision: { key, reason: quiet ? 'COMPARISON_HIDDEN' : voice.lastDecision }, token: event.token, atMs: Date.now() });
       if (spoken) {
         clearTimeout(bubbleTimer.current); const id = ++bubbleToken.current;
         setBubble(spoken.text); trace.current.push({ lineId: spoken.lineId, token: event.token, shown: !quiet, atMs: Date.now() });
@@ -171,8 +175,9 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       const snapshot = await memories.current!.moveCushion(point, before.revision);
       if (requestEpoch !== epoch.current || snapshot.cushion.revision === before.cushion.revision) return { memory: snapshot };
       const old = eligibleMemories(before, REBOOT_ITEM.cushion).at(-1)?.position;
+      const witnessed = AppState.currentState === 'active' && !!latest.current.pet && projectPetRest(latest.current.pet).mode === 'awake';
       return { memory: snapshot, command: { token: request, kind: 'cushion_changed', sourceRevision: snapshot.revision,
-        itemRevision: snapshot.cushion.revision, target: old } };
+        itemRevision: snapshot.cushion.revision, target: old, observation: witnessed ? 'witnessed' : 'remembered' } };
     });
   };
   const selectStage = (stage: RebootStage) => {
@@ -187,7 +192,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = (file = 'arucon-reboot-evidence.json') => {
-    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-two-paws-v9', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-emotion-v10', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, quiet, finalSize: null, finalRenderProfile: null },
       comparison: controlled ? { baseline: comparisonBaseline(controlled), id: controlled.id, petId: controlled.petId, pacing: comparisonPacing,
         culling: comparisonCulling ? 'closed_opaque_front' : 'source',
         initialState: comparisonInitialState.current,
