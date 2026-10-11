@@ -1,3 +1,67 @@
+# REBOOT-04 후속 — 눈·귀·감정·대사 / v10
+
+사용자의 v9 평가는 **REWORK_REQUIRED — 눈 균형·감정 전달·세 성격·대사·방 디자인**이다. 이전 두 발 기술 PASS가 이 평가를 대신하지 않는다. 첨부 ZIP의 MD 1개를 전체 읽고 [후속 지시](tasks/REBOOT-04-emotion-room-followup.md)에 원문 그대로 저장했다. 이번 v10은 그 평가에 대한 **수정·실제 비교 준비 / SELF_REVIEW**이며 최종 표현·아트·재미 승인은 USER_REVIEW_PENDING이다. 전체 상태는 PERF-01 미달 때문에 REWORK_REQUIRED를 유지한다.
+
+장난은 손을 앞발로 건드린 뒤 옆으로 빼며 확인한다. 다정은 볼/옆구리와 체중을 맡기고 귀의 긴장이 풀린다. 도도는 몸을 세운 채 옆으로 짧게 접촉하고 실제 이전 관심으로 돌아간다. 기본 호기심은 두 눈이 균형 있게 열리고, 윙크는 앞발 장난의 짧은 순간에만 나온다. 표현 개수나 정확한 성격 이름 맞추기를 완료 기준으로 삼지 않았다.
+
+## 먼저 볼 실제 결과
+
+- 같은 초기 상태·합성 경험·외형·가구·카메라·빛·+35·DPR2.5/AA0의 대사/이름 숨김: [장난 28초](evidence/reboot-04-emotion-2026-10-11/playful-hand-short-v10.mp4), [다정 37초](evidence/reboot-04-emotion-2026-10-11/warm-hand-short-v10.mp4), [도도 44초](evidence/reboot-04-emotion-2026-10-11/poised-hand-short-v10.mp4).
+- 도도의 [수정 전 v9](evidence/reboot-04-emotion-2026-10-11/before-hand-v9.mp4)와 위 v10을 비교한다. [수정 전 한쪽 눈 유지 프레임](evidence/reboot-04-emotion-2026-10-11/before-frames/076.300.png)은 같은 카메라의 실제 자율 peek/playful 구간이다. 원근·머리 회전과 별도로 아래 코드/변형 원인을 확인했다.
+- [대사 ON·쿠션 이동 35초](evidence/reboot-04-emotion-2026-10-11/speech-and-cushion-short-v10.mp4): 정상 꾸미기 입력으로 이동 → 현재 위치 접근/사용 → 짧은 발화. [6분 원본](evidence/reboot-04-emotion-2026-10-11/speech-objects-v10.mp4), [다정 대사 ON 원본](evidence/reboot-04-emotion-2026-10-11/warm-speech-v10.mp4), [도도 대사 ON 원본](evidence/reboot-04-emotion-2026-10-11/poised-speech-v10.mp4).
+- [현재 방 native 캡처](evidence/reboot-04-emotion-2026-10-11/playful-frames/001.000.png), [현재 펫을 넣은 방 시안](evidence/reboot-04-emotion-2026-10-11/room-concept/sunlit-nest-concept.png), [편집 가능한 방 시안](evidence/reboot-04-emotion-2026-10-11/room-concept/sunlit-nest-concept.blend). 같은1170×2532 비율/카메라/펫 좌표·배율의 **Blender 오프라인 컨셉**이다. Cycles CPU24/denoise/AgX 조명·재질 제안이며 앱 렌더 품질/성능 증거가 아니다. 기본 방은 교체하지 않았다. PNG/.blend/영상/DB는 로컬에만 있고, Git에는 [재현 제작 소스](art/reboot-04/room_concept.py)만 포함한다.
+- 로컬 파일 [검토 플레이어](evidence/reboot-04-emotion-2026-10-11/review.html)는 원본 native 영상을 1배속으로 재생하는 뷰어다. 새로운 브라우저 게임 구현/검증이 아니다.
+
+원본 영상·프레임 PTS·각 발췌 mp4.json을 보존했다. 발췌는 한 연속 구간이며 중간 실패 삭제/배속/확대/색 보정 없이 passthrough다. 실제 펫 입력·메뉴와 정상 director를 사용했고 강제 scene 재생이 아니다. QuickTime 열기는 시간 초과됐으나 Mac/Simulator 접근을 다시 확인했고 로컬 플레이어에서 native1170×2532, playbackRate1, 각 구간 끝까지 재생되는 것을 확인했다. 정상 입력·재생 전중후·원본 프레임 시퀀스를 함께 SELF_REVIEW했다. 영상 encoding FPS는 앱/GPU FPS가 아니다.
+
+## 원인과 수정
+
+1. 보존된 C/two-paw 자산의 Curious eye/lid key가 왼쪽 높이1.18, 오른쪽.90으로 제작돼 있었다. 이를 기본 호기심에 .9로 적용하고, 손 연기 밖의 playful에는 왼쪽 Blink .92를 상태 전체에 적용했다. v9 실제 자율 playful 구간의 지속 비대칭과 코드/원본 shape를 대조했다. 기본 neutral geometry의 양쪽 높이/폭과 blink/표정 혼합은 별도 회귀로 확인했다.
+2. 기본 관심은 기존 대칭 Surprised key의 약한 값(.34)+눈썹/입으로 표현한다. Curious 원본 자산은 보존한다. 앞발 장난의 .18~.42초 구간에서만 윙크 envelope를 쓰며 기존 손 연기의 .23초 윙크는 유지한다. 중립·취소·해제·수면 복귀는 양쪽 눈으로 돌아온다. 모든 표정을 대칭화하거나 눈을 새로 교체하지 않았다.
+3. 귀의 항상 같은 sin(time*3) 흔들림을 제거했다. 실제 look/approach/curious/excited/surprised/content/embarrassed/sleepy의 준비·이완과 손의 옆 확인에 연결하고 실제 Blender ear rest bone에 보간 적용한다. 몸에 붙은 skin/부모 공간과 reduced22%를 검사했다. 렌더 프레임마다 DB·카탈로그·React 쓰기를 추가하지 않았다.
+4. 손의 렌더 sample과 별개였던 legacy babyBeat/표정 trace를 실제 handActing 박자에 맞췄다. 그 박자의 앞발·볼 기대기에 짧은 말을 연결한다. 장난의 발/옆 확인, 다정의 체중, 도도의 세운 방향을 다듬고 기존 style/문맥/최근 이력·familiar hand 선택을 보존했다.
+5. 숨김 비교는 발화 사용 이력을 소비하지 않는다. 정상 모드에서 선택/숨김/최근 발화 억제/비언어 이유를 trace로 남긴다. 같은 문장 의미를 alias가 바뀌어도 최근3개에서 제외한다. 자동 몸짓을 실제 손 접촉처럼 말하지 않으며 기술 시연 문구 일부를 자연스러운 짧은 말로 정리했다. 발화 할당량·LLM·대사 큐를 추가하지 않았다.
+6. 화면에서 직접 옮긴 쿠션은 witnessed로 현재 위치부터 본다. 기억된 옛 좌표는 증거에 남기되 현재 사실로 경로를 잡지 않는다. 보지 못한 remembered 경로는 옛 위치 glance 후 현재 위치로 접근하는 기존 분기를 유지한다. 실제 witnessed 입력을 확인했고 unseen 시간 조건은 격리 단위 검사다.
+
+## 실제 검증과 판독 한계
+
+| 범위 | 같은 v10 실제 결과 |
+|---|---|
+| 장난 / 대사 숨김 | 손 유지18.91s, 직접 탭 연기2.41s, 메뉴 취소10.77s. 짧은 앞발·옆 확인 후 편한 두 눈. 정상 대사 ON 별도 개체에서 짧은 유지3.59s도 확인. |
+| 다정 / 대사 숨김 | 유지28.36s, 짧은 유지7.42s, 탭 연기2.54s, 취소11.18s. 볼/옆구리와 귀 이완, 해제 뒤 부드러운 복원. |
+| 도도 / 대사 숨김 | 유지34.16s, 짧은 유지3.69s, 탭 연기2.64s, 취소14.35s. 세운 몸/옆 시선과 이전 관심 복귀. 취소가180초 원본 끝 밖이어서 [정상 도도 보완 영상](evidence/reboot-04-emotion-2026-10-11/poised-cancel-v10.mp4)에서 실제 취소13.67s를 추가 확인. |
+| 대사 ON | 일반 성격 검토 모드의 quiet=false를 확인했다. 장난은 앞발 장난 말, 다정은 기대기 말, 도도는 짧은 접촉 말을 실제 표시했다. 원본과 trace에서 선택 시각을 찾을 수 있다. 긴 다정 ON 유지의 끝은 메뉴 취소이며 완료 기억으로 세지 않았다. |
+| 쿠션 | 기존 검토 쿠션의 정상 이동·새 좌표 접근/사용·완료1회. 첫 좌표 입력은 적용되지 않았고 다음 정상 바닥 입력으로 적용됨을 확인했다. 무효 시도를 성공으로 세지 않았다. |
+| 취소·기억 | matched3개의 완료 token은 기억1개, 취소 token은0개. 일반 개체와 합성 비교의 기억 소유자를 분리했다. 새 합성4개의 경제는0, 일반 원장도 동일. |
+| 복귀 | 기존 장난/다정 검토 개체의 정상 동면 복귀, 장난의 잠자기→깨우기→접촉, 동작 줄이기 ON/OFF, 메뉴 닫기, 같은 설치본 콜드 재실행 후 같은 개체·현 쿠션 좌표/revision/이번 이동 완료 기억을 확인. |
+
+단순 정지 얼굴만으로 세 기질을 확정할 수 있다고 보지 않는다. SELF_REVIEW에서 차이는 손을 다루는 발/체중/방향/복귀에 더 잘 읽혔다. 귀는 작은 보조 단서이며, 귀만 가려/보여 감정을 정확히 맞추는 사용자 시험은 하지 않았다. 기본 호기심의 오류와 길게 고정된 윙크는 수정했지만 최종 감정 판독·대사 매력·방 디자인 만족은 사용자 재평가를 기다린다. 실제 짧은/긴 유지 시간은 도구·접근 지연에 따라 다르며 동일 밀리초 자극이라고 주장하지 않는다.
+
+추가 영향 확인: [모자·귀 v10 원본](evidence/reboot-04-emotion-2026-10-11/hat-ears-v10.mp4). 같은 도도 개체에서 기존 모자를 쓰고 정상 손 교감·귀 반응·해제를 확인했고 모자 미착용으로 복원했다. 관찰 구간에서 귀 분리나 한 뿔을 가리는 새 관통은 보이지 않았다. 모자 자체의 최종 디자인 만족을 승인한 것은 아니다.
+
+## 성능·실행 환경
+
+macOS15.6/Xcode26.3/iPhone16e iOS26.3.1 Simulator/390×844pt/native1170×2532/Apple Software Renderer. 모든 비교는 원래 양면·tail·DPR2.5/AA0/GL975×2110/일반 모션·두 발/+35이며 최종 렌더 채택이 아니다.
+
+이번 기능 녹화 중 완료된60초 RAF p95: v9 도도28.05ms, v10 장난60.80ms(FAIL), 다정37.29ms(FAIL), 도도29.41ms. 같은 도도의 phase p95는 판단 .043→.050ms, pose .462→.517ms, CPU morph .892→.938ms, GL 대기21.66→25.45ms. 호스트/기능 입력 시점이 같지 않은 단일 ON 관찰이며 표준 OFF 순서반전 벤치나 인과 개선율이 아니다. 입력→제출 표본0은 INSUFFICIENT_DATA다. 전체 구간/실패를 [성능 관찰 JSON](evidence/reboot-04-emotion-2026-10-11/performance-observation.json)에 보존했다. **PERF-01 OPEN**, 품질/해상도/행동/판정 기준을 낮추지 않았다. 실제 GPU·화면 표시 FPS·물리 터치·실기기·발열/배터리는 NOT_RUN이다.
+
+소스 **ef32ac3**, 설치 **reboot-04-emotion-v10 Release arm64 Simulator ad hoc**. 시작 clean0eb1156/v9의227 입력/JS/native 해시를 직접 대조했다. 수정 후 같은DB 설치와227입력 일치를 확인했다. v10 JS `13468021d564af51f4a6fadd9284aa4772780428736daa77e1a7d3664a5c9bb7`, native `aa2bbafad29819da70a6271959fb742d70ea5bb87778a4c5b3904883d311ffd2`, source fingerprint `eb87ef1fd1983a566c4adcbc947ad202e2e40abef27718184887617a134992e4`. 실제 컨테이너 이동 후 새 경로를 조회했으며 재설치/초기화로 저장을 만들지 않았다.
+
+최종 운영 정적42/42·validator 직접 회귀1/1 PASS. 이번 실제 자동검사 **473/473 fail0/skip0**, 새 눈/귀/발화/관찰 원인 검사 포함 영향17/17, lint/typecheck PASS, iOS Release xcodebuild exit0, Android JS bundle PASS, CNG 27 STATIC PASS. 기존 검사1개가 지속 playful wink .92를 요구해 처음 실패했다. 새 사용자 요구에 맞춰 ‘상태만으로 윙크 금지/짧은 장면 허용/복원’을 더 구체적으로 검사했으며 수면·저장·성능 기대값을 완화하지 않았다. 이번 Android native/UI는 NOT_RUN이다.
+
+## 보존·운영·다음 경계
+
+기존61개 snapshot의 이름/형태/성격/coin/food/EXP/시설/활동, 최종 sleeping/hibernating과5경제 원장이 동일. 총65개이며 새 합성4개만 추가했다. 원본50파일 hash/진단8건/3DB integrity ok. 정상 검토에서 기존 장난/다정/도도에 완료 경험이 추가됐고, 장난31건·도도16건의 오래된 기억은 기존64개 보관 규칙으로 정리됐다. 이를 ‘모든 기억이 byte동일’이라고 하지 않는다. 남은 원래 사건은 정확히 동일하고 전체 착수 전 DB 백업을 보존했다. 이번 쿠션 이동 사실은 콜드 복귀 후 그대로 있다. 원본 자산·DB·영상의 수동 삭제/reset/초기화 없음. **CANTOPEN 정확한 VFS 원인은 OPEN**이다.
+
+실제 사용: CUA native 정상 입력, simctl 영상/Release, AVFoundation 원본 프레임/무변환 발췌, 로컬 Blender5.2.0 bpy 오프라인 방 렌더, 로컬 영상 플레이어. Blender MCP/Figma/새 AI/외부 전송·새 설치는 하지 않았다. SOL_DIRECT/SELF_REVIEW/subagent0, 요청 GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED.
+
+다음은 이 비교의 사용자 감정·성격·대사 평가와 방 시안 한 개의 검토다. 방 기본 교체/귀 형태 재디자인/성장형/진화형/16유형/상점/AI B/경제로 확대하지 않는다. 기본 모델·크기·최종 아트·재미 USER_REVIEW_PENDING. source+검사+문서만 feature checkpoint/일반push하며 실제 원격 해시/clean은 최종 git-final-audit.json과 응답으로 확인한다. main/merge/force/tag/release/deploy/실건강/실결제/보안 변경/미디어 외부전송 없음.
+
+
+---
+
+## Historical — 아기 두 발 v9
+
 # REBOOT-04 — 아기 두 발 추가 결정 반영 / v9
 
 낮고 둥근 모찌 몸과 작은 두 발의 공통 아기 후보를 장난·다정·도도에 적용했다. 실제 방에서 두 발의 교대 이동·정지, 정상 생활 중 도약·착지와 세 성격의 손 기대기·접촉·복원을 확인했다. 기존 윙크·문맥·최근 이력·메뉴 취소 개선을 유지했다.

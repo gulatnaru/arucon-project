@@ -1,3 +1,24 @@
+# Next resume — REBOOT-04 감정·방 후속 v10
+
+[최신 보고](REBOOT-04-REPORT.md), [사용자 전체 지시](tasks/REBOOT-04-emotion-room-followup.md). 소스 **ef32ac3**, 설치 **reboot-04-emotion-v10 Release arm64 Simulator ad hoc**. 시작0eb1156, 원격/현재HEAD는 직접 조회한다. 현재 소스227입력 fingerprint `eb87ef1fd1983a566c4adcbc947ad202e2e40abef27718184887617a134992e4`, JS `13468021d564af51f4a6fadd9284aa4772780428736daa77e1a7d3664a5c9bb7`, native `aa2bbafad29819da70a6271959fb742d70ea5bb87778a4c5b3904883d311ffd2`. 설치/소스가 같으면 재빌드·재설치·DB 초기화하지 않는다.
+
+사용자는 v9 눈/감정/성격/대사/방을 REWORK_REQUIRED로 평가했다. 과거 두 발 기술 PASS로 덮지 않는다. v10은 기본 호기심의 비대칭 key·지속 playful 윙크를 수정하고 실제 귀/시선/손 박자/말을 연결했다. 세 기질의 대사 숨김 정상 손 교감과 정상 대사 ON, witnessed 쿠션 이동·사용, 수면/동면 정상 복귀, reduced ON/OFF, cold 같은개체/이동기억을 확인했다. 최종 감정·성격·재미·아트는 사용자 재평가 대기다. 전체 REWORK_REQUIRED/PERF-01 OPEN을 유지한다.
+
+영상/프레임/trace/보존감사/소스manifest는 `evidence/reboot-04-emotion-2026-10-11/`. 짧은 playful/warm/poised-hand-short-v10.mp4, before-hand-v9.mp4, speech-and-cushion-short-v10.mp4와 로컬review.html부터 본다. warm-speech-v10.mp4는 처음 warm-poised라는 작업 파일명이었으나 실제 다정 원본이어서 이름을 바로잡았다. 도도 대사는 별도poised-speech-v10.mp4, 메뉴 취소는poised-cancel-v10.mp4 보완이다. 원본 보존/배속·축소·보정 없음.
+
+방 시안은 `room-concept/sunlit-nest-concept.png/.blend`, 소스 `art/reboot-04/room_concept.py`. 현재 펫/동일 카메라·비율의 오프라인 Blender 컨셉이며 앱에 적용하지 않았다. 초록 구는 기본 화장실이며 시안도 소유·좌표를 유지한다. 승인 전 큰 방 자산 제작/기본 교체로 넘어가지 않는다.
+
+기존61개 identity/economy/시설/활동/최종rest·5원장·원본50·진단8 보존,3DBok,새 합성4→총65. 정상 검토 중 원래3종 경험은 추가됐고 기존64한도로 장난31/도도16의 옛 사건이 정리됐으며 beforeDB에 보존돼 있다. 모든 메모리 byte동일 주장 금지. 새 쿠션 이동 기억 cold복원 확인. 최초 VFS 원인 OPEN.
+
+이번473/473·영향17/lint/typecheck·iOS Release·AndroidJS·CNG27static PASS. 실제기기/GPU/물리 입력/이번AndroidnativeUI NOT_RUN. 기능녹화60초 RAF P60.80/W37.29/D29.41ms, P/WFAIL. v9D28.05와v10D29.41은 단일ON기능관찰이며 표준OFF벤치/인과 비교가 아니다. 해상도/행동/기준 유지.
+
+**다음 한 작업:** 사용자에게 세 손 영상/대사ON/방 시안 한 개를 보여주고 해당 범위 피드백을 반영한다. 성격 구조/발 수/기억/저장·경제를 다시 만들지 않는다. 별도 PERF-01을 개선했다거나 방·아트를 승인받았다고 간주하지 않는다. 영상 플레이어 임시 로컬 서버는 재개 조건이 아니며 실제 검토 앱은 이미 설치돼 있다. SOL_DIRECT/SELF_REVIEW, feature 일반commit/push만 허용한다.
+
+
+---
+
+## Historical — 두 발 v9 인계
+
 # Next resume — REBOOT-04 아기 두 발 v9
 
 [최신 보고](REBOOT-04-REPORT.md). 소스 **a269f88**, 설치 **reboot-04-two-paws-v9 Release arm64 Simulator adhoc**. JS `edb2ffbf9500c5599b79cf66b06b28c9c181ea90a6d2633c45576fe5e33830da`, native `d06ae8a31ab6fbeb0cd8a2ad1ac5bc25bd267379d2f39c99e3e483cc3f6a6ee7`,227입력 fingerprint `1e3bc5aff7bfa65f741bfb73220a85abe1cf4167af338c6d35c97dc8fc945263`. 실제HEAD/dirty/remote/설치hash를먼저확인하고같으면재빌드/재설치/DB초기화하지않는다. handoff는현재Git과새 evidence/git-final-audit.json을따른다.

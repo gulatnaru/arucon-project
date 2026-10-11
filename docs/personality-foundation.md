@@ -84,3 +84,12 @@ C의 원본을 읽기 전용 기준으로 실제 Blender Python에서 공통 네
 Context7 plugin MCP의 공개 문서 조회를 실제 실행했다. SDK55 선택 결과에 일부 main URL이 섞여 [Expo SDK55 SQLite 문서](https://docs.expo.dev/versions/v55.0.0/sdk/sqlite/)와 설치된 55.0.20 소스를 다시 대조했다. 트랜잭션 안에는 txn을 사용하고, 외부 쓰기는 기존 앱 대기열로 직렬화하며 statement 정리를 유지한다. SDK 내부 패치·새 설치·프로젝트 데이터 전송은 없다.
 
 기능·표현 검토는 SOL_DIRECT의 SELF_REVIEW다. 재미·최종 아트·성격 표현 선택은 USER_REVIEW_PENDING이며 실제 모델 ID는 ROUTING_UNVERIFIED다.
+
+
+## 감정·방 후속 — v10
+
+[사용자 문서](../tasks/REBOOT-04-emotion-room-followup.md)를 전체 적용했다. 기본 curious는 보존 자산의 비대칭 Curious 대신 대칭 open-eye key의 작은 값과 눈썹·입으로 표현한다. 일반 playful 상태가 윙크를 유지하지 않으며 앞발 장난의 짧은 envelope와 기존 손 wink만 허용한다. 귀는 실제 사건의 관심/기쁨/편안함/놀람/마무리에 따라 움직이고 전역 oscillator를 쓰지 않는다. 기존 bone/skin과 body/2paw는 보존한다.
+
+현재 손 trace의 babyBeat/expression은 실제 handActing과 동일하다. 대사는 그 실제 박자에서 선택하며, 비교숨김은 발화 이력을 소비하지 않는다. 같은 의미의 최근3개를 alias간에도 제외하고 억제 이유를 기록한다. 자동생활의 기대기를 존재하지 않는 손처럼 말하지 않는다. 직접 관찰한 쿠션 이동은 현재좌표부터 보고 기억좌표는 과거로만 남긴다. unseen 분기는 별도 단위검사이며 실제 봤다고 꾸미지 않는다.
+
+방은 변경되지 않았고 현 펫을 넣은 Blender 오프라인 시안1개만 준비했다. 실제 영상·SELF_REVIEW와 사용자 최종 표현/아트 승인은 다르다. PERF-01/CANTOPEN 원인은 OPEN이다.

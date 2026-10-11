@@ -1,3 +1,24 @@
+# 최신 재오픈 — REBOOT-04 감정·방 후속
+
+v9 사용자 표현 판정은 REWORK_REQUIRED다. v10(ef32ac3)에서 눈/귀/손/발화를 수정하고 실제 비교를 준비했다. [보고](REBOOT-04-REPORT.md).
+
+| 항목 | 현재 근거/판정 |
+|---|---|
+| 눈 균형·짧은 윙크·복원 | 실제 Simulator와 loaded GLB 회귀 확인 / scoped technical fix |
+| 세 기질 감정·교감·대사 | 대사 숨김/ON 정상입력 비교 준비 / USER_REVIEW_PENDING, 이전 불충족 자동승인 없음 |
+| 방 디자인 | 현 펫·동일비율/카메라의 오프라인 시안1개 / 앱적용 NOT_RUN·사용자 검토 전 보류 |
+| 기존 저장·원장·원본 | 61개identity/economy·5원장·원본50·진단8 보존 / 기존 bounded 기억정리 별도 기록 |
+| 성능 PERF-01 | OPEN / 기능녹화 RAF P/W 기준미달, 품질/기준 유지 |
+| CANTOPEN VFS | OPEN / 이번 표현 수정으로 인과 해결 주장 없음 |
+| 실기기·GPU·물리 입력 | NOT_RUN |
+
+전체MVP_NOT_COMPLETE/REWORK_REQUIRED. 기존 아래의 PASS는 해당 과거 환경·소스의 이력이다.
+
+
+---
+
+## Historical — v9 gap
+
 # SRS MVP gap matrix — fresh iOS validation
 
 ## 최신 REBOOT-04 아기 두 발 — 2026-10-11

@@ -1,3 +1,14 @@
+# REBOOT-04 감정·방 후속 v10 — 실제 수정·검토 자료
+
+사용자의 v9 표현 불충족을 재오픈했다. 기본 호기심 비대칭과 지속 윙크, 귀 oscillator, 손 연기/발화 박자 불일치를 수정했다. 같은 Release3성격 비언어 교감·대사ON·witnessed 쿠션·수면/동면/콜드 복귀를 실제 확인했다. 방은 현 펫을 넣은 오프라인 시안 한 개이며 기본방 미변경. [상세 결과](REBOOT-04-REPORT.md).
+
+소스 ef32ac3 / 설치 reboot-04-emotion-v10. 이번473/473·영향17·lint/types·iOS Release·AndroidJS·CNG27static PASS. 기존61개 identity/economy·5원장·원본50·진단8·3DBok 보존,새합성4. 기존64 기억보관에 따른 정상 정리는 별도 감사에 기록했다. PERF-01 P/W RAF 미달·VFS CANTOPEN 원인 OPEN. 실기기/GPU/물리 입력 NOT_RUN. 제품 표현은 SELF_REVIEW 검토 준비, 최종아트/재미 USER_REVIEW_PENDING, 전체REWORK_REQUIRED 유지. 실제 미디어/DB 외부전송 없이 feature 소스·문서만 일반push한다.
+
+
+---
+
+## Historical — v9 기록
+
 # 최신 실행 — REBOOT-04 아기 두 발 / 2026-10-11
 
 소스a269f88/설치two-paws-v9/실제소스·설치227해시대조. 사용자추가결정으로아기만두발,모찌A-v8몸+작은두발/1horn을유지한별도Blender8bone/2paw자산생성. 후방geometry/bones/tracks없음, 실제편집.blend/GLB/제작Python보존. 두발교대세계접지/체중/도약착지압축/정지/손지지와복원을연결하고3종같은모델의정상native입력으로검증. 원래네발·A/B/C·v8성격/기억/취소개선·경제/저장엔진을보존했다. 성장형/진화형네발제작·전환시점은이번미구현/미결정.

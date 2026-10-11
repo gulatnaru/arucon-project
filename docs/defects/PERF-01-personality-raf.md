@@ -49,3 +49,10 @@ performance-summary.json은 완료된60초 capture.summary만 사용한다. 최�
 ## 손 표현 v8 후속 — 2026-10-11
 
 소스6ad0ecd/v8의 손 유지·복원·취소 변경은 별도 제품 표현 수정이다. 3종의 녹화 정상 입력12사례를 확인했으나 새 표준OFF 벤치는 NOT_RUN이다. 동일DPR2.5/AA0/원래양면/tail/일반모션과 기존 예산을 유지했고 기존 실패를 새 capture/live 값이나 자동463검사로 닫지 않는다. **PERF-01 OPEN 유지**. 실제GPU/표시FPS/물리입력은 미검증이다.
+
+
+## 감정 v10 기능 녹화 관찰 — 기존 OPEN 유지
+
+같은 Apple Software Renderer/2.5AA0/+35/tail/원래양면에서 기능영상 중 완료60초 RAF p95는 v9D28.05, v10P60.80(FAIL), W37.29(FAIL), D29.41ms다. 도도 CPU판단 .043→.050, pose .462→.517, morph .892→.938, GL대기21.66→25.45ms. 입력→제출 표본0은 insufficient_data다. `evidence/reboot-04-emotion-2026-10-11/performance-observation.json`에 전 구간/실패를 보존한다.
+
+이는 단일 기능녹화 ON 관찰이며 호스트 상태/조작 시점이 동일한 OFF 순서반전 벤치가 아니다. 코드 인과 개선율·성능 통과를 선언하지 않는다. 기존 병목/기준/해상도/표현은 보존했고 성격·감정 수정의 확인과 분리한다. 실기기/GPU/표시FPS/물리입력은 NOT_RUN이다.
