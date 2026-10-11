@@ -33,7 +33,7 @@ const faceTargets: Record<BabyExpression, Record<string, number>> = {
 /** Additive whole attached-body acting and cached facial rig. No SQL/React/random. */
 export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
   time: number, dt: number, moving: boolean, reduced: boolean, grounded = false, neutral = false) {
-  const rig = rigFor(model), baby = pose?.baby, expression = baby?.beat.expression ?? 'curious';
+  const rig = rigFor(model), baby = pose?.baby, hand = pose?.handActing, expression = hand?.expression ?? baby?.beat.expression ?? 'curious';
   const style = pose?.personalityId ? personalityPoseStyle(pose.personalityId, expression) : undefined;
   const alpha = 1 - Math.exp(-14 * Math.min(.1, Math.max(0, dt))), soft = reduced ? .22 : 1;
   const p = baby?.progress ?? 0, pulse = Math.sin(Math.PI * p), recovering = pose?.phase === 'recover';
@@ -41,7 +41,10 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   const weight = contact ? 1 : recovering ? 1 - p * p * (3 - 2 * p) : 0;
   const id = baby?.beat.id ?? 'notice';
   const targetPosition = rig.targetPosition.set(0, 0, 0), targetRotation = rig.targetRotation.set(0, 0, 0);
-  if (moving) {
+  if (hand && !moving) {
+    targetPosition.set(hand.x * soft, 0, hand.z * soft); targetRotation.set(hand.pitch * soft, hand.yaw * soft, hand.roll * soft);
+    orientation.scale.x *= 1 + hand.compression * .45 * soft; orientation.scale.y *= 1 - hand.compression * soft; orientation.scale.z *= 1 + hand.compression * .45 * soft;
+  } else if (moving) {
     targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(time * 12)) * .065;
     targetRotation.z = grounded ? 0 : Math.sin(time * 6) * .04 * soft;
   } else if (contact || recovering) {
@@ -68,7 +71,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     } else if (id === 'yawn') targetRotation.x = -.085 * pulse * weight * soft;
     else if (id === 'look_back' || id === 'hat_show') targetRotation.z = .07 * pulse * weight * soft;
   } else if (pose?.phase === 'look') targetRotation.y = Math.sin(time * 4.5) * .16 * soft;
-  if (style) {
+  if (style && !hand) {
     targetPosition.multiplyScalar(style.bodyAmplitude); targetRotation.multiplyScalar(style.bodyAmplitude);
     if (pose?.phase === 'look') targetRotation.y += style.gazeAside;
     if ((contact || recovering) && pose?.kind === 'hand') {
@@ -78,27 +81,28 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     }
   }
   rig.position.lerp(targetPosition, alpha); rig.rotation.lerp(targetRotation, alpha);
-  const pawTarget = (id === 'paw_offer' ? .18 : id === 'paw_flick' ? .22 * Math.max(0, Math.sin(p * Math.PI * 2))
+  const pawTarget = hand ? hand.pawLift * soft : (id === 'paw_offer' ? .18 : id === 'paw_flick' ? .22 * Math.max(0, Math.sin(p * Math.PI * 2))
     : id === 'cushion_knead' ? .10 * Math.max(0, Math.sin(p * Math.PI * 4)) : id === 'sneak' ? .12 * pulse : 0) * weight * soft;
-  const leftPawTarget = (id === 'cushion_knead' ? .10 * Math.max(0, Math.sin(p * Math.PI * 4 + Math.PI)) : 0) * weight * soft;
+  const leftPawTarget = hand ? 0 : (id === 'cushion_knead' ? .10 * Math.max(0, Math.sin(p * Math.PI * 4 + Math.PI)) : 0) * weight * soft;
   rig.pawLift += (pawTarget - rig.pawLift) * alpha; rig.leftPawLift += (leftPawTarget - rig.leftPawLift) * alpha;
-  rig.pawReach += ((id === 'paw_flick' ? .16 * pulse * weight * soft : 0) - rig.pawReach) * alpha;
+  rig.pawReach += ((hand ? hand.pawReach * soft : id === 'paw_flick' ? .16 * pulse * weight * soft : 0) - rig.pawReach) * alpha;
   if (rig.paw) { rig.paw.position.y += rig.pawLift; rig.paw.position.z += rig.pawReach; }
   if (rig.leftPaw) rig.leftPaw.position.y += rig.leftPawLift;
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
   // An awake idle is not a perpetual asymmetric Curious expression. Explicit
   // curiosity/play/wink scenes keep their authored asymmetry on all three rigs.
-  const targets: Record<string, number> = neutral || !baby ? {} : { ...faceTargets[expression], ...(style ? {
+  const targets: Record<string, number> = neutral || !baby ? {} : { ...faceTargets[expression], ...(style && !hand ? {
     Smile: style.smile, Happy: Math.max(faceTargets[expression].Happy ?? 0, style.happy),
     Mischief: Math.max(faceTargets[expression].Mischief ?? 0, style.mischief) } : {}) };
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
-    rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) - (rig.weights[name] ?? 0)) * alpha;
+    rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) * (hand?.faceStrength ?? 1) - (rig.weights[name] ?? 0)) * alpha;
   const blink = Math.pow(Math.max(0, Math.sin(time * (expression === 'sleepy' ? .7 : 1.3))), 24);
+  const wink = hand ? hand.wink : expression === 'playful' ? .92 : 0;
   for (const { mesh, entries, eye } of rig.faceNodes) {
     if (!mesh.morphTargetInfluences) continue;
     for (const [name, index] of entries)
-      mesh.morphTargetInfluences[index] = name === 'Blink' ? Math.max(blink, expression === 'playful' && ['Eye_L', 'Lid_-1'].includes(mesh.name) ? .92 : 0)
-        : (rig.weights[name] ?? 0) * (eye ? 1 - Math.max(blink, expression === 'playful' && ['Eye_L', 'Lid_-1'].includes(mesh.name) ? .92 : 0) : 1);
+      mesh.morphTargetInfluences[index] = name === 'Blink' ? Math.max(blink, ['Eye_L', 'Lid_-1'].includes(mesh.name) ? wink : 0)
+        : (rig.weights[name] ?? 0) * (eye ? 1 - Math.max(blink, ['Eye_L', 'Lid_-1'].includes(mesh.name) ? wink : 0) : 1);
   }
   for (const side of [-1, 1]) {
     const spark = model.getObjectByName('EyeSpark' + side);

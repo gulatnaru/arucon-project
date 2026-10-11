@@ -187,7 +187,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = (file = 'arucon-reboot-evidence.json') => {
-    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-comparison-v6', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-hand-v8', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
       comparison: controlled ? { baseline: comparisonBaseline(controlled), id: controlled.id, petId: controlled.petId, pacing: comparisonPacing,
         culling: comparisonCulling ? 'closed_opaque_front' : 'source',
         initialState: comparisonInitialState.current,

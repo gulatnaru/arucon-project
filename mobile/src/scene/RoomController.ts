@@ -991,7 +991,7 @@ export class RoomController {
     const hop = art ? art.hop : pose?.phase === 'contact' && ['tiny_hops', 'hat_test_step'].includes(pose.baby?.beat.id ?? '') ? pose.baby?.progress : undefined;
     if (this.blenderRig || art) {
       const name = this.sleeping ? 'sleep' : moving ? 'walk' : hop !== undefined ? 'baby_hop'
-        : pose?.kind === 'hand' ? pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}`
+        : pose?.kind === 'hand' ? pose.handActing ? `idle_${this.profile}` : pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}`
           : ['hybrid','quad'].includes(this.rebootView?.artCandidate ?? '') && this.babyGaitRig?.gait.active ? 'baby_stop' : `idle_${this.profile}`;
       this.selectClip(name);
     }
@@ -1023,13 +1023,14 @@ export class RoomController {
     }
     if (this.babyGaitRig && this.rebootView) {
       this.babyGaitRig.apply(this.petOrientation, { position: this.position, facing: this.facing,
-        scale: rebootScale(this.rebootView), dt: comparison?.paused ? 0 : dt, moving: moving && !this.sleeping, reduced: this.reducedMotion, hop: this.sleeping ? undefined : hop }, !this.sleeping || !!this.blenderRig);
+        scale: rebootScale(this.rebootView), dt: comparison?.paused ? 0 : dt, moving: moving && !this.sleeping, reduced: this.reducedMotion, hop: this.sleeping ? undefined : hop }, !this.sleeping || !!this.blenderRig,
+        !!pose?.handActing && !moving, !!pose?.handActing && pose.handActing.pawLift > .01);
     }
     if (this.blenderRig && this.activeAction) {
       const clip = this.activeAction.getClip();
       if (moving && this.babyGaitRig) this.activeAction.time = (this.babyGaitRig.gait.phase % 1) * clip.duration;
       else if (hop !== undefined) this.activeAction.time = hop * clip.duration;
-      else if (pose?.kind === 'hand') this.activeAction.time = Math.min(.99999, pose.progress) * clip.duration;
+      else if (pose?.kind === 'hand' && !pose.handActing) this.activeAction.time = Math.min(.99999, pose.progress) * clip.duration;
       else if (clip.name === 'baby_stop' && this.babyGaitRig) this.activeAction.time = this.babyGaitRig.gait.stopProgress * clip.duration;
       this.mixer?.update(0);
       this.blenderRig.apply(this.sleeping);

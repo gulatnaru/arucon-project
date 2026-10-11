@@ -121,7 +121,7 @@ export class BabyGaitRig {
     };
     this.bodyShadow=make();this.soleShadows=this.footMeshes.map(()=>make());
   }
-  apply(orientation: THREE.Group, input: GaitInput, enabled: boolean) {
+  apply(orientation: THREE.Group, input: GaitInput, enabled: boolean, handSupport = false, freeRightPaw = false) {
     this.shadow.visible=enabled;
     if (!enabled) { this.gait.reset(); return; }
     const g=this.gait.update(input);
@@ -137,7 +137,7 @@ export class BabyGaitRig {
     this.inverse.copy(root.matrixWorld).invert(); root.getWorldScale(this.scale);
     this.footMeshes.forEach((foot,index) => {
       const layout=g.layout[index], plant=g.feet[index];
-      if (g.active) {
+      if ((g.active || handSupport) && !(handSupport && freeRightPaw && index === 1)) {
         this.target.set(plant.x, dockHeight + (onObject?0:babyGroundHeight(plant.x,plant.z)) + plant.y + .21*this.scale.y, plant.z).applyMatrix4(this.inverse);
         foot.position.set(this.target.x-layout.x,this.target.y-.21,this.target.z-layout.z);
       }

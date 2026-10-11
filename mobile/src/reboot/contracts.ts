@@ -1,5 +1,6 @@
 import type { FloorPoint } from '../scene/types';
 import type { ArtComparison, BabyArt } from './artComparison';
+import type { HandActingPose } from './handActing';
 import type { PersonalityFoundation, PersonalityAxes, PersonalityId } from './personality';
 
 export type RebootStage = 'baby' | 'growing' | 'evolved';
@@ -20,7 +21,7 @@ export type RebootCommand = Readonly<{ token: string; kind: RebootIntent; source
 export type RebootEvent = Readonly<{ token: string; kind: RebootIntent; phase: 'start' | 'look' | 'approach' | 'contact' | 'recover' | 'complete' | 'cancel';
   automatic: boolean; stage: RebootStage; sourceRevision: number; itemRevision?: number; target?: FloorPoint;
   rememberedPosition?: FloorPoint; currentTarget?: FloorPoint; babyMode?: boolean; babyBeat?: string; expression?: BabyExpression; touchRegion?: TouchRegion; memoryIds?: readonly string[];
-  personalityId?: PersonalityId; selectionReason?: string; randomState?: number }>;
+  personalityId?: PersonalityId; selectionReason?: string; randomState?: number; handActing?: HandActingPose; handContext?: RebootIntent; handStyle?: string }>;
 export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revision: number;
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand;
   babyCharm?: boolean; sizeCandidate?: 1.15 | 1.25 | 1.35; familiarHandId?: string;
