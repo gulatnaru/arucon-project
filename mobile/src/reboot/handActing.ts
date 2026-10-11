@@ -5,7 +5,7 @@ export type HandActingPlan = Readonly<{ profile: PersonalityId; style: string; c
   familiar: boolean; side: number; quietPeriod: number; recoverySeconds: number }>;
 export type HandActingPose = Readonly<{ beat: string; expression: BabyExpression; seconds: number;
   x: number; z: number; yaw: number; roll: number; pitch: number; compression: number;
-  pawLift: number; pawReach: number; wink: number; faceStrength: number }>;
+  pawLift: number; pawReach: number; supportX: number; wink: number; faceStrength: number }>;
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
 const ease = (x: number) => { const t = clamp(x); return t * t * (3 - 2 * t); };
 const pulse = (t: number, start: number, duration: number) => t > start && t < start + duration ? Math.sin((t - start) / duration * Math.PI) : 0;
@@ -31,7 +31,7 @@ export function sampleHandContact(plan: HandActingPlan, elapsed: number): HandAc
       expression: t < 1.45 ? 'excited' : t < 2.8 ? 'playful' : glance ? 'curious' : 'content', seconds: t,
       x: side * (.14 * check + .025 * enter), z: .025 * enter - .065 * check,
       yaw: side * (.36 * check + .10 * enter - .11 * glance), roll: side * (.085 * tap + .07 * wriggle), pitch: -.035 * tap,
-      compression: .018 * tap, pawLift: .11 * tap, pawReach: .21 * tap,
+      compression: .018 * tap, pawLift: .11 * tap, pawReach: .21 * tap, supportX: -.115 * pulse(t, .18, 1.5),
       wink, faceStrength: t < 3.3 ? .8 : .32 + glance * .2 };
   }
   if (plan.profile === 'warm') {
@@ -41,7 +41,7 @@ export function sampleHandContact(plan: HandActingPlan, elapsed: number): HandAc
       expression: glance ? 'curious' : 'content', seconds: t,
       x: side * (.10 * settle + .025 * nuzzle) * cheek, z: (.145 + (plan.familiar ? .015 : 0)) * settle + breath * settle,
       yaw: -side * .30 * settle + .07 * glance, roll: -side * .15 * settle, pitch: .035 * settle,
-      compression: .042 * settle, pawLift: .035 * pulse(t, .2, .8), pawReach: .025 * enter,
+      compression: .042 * settle, pawLift: .035 * pulse(t, .2, .8), pawReach: .025 * enter, supportX: -.07 * pulse(t, .05, 1.05),
       wink: 0, faceStrength: .72 - .14 * settle + .14 * glance };
   }
   const inspect = pulse(t, .15, .95), contact = ease((t - .65) / .7), check = pulse(t, 2.2, .8);
@@ -50,7 +50,7 @@ export function sampleHandContact(plan: HandActingPlan, elapsed: number): HandAc
     expression: startle > .3 ? 'surprised' : t < .8 || check > .2 || glance > .1 ? 'curious' : 'content', seconds: t,
     x: side * .065 * contact, z: .035 * contact - .035 * startle, yaw: side * (.42 * contact + .09 * inspect - .13 * check + .10 * glance),
     roll: .012 * side * contact, pitch: .018 * inspect - .045 * startle, compression: .008 * contact,
-    pawLift: .065 * pulse(t, .7, .75), pawReach: .11 * pulse(t, .7, .75), wink: 0,
+    pawLift: .065 * pulse(t, .7, .75), pawReach: .11 * pulse(t, .7, .75), supportX: -.10 * pulse(t, .45, 1.15), wink: 0,
     faceStrength: .56 + .22 * Math.max(inspect, check, glance) };
 }
 
@@ -60,5 +60,5 @@ export function sampleHandRelease(plan: HandActingPlan, from: HandActingPose, el
   return { ...from, beat: 'hand_release', seconds: elapsed, expression: plan.profile === 'poised' ? 'curious' : 'content',
     x: from.x * weight, z: from.z * weight, yaw: from.yaw * weight, roll: from.roll * weight, pitch: from.pitch * weight,
     compression: from.compression * weight, pawLift: from.pawLift * weight, pawReach: from.pawReach * weight,
-    wink: from.wink * weight, faceStrength: from.faceStrength * weight };
+    supportX: weight === 0 ? 0 : from.supportX * weight, wink: from.wink * weight, faceStrength: from.faceStrength * weight };
 }

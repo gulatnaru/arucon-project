@@ -19,7 +19,8 @@ export function babyGroundHeight(x: number, z: number) {
 /** Distance advances a stride; a supporting paw retains its world position. */
 export class BabyGait {
   readonly feet: Foot[];
-  constructor(readonly layout: readonly PawLayout[] = TWO_PAWS){ this.feet=layout.map(() => ({ x: 0, y: 0, z: 0, planted: true, phase: 0, fromX: 0, fromZ: 0, stopX: 0, stopY: 0, stopZ: 0 })); }
+  constructor(readonly layout: readonly PawLayout[] = TWO_PAWS, private twoPawBalance = false){ this.feet=layout.map(() => ({ x: 0, y: 0, z: 0, planted: true, phase: 0, fromX: 0, fromZ: 0, stopX: 0, stopY: 0, stopZ: 0 })); }
+  balanceX = 0;
   phase = 0; height = 0; compression = 0; roll = 0; pitch = 0; active = false;
   private previous?: FloorPoint;
   private yaw = 0;
@@ -27,7 +28,7 @@ export class BabyGait {
   private settle = 1;
   private firstLanding = 0;
   get stopProgress() { return this.settle; }
-  reset() { this.previous = undefined; this.phase = 0; this.wasMoving = false; this.settle = 1; }
+  reset() { this.previous = undefined; this.phase = 0; this.wasMoving = false; this.settle = 1; this.balanceX = 0; }
 
   update(input: GaitInput) {
     const { position: p, facing: yaw, scale, moving, reduced } = input;
@@ -49,7 +50,9 @@ export class BabyGait {
     const soft = reduced ? .28 : 1;
     const wave = Math.sin(this.phase * Math.PI * 2);
     this.height = moving ? .018 * (1 - Math.cos(this.phase * Math.PI * 4)) * scale * soft : 0;
-    this.roll = moving ? wave * .045 * soft : 0;
+    this.roll = moving ? wave * (this.twoPawBalance ? .06 : .045) * soft : 0;
+    const balance = this.twoPawBalance && moving ? -.085 * wave * scale * soft : 0;
+    this.balanceX += (balance - this.balanceX) * (1 - Math.exp(-13 * dt));
     this.pitch = moving ? .035 * soft : -.025 * Math.sin(this.settle * Math.PI) * soft;
     this.compression = .045 * Math.sin(this.settle * Math.PI) * soft;
     let hopHeight = 0;
@@ -102,9 +105,10 @@ export class BabyGaitRig {
   private bodyShadow: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   private soleShadows: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>[];
   private footprint = new THREE.Vector3();
-  constructor(private model: THREE.Object3D, scene: THREE.Scene) {
+  constructor(private model: THREE.Object3D, scene: THREE.Scene, twoPawBaby = false) {
     const quad=model.getObjectByName('PawBackL') instanceof THREE.Bone;
-    this.gait=new BabyGait(quad?FOUR_PAWS:TWO_PAWS);
+    if (twoPawBaby && quad) throw new Error('Two-paw baby cannot retain rear supports');
+    this.gait=new BabyGait(quad?FOUR_PAWS:TWO_PAWS, twoPawBaby);
     this.footMeshes = (quad?['Foot_L_Front','Foot_R_Front','Foot_L_Back','Foot_R_Back']:['Foot_L_Front','Foot_R_Front']).map(name => model.getObjectByName(name)!);
     this.shadow=new THREE.Group(); scene.add(this.shadow);
     // A tiny analytic disc: no texture upload, shadow map or postprocess pass.
@@ -128,6 +132,7 @@ export class BabyGaitRig {
     const dockHeight=Math.max(0,orientation.position.y);
     const onObject=dockHeight>.1;
     orientation.position.y += g.height + (onObject ? 0 : babyGroundHeight(input.position.x,input.position.z));
+    orientation.position.x += g.balanceX;
     orientation.rotation.z += g.roll; orientation.rotation.x += g.pitch;
     orientation.scale.x *= 1+g.compression*.45;
     orientation.scale.y *= 1-g.compression;

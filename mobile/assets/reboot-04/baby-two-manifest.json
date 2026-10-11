@@ -1,0 +1,23 @@
+{
+  "blender": "5.2.0 LTS",
+  "sourceCsha": "e44d4cef93c5e57a7af3705dea3aedc6d4c17294675973a57c3f1f87dcaf3ffe",
+  "v8DesignSource": "reboot-02/baby-gait.glb through immutable Hybrid C",
+  "singleHorn": true,
+  "paws": 2,
+  "rearGeometryBonesTracks": "ABSENT",
+  "bones": [
+    "Root",
+    "BodyBone",
+    "HeadBone",
+    "Ear.L",
+    "Ear.R",
+    "HornBone",
+    "Paw.L",
+    "Paw.R"
+  ],
+  "vertices": 3858,
+  "bytes": 434492,
+  "sha256": "9749b490b5be5c56ee184da8c417931110a1ead3a0da17b64496a1f160c5fd30",
+  "approval": "FOOT_COUNT_DIRECTION_USER_APPROVED;FINAL_ART_USER_REVIEW_PENDING",
+  "scope": "baby only; shared three personalities; grown/evolved four-paw direction and timing deferred"
+}

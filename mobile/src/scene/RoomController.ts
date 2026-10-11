@@ -90,6 +90,9 @@ const BLENDER_BABY_ASSET = require('../../assets/reboot-03/blender-baby.glb') as
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const HYBRID_BABY_ASSET = require('../../assets/reboot-03-1/hybrid-baby.glb') as number;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
+const TWO_PAW_BABY_ASSET = require('../../assets/reboot-04/baby-two-paws.glb') as number;
+// Preserved four-paw reference uses the same Metro static-asset mechanism.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const QUAD_BABY_ASSET = require('../../assets/reboot-04/common-quad.glb') as number;
 const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? view.sizeCandidate ?? 1.25 : 1);
 
@@ -500,7 +503,7 @@ export class RoomController {
   }
 
   private petAsset() {
-    if (this.rebootView?.babyCharm && this.rebootView.stage === 'baby') return this.rebootView.artCandidate === 'quad' ? QUAD_BABY_ASSET : this.rebootView.artCandidate === 'hybrid' ? HYBRID_BABY_ASSET : this.rebootView.artCandidate === 'blender' ? BLENDER_BABY_ASSET : BABY_CHARM_ASSET;
+    if (this.rebootView?.babyCharm && this.rebootView.stage === 'baby') return this.rebootView.artCandidate === 'two_paw' ? TWO_PAW_BABY_ASSET : this.rebootView.artCandidate === 'quad' ? QUAD_BABY_ASSET : this.rebootView.artCandidate === 'hybrid' ? HYBRID_BABY_ASSET : this.rebootView.artCandidate === 'blender' ? BLENDER_BABY_ASSET : BABY_CHARM_ASSET;
     if (this.rebootView) return REBOOT_ASSETS[this.rebootView.stage];
     return this.formPresentation.formId !== 'arucon' || this.characterCandidateId === DEFAULT_CHARACTER_CANDIDATE_ID
       ? FORM_ASSETS[this.formPresentation.assetKey]
@@ -539,7 +542,7 @@ export class RoomController {
       loaded.scale.setScalar(this.rebootView ? rebootScale(this.rebootView) : 0.62 * growthExpression(this.growthStage).scale);
       const hat = loaded.getObjectByName('RebootHat'); if (hat) hat.visible = !!this.rebootView?.hatWorn;
       const firstModel = !this.loadedPet;
-      const blenderRig = this.rebootView?.babyCharm && ['blender', 'hybrid', 'quad'].includes(this.rebootView.artCandidate ?? '') ? new BlenderBabyRig(loaded, ['hybrid','quad'].includes(this.rebootView.artCandidate ?? '')) : undefined;
+      const blenderRig = this.rebootView?.babyCharm && ['blender', 'hybrid', 'quad', 'two_paw'].includes(this.rebootView.artCandidate ?? '') ? new BlenderBabyRig(loaded, ['hybrid','quad','two_paw'].includes(this.rebootView.artCandidate ?? '')) : undefined;
       this.petOrientation.rotation.y = this.comparisonMode ? comparisonCameraYaw(this.comparisonCameraAngle) : 0;
       this.mixer?.stopAllAction();
       if (this.loadedPet) {
@@ -549,7 +552,7 @@ export class RoomController {
       this.loadedPet = loaded; this.blenderRig = blenderRig;
       this.petOrientation.add(loaded);
       this.babyGaitRig?.dispose();
-      this.babyGaitRig = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' ? new BabyGaitRig(loaded, this.scene) : undefined;
+      this.babyGaitRig = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' ? new BabyGaitRig(loaded, this.scene, this.rebootView.artCandidate === 'two_paw') : undefined;
       this.modelReady = true;
       this.frontPaw = this.loadedPet?.getObjectByName('Foot_R_Front');
       this.leftPaw = this.loadedPet?.getObjectByName('Foot_L_Front');
@@ -992,7 +995,7 @@ export class RoomController {
     if (this.blenderRig || art) {
       const name = this.sleeping ? 'sleep' : moving ? 'walk' : hop !== undefined ? 'baby_hop'
         : pose?.kind === 'hand' ? pose.handActing ? `idle_${this.profile}` : pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}`
-          : ['hybrid','quad'].includes(this.rebootView?.artCandidate ?? '') && this.babyGaitRig?.gait.active ? 'baby_stop' : `idle_${this.profile}`;
+          : ['hybrid','quad','two_paw'].includes(this.rebootView?.artCandidate ?? '') && this.babyGaitRig?.gait.active ? 'baby_stop' : `idle_${this.profile}`;
       this.selectClip(name);
     }
     this.mixer?.update(comparison?.paused ? 0 : dt);
@@ -1002,7 +1005,7 @@ export class RoomController {
       applyRebootPose(this.petOrientation, this.loadedPet, pose, art ? this.artTime : this.rebootTime,
         moving, this.reducedMotion, this.position, this.facing, !!this.babyGaitRig);
       if (this.rebootView.babyCharm && this.rebootView.stage === 'baby') applyBabyPose(this.petOrientation, this.loadedPet,
-        pose, art ? this.artTime : this.rebootTime, dt, moving, this.reducedMotion, !!this.babyGaitRig, art?.scene === 'neutral');
+        pose, art ? this.artTime : this.rebootTime, dt, moving, this.reducedMotion, !!this.babyGaitRig, art?.scene === 'neutral', this.rebootView.artCandidate === 'two_paw');
       const dock = this.reboot.pose?.dockTarget && ['contact', 'recover'].includes(this.reboot.pose.phase);
       if (dock) {
         const p = this.petOrientation.position;

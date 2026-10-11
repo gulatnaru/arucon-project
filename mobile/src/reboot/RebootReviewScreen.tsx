@@ -44,7 +44,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   const comparisonEvents = useRef<ComparisonWindowEvent[]>([]);
   const [completedCapture, setCompletedCapture] = useState<RoomPerformanceCapture>();
   const [babyReview, setBabyReview] = useState(true), [sizeCandidate, setSizeCandidate] = useState<1.15 | 1.25 | 1.35>(personalityReview ? 1.35 : 1.25);
-  const [artCandidate, setArtCandidate] = useState<BabyArt>(personalityReview ? 'quad' : 'v8'), [artComparison, setArtComparison] = useState<ArtComparison>();
+  const [artCandidate, setArtCandidate] = useState<BabyArt>(personalityReview ? 'two_paw' : 'v8'), [artComparison, setArtComparison] = useState<ArtComparison>();
   const [renderProfile, setRenderProfile] = useState<RoomRendererProfileId>(personalityReview ? 'quality_250' : 'automatic');
   const [voice] = useState(() => new BabyLines());
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined), bubbleToken = useRef(0);
@@ -187,7 +187,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = (file = 'arucon-reboot-evidence.json') => {
-    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-hand-v8', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-two-paws-v9', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, finalSize: null, finalRenderProfile: null },
       comparison: controlled ? { baseline: comparisonBaseline(controlled), id: controlled.id, petId: controlled.petId, pacing: comparisonPacing,
         culling: comparisonCulling ? 'closed_opaque_front' : 'source',
         initialState: comparisonInitialState.current,

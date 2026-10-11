@@ -32,7 +32,7 @@ const faceTargets: Record<BabyExpression, Record<string, number>> = {
 
 /** Additive whole attached-body acting and cached facial rig. No SQL/React/random. */
 export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, pose: RebootPose | undefined,
-  time: number, dt: number, moving: boolean, reduced: boolean, grounded = false, neutral = false) {
+  time: number, dt: number, moving: boolean, reduced: boolean, grounded = false, neutral = false, twoPawSupport = false) {
   const rig = rigFor(model), baby = pose?.baby, hand = pose?.handActing, expression = hand?.expression ?? baby?.beat.expression ?? 'curious';
   const style = pose?.personalityId ? personalityPoseStyle(pose.personalityId, expression) : undefined;
   const alpha = 1 - Math.exp(-14 * Math.min(.1, Math.max(0, dt))), soft = reduced ? .22 : 1;
@@ -42,7 +42,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   const id = baby?.beat.id ?? 'notice';
   const targetPosition = rig.targetPosition.set(0, 0, 0), targetRotation = rig.targetRotation.set(0, 0, 0);
   if (hand && !moving) {
-    targetPosition.set(hand.x * soft, 0, hand.z * soft); targetRotation.set(hand.pitch * soft, hand.yaw * soft, hand.roll * soft);
+    targetPosition.set((hand.x + (twoPawSupport ? hand.supportX : 0)) * soft, 0, hand.z * soft); targetRotation.set(hand.pitch * soft, hand.yaw * soft, hand.roll * soft);
     orientation.scale.x *= 1 + hand.compression * .45 * soft; orientation.scale.y *= 1 - hand.compression * soft; orientation.scale.z *= 1 + hand.compression * .45 * soft;
   } else if (moving) {
     targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(time * 12)) * .065;

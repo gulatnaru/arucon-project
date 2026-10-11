@@ -30,6 +30,6 @@ export function comparisonBaseline(c: ComparisonCase) {
   return { protocol: 'REBOOT04_MATCHED_V1', atMs: c.atMs, stage: c.memory.previewStage,
     hat: c.memory.hatWorn, cushion: c.memory.cushion, randomState: c.memory.randomState,
     facts: c.memory.events.map(({ petId: _petId, eventId: _eventId, ...e }) => e),
-    appearance: 'quad', size: 1.35, render: 'quality_250', reduced: false,
+    appearance: 'two_paw', size: 1.35, render: 'quality_250', reduced: false,
     observation: 'NORMAL_DIRECTOR_SELECTION', warmupMs: COMPARISON_WARMUP_MS, measureMs: COMPARISON_CAPTURE_MS };
 }
