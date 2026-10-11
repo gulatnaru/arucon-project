@@ -1,3 +1,21 @@
+# Next resume — REBOOT-04 손 표현 v8 / 별도 PERF-01 OPEN
+
+[최신 결과](REBOOT-04-REPORT.md). 소스 **6ad0ecd**, 설치 **reboot-04-hand-v8 Release arm64 Simulator adhoc**. JS `862b56c4c0303770e03a6d312880690313299ace2d27639606160234620e600e`, native `91df946e6080203bca461075dbe2376799fdb6dc332c1bd699d61193f94c55af`,222입력 fingerprint `f19a4baee0f4b118cb39100ecd2250dbb5ca89e381353ac3593592fd93ca4c91`. 실제 HEAD/dirty/remote/설치 hash를 먼저 대조하고 같으면 불필요한 재빌드·재설치·DB초기화를 하지 않는다. 최종 handoff는 현재 Git과 hand evidence의 git-final-audit.json을 따른다.
+
+현재 손 표현 검토 PREPARED / 같은 최신 Release에서3성격×4상황 실제 확인. 장난은 짧은 앞발/윙크/옆 확인 뒤 쉬기, 다정은 볼/체중과 부드러운 복원, 도도는 세운 몸/옆 시선과 실제 원래 관심 복귀. 정상 자율 선택·손 도구·직접 몸 탭을 사용했고 강제 장면으로 대체하지 않았다. 성격 구조/외형/유형수/저장·경제·시간·수면·동면/일반위젯은 재작성하지 않았다.
+
+원본v6와 before/after-v8 약30초3쌍, 최종 v8 장난160/다정180/도도180초, hand-matrix.json(실제 접촉/완료/취소·기억), 배경 취소와 최종 모션OFF, 보호 감사는 evidence/reboot-04-hand-2026-10-11/에 있다. v7 메뉴 취소가 완료가 된 실패와 처음 촬영 지연도 그대로 남겼다. 최신 완료token 기억1개씩/취소0/경제0. GPU·물리입력/FPS·실기기는NOT_RUN이며 영상 인코딩FPS를 앱FPS로 쓰지 않는다.
+
+기존52개 snapshot의 이름/형태/성격/경제/EXP/시설/활동/수면·동면/5원장 동일,3DBok/48원본/진단8보존. 기존 main/대표3종 기억exact. 당시 활성 옛 합성 도도만 자율36건과 기존64한계 정리, 이전 DB 보존. 새합성4개는 경제0. 최종463검사·영향15/lint/types/v8Release/AndroidJS/CNG27static PASS; 최종운영42/42·validator직접회귀1/1 PASS. 일반모션OFF복원은실제UI와json에서확인했다.
+
+**다음 한 작업:** 사용자가 before/after3쌍의 손 표현을 평가하거나, 별도 PERF-01을 같은 조건으로 추적한다. 현재유형·성장형·상점으로 확대하지 않는다. PERF-01은이번새OFF벤치를안해OPEN, CANTOPEN VFS 원인도OPEN, 재미/최종아트/성격표현은USER_REVIEW_PENDING. 기존 v6 실패·초기 v7·정지 PNG·설정상수만으로 최신 성능/표현을 통과시키지 않는다.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. feature checkpoint/일반push만,main/merge/force/tag/release/deploy/실건강/실결제/보안/외부영상업로드 금지.
+
+---
+
+## Historical — 동일 조건 v6 인계
+
 # Next resume — REBOOT-04 동일 조건 비교 / 성능 OPEN
 
 [최신 보고](REBOOT-04-REPORT.md), [PERF-01](docs/defects/PERF-01-personality-raf.md). 소스 **ecd62de** / 설치 **reboot-04-comparison-v6 Release arm64 Simulator ad hoc**. JS `76c65a6aab58e73cf40c48f2e8471a8811dce3c69a490880ab9a51a754bf82e8`, native `8d9eb22e3d9d59d220c2694a6797fae537dcc398747113634b82169052ccec38`, 220입력 fingerprint `89ddabb443be94a050a05fc908dcfe6b741fde8f59ee377352dd075763a0fdf7`. 실제 HEAD/dirty/원격/설치 해시를 먼저 직접 대조하고 같으면 재빌드·재설치·DB 초기화하지 않는다. 최종 handoff는 현재Git과 후속 evidence의 git-final-audit.json을 따른다.

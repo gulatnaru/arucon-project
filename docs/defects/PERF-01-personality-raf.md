@@ -45,3 +45,7 @@
 macOS15.6/Xcode26.3/iPhone16e iOS26.3.1 Simulator/Apple Software Renderer. **OPEN: 현 환경의 전체 프레임 기준 미충족.** 자동456개 통과와 성격 비교 준비가 이를 닫지 않는다. 실제 iPhone/Android/GPU/표시FPS/물리 지연/발열·배터리는 NOT_RUN이다. 후속은 같은 절차의 호스트 안정 조건 반복과 기기 계측에서 지속되는 병목을 분리하는 것이다. 해상도/표정/행동을 낮추거나 기준을 완화하지 않았다.
 
 performance-summary.json은 완료된60초 capture.summary만 사용한다. 최근10초 live 값/영상 encoding FPS를 전체 성능으로 쓰지 않는다. [RN0.83 공식 timers](https://reactnative.dev/docs/0.83/timers)와 설치0.83.10 JSTimers.js의 performance.now() callback 전달을 대조했다. 실제 생활/손 교감은 [보고서](../../REBOOT-04-REPORT.md)의 별도 정상 속도 영상이다. 실제 GPU 원인은 이 proxy만으로 확정할 수 없다.
+
+## 손 표현 v8 후속 — 2026-10-11
+
+소스6ad0ecd/v8의 손 유지·복원·취소 변경은 별도 제품 표현 수정이다. 3종의 녹화 정상 입력12사례를 확인했으나 새 표준OFF 벤치는 NOT_RUN이다. 동일DPR2.5/AA0/원래양면/tail/일반모션과 기존 예산을 유지했고 기존 실패를 새 capture/live 값이나 자동463검사로 닫지 않는다. **PERF-01 OPEN 유지**. 실제GPU/표시FPS/물리입력은 미검증이다.

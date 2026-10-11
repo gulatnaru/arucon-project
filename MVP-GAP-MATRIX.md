@@ -1,5 +1,22 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 최신 REBOOT-04 손 표현 제품 리뷰 반영 — 2026-10-11
+
+| 범위 | 판정 | 실제 근거 / 한계 |
+|---|---|---|
+| 세 성격 손 표현·긴 유지·복원 | PASS_SIMULATOR_SCOPED / SELF_REVIEW | 같은v8/라벨·대사숨김/+35/2.5AA0, 정상 입력/약30초전후3쌍; 사용자최종표현대기 |
+| 직접탭·잠깐·오래·중간취소 | PASS_NATIVE_SCOPED | 3종×4사례, 완료기억1·취소0·경제0; 가상손검토도구와몸직접탭구분 |
+| 메뉴·배경 취소 / 설정 복원 | PASS_SIMULATOR_SCOPED | v7취소→완료결함 수정, v8실제메뉴/Home취소·같은개체복귀·최종모션OFF 확인 |
+| 구조·아트·시간·경제·저장 | PASS_PRESERVATION | 축/타입/GLB/schema/정책 재작성없음;52원래snapshot/5원장/48원본/8진단/3DBok |
+| 프레임 성능 | OPEN / NEW_OFF_BENCH_NOT_RUN | 기존FAIL보존,해상도/표현/예산유지; 새녹화영상으로성능PASS하지않음 |
+| CANTOPEN 원래 VFS | OPEN | 이번정상입력/저장으로종결하지않음 |
+| 실기기·GPU·물리 지연 | NOT_RUN | Simulator와분리 |
+| 최종성격·재미·아트 / 다음유형 | USER_REVIEW_PENDING / OUT_OF_SCOPE | 현재3종손평가전유형/성장형/상점확대없음 |
+
+[상세 보고](REBOOT-04-REPORT.md). 아래는 과거 증거로 보존한다.
+
+### Historical — 동일 조건 재감사
+
 ## 최신 REBOOT-04 동일 조건 재감사 — 2026-10-11
 
 | 범위 | 판정 | 실제 근거 / 남은 범위 |

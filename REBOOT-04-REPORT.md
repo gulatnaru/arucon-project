@@ -1,3 +1,60 @@
+# REBOOT-04 손 교감 제품 리뷰 반영 — v8
+
+장난은 짧게 앞발을 내밀고 옆으로 몸을 빼 손 쪽을 확인한 뒤 편하게 머무른다. 다정은 볼/옆구리 방향으로 몸을 기울여 무게를 맡기고, 손을 떼면 그 자세에서 부드럽게 몸을 세운다. 도도는 크게 기울이지 않고 몸을 세운 채 방향·시선을 옆으로 두며, 실제로 보던 대상이 있으면 해제 뒤 그쪽으로 돌아간다. 이름과 말풍선을 숨긴 같은 게임 크기의 최신 Release에서 비교했다.
+
+**손 표현 검토판: PREPARED / PASS_SIMULATOR_SCOPED / SELF_REVIEW. 최종 매력·성격 표현 채택: USER_REVIEW_PENDING. PERF-01: 별도 OPEN.** 이번 표현 개선을 전체 게임 재미·성장에 따른 성격 형성·성능 통과로 기록하지 않는다.
+
+## 짧은 전후 비교 — 같은 손 제안→접촉→유지→복원
+
+| 성격 | 기존 v6 | 수정 v8 |
+|---|---|---|
+| 장난 | [29초 발췌](evidence/reboot-04-hand-2026-10-11/before-playful-v6.mp4) | [30초 발췌](evidence/reboot-04-hand-2026-10-11/after-playful-v8.mp4) |
+| 다정 | [29초 발췌](evidence/reboot-04-hand-2026-10-11/before-warm-v6.mp4) | [31초 발췌](evidence/reboot-04-hand-2026-10-11/after-warm-v8.mp4) |
+| 도도 | [32초 발췌](evidence/reboot-04-hand-2026-10-11/before-poised-v6.mp4) | [32초 발췌](evidence/reboot-04-hand-2026-10-11/after-poised-v8.mp4) |
+
+원본 v6 matched 영상3개와 최신 v8 [장난160초](evidence/reboot-04-hand-2026-10-11/playful-v8.mp4)/[다정180초](evidence/reboot-04-hand-2026-10-11/warm-v8.mp4)/[도도180초](evidence/reboot-04-hand-2026-10-11/poised-v8.mp4)를 그대로 보존했다. 위 짧은 영상은 각각 하나의 연속 구간 발췌이며 중간 실패를 이어 붙여 숨기거나 배속·축소·색 보정을 하지 않았다. 정확한 source/start/end는 각 mp4.json에 있다.
+
+같은 방·카메라·조명·quad/+35·DPR2.5/AA0/975×2110·원래 양면/tail·일반 모션. 새 합성 개체3개는 같은 초기 상태·4개 경험·RNG·쿠션을 갖는다. 정상 자율 선택 뒤 같은 손 위치로 접근한다. 버전별 실제 직전 활동·접근 시간·유지 시간은 다르므로 같은 밀리초 자극/같은 강제 장면이라고 주장하지 않는다. 실제 문맥과 최근 접촉이 선택한 style/context는 hand-matrix.json에 있다.
+
+기존 v6가 마지막 beat 끝 프레임과 playful 윙크를 계속 유지하던 원인을 수정했다. 첫 장난 표현 뒤에는 두 눈을 뜨고 쉬며 가끔 손/주변을 확인한다. 설정된 짧은 윙크 envelope는 .23초이며 실제 영상에서도 짧게 나온다. 이 설정값을 실제 GPU 표시 시간/물리 반응 측정값으로 부르지 않는다. 앞발이 실제 손 표면에 닿았다는 정량 접촉 판정은 없으며, 앞발 제스처와 옆 확인의 의도 읽기성을 SELF_REVIEW했다.
+
+## 네 상황의 같은 최신 빌드 검증
+
+| 성격 | 직접 짧은 탭 | 잠깐 유지(실제 접촉) | 오래 유지(실제 접촉) | 메뉴 중간 취소 |
+|---|---|---|---|---|
+| 장난 | 2.44s 반응 후 완료 | 1.13s | 24.30s | cancel / 완료 기억0 |
+| 다정 | 2.53s 반응 후 완료 | 4.21s | 23.14s | cancel / 완료 기억0 |
+| 도도 | 2.65s 반응 후 완료 | 3.04s | 25.57s | cancel / 완료 기억0 |
+
+직접 탭은 native 펫의 몸 영역 입력이다. 반응 시간은 터치가 눌린 길이가 아니라 완료 전 접촉 연출 구간이다. 잠깐/오래 유지는 정상 손 내밀기·거두기 검토 도구를 사용했다. 실제 iPhone의 손가락을 오래 누르는 시험은 NOT_RUN이다. 각 완료 token의 기억은 정확히1개, 취소 token은0개이며 coin/food/EXP0/meal0. 취소 뒤 이동·생활 복귀와 취소한 반응이 되살아나지 않는 것을 실제로 확인했다. 진단 버튼의 강제 장면 재생을 사용하지 않았다.
+
+v7에서 메뉴를 열면 교감이 정지됐다가 닫을 때 recover→complete가 되는 실제 결함을 찾았다. v8은 해당 세 성격 손 교감의 입력 gate가 닫힐 때 cancel하고 접촉·이전 의도 참조를 정리한다. 잘못 완료된 v7 합성 시험 기록/영상도 그대로 남겼고 최신 통과로 사용하지 않는다. 초기 장난 v7 촬영의 조작 지연·오래 유지/짧은 유지 목표 불일치도 원본과 보완 영상으로 보존했다.
+
+부가 영향 확인: 같은 도도 개체에서 동작 줄이기 입력·접촉, Home→앱 아이콘 복귀 중 cancel/완료 기억0, 오래된 손 포즈/입력 잠금 없음. 일반 위젯은 Home에서 기존 일반 상태를 표시했고 검토 개체로 덮지 않았다. 앱 아이콘 복귀를 위젯 탭이라고 기록하지 않는다. 첫 OFF 조작은 실제 적용되지 않아 다시 UI를 확인하고 최종 OFF를 확인했다. final-motion-off-v8.png와 poised-final-v8.json에 최종 상태가 있다. reduced-background-v8.mp4의100초 부가 영상과 최종 확인은 별도이며 정량 reduced/full 성능 비교는 아니다.
+
+## 구현 범위와 검사
+
+- handActing.ts: 기존 style·실제 문맥·최근 스타일·같은 개체의 손 기억으로 접촉 연기를 준비한다. 처음의 짧은 동작 뒤 쉬는 유지로 넘어가며 가끔 작은 시선 변화만 한다. 매 프레임 전체 카탈로그/DB/난수 재생은 없다.
+- director.ts: 실제 손을 뗀 순간의 sample에서 복원하고, 알려진 원래 관심 대상으로 새 token의 정상 행동을 재개한다. 메뉴/배경 취소는 완료 경험을 만들지 않는다.
+- babyPose/pose/babyGait/RoomController: 기존 공통 기울기·끝 clip 고정 대신 해당 손 연기를 적용하고 지지하는 발은 제자리에 두며 동작 중 앞발은 자유롭게 둔다. 기존 몸·귀·뿔·얼굴 자산과 다른 생활 동작은 그대로다.
+- personality.ts/축/유형 수/외형/GLB/성장/경제/수면·동면/SQLite schema·공통 대기열·정산/일반 이름과 위젯·package/lock/config 변경 없음.
+- 새 hand 영향7개, 관련 hand/personality15개 PASS. 최종 전체463/463 fail0/skip0, lint/typecheck PASS. v8 iOS Release arm64 xcodebuild exit0/동일DB 설치/실제 조작. Android JS bundle PASS/CNG27 STATIC PASS. 이번 Android native/UI/실기기/GPU/물리 지연 NOT_RUN. 최종 운영 정적42/42·validator 직접 회귀1/1 PASS.
+- 잘못된 루트 cwd의 tsx 실행, 버전 문자열 수정 경로 오류, 최초 내보내기/설정 조작 확인 부족은 성공으로 숨기지 않고 올바른 cwd/최신 hash/실제 UI·파일로 확인했다. 새 설치·SDK 내부 패치·보안 변경·외부 업로드 없음.
+
+앱 소스 **6ad0ecd**, 설치 **reboot-04-hand-v8 Release arm64 Simulator ad hoc**. 222개 입력 fingerprint `f19a4baee0f4b118cb39100ecd2250dbb5ca89e381353ac3593592fd93ca4c91`, JS `862b56c4c0303770e03a6d312880690313299ace2d27639606160234620e600e`, native `91df946e6080203bca461075dbe2376799fdb6dc332c1bd699d61193f94c55af`와 실제 설치를 대조했다. macOS15.6/Xcode26.3/iPhone16e iOS26.3.1/390×844pt/native1170×2532/Apple Software Renderer, Metro 없이 같은 embedded Release다.
+
+## 보존·성능·다음 검토
+
+기존52개 저장의 이름/형태/성격/coin/food/EXP/시설/활동/sleeping/hibernating과5경제 원장 정확히 동일, 3DB integrity ok, 원본48파일/진단8건 보존. 기존 main과 본래 대표3종의 기억도 exact다. 착수 당시 실행 중이던 옛 합성 도도만 정상 자율 완료36건/RNG/revision과 기존64한계 정리가 있었고 beforeDB도 보존했다. 이번에 새로 만든 합성4개(v7 1개/v8 3개)는 경제0이며 일반 저장에 보상을 지급하지 않았다.
+
+**PERF-01 OPEN**: 이번은 표현 검증이고 새 표준 녹화OFF 벤치를 하지 않았다. 기존 RAF 실패와 호스트 변동 이력을 유지하며 새 녹화 capture/live 숫자로 이를 닫지 않는다. 해상도·표정·행동·판정 기준을 줄이지 않았다. CANTOPEN 원래 VFS 원인도 OPEN. 재미·최종 아트·성격 표현 채택 USER_REVIEW_PENDING.
+
+SOL_DIRECT / SELF_REVIEW / subagent0 / 요청GPT-6.1 Sol Max / effective ROUTING_UNVERIFIED. 검토 절차는 기존 성격 검토판→우리 아이→합성 동일조건 비교→3종 선택→시작→손 내밀기/거두기다. 다음은 이 손 표현의 사용자 평가와 별도 PERF-01 추적이며 유형·성장형·상점으로 확대하지 않는다. 코드·보고만 기존 feature 브랜치에 일반 push하고 DB/영상/generated native/비밀은 제외한다. 최종 remote/clean은 git-final-audit.json과 최종 응답을 따른다.
+
+---
+
+## Historical — 2026-10-11 동일 조건 v6
+
 # REBOOT-04 후속 — 동일 조건 비교 준비 / 성능 OPEN
 
 세 아이는 같은 방과 경험으로 시작해 서로 다른 살핌·손 접근·발짓/기대기·시선·생활 복귀를 보여준다. 장난은 빼꼼 보고 앞발 장난과 윙크, 다정은 손 쪽에 몸을 낮추고 기대기, 도도는 오래 살피고 한 번 놀란 뒤 시선을 돌린다. 이름과 말풍선을 가린 같은 최신 Release의 정상 입력 영상3개를 준비했다. 정지 얼굴만으로 성격을 맞추는 차이는 약하며 사용자 성격 평가·재미·아트·크기는 USER_REVIEW_PENDING이다.

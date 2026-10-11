@@ -1,3 +1,13 @@
+# 최신 실행 — REBOOT-04 손 교감 표현 / 2026-10-11
+
+[현재 보고](REBOOT-04-REPORT.md). 소스6ad0ecd/v8/222입력·설치JS/native 직접 대조. v6의끝beat/윙크고착을 짧은장난→편한유지, 다정볼/체중, 도도세운몸/옆시선/원래대상복귀로 수정. v7 실제메뉴취소가닫을때완료로기록되는결함을발견→v8손 gate cancel 수정→같은 최신 Release 3종×짧은탭/잠깐유지/오래유지/메뉴취소12사례를직접확인. 완료기억1/취소0/경제0, 실제문맥/최근스타일trace. 원본v6/v7실패/v8전체와약30초전후3쌍보존. 성격 구조/외형/유형수/경제·저장엔진확대없음.
+
+손표현검토PREPARED/SELF_REVIEW, 사용자최종표현·재미·아트대기. PERF-01은별도OPEN/새표준OFF벤치미실행, GPU/물리/실기기NOT_RUN. 최신463/463·영향15/lint/types/iOSRelease exit0/AndroidJS/CNG27STATIC PASS. 기존52snapshot/5원장/48원본/진단8/3DBok,본래main/3종기억exact·활성옛합성도도자율36/64한계정리별도보고. Home/아이콘복귀취소0완료·최종일반모션OFF를확인했고일반위젯표시보존(이번위젯탭아님). CANTOPEN VFS인과OPEN. feature일반push만,외부미디어업로드없음. SOL_DIRECT/subagent0/effective ROUTING_UNVERIFIED.
+
+---
+
+## Historical — 동일 조건 성격 비교 v6
+
 # 최신 실행 — REBOOT-04 동일 조건 비교·성능 추적 / 2026-10-11
 
 [실제 결과](REBOOT-04-REPORT.md), [PERF-01](docs/defects/PERF-01-personality-raf.md). 소스ecd62de/설치comparison-v6/220manifest입력·JS/native 직접 대조. 원래3종 경험을 초기화하지 않고 같은상태/4합성경험/가구/RNG/quad+35/2.5AA0인 새비교개체에서 이름/대사를 가린 정상 관찰→손 제안→접촉→해제→생활복귀 영상3개를 남겼다. 성장에 따른 형성 완료가 아니며 정지얼굴만의 구별은약하다. 사용자 성격/재미/아트 평가는대기.
