@@ -4,10 +4,10 @@
   "timezone": "Asia/Seoul",
   "status": "REWORK_REQUIRED",
   "overallGate": "MVP_NOT_COMPLETE_PERFORMANCE_OPEN",
-  "definition": "Scoped three-personality hand expression review prepared; overall MVP and PERF-01 remain incomplete",
-  "reason": "v8 actual native12 input cases plus background cancellation verified; user-requested hand hold/release distinction implemented. v7 panel completion defect fixed. Performance is separately OPEN and no new OFF benchmark or product approval is claimed.",
-  "sourceBaseline": "3675689875fd989b22b80b5f28e0757b78fdf7f9",
-  "sourceCheckpoint": "6ad0ecdf267b320669f4f94ea1268fe5dc22e86b",
+  "definition": "Scoped shared two-paw baby review prepared; grown/evolved four-paw design and transition timing deferred",
+  "reason": "Actual Blender two-paw asset/skin/stride/hop/stop/hand support integrated in v9 with native normal-input movement and three hand styles verified. Prior identity/memory/economy preserved. Foot direction approved; final art/fun and performance signoff pending.",
+  "sourceBaseline": "c18d4bf5bf5138916c7ef55ed4e76135d94cbbaf",
+  "sourceCheckpoint": "a269f88b554c4a684a12510c7f95beecca0fb535",
   "currentLivingReport": "REBOOT-04-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
@@ -326,13 +326,14 @@
     "luna": "requested Luna: narrow documentation staging; effective model remains unverified"
   },
   "completion": {
-    "independentLocalEngineering": "HAND_EXPRESSION_REVIEW_PREPARED",
+    "independentLocalEngineering": "TWO_PAW_BABY_REVIEW_PREPARED",
     "productMvp": "NOT_COMPLETE",
-    "iosCurrentRuntime": "V8_ACTUAL_HAND12_MENU_BACKGROUND_CANCEL_AND_FINAL_MOTION_OFF",
+    "iosCurrentRuntime": "V9_ACTUAL_TWO_PAW_MOVE_HOP_STOP_HAND3_CANCEL",
     "androidRuntime": "CURRENT_JS_BUNDLE_PASS;NATIVE/UI_NOT_RUN",
     "widgetRuntimeQa": "GENERAL_DISPLAY_OBSERVED_HOME;APP_ICON_RETURN;WIDGET_TAP_NOT_RUN_THIS_SCOPE",
-    "performance": "PERF01_OPEN_NO_NEW_OFF_BENCH_NO_BUDGET_REDUCTION",
-    "artFunSizeModelRenderAdoption": "USER_REVIEW_PENDING"
+    "performance": "PERF01_OPEN_NEW_OFF_BENCH_NOT_RUN",
+    "artFunSizeModelRenderAdoption": "USER_REVIEW_PENDING",
+    "grownEvolvedFootTransition": "NOT_IMPLEMENTED_NOT_DECIDED_THIS_SCOPE"
   },
   "historicalWindowsValidation": {
     "scope": "Historical 2026-09-25 Windows source, native-build, and observed-runtime validation",
@@ -545,30 +546,30 @@
     ]
   },
   "lastValidation": {
-    "scope": "REBOOT-04 hand-only expression and cancel semantics",
-    "sourceCheckpoint": "6ad0ecdf267b320669f4f94ea1268fe5dc22e86b",
-    "sourceManifest": "evidence/reboot-04-hand-2026-10-11/release-v8-manifest.json",
+    "scope": "REBOOT-04 baby-only two-paw asset and motion integration",
+    "sourceCheckpoint": "a269f88b554c4a684a12510c7f95beecca0fb535",
+    "sourceManifest": "evidence/reboot-04-two-paws-2026-10-11/release-v9-manifest.json",
     "mobileTests": {
-      "passed": 463,
-      "total": 463,
+      "passed": 468,
+      "total": 468,
       "failed": 0,
       "skipped": 0
     },
-    "impactTests": "15/15 including7 hand-specific",
+    "impactTests": "18/18 two-paw/retainedhand/gait/quadreference",
     "lint": "PASS",
     "typecheck": "PASS",
-    "iOSReleaseCompile": "exit0_v8",
-    "iOSInstallLaunch": "SAME_DB_222_INPUTS_HASH_MATCH_ACTUAL_NATIVE_12_CASES",
+    "iOSReleaseCompile": "exit0_v9",
+    "iOSInstallLaunch": "SAME_DB_227_HASH_MATCH_ACTUAL_NORMAL_MOVE_HOP_HAND3",
     "androidJsBundle": "PASS",
-    "CNG": "27/27 STATIC PASS",
+    "cng": "27/27 STATIC PASS",
     "workflow": "42/42_FRESH;DIRECT_VALIDATOR1/1",
-    "handTrace": "COMPLETE1_MEMORY_EACH_CANCEL0;NORMAL_UI;NO_ECONOMIC_GAIN",
-    "performance": "PERF01_OPEN_PREVIOUS_BASELINE_RETAINED_NEW_OFF_BENCH_NOT_RUN",
+    "preservation": "56_EXISTING_SNAPSHOTS_AND_ALL_MEMORIES/5LEDGERS/48ORIGINALS/8INCIDENTS/3DBOK;3NEW_SYNTHETIC_ECONOMY0",
+    "grownEvolvedTransition": "NOT_IMPLEMENTED_NOT_DECIDED",
+    "performance": "PERF01_OPEN_NEW_OFF_BENCH_NOT_RUN",
     "physicalGpuLatency": "NOT_RUN",
-    "health": "OFF",
-    "preservation": "52_EXISTING/5LEDGERS/48FILES/8INCIDENTS/3DBOK;4_NEW_SYNTHETIC_ECONOMY0",
     "originalCantopenCause": "OPEN",
-    "evidence": "evidence/reboot-04-hand-2026-10-11/"
+    "health": "OFF",
+    "evidence": "evidence/reboot-04-two-paws-2026-10-11/"
   },
   "environment": {
     "host": "macOS 15.6",
@@ -582,7 +583,7 @@
     "hostLocked": false,
     "iosRuntime": "26.3.1",
     "xcode": "26.3",
-    "configuration": "REBOOT-04 hand-v8 embedded Release arm64 Simulator adhoc; Metro not required",
+    "configuration": "REBOOT-04 two-paws-v9 embedded Release arm64 Simulator adhoc;Metro not required",
     "contentSize": "Preserved normal size; no new large-text matrix this scope",
     "currentRendererSnapshot": {
       "profileId": "quality_250",
@@ -615,12 +616,13 @@
     "figma": "TOOLS_EXPOSED; ACCOUNT_CHOICE_PENDING; NO_SUCCESSFUL_CALL_OR_ARTIFACT",
     "physicalIosInventory": "currentdevicectl no devices found",
     "transientDiskPressure": "127MiB coincided with actual capture/storage errors; headroom recovered and same-app native write restored; exact first internal cause not asserted",
-    "reviewSelection": "controlled poised;quad+35/DPR2.5AA0/tail/source/awake/lines_hidden/reduced_OFF_verified",
+    "reviewSelection": "controlled poised/two_paw+35/quality250AA0/tail/source/awake/lines_hidden/reducedOFF",
     "handToolsUsedThisScope": [
       "CUA",
       "simctl",
       "Swift_AVFoundation"
-    ]
+    ],
+    "blenderThisScope": "ACTUAL_LOCAL5.2.0_BPY_REAUTHOR_AND_SEPARATE_BLEND_GLB;NO_NEW_INSTALL"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
@@ -3467,13 +3469,13 @@
     }
   ],
   "personalityFoundation": {
-    "status": "HAND_EXPRESSION_REVIEW_PREPARED_PERFORMANCE_OPEN",
+    "status": "TWO_PAW_BABY_REVIEW_PREPARED_PERFORMANCE_OPEN",
     "report": "REBOOT-04-REPORT.md",
-    "sourceCheckpoint": "6ad0ecdf267b320669f4f94ea1268fe5dc22e86b",
-    "build": "reboot-04-hand-v8 Release arm64 Simulator adhoc",
-    "jsBundleSha256": "862b56c4c0303770e03a6d312880690313299ace2d27639606160234620e600e",
-    "nativeExecutableSha256": "91df946e6080203bca461075dbe2376799fdb6dc332c1bd699d61193f94c55af",
-    "sourceFingerprint": "f19a4baee0f4b118cb39100ecd2250dbb5ca89e381353ac3593592fd93ca4c91",
+    "sourceCheckpoint": "a269f88b554c4a684a12510c7f95beecca0fb535",
+    "build": "reboot-04-two-paws-v9 Release arm64 Simulator adhoc",
+    "jsBundleSha256": "edb2ffbf9500c5599b79cf66b06b28c9c181ea90a6d2633c45576fe5e33830da",
+    "nativeExecutableSha256": "d06ae8a31ab6fbeb0cd8a2ad1ac5bc25bd267379d2f39c99e3e483cc3f6a6ee7",
+    "sourceFingerprint": "1e3bc5aff7bfa65f741bfb73220a85abe1cf4167af338c6d35c97dc8fc945263",
     "axesVersion": 1,
     "representatives": [
       "playful",
@@ -3482,16 +3484,16 @@
     ],
     "full16": "NOT_IMPLEMENTED_THIS_SCOPE",
     "growth": "INTERFACE_ONLY;NOT_FORMATION_COMPLETE",
-    "commonArt": "NEW_ISOLATED_QUAD_CANDIDATE; ABC_ORIGINALS_PRESERVED",
-    "tests": "463/463 FRESH;15 impact including7 newhand",
+    "commonArt": "SHARED_BABY_TWO_PAWS_8_BONES;QUAD_AND_ABC_PRESERVED",
+    "tests": "468/468 FRESH;18 impact",
     "lint": "PASS",
     "typecheck": "PASS",
     "iosRelease": "PASS_XCODEBUILD_EXIT0_ACTUAL_SIMULATOR_INPUT",
     "android": "JS_BUNDLE_PASS; NATIVE_EMULATOR_NOT_RUN",
     "CNG": "27/27 STATIC PASS",
     "performance": "PERF01_OPEN_NEW_OFF_BENCH_NOT_RUN",
-    "storage": "52_EXISTING/5LEDGERS/48FILES/8INCIDENTS/3DBOK;4_NEWCOMPARE_ECONOMY0",
-    "legacyMemory": "ORIGINAL_MAIN_AND_REPRESENTATIVE3_EXACT;ONLY_PREEXISTING_ACTIVE_SYNTHETIC_POISED_AUTO36/64BOUND;BEFOREDB_PRESERVED",
+    "storage": "56OLD_SNAPSHOTS_ALL_MEMORIES_EXACT/48FILES/5LEDGERS/8INCIDENTS/3DBOK;3NEWCOMPARE_ECONOMY0",
+    "legacyMemory": "ALL_PREEXISTING_MEMORIES_EXACT;NORMAL_MENU_PAUSE_BEFORE_BACKUP",
     "cold": "ALL3_SNAPSHOTS_AXES_RNG_CUSHION_EXACTLY_EQUAL_IMMEDIATELY_AFTER_RELAUNCH",
     "review": "SELF_REVIEW",
     "requestedModel": "GPT-6.1 Sol Max",
@@ -3499,11 +3501,13 @@
     "subagents": 0,
     "healthAndPayments": "OFF",
     "funArtSizePersonality": "USER_REVIEW_PENDING",
-    "evidence": "evidence/reboot-04-hand-2026-10-11/",
-    "nextScope": "USER_HAND_EXPRESSION_REVIEW_OR_SEPARATE_PERF01_ONLY",
+    "evidence": "evidence/reboot-04-two-paws-2026-10-11/",
+    "nextScope": "USER_TWO_PAW_BABY_REVIEW_OR_SEPARATE_PERF01_ONLY",
     "comparison": "SYNTHETIC_4_FACTS_FIXED;INITIALSTATE_EXCEPT_OWNER_EQUAL;NORMAL_SELECTION_HIDDEN_LABELS_LINES_3VIDEOS",
     "workflow": "42/42_FRESH_PASS;DIRECT_VALIDATOR_REGRESSION1/1",
-    "handReview": "3PROFILES_X4_NATIVE_INPUTS;BEFORE_AFTER_CLIPS;CANCELLED_MEMORY0"
+    "handReview": "3PROFILES_X4_NATIVE_INPUTS;BEFORE_AFTER_CLIPS;CANCELLED_MEMORY0",
+    "footDirection": "USER_APPROVED_BABY_ONLY;GROWN_EVOLVED_FOUR_DIRECTION_ONLY",
+    "growthFootTransition": "NOT_DECIDED_THIS_SCOPE"
   },
   "historicalPersonalityFoundationBeforeEcd62de": {
     "status": "PERSONALITY_3_REVIEW_READY",
@@ -3699,6 +3703,86 @@
       "androidRuntime": "CURRENT_JS_BUNDLE_PASS;NATIVE/UI_NOT_RUN",
       "widgetRuntimeQa": "PRIOR_V4_DISPLAY_TAP_PRESERVED; NOT_REPEATED_AS_V6_FRESH_PASS",
       "performance": "OPEN_EXISTING_RAF_BUDGET_FAIL; NO_DEFAULT_RENDER_FIX_ADOPTED",
+      "artFunSizeModelRenderAdoption": "USER_REVIEW_PENDING"
+    }
+  },
+  "historicalBeforeTwoPawA269f88": {
+    "definition": "Scoped three-personality hand expression review prepared; overall MVP and PERF-01 remain incomplete",
+    "reason": "v8 actual native12 input cases plus background cancellation verified; user-requested hand hold/release distinction implemented. v7 panel completion defect fixed. Performance is separately OPEN and no new OFF benchmark or product approval is claimed.",
+    "sourceBaseline": "3675689875fd989b22b80b5f28e0757b78fdf7f9",
+    "sourceCheckpoint": "6ad0ecdf267b320669f4f94ea1268fe5dc22e86b",
+    "lastValidation": {
+      "scope": "REBOOT-04 hand-only expression and cancel semantics",
+      "sourceCheckpoint": "6ad0ecdf267b320669f4f94ea1268fe5dc22e86b",
+      "sourceManifest": "evidence/reboot-04-hand-2026-10-11/release-v8-manifest.json",
+      "mobileTests": {
+        "passed": 463,
+        "total": 463,
+        "failed": 0,
+        "skipped": 0
+      },
+      "impactTests": "15/15 including7 hand-specific",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iOSReleaseCompile": "exit0_v8",
+      "iOSInstallLaunch": "SAME_DB_222_INPUTS_HASH_MATCH_ACTUAL_NATIVE_12_CASES",
+      "androidJsBundle": "PASS",
+      "CNG": "27/27 STATIC PASS",
+      "workflow": "42/42_FRESH;DIRECT_VALIDATOR1/1",
+      "handTrace": "COMPLETE1_MEMORY_EACH_CANCEL0;NORMAL_UI;NO_ECONOMIC_GAIN",
+      "performance": "PERF01_OPEN_PREVIOUS_BASELINE_RETAINED_NEW_OFF_BENCH_NOT_RUN",
+      "physicalGpuLatency": "NOT_RUN",
+      "health": "OFF",
+      "preservation": "52_EXISTING/5LEDGERS/48FILES/8INCIDENTS/3DBOK;4_NEW_SYNTHETIC_ECONOMY0",
+      "originalCantopenCause": "OPEN",
+      "evidence": "evidence/reboot-04-hand-2026-10-11/"
+    },
+    "personalityFoundation": {
+      "status": "HAND_EXPRESSION_REVIEW_PREPARED_PERFORMANCE_OPEN",
+      "report": "REBOOT-04-REPORT.md",
+      "sourceCheckpoint": "6ad0ecdf267b320669f4f94ea1268fe5dc22e86b",
+      "build": "reboot-04-hand-v8 Release arm64 Simulator adhoc",
+      "jsBundleSha256": "862b56c4c0303770e03a6d312880690313299ace2d27639606160234620e600e",
+      "nativeExecutableSha256": "91df946e6080203bca461075dbe2376799fdb6dc332c1bd699d61193f94c55af",
+      "sourceFingerprint": "f19a4baee0f4b118cb39100ecd2250dbb5ca89e381353ac3593592fd93ca4c91",
+      "axesVersion": 1,
+      "representatives": [
+        "playful",
+        "warm",
+        "poised"
+      ],
+      "full16": "NOT_IMPLEMENTED_THIS_SCOPE",
+      "growth": "INTERFACE_ONLY;NOT_FORMATION_COMPLETE",
+      "commonArt": "NEW_ISOLATED_QUAD_CANDIDATE; ABC_ORIGINALS_PRESERVED",
+      "tests": "463/463 FRESH;15 impact including7 newhand",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iosRelease": "PASS_XCODEBUILD_EXIT0_ACTUAL_SIMULATOR_INPUT",
+      "android": "JS_BUNDLE_PASS; NATIVE_EMULATOR_NOT_RUN",
+      "CNG": "27/27 STATIC PASS",
+      "performance": "PERF01_OPEN_NEW_OFF_BENCH_NOT_RUN",
+      "storage": "52_EXISTING/5LEDGERS/48FILES/8INCIDENTS/3DBOK;4_NEWCOMPARE_ECONOMY0",
+      "legacyMemory": "ORIGINAL_MAIN_AND_REPRESENTATIVE3_EXACT;ONLY_PREEXISTING_ACTIVE_SYNTHETIC_POISED_AUTO36/64BOUND;BEFOREDB_PRESERVED",
+      "cold": "ALL3_SNAPSHOTS_AXES_RNG_CUSHION_EXACTLY_EQUAL_IMMEDIATELY_AFTER_RELAUNCH",
+      "review": "SELF_REVIEW",
+      "requestedModel": "GPT-6.1 Sol Max",
+      "effectiveModel": "ROUTING_UNVERIFIED",
+      "subagents": 0,
+      "healthAndPayments": "OFF",
+      "funArtSizePersonality": "USER_REVIEW_PENDING",
+      "evidence": "evidence/reboot-04-hand-2026-10-11/",
+      "nextScope": "USER_HAND_EXPRESSION_REVIEW_OR_SEPARATE_PERF01_ONLY",
+      "comparison": "SYNTHETIC_4_FACTS_FIXED;INITIALSTATE_EXCEPT_OWNER_EQUAL;NORMAL_SELECTION_HIDDEN_LABELS_LINES_3VIDEOS",
+      "workflow": "42/42_FRESH_PASS;DIRECT_VALIDATOR_REGRESSION1/1",
+      "handReview": "3PROFILES_X4_NATIVE_INPUTS;BEFORE_AFTER_CLIPS;CANCELLED_MEMORY0"
+    },
+    "completion": {
+      "independentLocalEngineering": "HAND_EXPRESSION_REVIEW_PREPARED",
+      "productMvp": "NOT_COMPLETE",
+      "iosCurrentRuntime": "V8_ACTUAL_HAND12_MENU_BACKGROUND_CANCEL_AND_FINAL_MOTION_OFF",
+      "androidRuntime": "CURRENT_JS_BUNDLE_PASS;NATIVE/UI_NOT_RUN",
+      "widgetRuntimeQa": "GENERAL_DISPLAY_OBSERVED_HOME;APP_ICON_RETURN;WIDGET_TAP_NOT_RUN_THIS_SCOPE",
+      "performance": "PERF01_OPEN_NO_NEW_OFF_BENCH_NO_BUDGET_REDUCTION",
       "artFunSizeModelRenderAdoption": "USER_REVIEW_PENDING"
     }
   }

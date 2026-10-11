@@ -1,5 +1,22 @@
 # SRS MVP gap matrix — fresh iOS validation
 
+## 최신 REBOOT-04 아기 두 발 — 2026-10-11
+
+| 범위 | 판정 | 실제 근거 / 한계 |
+|---|---|---|
+| 아기 두 발 제작/3성격 동일자산 | PASS_SCOPED / USER_APPROVED_FOOT_DIRECTION | 실제Blender .blend/GLB/8bone/2paw, 뒷발메시·뼈·트랙없음; 최종아트미승인 |
+| 교대접지·체중·도약/착지·정지 | PASS_SIMULATOR_SCOPED / SELF_REVIEW | 정상바닥3방향·자율도약원본영상/실제flight→landing; 고속기기계측아님 |
+| 3종손지지·해제·복원·취소 | PASS_NATIVE_SCOPED | 같은v9/완료기억1/취소0/경제0;v8기질/기억/손연기보존 |
+| 원본·저장·경제·정책 | PASS_PRESERVATION | 기존56snapshot·모든기억/5원장/48원본/8진단/3DBok exact |
+| 성장형/진화형네발·전환시점 | NOT_IMPLEMENTED / NOT_DECIDED_THIS_SCOPE | 방향유지,이번제작/시점/성장규칙변경없음 |
+| PERF-01·CANTOPEN VFS | OPEN | 구조비용변화를성능/저장결함해결로표시하지않음 |
+| 실제기기/GPU/물리입력 | NOT_RUN | Simulator와분리 |
+| 최종아트·재미·크기·표현 | USER_REVIEW_PENDING | 발수승인과최종품질승인분리 |
+
+[최신 보고](REBOOT-04-REPORT.md). 아래 네발/손 개선은 과거 실제 증거로 보존한다.
+
+### Historical — 손 표현 v8
+
 ## 최신 REBOOT-04 손 표현 제품 리뷰 반영 — 2026-10-11
 
 | 범위 | 판정 | 실제 근거 / 한계 |

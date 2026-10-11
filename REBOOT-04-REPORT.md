@@ -1,3 +1,54 @@
+# REBOOT-04 — 아기 두 발 추가 결정 반영 / v9
+
+낮고 둥근 모찌 몸과 작은 두 발의 공통 아기 후보를 장난·다정·도도에 적용했다. 실제 방에서 두 발의 교대 이동·정지, 정상 생활 중 도약·착지와 세 성격의 손 기대기·접촉·복원을 확인했다. 기존 윙크·문맥·최근 이력·메뉴 취소 개선을 유지했다.
+
+**두 발 아기 검토판: PREPARED / PASS_SIMULATOR_SCOPED / SELF_REVIEW.** 발 수 방향은 사용자 승인 범위이며 최종 아트·재미는 USER_REVIEW_PENDING이다. 성장기·진화형의 네발은 디자인 방향으로만 남고 이번에 제작하거나 전환 시점을 정하지 않았다. PERF-01과 CANTOPEN 원인은 별도 OPEN이다.
+
+## 바로 보기
+
+현재 v9에서 기존 성격 검토판→우리 아이→합성 동일조건 비교→3종 선택→시작을 사용한다. 본래3종 저장도 같은 두 발 아기를 표시하며 일반/다른 검토 저장의 성격·재화를 바꾸지 않는다. +35/DPR2.5-AA0/같은 방·카메라·조명·원래양면/tail/일반 모션·이름/말풍선 숨김을 유지했다. 새3개 합성 비교는 같은 상태/4개 경험/RNG/가구로 시작했다.
+
+| 실제 장면 | 정상 속도 증거 |
+|---|---|
+| 정면·측면·후면의 실제 바닥 이동/정지 | [75초 발췌](evidence/reboot-04-two-paws-2026-10-11/two-paw-movement-short.mp4) / [300초 원본](evidence/reboot-04-two-paws-2026-10-11/two-paw-playful-v9.mp4) |
+| 장난 손 교감/두 발 지지/복원 | [26초](evidence/reboot-04-two-paws-2026-10-11/two-paw-playful-hand-short.mp4) / [110초 보완 원본](evidence/reboot-04-two-paws-2026-10-11/two-hand-playful-v9.mp4) |
+| 다정 기대기/복원 | [27초](evidence/reboot-04-two-paws-2026-10-11/two-paw-warm-hand-short.mp4) / [180초 원본](evidence/reboot-04-two-paws-2026-10-11/two-hand-warm-v9.mp4) |
+| 도도 세운 접촉/원래 관심 복귀 | [26초](evidence/reboot-04-two-paws-2026-10-11/two-paw-poised-hand-short.mp4) / [180초 원본](evidence/reboot-04-two-paws-2026-10-11/two-hand-poised-v9.mp4) |
+
+첫 장난300초의 손 교감은 촬영 끝에 걸려 전체 복원이 담기지 않아 같은 빌드·같은 개체의110초 영상으로 보완했다. 이를 원본 안의 완전한 손 검증으로 기록하지 않는다. 짧은 영상은 한 연속 구간 발췌이며 배속/색 보정/축소/실패 이어붙이기 없음. 각 mp4.json/프레임 metadata가 실제 source/PTS를 남긴다. 실제 조작 시간·직전 생활은 유형마다 다르며 고정 장면 재생을 정상 선택으로 대체하지 않았다.
+
+정상 자율생활의 tiny_hops를 실제로 포착했다. [도약140.36s](evidence/reboot-04-two-paws-2026-10-11/movement-hop-frames/140.360.png)와 [착지140.83s](evidence/reboot-04-two-paws-2026-10-11/movement-hop-frames/140.830.png)는 native1170×2532 원본이며 두 발과 그림자/압축이 함께 변한다. 정지 PNG만으로 모션/FPS를 승인하지 않는다. 실제 바닥4방향 클릭과 자연스러운 생활/도약은300초 원본에 있다.
+
+## 메시·리그·움직임을 함께 수정
+
+- 실제 프로젝트 로컬 Blender5.2.0 LTS/Python 호출로 별도 [편집 .blend](art/reboot-04/baby_two_paws.blend), [제작 소스](art/reboot-04/build_baby_two_paws.py), [게임 GLB](mobile/assets/reboot-04/baby-two-paws.glb)를 만들었다. 기존 C/A-v8 표면을 그대로 참고했고 A-v8 몸·두 발 좌표의99.5% 이상을 실제 geometry 검사로 대조했다. 사람이 직립하는 몸/긴 다리/새 몸통을 추가하지 않았다.
+- 아기 GLB는 실제8bone/2paw다. 뒷발 geometry/bone/weight/track가 없으며 숨김 처리로 끝내지 않았다. 기존 네발 .blend/GLB와 A/B/C는 byte일치한다. face/horn/귀와 성격 구조를 새로 만들지 않았다.
+- 두 발의 반대 위상·세계 좌표 접지·지지 쪽으로 체중 이동·정지 때 부드러운 중심 복귀를 연결했다. 두 발 동시 도약/착지와 압축·그림자를 확인했다. 기존 네발 runtime/reference는 그대로 사용할 수 있다.
+- 한 발로 장난할 때 두 발 아기에만 지지 쪽 체중 이동을 적용한다. 다정/도도의 본래 손 연기와 실제 release sample의 smooth 복원을 유지한다. 없는 뒷발을 지지점으로 만들지 않고 실제두발만 사용한다.
+- runtime은 REBOOT-04 아기 후보/대표3종에 적용한다. 기존 성장기/진화형 자산·성장 조건·Lv전환·경제·저장 schema·SQLite 대기열·시간/수면/동면 정책·일반 위젯/건강OFF는 변경하지 않았다. 성격을 과거 코드로 reset하지 않았다.
+
+## 실제 검증과 보존
+
+최신 v9 3종의 정상 손 제안/유지→해제→생활 복귀, 직접 몸 탭, 메뉴 중간 취소를 확인했다. 같은 실제 token의 완료 기억1개, 취소0개, 새개체coin/food/EXP/meal0. two-paw-runtime-summary.json과 각 native trace를 제공한다. 두발 지지/체중/연결에 심한 찢어짐·귀/뿔 분리·뒷발 출현은 SELF_REVIEW에서 보이지 않았다. 고속 실기기 접지/GPU 계측은 NOT_RUN이며 사용자 최종 품질 판독은 대기한다.
+
+기존56개 snapshot의 이름/형태/성격/재화/EXP/시설/활동/수면·동면/5원장 정확히 동일. 기존 모든 기억도 exact(착수 전에 정상 메뉴로 생활을 멈춤), 원본48파일·진단8건·3DB integrity ok. 새 합성3개만 추가했고 일반 저장에 먹이/가구/보상을 지급하지 않았다. DB 초기화·원본/영상 삭제 없음.
+
+최신 전체468/468 fail0/skip0·두발/기존손/보행/네발 원본 영향18/18, lint/typecheck PASS. v9 iOS Release arm64 xcodebuild exit0/동일DB 설치/실제 화면 입력, Android JS bundle PASS/CNG27 STATIC PASS. 최종 운영 정적42/42·validator 직접 회귀1/1 PASS. 이번 Android native/UI/실기기·GPU·물리 입력·발열/배터리는 NOT_RUN이다.
+
+처음 새 테스트 파일의 cwd 오류는 새 검사를 실행한 성공으로 세지 않았고 올바른 경로에서 재실행했다. -0 endpoint는 코드에서 실제0으로 정규화했으며 기존 기대값/성능 기준을 낮추지 않았다. 기존 static Metro asset require의 lint 지시 위치를 유지했다. 새 시스템 설치·SDK 내부 패치·보안 변경·외부 업로드 없음. Blender MCP/GUI 손조형을 했다고 기록하지 않으며 실제 사용은 로컬 bpy와 실제 native/CUA/AVFoundation이다.
+
+앱 소스 **a269f88** / 설치 **reboot-04-two-paws-v9 Release arm64 Simulator ad hoc**. 227입력 fingerprint `1e3bc5aff7bfa65f741bfb73220a85abe1cf4167af338c6d35c97dc8fc945263`, JS `edb2ffbf9500c5599b79cf66b06b28c9c181ea90a6d2633c45576fe5e33830da`, native `d06ae8a31ab6fbeb0cd8a2ad1ac5bc25bd267379d2f39c99e3e483cc3f6a6ee7`를 실제 설치/현재 소스와 대조했다. 아기 .blend343004bytes / GLB434492bytes / body3858vertices / GLB SHA `9749b490b5be5c56ee184da8c417931110a1ead3a0da17b64496a1f160c5fd30`. macOS15.6/Xcode26.3/iPhone16e iOS26.3.1/390×844pt/native1170×2532/Apple Software Renderer, Metro 없이 같은 embedded Release다.
+
+## 남은 범위와 Git
+
+PERF-01은 OPEN이고 새 표준 녹화OFF 벤치를 하지 않았다. 발 수가 줄어 구조 비용이 달라진 사실을 성능 통과로 해석하지 않는다. 해상도/표정/성격/기준은 유지했다. CANTOPEN VFS 인과도 OPEN, 실제기기/GPU/물리 지연은 NOT_RUN. 성장형/진화형 네발 제작과 전환 시점은 NOT_IMPLEMENTED/NOT_DECIDED_THIS_SCOPE. 아기 최종 아트·재미·성격 표현·크기는 USER_REVIEW_PENDING이다.
+
+발 수의 최신 승인 범위는 AGENTS/SRS/decisions/작업 지시에 반영했고 과거 네발 증거는 아래에 보존한다. 소스·.blend/GLB·검사·문서만 feature 체크포인트/일반push, DB/영상/build/generated native/비밀은 제외한다. 최종 HEAD/tracking/live-origin/clean은 git-final-audit.json과 최종 응답에서 확인한다. SOL_DIRECT/SELF_REVIEW/subagent0/요청GPT-6.1 Sol Max/effective ROUTING_UNVERIFIED. main/merge/force/tag/release/deploy/건강읽기/실결제/보안 변경 없음.
+
+---
+
+## Historical — 네발 기반 손 표현 v8
+
 # REBOOT-04 손 교감 제품 리뷰 반영 — v8
 
 장난은 짧게 앞발을 내밀고 옆으로 몸을 빼 손 쪽을 확인한 뒤 편하게 머무른다. 다정은 볼/옆구리 방향으로 몸을 기울여 무게를 맡기고, 손을 떼면 그 자세에서 부드럽게 몸을 세운다. 도도는 크게 기울이지 않고 몸을 세운 채 방향·시선을 옆으로 두며, 실제로 보던 대상이 있으면 해제 뒤 그쪽으로 돌아간다. 이름과 말풍선을 숨긴 같은 게임 크기의 최신 Release에서 비교했다.

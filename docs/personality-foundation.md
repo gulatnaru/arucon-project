@@ -67,6 +67,14 @@
 
 handActing trace는 기존 babyBeat와 별도로 현재 렌더 연기를 기록한다. 매 프레임 전체 카탈로그·DB·React root 쓰기는 없고 beat 변경/완료/취소만 기록한다. raw v7의 취소 결함과 최신 v8의12사례를 분리했다. 새 타입/외형/성장/경제/AI 없이 사용자 성격 표현 검토를 대기하며 PERF-01과 CANTOPEN 원인은 OPEN이다.
 
+## 2026-10-11 아기 두 발 범위 — 최신 사용자 결정
+
+과거 공통 네발 검토는 이력이다. 아기만 A-v8의 낮고 둥근 몸·작은 두 발로 돌아가고 대표3종에 같은 별도 GLB를 적용한다. 기존 성격/기억/손 개선을 유지하며 저장 초기화/성격 소급 변경은 없다. 성장기·진화형은 네발 디자인 방향만 유지하고 이번 제작/전환 시점은 정하지 않는다.
+
+baby_two_paws.blend는 immutable Hybrid C(A-v8 body surface)에 실제 두 발 트랙/체중/도약·착지/정지/복원을 편집한 원본이다. 8bone/2paw/no rear geometry/weights/tracks. runtime two_paw 후보는 실제 두 지지와 발 그림자만 생성하고 교대 stance의 lateral weight shift를 정지 때 부드럽게 복원한다. 손의 앞발 동작에는 지지 쪽 supportX를 추가하되 기존3종 연기/유형/축/가격/성장/시간 정책을 바꾸지 않는다.
+
+같은 v9 정상 바닥 입력의 정면/측면/후면 보행·자율 도약·세 손 연기를 실제 확인했다. Node/static 증거와 실제 native video를 보고서에서 구분한다. 네발/A/B/C 원본은 그대로다. 발 수 방향만 USER_APPROVED_SCOPE이며 최종 아트/재미/크기/표현은 USER_REVIEW_PENDING이다. PERF-01/CANTOPEN VFS는 별도OPEN, 실제기기/GPU/물리 지연 미검증.
+
 ## 공통 자산과 확장 경계
 
 C의 원본을 읽기 전용 기준으로 실제 Blender Python에서 공통 네발 후보 하나만 제작했다. 두 뒤발·유연한 상단 연결·정규화 skin weight·대각 발 track을 추가하고 런타임 접지와 네 발 그림자를 연결했다. A/B/C와 원본 .blend/GLB는 덮지 않았다. 편집 원본은 art/reboot-04/common_quad.blend, 제작 소스는 같은 폴더의 Python, 런타임은 mobile/assets/reboot-04/common-quad.glb다. 최종 아트 승인은 대기한다.

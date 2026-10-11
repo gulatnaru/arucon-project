@@ -1,3 +1,13 @@
+# 최신 실행 — REBOOT-04 아기 두 발 / 2026-10-11
+
+소스a269f88/설치two-paws-v9/실제소스·설치227해시대조. 사용자추가결정으로아기만두발,모찌A-v8몸+작은두발/1horn을유지한별도Blender8bone/2paw자산생성. 후방geometry/bones/tracks없음, 실제편집.blend/GLB/제작Python보존. 두발교대세계접지/체중/도약착지압축/정지/손지지와복원을연결하고3종같은모델의정상native입력으로검증. 원래네발·A/B/C·v8성격/기억/취소개선·경제/저장엔진을보존했다. 성장형/진화형네발제작·전환시점은이번미구현/미결정.
+
+[보고/실제 영상](REBOOT-04-REPORT.md). P300초보행/정상도약/3방향·P110초손보완·W/D180초·손26~27초3개/이동75초·nativePTS. 완료기억1/취소0/경제0. 기존56snapshot·모든기억·5원장·48원본·진단8·3DBok exact. 최신468/468·영향18/lint/types/Releaseexit0/AndroidJS/CNG27STATIC PASS. Node검사/정지이미지를모션PASS로대체하지않았다. PERF-01/CANTOPEN VFS OPEN;새OFF벤치/기기/GPU/물리 미실행. 발수방향만승인,최종아트/재미/크기/표현대기. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. feature일반push만/외부업로드없음.
+
+---
+
+## Historical — 손 표현 v8
+
 # 최신 실행 — REBOOT-04 손 교감 표현 / 2026-10-11
 
 [현재 보고](REBOOT-04-REPORT.md). 소스6ad0ecd/v8/222입력·설치JS/native 직접 대조. v6의끝beat/윙크고착을 짧은장난→편한유지, 다정볼/체중, 도도세운몸/옆시선/원래대상복귀로 수정. v7 실제메뉴취소가닫을때완료로기록되는결함을발견→v8손 gate cancel 수정→같은 최신 Release 3종×짧은탭/잠깐유지/오래유지/메뉴취소12사례를직접확인. 완료기억1/취소0/경제0, 실제문맥/최근스타일trace. 원본v6/v7실패/v8전체와약30초전후3쌍보존. 성격 구조/외형/유형수/경제·저장엔진확대없음.

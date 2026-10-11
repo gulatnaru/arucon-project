@@ -1,3 +1,21 @@
+# Next resume — REBOOT-04 아기 두 발 v9
+
+[최신 보고](REBOOT-04-REPORT.md). 소스 **a269f88**, 설치 **reboot-04-two-paws-v9 Release arm64 Simulator adhoc**. JS `edb2ffbf9500c5599b79cf66b06b28c9c181ea90a6d2633c45576fe5e33830da`, native `d06ae8a31ab6fbeb0cd8a2ad1ac5bc25bd267379d2f39c99e3e483cc3f6a6ee7`,227입력 fingerprint `1e3bc5aff7bfa65f741bfb73220a85abe1cf4167af338c6d35c97dc8fc945263`. 실제HEAD/dirty/remote/설치hash를먼저확인하고같으면재빌드/재설치/DB초기화하지않는다. handoff는현재Git과새 evidence/git-final-audit.json을따른다.
+
+최신 사용자 승인: **아기만 두 발**. A-v8 low mochi body/작은두발을참고한공통1종을3성격에적용. 과거네발유지는성장기/진화형방향이며이번제작/전환시점결정없음. 옛네발/A/B/C와성격/기억/손개선/원본저장보존. BodyRoot는두발8bone/뒷발메시·bone·track없음, 실제 .blend/GLB/제작소스는art/reboot-04와mobile/assets/reboot-04의baby_two/baby-two파일이다.
+
+v9에서정상바닥입력3방향보행/정지·자율도약/착지·3성격손제안/해제/직접몸접촉/메뉴취소를실제확인. 완료기억1/취소0/경제0. 같은+35/2.5AA0/tail/source/일반모션/대사·이름숨김. P300초영상은이동/도약,끝의불완전손구간은동일개체110초보완으로확인;W/D180초와26~27초손발췌/75초이동발췌/nativePTS는evidence/reboot-04-two-paws-2026-10-11/에있다. 고정진단재생과정상행동을혼동하지않는다.
+
+기존56개snapshot/모든기억/5원장/48원본/진단8/3DBok exact,새합성3 경제0. 최종468/468·영향18/18/lint/types/v9Releaseexit0/AndroidJS/CNG27static PASS. 최종운영42/42·validator직접회귀1/1 PASS. 원본/DB/영상삭제나과거reset없음. 건강/결제OFF, 일반위젯publish경로변경없음.
+
+**다음 한 작업:** 사용자가두발아기의정상보행·실루엣·3손교감을평가하거나별도PERF-01을추적한다. 발수방향승인과최종아트/재미/크기승인분리. 성장형/진화형네발제작·전환시점·유형추가·상점/AI확대없음. PERF-01은새OFF벤치를하지않아OPEN, CANTOPEN VFS 원인도OPEN. 실기기/GPU/물리/FPS/발열배터리/이번AndroidnativeUI NOT_RUN.
+
+SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. featurecheckpoint/일반push만;main/merge/force/tag/deploy/실건강/실결제/보안/외부영상업로드금지.
+
+---
+
+## Historical — 손 표현 v8 인계
+
 # Next resume — REBOOT-04 손 표현 v8 / 별도 PERF-01 OPEN
 
 [최신 결과](REBOOT-04-REPORT.md). 소스 **6ad0ecd**, 설치 **reboot-04-hand-v8 Release arm64 Simulator adhoc**. JS `862b56c4c0303770e03a6d312880690313299ace2d27639606160234620e600e`, native `91df946e6080203bca461075dbe2376799fdb6dc332c1bd699d61193f94c55af`,222입력 fingerprint `f19a4baee0f4b118cb39100ecd2250dbb5ca89e381353ac3593592fd93ca4c91`. 실제 HEAD/dirty/remote/설치 hash를 먼저 대조하고 같으면 불필요한 재빌드·재설치·DB초기화를 하지 않는다. 최종 handoff는 현재 Git과 hand evidence의 git-final-audit.json을 따른다.
