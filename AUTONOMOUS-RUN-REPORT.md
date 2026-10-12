@@ -1,3 +1,13 @@
+# 최신 실행 — REBOOT-04 생활 맥락·말풍선 / 2026-10-13
+
+[실제 결과/영상 전달](REBOOT-04-REPORT.md), 소스317ca1e/v11/230입력·설치JS/native해시일치. 합성 사실→3종 의도/몸/눈/귀/말, unknown≠부족, rest/말줄이기/동일사건·콜드 중복 차단, native 콘텐츠 폭/X 없는 말풍선. 짧은 대사 테두리 폭/여러줄 폭 문제를 실제 수정. 실패한 이모지 글꼴 실험 제거·동일 해시복원. 3종 실제 영상·trace,수면/깨우기/이동/접촉/복귀. 원래65저장·5원장·원본50·진단8보존/3DBok; bounded기억정리 별도기록. 이번482/482·linter/types·iOSRelease·AndroidJS·CNG27STATIC·workflow42+direct1 PASS.
+
+생활 검토 PARTIAL_WITH_BLOCKERS(이모지 대체글리프·실제읽기/실기기 미확인); 전체REWORK_REQUIRED/PERF-01 OPEN/P35.83ms미달. CANTOPEN VFS OPEN, 최종표현/재미/아트대기. SOL_DIRECT/SELF_REVIEW/subagent0/effective ROUTING_UNVERIFIED. 개인iCloudArucon/Reviews(v11 MP4+안내문만) 업로드·비공개·해시확인, DELIVERY_SENT/MOBILE_NOT_VERIFIED. 원본/DB/로그외부전송없음. 소스feature checkpoint후검사된문서만추가저장/일반push하며최종실제SHA는조회한다.
+
+---
+
+## Historical — v10
+
 # REBOOT-04 감정·방 후속 v10 — 실제 수정·검토 자료
 
 사용자의 v9 표현 불충족을 재오픈했다. 기본 호기심 비대칭과 지속 윙크, 귀 oscillator, 손 연기/발화 박자 불일치를 수정했다. 같은 Release3성격 비언어 교감·대사ON·witnessed 쿠션·수면/동면/콜드 복귀를 실제 확인했다. 방은 현 펫을 넣은 오프라인 시안 한 개이며 기본방 미변경. [상세 결과](REBOOT-04-REPORT.md).

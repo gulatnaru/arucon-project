@@ -1,13 +1,13 @@
 {
   "schemaVersion": 6,
-  "runDate": "2026-10-12",
+  "runDate": "2026-10-13",
   "timezone": "Asia/Seoul",
   "status": "REWORK_REQUIRED",
   "overallGate": "MVP_NOT_COMPLETE_PERFORMANCE_OPEN",
-  "definition": "Emotion followup comparison prepared; prior user expression failure awaits reevaluation; room concept only",
-  "reason": "Balanced interest/brief wink/event-linked ears/actual hand speech cues fixed and native reviewed; final emotion/personality/room quality not user-approved; PERF-01 remains OPEN",
-  "sourceBaseline": "0eb11560c4717d5cfac5a6988df51130c34d7e59",
-  "sourceCheckpoint": "ef32ac36c0532d83120636bedb1fea2fe4e4e503",
+  "definition": "Synthetic life context / personality expressions / content-sized pet speech native review; overall performance and user expression approval pending",
+  "reason": "Synthetic life context and content-sized X-less bubbles native reviewed; emoji/actual reading/device gates incomplete; PERF-01 and original VFS cause OPEN; expression/fun/art pending",
+  "sourceBaseline": "57368d7",
+  "sourceCheckpoint": "317ca1eca6bb74632a04f631ede9c0c7793fb46b",
   "currentLivingReport": "REBOOT-04-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
@@ -546,83 +546,41 @@
     ]
   },
   "lastValidation": {
-    "scope": "REBOOT-04 baby-only two-paw asset and motion integration",
-    "sourceCheckpoint": "a269f88b554c4a684a12510c7f95beecca0fb535",
-    "sourceManifest": "evidence/reboot-04-two-paws-2026-10-11/release-v9-manifest.json",
+    "sourceCommit": "317ca1eca6bb74632a04f631ede9c0c7793fb46b",
     "mobileTests": {
-      "passed": 468,
-      "total": 468,
+      "passed": 482,
       "failed": 0,
       "skipped": 0
     },
-    "impactTests": "18/18 two-paw/retainedhand/gait/quadreference",
     "lint": "PASS",
     "typecheck": "PASS",
-    "iOSReleaseCompile": "exit0_v9",
-    "iOSInstallLaunch": "SAME_DB_227_HASH_MATCH_ACTUAL_NORMAL_MOVE_HOP_HAND3",
+    "iOSRelease": "PASS_XCODEBUILD_EXIT0",
     "androidJsBundle": "PASS",
-    "cng": "27/27 STATIC PASS",
-    "workflow": "42/42_FRESH;DIRECT_VALIDATOR1/1",
-    "preservation": "56_EXISTING_SNAPSHOTS_AND_ALL_MEMORIES/5LEDGERS/48ORIGINALS/8INCIDENTS/3DBOK;3NEW_SYNTHETIC_ECONOMY0",
-    "grownEvolvedTransition": "NOT_IMPLEMENTED_NOT_DECIDED",
-    "performance": "PERF01_OPEN_NEW_OFF_BENCH_NOT_RUN",
-    "physicalGpuLatency": "NOT_RUN",
-    "originalCantopenCause": "OPEN",
-    "health": "OFF",
-    "evidence": "evidence/reboot-04-two-paws-2026-10-11/"
+    "nativeGeneration": "27_STATIC_PASS",
+    "workflow": "42_PASS",
+    "workflowDirectSelftest": "1_PASS",
+    "physicalDeviceGpuPhysicalLatency": "NOT_RUN",
+    "scope": "current source equality verified against Release manifest; no historical test numbers reused"
   },
   "environment": {
     "host": "macOS 15.6",
-    "node": "v26.7.0",
-    "npm": "11.19.0",
-    "androidToolchain": "BLOCKED_ENV: noANDROID_HOME/SDK_ROOT;standardSDK/adbmissing",
-    "androidAvd": "preserved historical Windows AVD",
-    "healthAccess": "OFF",
-    "hostGpu": "Apple Software Renderer",
-    "softwareEmulator": "quality_250 DPR2.5 AA0 vertex-lit CPU morph public GL queue barrier; tail/source default",
-    "hostLocked": false,
-    "iosRuntime": "26.3.1",
     "xcode": "26.3",
-    "configuration": "REBOOT-04 two-paws-v9 embedded Release arm64 Simulator adhoc;Metro not required",
-    "contentSize": "Preserved normal size; no new large-text matrix this scope",
-    "currentRendererSnapshot": {
-      "profileId": "quality_250",
-      "requestedDpr": 2.5,
-      "identity": {
-        "renderer": "Apple Software Renderer",
-        "vendor": "Apple Inc.",
-        "version": "OpenGL ES 3.0 APPLE-23.0.2"
-      },
-      "cpuMorphs": true,
-      "logicalWidth": 390,
-      "logicalHeight": 844,
-      "deviceDpr": 3,
-      "bufferWidth": 975,
-      "bufferHeight": 2110,
-      "requestedMsaa": 0,
-      "postprocessAa": "none",
-      "roomCurves": "refined",
-      "maxSamples": 9,
-      "sampleBuffers": 0,
-      "samples": 0,
-      "framebufferStatus": 36053,
-      "error": 0
-    },
-    "iosRuntimeLabel": "26.3",
-    "iosRuntimeBuild": "23D8133",
-    "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
-    "isolatedReplayDevice": "FE2B778D-B598-45F3-BE4F-0E1BB3F76A5B",
-    "blender": "PROJECT_LOCAL5.2.0_LTS_ACTUAL_BPY_CREATION",
-    "figma": "TOOLS_EXPOSED; ACCOUNT_CHOICE_PENDING; NO_SUCCESSFUL_CALL_OR_ARTIFACT",
-    "physicalIosInventory": "currentdevicectl no devices found",
-    "transientDiskPressure": "127MiB coincided with actual capture/storage errors; headroom recovered and same-app native write restored; exact first internal cause not asserted",
-    "reviewSelection": "controlled poised/two_paw+35/quality250AA0/tail/source/awake/lines_hidden/reducedOFF",
-    "handToolsUsedThisScope": [
-      "CUA",
-      "simctl",
-      "Swift_AVFoundation"
+    "simulator": "iPhone16e iOS26.3.1",
+    "viewportPoints": [
+      390,
+      844
     ],
-    "blenderThisScope": "ACTUAL_LOCAL5.2.0_BPY_REAUTHOR_AND_SEPARATE_BLEND_GLB;NO_NEW_INSTALL"
+    "nativeVideoPixels": [
+      1170,
+      2532
+    ],
+    "renderer": "Apple Software Renderer",
+    "dpr": 2.5,
+    "msaa": 0,
+    "sizeCandidate": 1.35,
+    "actualInput": "ACCESS_CONFIRMED_THIS_RUN",
+    "actualGpuAndPhysicalDevice": "NOT_RUN",
+    "emoji": "PLACEHOLDER_OPEN_ENVIRONMENT_DIAGNOSIS"
   },
   "historicalMacCompletion": {
     "independentLocalEngineering": "IN_PROGRESS_FONT_130_DB_BLOCKER",
@@ -1005,15 +963,11 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
-    "initialHead": "b58967ec7d805d8c3142c16bdb7ff1ee630a66d4",
-    "initialHeadTrackingLiveMatch": true,
-    "initialClean": true,
-    "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
-    "verificationEvidence": "evidence/storage-01-resume-2026-10-10/git-final-audit.json",
-    "publicationRecordScope": "STORAGE-01 diagnostic preservation source/report checkpoints, feature only",
-    "publicationState": "Final publication receipt after ordinary push is authoritative",
-    "mainPushMergeDeploy": false
+    "appSource": "317ca1eca6bb74632a04f631ede9c0c7793fb46b",
+    "remote": "origin",
+    "allowed": "normal feature checkpoint/push only",
+    "finalReceipt": "evidence/reboot-04-life-context-v11/final-git.json",
+    "resumeRule": "read current HEAD/status/live origin; do not reset to app source commit"
   },
   "realHealthDataRead": false,
   "realAccountsOrCloudCreated": false,
@@ -1081,7 +1035,7 @@
       }
     }
   },
-  "evidenceDirectory": "evidence/storage-01-resume-2026-10-10/",
+  "evidenceDirectory": "evidence/reboot-04-life-context-v11/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -1817,7 +1771,7 @@
     },
     "evidenceDirectory": "evidence/product-hardening-sol-unlocked-2026-10-04/"
   },
-  "implementedScope": "Bounded two-slot diagnostic archive/cold restoration/sealed sessions; no art/renderer/game/economy/growth/rest/schema changes",
+  "implementedScope": "presentation-only synthetic context; existing director/memory/SQLite lane; native measured X-less bubble; no economy/domain clock/schema/asset changes",
   "historicalLife02At3a7a6c1": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
     "reason": "Actual current Mac access succeeded. Preserved Rumi20 normal-menu/cold resume passed. A distinct Mori started at EXP0 and reached Lv20 through374 automatic synthetic-fed meals/6150EXP, one real Lv16 mono evolution and20 sequential checkpoints. Latest v5 native150 contention requests and replay protection passed; normal original/profile/input/restore and fixed60-second proxy gates passed. No app change, rebuild, reinstall or DB reset. Physical/GPU/physical latency and fun/final-art approval remain separate.",
@@ -2312,7 +2266,7 @@
       "memoryDefect": "CLOSED_V7: first/latest AVAILABLE object facts retained within64; previously evicted facts not fabricated"
     }
   },
-  "activeTask": "tasks/REBOOT-03-2-global-visual-quality.md",
+  "activeTask": "tasks/REBOOT-04-life-context-dialogue-and-bubbles.md",
   "reboot02": {
     "task": "tasks/REBOOT-02-baby-charm.md",
     "status": "REWORK_REQUIRED",
@@ -3818,38 +3772,184 @@
     "workflowValidatorDirect": "1/1 PASS"
   },
   "videoDelivery": {
-    "rule": "docs/remote-video-delivery.md",
-    "videoStatus": "VIDEO_READY",
-    "deliveryStatus": "DELIVERY_SENT",
-    "mobilePlayback": "MOBILE_NOT_VERIFIED",
-    "build": "reboot-04-emotion-v10",
-    "source": "ef32ac36c0532d83120636bedb1fea2fe4e4e503",
-    "fileName": "arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
-    "localManifest": "evidence/remote-delivery-v10/delivery-manifest.json",
-    "durationSeconds": 124,
-    "bytes": 19791087,
-    "sha256": "1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4",
-    "actualUpload": true,
-    "approvedPrivateRoute": {
-      "provider": "personal iCloud Drive",
-      "relativeFolder": "Arucon/Reviews",
-      "allowed": [
-        "review MP4",
-        "short scene guide if needed"
-      ],
-      "status": "USER_CONFIRMED_ACTIVE"
+    "status": "DELIVERY_SENT",
+    "mobile": "MOBILE_NOT_VERIFIED",
+    "route": "personal iCloud Drive Arucon/Reviews",
+    "file": "2026-10-13_arucon_REBOOT04_context_v11_317ca1e_review.mp4",
+    "seconds": 152,
+    "bytes": 27637408,
+    "sha256": "f9d6165837f755e52f9990aaf53d8b8d0d0f26f616852ff3e6be2faf7c1d9174",
+    "upload": "verified completed/unshared/no error"
+  },
+  "lifeContextFollowup": {
+    "status": "PARTIAL_WITH_BLOCKERS",
+    "featureStatus": "SCOPED_IMPLEMENTATION_AND_NATIVE_REVIEW_PREPARED",
+    "sourceCommit": "317ca1eca6bb74632a04f631ede9c0c7793fb46b",
+    "build": "reboot-04-context-v11",
+    "bundleSha256": "1d5e1871b706202815398620c30a921f94ecdc20fb3d028403b6911bd4959bde",
+    "tests": "482/482 FRESH fail0 skip0",
+    "checks": [
+      "lint PASS",
+      "typecheck PASS",
+      "iOS Release exit0",
+      "Android JS PASS",
+      "CNG27 STATIC PASS",
+      "workflow42/direct1 PASS"
+    ],
+    "healthRead": "OFF_SYNTHETIC_ONLY",
+    "preservation": "65 snapshots/5 ledgers/50 protected files/8 incidents/3DB ok; bounded memory retirement explicit",
+    "native": "three profiles invite/goal/care + duplicate/cold/permission + sleep/wake/input; W completed synthetic run confirmed in native video at73s",
+    "emoji": "OPEN_ENVIRONMENT_DIAGNOSIS_EXPLICIT_FONT_NO_EFFECT_REVERTED",
+    "longPressAndVoiceOverReading": "NOT_RUN",
+    "performance": "PERF-01 OPEN; ON P35.83ms FAIL W29.58ms PASS; P input insufficient; not matched causal benchmark",
+    "cantopenVfsCause": "OPEN",
+    "physicalDeviceGpuPhysicalLatency": "NOT_RUN",
+    "requestedModel": "GPT-6.1 Sol Max",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "subagents": 0,
+    "reviewMode": "SELF_REVIEW",
+    "funAndFinalArt": "USER_REVIEW_PENDING",
+    "delivery": {
+      "status": "DELIVERY_SENT",
+      "mobile": "MOBILE_NOT_VERIFIED",
+      "route": "personal iCloud Drive Arucon/Reviews",
+      "file": "2026-10-13_arucon_REBOOT04_context_v11_317ca1e_review.mp4",
+      "seconds": 152,
+      "bytes": 27637408,
+      "sha256": "f9d6165837f755e52f9990aaf53d8b8d0d0f26f616852ff3e6be2faf7c1d9174",
+      "upload": "verified completed/unshared/no error"
+    }
+  },
+  "historicalBeforeLifeContextAt57368d7": {
+    "definition": "Emotion followup comparison prepared; prior user expression failure awaits reevaluation; room concept only",
+    "activeTask": "tasks/REBOOT-03-2-global-visual-quality.md",
+    "lastValidation": {
+      "scope": "REBOOT-04 baby-only two-paw asset and motion integration",
+      "sourceCheckpoint": "a269f88b554c4a684a12510c7f95beecca0fb535",
+      "sourceManifest": "evidence/reboot-04-two-paws-2026-10-11/release-v9-manifest.json",
+      "mobileTests": {
+        "passed": 468,
+        "total": 468,
+        "failed": 0,
+        "skipped": 0
+      },
+      "impactTests": "18/18 two-paw/retainedhand/gait/quadreference",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iOSReleaseCompile": "exit0_v9",
+      "iOSInstallLaunch": "SAME_DB_227_HASH_MATCH_ACTUAL_NORMAL_MOVE_HOP_HAND3",
+      "androidJsBundle": "PASS",
+      "cng": "27/27 STATIC PASS",
+      "workflow": "42/42_FRESH;DIRECT_VALIDATOR1/1",
+      "preservation": "56_EXISTING_SNAPSHOTS_AND_ALL_MEMORIES/5LEDGERS/48ORIGINALS/8INCIDENTS/3DBOK;3NEW_SYNTHETIC_ECONOMY0",
+      "grownEvolvedTransition": "NOT_IMPLEMENTED_NOT_DECIDED",
+      "performance": "PERF01_OPEN_NEW_OFF_BENCH_NOT_RUN",
+      "physicalGpuLatency": "NOT_RUN",
+      "originalCantopenCause": "OPEN",
+      "health": "OFF",
+      "evidence": "evidence/reboot-04-two-paws-2026-10-11/"
     },
-    "routeConfirmationRequestedOnce": true,
-    "directAttachmentBlock": "No exposed MP4 chat attachment tool; actual Codex UI access rejected by CUA safety policy",
-    "rebuildReinstallDbReset": "NONE",
-    "accountConfirmationRequestedOnce": true,
-    "icloudDriveSyncObserved": "ON_IN_SYSTEM_SETTINGS",
-    "localCopy": true,
-    "accountConfirmedByUser": true,
-    "sameIPhoneAccountConfirmedByUser": true,
-    "cloudUploadConfirmed": true,
-    "shared": false,
-    "deliveredFileName": "2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
-    "uploadStatusEvidence": "NSURLUbiquitousItemIsUploaded=true; IsUploading=false; IsShared=false; UploadingError=null"
+    "environment": {
+      "host": "macOS 15.6",
+      "node": "v26.7.0",
+      "npm": "11.19.0",
+      "androidToolchain": "BLOCKED_ENV: noANDROID_HOME/SDK_ROOT;standardSDK/adbmissing",
+      "androidAvd": "preserved historical Windows AVD",
+      "healthAccess": "OFF",
+      "hostGpu": "Apple Software Renderer",
+      "softwareEmulator": "quality_250 DPR2.5 AA0 vertex-lit CPU morph public GL queue barrier; tail/source default",
+      "hostLocked": false,
+      "iosRuntime": "26.3.1",
+      "xcode": "26.3",
+      "configuration": "REBOOT-04 two-paws-v9 embedded Release arm64 Simulator adhoc;Metro not required",
+      "contentSize": "Preserved normal size; no new large-text matrix this scope",
+      "currentRendererSnapshot": {
+        "profileId": "quality_250",
+        "requestedDpr": 2.5,
+        "identity": {
+          "renderer": "Apple Software Renderer",
+          "vendor": "Apple Inc.",
+          "version": "OpenGL ES 3.0 APPLE-23.0.2"
+        },
+        "cpuMorphs": true,
+        "logicalWidth": 390,
+        "logicalHeight": 844,
+        "deviceDpr": 3,
+        "bufferWidth": 975,
+        "bufferHeight": 2110,
+        "requestedMsaa": 0,
+        "postprocessAa": "none",
+        "roomCurves": "refined",
+        "maxSamples": 9,
+        "sampleBuffers": 0,
+        "samples": 0,
+        "framebufferStatus": 36053,
+        "error": 0
+      },
+      "iosRuntimeLabel": "26.3",
+      "iosRuntimeBuild": "23D8133",
+      "originalDevice": "2170BD93-715C-482E-AD9C-DD7479970003",
+      "isolatedReplayDevice": "FE2B778D-B598-45F3-BE4F-0E1BB3F76A5B",
+      "blender": "PROJECT_LOCAL5.2.0_LTS_ACTUAL_BPY_CREATION",
+      "figma": "TOOLS_EXPOSED; ACCOUNT_CHOICE_PENDING; NO_SUCCESSFUL_CALL_OR_ARTIFACT",
+      "physicalIosInventory": "currentdevicectl no devices found",
+      "transientDiskPressure": "127MiB coincided with actual capture/storage errors; headroom recovered and same-app native write restored; exact first internal cause not asserted",
+      "reviewSelection": "controlled poised/two_paw+35/quality250AA0/tail/source/awake/lines_hidden/reducedOFF",
+      "handToolsUsedThisScope": [
+        "CUA",
+        "simctl",
+        "Swift_AVFoundation"
+      ],
+      "blenderThisScope": "ACTUAL_LOCAL5.2.0_BPY_REAUTHOR_AND_SEPARATE_BLEND_GLB;NO_NEW_INSTALL"
+    },
+    "evidenceDirectory": "evidence/storage-01-resume-2026-10-10/",
+    "implementedScope": "Bounded two-slot diagnostic archive/cold restoration/sealed sessions; no art/renderer/game/economy/growth/rest/schema changes",
+    "git": {
+      "branch": "feature/arucon-mobile-autonomous",
+      "sourceCheckpoint": "53b9061445a405a691d318e446245f66292aa480",
+      "initialHead": "b58967ec7d805d8c3142c16bdb7ff1ee630a66d4",
+      "initialHeadTrackingLiveMatch": true,
+      "initialClean": true,
+      "authorizedPushTarget": "origin/feature/arucon-mobile-autonomous",
+      "verificationEvidence": "evidence/storage-01-resume-2026-10-10/git-final-audit.json",
+      "publicationRecordScope": "STORAGE-01 diagnostic preservation source/report checkpoints, feature only",
+      "publicationState": "Final publication receipt after ordinary push is authoritative",
+      "mainPushMergeDeploy": false
+    },
+    "videoDelivery": {
+      "rule": "docs/remote-video-delivery.md",
+      "videoStatus": "VIDEO_READY",
+      "deliveryStatus": "DELIVERY_SENT",
+      "mobilePlayback": "MOBILE_NOT_VERIFIED",
+      "build": "reboot-04-emotion-v10",
+      "source": "ef32ac36c0532d83120636bedb1fea2fe4e4e503",
+      "fileName": "arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
+      "localManifest": "evidence/remote-delivery-v10/delivery-manifest.json",
+      "durationSeconds": 124,
+      "bytes": 19791087,
+      "sha256": "1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4",
+      "actualUpload": true,
+      "approvedPrivateRoute": {
+        "provider": "personal iCloud Drive",
+        "relativeFolder": "Arucon/Reviews",
+        "allowed": [
+          "review MP4",
+          "short scene guide if needed"
+        ],
+        "status": "USER_CONFIRMED_ACTIVE"
+      },
+      "routeConfirmationRequestedOnce": true,
+      "directAttachmentBlock": "No exposed MP4 chat attachment tool; actual Codex UI access rejected by CUA safety policy",
+      "rebuildReinstallDbReset": "NONE",
+      "accountConfirmationRequestedOnce": true,
+      "icloudDriveSyncObserved": "ON_IN_SYSTEM_SETTINGS",
+      "localCopy": true,
+      "accountConfirmedByUser": true,
+      "sameIPhoneAccountConfirmedByUser": true,
+      "cloudUploadConfirmed": true,
+      "shared": false,
+      "deliveredFileName": "2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
+      "uploadStatusEvidence": "NSURLUbiquitousItemIsUploaded=true; IsUploading=false; IsShared=false; UploadingError=null"
+    }
   }
 }

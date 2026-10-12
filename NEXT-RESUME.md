@@ -1,3 +1,17 @@
+# 재개 지점 — 생활 맥락·말풍선 v11
+
+[현재 보고](REBOOT-04-REPORT.md), [전체 지시](tasks/REBOOT-04-life-context-dialogue-and-bubbles.md). 앱 소스317ca1e / reboot-04-context-v11 Release, JS1d5e1871… / native10c905b1… / 입력230. 실제 HEAD·dirty·설치 해시를 직접 대조한다. 같으면 재빌드/재설치/DB 초기화부터 하지 않는다. 기존65개 저장·두발·3성격·경제·원본50·진단8을 보존했다.
+
+합성 초대/목표 달성/수면 배려를 기존 director에 연결하고 콘텐츠 폭/X 없는 말풍선을 실제 검토했다. 같은 사건·revision/콜드 복귀는 중복 차단. EXP/코인·게임시간/실Health는 건드리지 않았다. 이번482/482·linter/types·Release·AndroidJS·CNG27STATIC·workflow42+직접1 PASS. 일반 수면/깨우기와 입력 복귀를 확인했다. 전역 큰 글자·긴 누르기/VoiceOver 실제 읽기·실기기/GPU/물리 지연은 미검증. Simulator 이모지 대체 글리프 OPEN(글꼴 실험 제거); Safari 개인정보 ‘계속’은 자동 승인 검토 차단, 우회하지 않는다.
+
+**전달 완료:** 개인 iCloud Drive → Arucon/Reviews → `2026-10-13_arucon_REBOOT04_context_v11_317ca1e_review.mp4` 및 `_scenes.txt`. 2:32/26.36MiB/native1170×2532/원본 정상속도 발췌/합성 데이터만. 해시 일치·공유 안 됨·업로드 완료·오류 없음. DELIVERY_SENT / MOBILE_NOT_VERIFIED. iPhone 재생/최종 재미·표현·아트는 사용자 확인 대기. 원본·과거 영상 유지, DB/로그/소스 외부 전송 없음.
+
+**다음 한 작업:** 전달된 v11 생활 대사/몸짓/말풍선에 대한 사용자 평가를 반영한다. 새 유형·성장형·상점으로 확대하지 않는다. PERF-01은 이번P35.83ms 미달/W29.58ms 기능창과 함께 OPEN; 표준OFF 비교/실기기 성능 통과로 확대하지 않는다. STORAGE-01의 정확한 CANTOPEN VFS 원인도 OPEN. 검증 범위 PARTIAL_WITH_BLOCKERS, 기존 전체 REWORK_REQUIRED/USER_REVIEW_PENDING을 자동 승인하지 않는다. feature checkpoint/일반push만 승인돼 있으며 main/merge/deploy/실건강/결제/보안 변경 금지.
+
+---
+
+## Historical — v10 영상 전달
+
 # v10 iCloud 전달 완료 — iPhone 재생 확인 대기
 
 사용자가 개인 계정 및 받을 iPhone의 동일 계정 사용을 확인했다. **개인 iCloud Drive → Arucon → Reviews**에 다음 두 파일을 비덮어쓰기 복사했다.

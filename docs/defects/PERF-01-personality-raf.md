@@ -56,3 +56,8 @@ performance-summary.json은 완료된60초 capture.summary만 사용한다. 최�
 같은 Apple Software Renderer/2.5AA0/+35/tail/원래양면에서 기능영상 중 완료60초 RAF p95는 v9D28.05, v10P60.80(FAIL), W37.29(FAIL), D29.41ms다. 도도 CPU판단 .043→.050, pose .462→.517, morph .892→.938, GL대기21.66→25.45ms. 입력→제출 표본0은 insufficient_data다. `evidence/reboot-04-emotion-2026-10-11/performance-observation.json`에 전 구간/실패를 보존한다.
 
 이는 단일 기능녹화 ON 관찰이며 호스트 상태/조작 시점이 동일한 OFF 순서반전 벤치가 아니다. 코드 인과 개선율·성능 통과를 선언하지 않는다. 기존 병목/기준/해상도/표현은 보존했고 성격·감정 수정의 확인과 분리한다. 실기기/GPU/표시FPS/물리입력은 NOT_RUN이다.
+
+
+## 2026-10-13 context-v11 기능창 — OPEN 유지
+
+소스317ca1e/JS1d5e1871…/DPR2.5 AA0 +35/실제software Simulator. 녹화ON·60초: P RAFp95 35.833msFAIL/max84.951,GLqueuep95 31.776,morph1.047,draw1.346,decision.047ms;2입력은표본부족. W RAFp95 29.576/max55.654,GLqueue26.135,morph1.005,draw1.243,decision.043ms;6입력→제출p95 47.593ms. 두창500ms초과gap0. 쿠션좌표·메뉴/입력순서·호스트부하가통제된ON/OFF벤치아니며D새60초NOT_RUN. 과거측정과합치지않았고글꼴실험제거후소스/설치해시동일확인. 해상도/표정/기준을낮추지않았다. 실제GPU/표시FPS/물리입력·실기기미검증. 원본 `evidence/reboot-04-life-context-v11/{playful,warm}-final.json` capture.summary.

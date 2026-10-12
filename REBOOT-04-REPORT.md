@@ -1,3 +1,53 @@
+# REBOOT-04 생활 맥락·말풍선 v11 — 2026-10-13
+
+장난은 합성 목표 달성에 짧게 통통 뛰고 앞발로 축하한다. 다정은 눈맞춤·기대기로 함께 기뻐하고, 도도는 짧은 앞발 인사와 절제된 말을 쓴다. 합성 수면 자기보고와 개인 기준보다 짧은 **기록**을 구분해 배려하며, 기록 없음/지연/권한 불명확을 활동 부족이나 피로로 바꾸지 않는다. 실제 건강정보 연결은 OFF다. 기존 두 발·한 뿔·3종·기억·성장/경제·일반 저장을 다시 만들지 않았다.
+
+이번 기능은 **SCOPED_IMPLEMENTATION_AND_NATIVE_REVIEW_PREPARED**다. 검증 범위는 **PARTIAL_WITH_BLOCKERS**이며 이모지·실제 긴 누르기/VoiceOver 읽기·실기기 미확인을 통과로 표시하지 않는다. 전체 상태의 PERF-01 미달/기존 사용자 표현 재평가는 여전히 REWORK_REQUIRED / USER_REVIEW_PENDING이다. STORAGE-01 CANTOPEN의 정확한 VFS 원인은 OPEN이다.
+
+## 바로 볼 전달 영상
+
+개인 iCloud Drive → **Arucon → Reviews → `2026-10-13_arucon_REBOOT04_context_v11_317ca1e_review.mp4`**. 2:32 / 26.36MiB / native1170×2532 / H.264 8bit420 / fast-start / 무음. 대사 ON, 합성 데이터만 사용. 9,816프레임 전체 디코딩 통과. 정상 속도·원본 해상도 passthrough 발췌 합본이며 컷/원본 시각은 같은 이름의 `_scenes.txt`에 있다. 무편집 연속 통과 영상으로 주장하지 않는다.
+
+**VIDEO_READY / DELIVERY_SENT / MOBILE_NOT_VERIFIED**. 원본/복사본 용량·SHA256 일치, 공식 macOS URL 리소스에서 두 파일 공유 안 됨/업로드 완료/오류 없음. SHA256 `f9d6165837f755e52f9990aaf53d8b8d0d0f26f616852ff3e6be2faf7c1d9174`. 휴대폰 다운로드·재생은 사용자 확인 전이다. 영상·DB·로그는 Git에 넣지 않았고 iCloud에는 이 MP4와 짧은 안내문만 복사했다. 기존 v10 영상도 보존한다.
+
+## 코드·범위·실제 수정
+
+[전체 지시](tasks/REBOOT-04-life-context-dialogue-and-bubbles.md)를 ZIP에서 읽고 원문 저장했다. 시작57368d7, 이전 앱ef32ac3/v10이었으며 해당 요구는 아직 구현되지 않았다. 동시 작성자는 발견하지 않았다. 소스 **317ca1e**, 설치 **reboot-04-context-v11 Release arm64 Simulator ad hoc**, Expo55/RN0.83.10/SQLite55.0.20. 230입력 source fingerprint `7bcdb53f7fede532d947c132b664a03d667709de61584373bc3dabbd83db41ff`, JS `1d5e1871b706202815398620c30a921f94ecdc20fb3d028403b6911bd4959bde`, native `10c905b1d87a395e0ec179d50f3ec0a3bb276c0331bc62e985d4dc64d1075810`. 실패한 글꼴 실험은 제거하고 동일 소스/JS/native 해시로 복원했다. 아래 최종 영상3개와 설치본이 동일하다. 과거/중간 빌드 영상은 최종 통과로 재사용하지 않았다.
+
+- presentation-only `LifeContext`: 합성 사건/기간/조회 시각/품질/개인 비교 기준/자기보고/쉬기. 시간창·유효성·실제 근거 ID를 검사한다. 체중·질병·진짜 권한 추론·실제 reader·외부 LLM은 추가하지 않았다.
+- 기존 director에 의도→시선/접근→성격별 BabyPlan→발화→복원을 연결한다. UI에서 합성 **관찰 입력**을 선택하지만 강제 아트 클립을 재생하지 않는다. EXP/수면 정산 시계는 사용하지 않는다.
+- 건강 주제 간격10분/부정적 초대 하루 최대1회는 가역 검토 튜닝이다. 개인 목표6000 등은 합성 fixture 수치이며 건강 권장량이 아니다. 명시적 쉬기/잠을 설쳤다는 자기보고는 조용한 배려를 허용한다. 말 줄이기에서 숨긴 유효 수면 고려도 이후 초대를 막되 ‘쉬기를 선택했다’고 꾸미지 않는다.
+- 기존 SQLite 대기열/트랜잭션 안에서 표현 사건을 먼저 claim한다. 같은 사건의 새 revision/재실행을 중복 발화로 바꾸지 않으며 취소를 완료 경험/보상으로 저장하지 않는다. raw 관찰을 durable DB에 저장하지 않고 제한된 합성 ID/선호만 남긴다. optional memory 필드이며 DB schema/경제 원장을 변경하지 않았다.
+- 폭은 실제 native `onTextLayout`로 측정한다. 테두리2px 누락으로 짧은 대사의 마지막 음절이 밀리는 문제를 실제 v11에서 찾고 수정했다. 여러 줄은 최초 native 줄바꿈 폭을 유지한다. X 없이 탭/접근성 dismiss, 길이별 읽기 시간, 부드러운 소멸, 읽기 hold/오래된 timer 취소를 넣었다. 긴 글자는 잘라내거나 축소하지 않는다. GLView/controller는 말풍선 변경으로 재생성하지 않는다. 실제 저장 오류는 자동으로 숨기지 않는다.
+- 긴 검토 메뉴는 활동/수면/기록 그룹으로 정리했다. 앱 관찰 시각과 게임 시간은 분리한다. 일반 펫 이름·자원·위젯을 검토 프로필로 덮어쓰지 않는다.
+
+## 실제 native 확인과 한계
+
+Mac 잠금 해제/Simulator 화면·입력 접근을 직접 확인했다. macOS15.6/Xcode26.3/iPhone16e iOS26.3.1, 390×844pt/1170×2532native, software renderer/DPR2.5/AA0/+35. 기존 개체의 경험·쿠션 위치를 보존한 기능 비교이며 새 통제된 성격 실험은 아니다.
+
+| 항목 | 이번 실제 근거 |
+|---|---|
+| 3종 합성 초대·축하·배려 | W 합성 달리기 종료도 `run-rest.mp4` 73초 실제 말/표정·앞발/복원으로 보완 확인. 파일명과 달리 이 보완 영상의 새 쉬기 시험은 실행하지 않았다. 긴 관찰로 해당 trace가256한도 밖이어서 영상+저장된claim으로 대조했다. 정상 메뉴 입력→director→실제 대사/귀/눈/몸/복원. `playful-final`, `warm-final`, `poised-final.mp4`와 시점 trace/native 프레임. P/W 자기보고, D 짧은 기록/쉬기. |
+| 없는/늦은/불명확한 기록 | D missing/delayed, W permission은 UNKNOWN_NOT_DEFICIT. 일반 생활 말은 계속될 수 있지만 건강 상태로 바꾸지 않음. failed/오전/여러 경계는 자동 검사. |
+| 반복·취소·복귀 | 같은 사건 다시 선택 및 W 콜드 복귀 후 ALREADY_ACKNOWLEDGED_EVENT. 메뉴 닫기·직접 접촉·바닥 이동, 정상 잠자기→깨우기→접촉/이동. 일반 수면/동면 규칙은 기존 회귀 유지, 강제 상태 변경 없음. |
+| 말풍선 | 짧은 ‘히히!’ 한 줄, 한국어 개행·긴 문장, 1.6배 검토 글자, 가장자리 위/아래 앵커를 실제 화면에서 확인. 이는 OS 전체 큰 글자 설정 시험이 아니다. |
+| 읽기 접근성 | 중첩 hold/timeout/stale callback은 자동 검사. 시각 X 없음/탭 닫기는 실제 확인. 긴 누르기 유지·VoiceOver 실제 읽기는 현재 입력 도구로 NOT_RUN. |
+| 이모지 | 실제 발바닥 이모지가 대체 글리프. runtime font 존재 및 glyph1051 확인; 명시적 AppleColorEmoji 선택도 효과 없어 제거. 원인 확정/실기기 표시 PASS 아님. [동일 조합 이슈](https://github.com/react/react-native/issues/56183)는 참고 보고이며 우리 환경의 인과 증거를 대신하지 않음. Safari의 개인정보 관련 ‘계속’ 선택은 자동 승인 검토가 거부해 대조 미완료. 보안·runtime·SDK 패치 없음. |
+
+## 성능·저장·검사
+
+새 기능녹화 ON 60초(같은 Release/DPR2.5/AA0/+35), 장난 RAF p95 **35.83ms FAIL**, GL대기31.78/morph1.05/draw1.35/판단.047ms. 다정 RAF p95 **29.58ms PASS**, GL대기26.13/morph1.00/draw1.24/판단.043ms, 실제6입력→제출proxy p95 **47.59ms**. 장난 입력2개는 표본부족. 두 창 모두500ms초과 RAF gap0. 메뉴/입력 순서·쿠션 좌표·호스트 부하가 통제된 ON/OFF 인과 비교가 아니며 도도의 새60초는 NOT_RUN. 좋은 구간만으로 PERF-01을 닫지 않았다. 실제 표시 FPS/GPU/물리 지연/실기기·이번 Android native UI는 NOT_RUN.
+
+이번 최종소스 **482/482 fail0/skip0**, lint/typecheck PASS, iOS Release xcodebuild exit0, Android JS bundle PASS, CNG27STATIC PASS, workflow42/42와 validator 직접 검사1 PASS. unittest 발견으로는0개여서 통과로 세지 않았고 실제 함수를 실행했다. 초기 새 저장 테스트의 초기화 누락은 앱과 같은 load 순서로 고쳤으며 기대값·정책을 낮추지 않았다.
+
+기존 **65 snapshots(1/29/35)** identity/name/form/personality/coin/food/EXP/activity/facilities·5원장 그대로,3DB integrity ok·원본50·오류진단8 보존. 정상 검토 경험이 추가돼 기존64개 한도에 따라 P10/W46/D31개의 오래된 사건이 정리됐고 시작 전 DB 사본에 보존했다. 남아 있는 기존 사건은 내용 동일, 현재 성격/모자/쿠션 사실은 유지됐다. 모든 메모리 byte동일 주장은 하지 않는다. 소스·검증·원본 증거/manifest/DB 사본은 로컬 `evidence/reboot-04-life-context-v11/`에 있다. CANTOPEN VFS 인과는 OPEN.
+
+SOL_DIRECT / SELF_REVIEW / subagent0. 요청 GPT-6.1 Sol Max, effective model **ROUTING_UNVERIFIED**. 최종 재미·감정 전달·아트는 USER_REVIEW_PENDING. 이번 범위의 반응/말풍선 검토와 별도로 PERF-01, 환경별 이모지/접근성/실기기 검증을 남긴다.
+
+---
+
+## Historical — v10 감정·방 후속
+
 # REBOOT-04 후속 — 눈·귀·감정·대사 / v10
 
 > **원격 영상 전달 완료:** [전달 규칙](docs/remote-video-delivery.md)에 따라 사용자가 확인한 개인 iCloud Drive의 `Arucon/Reviews`로 `2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4`와 짧은 장면 안내문을 복사했다. **VIDEO_READY / DELIVERY_SENT / MOBILE_NOT_VERIFIED**. 124초/18.87MiB/native1170×2532/H.2648bit420/fast-start이며 원본·복사본의 크기와 SHA-256이 일치한다. macOS에서 두 파일의 공유 안 됨·업로드 완료·업로드 중 아님·오류 없음이 확인됐다. iPhone 다운로드·재생 자체는 아직 미확인이다. 앞선 직접 첨부 차단은 승인된 개인 전달 경로로 해소했으며, 원본을 이동·삭제하거나 DB/소스/로그를 보내지 않았다. 컷과 원본 시각은 함께 전달한 안내문에 있다.

@@ -93,3 +93,12 @@ Context7 plugin MCP의 공개 문서 조회를 실제 실행했다. SDK55 선택
 현재 손 trace의 babyBeat/expression은 실제 handActing과 동일하다. 대사는 그 실제 박자에서 선택하며, 비교숨김은 발화 이력을 소비하지 않는다. 같은 의미의 최근3개를 alias간에도 제외하고 억제 이유를 기록한다. 자동생활의 기대기를 존재하지 않는 손처럼 말하지 않는다. 직접 관찰한 쿠션 이동은 현재좌표부터 보고 기억좌표는 과거로만 남긴다. unseen 분기는 별도 단위검사이며 실제 봤다고 꾸미지 않는다.
 
 방은 변경되지 않았고 현 펫을 넣은 Blender 오프라인 시안1개만 준비했다. 실제 영상·SELF_REVIEW와 사용자 최종 표현/아트 승인은 다르다. PERF-01/CANTOPEN 원인은 OPEN이다.
+
+
+## 생활 맥락·말풍선 v11
+
+[전체 지시](../tasks/REBOOT-04-life-context-dialogue-and-bubbles.md), [실제 보고](../REBOOT-04-REPORT.md). source317ca1e. `LifeContext`는 합성 source/event/revision/기간/조회품질/evidence/개인목표/직접수면자기보고/쉬기이며 raw 건강 DB가 아니다. unknown/늦음/실패/권한불명확은 부족/피로로 해석하지 않는다. 각 반응의 intent에 3종 plan·speechBeat를 붙여 같은 몸/눈/귀/말과 복원으로 전달한다. 확정된 활동/목표는 축하, 기록 짧음은 기록으로만 표현, 직접 자기보고는 배려, 명시적 쉼은 압박 없는 복귀다. 체중·질병·실reader·LLM·성격 재추첨·경제 보상은 없다.
+
+`RebootSnapshot.lifeContext` optional(version1, day, bounded64eventId/revision, invited/rested/avoidInvites/lessTalk/lastSpoken). 기존 대기열/transaction에서 먼저 claim, 실패 rollback, stale epoch는 acting으로 가지 않음. 취소는 완료 경험이 아니고 같은 사건은 새revision/재실행으로 재발화하지 않는다. 과거day는 버린다. 별도 DB/schema/경제 원장 없음. 건강 주제10분/초대1회·합성개인목표6000/수면420분은 검토 config/fixture이며 의료·출시 기준이 아니다. 실제 도메인 시계와 무관하다.
+
+말풍선은 `onTextLayout` native 폭+padding/border; multiline은 원래 폭 유지. 실제세트 width/height 기반 안전앵커, X없음, tap/dismiss, nested읽기hold, ID로stale timer폐기. 장식렌더/호흡은 읽기와 공존, 일반저장오류는자동소멸하지않음. 한국어개행/1.6검토글자/탭은실제검토했으며 이모지/실제긴누르기/VoiceOver는미완료범위를별도기록한다. Renderer/GLcontext를말마다재생성하거나프레임마다SQLite조회하지않는다.

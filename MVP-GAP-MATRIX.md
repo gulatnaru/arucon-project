@@ -1,3 +1,24 @@
+# 최신 후속 — 생활 맥락·말풍선 v11
+
+| 범위 | 이번 상태 / 근거 |
+|---|---|
+| 합성 걷기/활동/수면·3성격 | SCOPED_NATIVE_REVIEW_PREPARED / source317ca1e, 실제 provider 입력→director→대사/눈/귀/몸/복원 |
+| 기록 없음/지연/권한 불명확·쉬기 | UNKNOWN_NOT_DEFICIT·중복/초대 억제; 실제 메뉴 + 경계 회귀. 실데이터 OFF |
+| 콘텐츠 폭/X 없는 말풍선 | native짧음/개행/1.6검토글자·탭; GPU remount 없음. 전역글자/긴누르기·VoiceOver읽기 NOT_RUN |
+| 이모지 | OPEN_ENVIRONMENT_DIAGNOSIS / iOS26.3.1 대체글리프·글꼴실험무효제거·Safari추가동의차단. 인과확정/실기기PASS아님 |
+| 저장/원장/원본/복귀 | 65identity/economy·5원장·원본50·진단8·3DBok; bounded기억정리별도. 같은사건cold차단·잠자기/깨우기/입력 |
+| 자동 검사/build | fresh482/482·lint/typecheck·iOSRelease·AndroidJS·CNG27static·workflow42+direct1 |
+| PERF-01 | OPEN / 이번기능녹화P RAFp95 35.83msFAIL, W29.58msPASS. 통제ON/OFF인과비교/실기기아님 |
+| STORAGE-01 | OPEN / 정확한CANTOPEN VFS원인미확정 |
+| 영상 전달 | DELIVERY_SENT / 개인iCloudArucon/Reviews 2:32·26.36MiB,해시/업로드/비공개확인;MOBILE_NOT_VERIFIED |
+| 전체·아트/재미 | MVP_NOT_COMPLETE / REWORK_REQUIRED;현검증PARTIAL_WITH_BLOCKERS·USER_REVIEW_PENDING |
+
+[현재 보고](REBOOT-04-REPORT.md). 과거 검사를 이번 실행 숫자로 재사용하지 않았다.
+
+---
+
+## Historical — v10 gap
+
 # 최신 재오픈 — REBOOT-04 감정·방 후속
 
 v9 사용자 표현 판정은 REWORK_REQUIRED다. v10(ef32ac3)에서 눈/귀/손/발화를 수정하고 실제 비교를 준비했다. [보고](REBOOT-04-REPORT.md).

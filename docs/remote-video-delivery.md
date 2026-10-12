@@ -74,3 +74,6 @@
 최초 계정 확인 완료: 사용자가 현재 Mac의 계정이 개인 계정이며 받을 iPhone도 같은 계정이라고 확인했다. 설정 화면에서 iCloud Drive '이 Mac 동기화' ON을 확인했다. 이 승인된 계정과 폴더 범위는 이후 검토에도 재사용한다. 계정이 바뀌거나 공유 상태가 달라질 때만 다시 확인한다.
 
 첫 전달 완료: `2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4`와 같은 이름의 `_scenes.txt` 안내문을 새 비공개 `Arucon/Reviews`에 비덮어쓰기 복사했다. MP4는 124초, 19,791,087bytes(18.87MiB), 1170×2532다. 원본과 복사본의 크기·SHA-256이 일치했고, macOS URL 리소스 API에서 폴더와 두 파일 모두 `IsShared=false`, `IsUploaded=true`, `IsUploading=false`, 업로드 오류 없음으로 확인했다. **DELIVERY_SENT / MOBILE_NOT_VERIFIED**다. iPhone 재생은 사용자의 실제 확인을 기다린다. 원본은 이동·삭제하지 않았다.
+
+
+생활 맥락 v11 전달: `2026-10-13_arucon_REBOOT04_context_v11_317ca1e_review.mp4` 및 `_scenes.txt`. 152초/27,637,408bytes(26.36MiB)/1170×2532/H.2648bit420/fast-start/무음·정상속도발췌·합성데이터만. MP4 SHA256 `f9d6165837f755e52f9990aaf53d8b8d0d0f26f616852ff3e6be2faf7c1d9174`. 같은승인폴더에비덮어쓰기복사,원본/복사본해시일치,공식URL리소스IsSharedfalse/IsUploadedtrue/IsUploadingfalse/errornull. DELIVERY_SENT / MOBILE_NOT_VERIFIED. 원본/과거영상유지,MP4+짧은안내문외복사없음.
