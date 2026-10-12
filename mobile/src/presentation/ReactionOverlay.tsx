@@ -13,11 +13,11 @@ export function ReactionOverlay({ view, onChoice, onClose, reduceDialogue = fals
     return null;
   }
   return <View accessibilityLiveRegion="polite" style={styles.bubble} testID="reaction-dialogue">
-    <Pressable accessibilityRole="button" accessibilityLabel="대화 닫기" onPress={onClose} style={styles.dismiss}>
-      <Text style={styles.close}>×</Text>
-    </Pressable>
     <ScrollView style={styles.message} contentContainerStyle={styles.messageContent} bounces={false}>
-      <Text style={[styles.text, { paddingRight: 30 }]}>{view.text}</Text>
+      <Pressable accessibilityRole="button" accessibilityLabel={view.text} accessibilityHint="탭하면 대사를 닫습니다."
+        accessibilityActions={[{ name: 'dismiss', label: '대화 닫기' }]} onAccessibilityAction={e => { if (e.nativeEvent.actionName === 'dismiss') onClose(); }} onPress={onClose}>
+        <Text style={styles.text}>{view.text}</Text>
+      </Pressable>
       {!!view.choices.length && <View style={styles.choices}>
       {view.choices.map(choice => <Pressable
         key={choice.id}

@@ -23,9 +23,10 @@ import { installStorageDiagnostics, storageDiagnosticsSnapshot } from '../storag
 
 import { expressPersonality, PERSONALITY_IDS, PERSONALITY_PROFILES, type PersonalityId } from './personality';
 import { comparisonBaseline, type ComparisonCase } from './comparison';
+import { SYNTHETIC_CONTEXT_CASES, syntheticLifeContext, type SyntheticCase } from './lifeContext';
 import type { ComparisonWindowEvent } from '../scene/comparisonWindow';
 const stageName: Record<RebootStage, string> = { baby: '아기', growing: '성장기', evolved: '1차 진화 후' };
-type Menu = 'main' | 'pet' | 'objects' | 'settings' | 'render' | null;
+type Menu = 'main' | 'pet' | 'objects' | 'settings' | 'render' | 'context' | 'bubble' | null;
 type CommandResult = { state?: PetState; memory?: RebootSnapshot; command?: RebootCommand };
 
 export function RebootReviewScreen({ onExit, personalityReview, onPersonality, onComparison, controlled, comparisonPacing = 'tail', onComparisonPacing, comparisonCulling = false, onComparisonCulling, onControlledRestart }: {
@@ -38,6 +39,12 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   const [pet, setPet] = useState<PetState | null>(null), [memory, setMemory] = useState<RebootSnapshot | null>(null);
   const [menu, setMenu] = useState<Menu>(null), [hand, setHand] = useState(false), [placement, setPlacement] = useState(false);
   const [command, setCommand] = useState<RebootCommand>(), [bubble, setBubble] = useState('');
+  const [speechId, setSpeechId] = useState(0), [bubbleScale, setBubbleScale] = useState(1);
+  const [speechReading, setSpeechReading] = useState(false);
+  const [contextDay, setContextDay] = useState(0), [contextMinute, setContextMinute] = useState(0), [contextFeedback, setContextFeedback] = useState('');
+  const [contextGroup, setContextGroup] = useState<'activity' | 'sleep' | 'records'>('activity');
+  const contextInitialized = useRef(false), speechActive = useRef(false), speechOwner = useRef<string | undefined>(undefined);
+  const contextSpeechTokens = useRef<string[]>([]);
   const [quiet, setQuiet] = useState(!!controlled), [reduced, setReduced] = useState(false), [busy, setBusy] = useState(false);
   const [comparisonToken, setComparisonToken] = useState<string>();
   const [comparisonStage, setComparisonStage] = useState<ComparisonWindowEvent>();
@@ -47,7 +54,10 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   const [artCandidate, setArtCandidate] = useState<BabyArt>(personalityReview ? 'two_paw' : 'v8'), [artComparison, setArtComparison] = useState<ArtComparison>();
   const [renderProfile, setRenderProfile] = useState<RoomRendererProfileId>(personalityReview ? 'quality_250' : 'automatic');
   const [voice] = useState(() => new BabyLines());
-  const bubbleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined), bubbleToken = useRef(0);
+  const bubbleToken = useRef(0);
+  const showSpeech = useCallback((text: string, owner?: string) => { speechActive.current = !!text; speechOwner.current = owner;
+    setBubble(text); setSpeechId(++bubbleToken.current); }, []);
+  const dismissSpeech = useCallback(() => showSpeech(''), [showSpeech]);
   const [error, setError] = useState(''), [captureToken, setCaptureToken] = useState<string>();
   const [captureDuration, setCaptureDuration] = useState<60_000|180_000>(60_000);
   const [backend, setBackend] = useState<'A' | 'B'>('A'), [modelStatus, setModelStatus] = useState('A · 구조화된 실제 기억');
@@ -83,7 +93,9 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
     queue.current = work.catch(() => undefined); return work;
   }, [apply]);
   const now = useCallback(() => controlled?.atMs ?? Math.max(Date.now(), latest.current.pet?.lastSimulatedAtMs ?? 0), [controlled?.atMs]);
-  const cancel = useCallback(() => { epoch.current++; semantic.current.cancel(); ++bubbleToken.current; clearTimeout(bubbleTimer.current); setHand(false); setCommand(undefined); setBubble(''); }, []);
+  const cancel = useCallback(() => { epoch.current++; semantic.current.cancel(); setHand(false); setCommand(undefined); dismissSpeech(); }, [dismissSpeech]);
+  useEffect(() => { if (menu !== null) dismissSpeech(); }, [menu, dismissSpeech]);
+  useEffect(() => { if (memory && !contextInitialized.current) { contextInitialized.current = true; setContextDay(memory.lifeContext?.day ?? 0); } }, [memory]);
   useEffect(() => {
     alive.current = true;
     const stopStorageDiagnostics=installStorageDiagnostics();
@@ -103,36 +115,43 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
     const tick = setInterval(() => {
       if (AppState.currentState === 'active' && service.current) void run(async () => ({ state: await service.current!.advanceForeground(now()) }));
     }, 30_000);
-    return () => { alive.current = false; requestEpoch.current++; modelQueue.cancel(); clearTimeout(bubbleTimer.current); subscription.remove(); clearInterval(tick); stopStorageDiagnostics(); };
+    return () => { alive.current = false; requestEpoch.current++; modelQueue.cancel(); subscription.remove(); clearInterval(tick); stopStorageDiagnostics(); };
   }, [cancel, now, run, PET_ID, personalityReview, controlled?.atMs, controlled?.memory]);
 
   const onEvent = useCallback((event: RebootEvent) => {
     if (!alive.current) return;
     trace.current.push({ ...event, atMs: Date.now() }); trace.current = trace.current.slice(-256);
-    if (event.phase === 'cancel' || event.phase === 'start') { ++bubbleToken.current; clearTimeout(bubbleTimer.current); setBubble(''); }
+    if (event.phase === 'cancel' && speechOwner.current === event.token || event.phase === 'start' && event.kind === 'life_context') dismissSpeech();
     if (event.phase === 'start') activeIntent.current = event;
     if (event.phase === 'cancel' || event.phase === 'complete') {
       if (activeIntent.current?.token === event.token) activeIntent.current = null;
+    }
+    if (event.kind === 'life_context') {
+      if (event.contextGeneration !== epoch.current) return;
+      if (event.phase === 'contact' && event.contextCue && event.babyBeat === event.contextCue.speechBeat && !contextSpeechTokens.current.includes(event.token)) {
+        contextSpeechTokens.current = [...contextSpeechTokens.current, event.token].slice(-64);
+        if (!quiet) showSpeech(event.contextCue.text, event.token);
+        trace.current.push({ contextLine: event.contextCue.intent, token: event.token, shown: !quiet, atMs: Date.now() });
+      }
+      return; // Presentation claims are not completed game/experience rewards.
     }
     if (event.phase === 'contact' && event.babyBeat) {
       const key = event.kind === 'cushion_changed' && event.babyBeat === 'cushion_knead'
         ? event.observation === 'witnessed' ? 'cushion_seen' : 'cushion_changed'
         : event.handActing ? ['paw_offer', 'paw_flick', 'side_nuzzle'].includes(event.babyBeat) ? `hand_${event.babyBeat}` : 'hand_silent'
           : event.babyBeat;
-      const spoken = quiet ? null : voice.select(key, event.token, event.automatic, Date.now(), personalityReview);
-      trace.current.push({ speechDecision: { key, reason: quiet ? 'COMPARISON_HIDDEN' : voice.lastDecision }, token: event.token, atMs: Date.now() });
+      const spoken = quiet || speechActive.current ? null : voice.select(key, event.token, event.automatic, Date.now(), personalityReview);
+      trace.current.push({ speechDecision: { key, reason: quiet ? 'COMPARISON_HIDDEN' : speechActive.current ? 'READING_CURRENT_LINE' : voice.lastDecision }, token: event.token, atMs: Date.now() });
       if (spoken) {
-        clearTimeout(bubbleTimer.current); const id = ++bubbleToken.current;
-        setBubble(spoken.text); trace.current.push({ lineId: spoken.lineId, token: event.token, shown: !quiet, atMs: Date.now() });
-        bubbleTimer.current = setTimeout(() => { if (alive.current && bubbleToken.current === id) setBubble(''); }, Math.max(2200, spoken.text.length * 125));
+        showSpeech(spoken.text, event.token); trace.current.push({ lineId: spoken.lineId, token: event.token, shown: !quiet, atMs: Date.now() });
       }
     } else if (event.phase === 'contact' && !event.automatic) {
       const known = latest.current.memory?.events.some(x => x.kind === 'hand');
-      setBubble(event.kind === 'hand' ? event.stage === 'baby' ? '조금만 가까이.' : event.stage === 'growing' ? '가만히 있어 봐.' : known ? '그 손, 알아.' : '여기 기대도 돼?'
+      showSpeech(event.kind === 'hand' ? event.stage === 'baby' ? '조금만 가까이.' : event.stage === 'growing' ? '가만히 있어 봐.' : known ? '그 손, 알아.' : '여기 기대도 돼?'
         : event.kind === 'hat_first' ? '이건 처음 보네.' : event.kind === 'hat_again' ? '이제 잘 맞네.' : event.kind === 'hat_busy' ? '잠깐만 쓰고 갈게.' : '자리가 달라졌네.');
     }
     if (event.phase !== 'complete' || !memories.current) return;
-    if (!event.babyMode) setBubble('');
+    if (!event.babyMode) dismissSpeech();
     const kind = event.kind.startsWith('hat') ? 'hat_used' : ['rest', 'cushion_changed'].includes(event.kind) ? 'cushion_used' : event.kind === 'hand' ? 'hand' : personalityReview && event.automatic ? 'personality_scene' : null;
     if (!kind) return;
     const captured = latest.current.memory;
@@ -143,7 +162,22 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       ...(kind === 'hand' && event.touchRegion ? { touchRegion: event.touchRegion } : {}),
       ...(kind === 'cushion_used' ? { itemRevision: event.itemRevision ?? captured.cushion.revision, position: { x: captured.cushion.x, z: captured.cushion.z } } : {}),
     }, event.sourceRevision, event.randomState) }));
-  }, [run, voice, quiet, personalityReview, PET_ID]);
+  }, [run, voice, quiet, personalityReview, PET_ID, showSpeech, dismissSpeech]);
+
+  const selectLifeContext = (name: SyntheticCase) => {
+    if (!memories.current || !personalityReview || !latest.current.pet || projectPetRest(latest.current.pet).mode !== 'awake') return;
+    cancel(); setMenu(null); setPlacement(false); setArtComparison(undefined);
+    const generation = epoch.current, input = syntheticLifeContext(name, contextDay, contextMinute);
+    trace.current.push({ syntheticContext: input, atMs: Date.now() });
+    void run(async () => {
+      const result = await memories.current!.claimLifeContext(input, input.queriedAtMs);
+      trace.current.push({ contextDecision: result.reason, eventId: input.eventId, revision: input.revision, atMs: Date.now() });
+      setContextFeedback(result.cue ? '합성 기록을 보고 반응했어요.' : '같은 사건·쉬기 선택·확인되지 않은 기록에는 새로 재촉하지 않아요.');
+      if (!result.cue || epoch.current !== generation) return { memory: result.memory };
+      return { memory: result.memory, command: { token: token('context'), kind: 'life_context', sourceRevision: result.memory.revision,
+        contextGeneration: generation, contextCue: result.cue, target: { x: personalityReview === 'warm' ? 0 : personalityReview === 'poised' ? .35 : -.2, z: 2.55 } } };
+    });
+  };
 
   const wear = () => {
     if (!memories.current || !latest.current.memory || !latest.current.pet || projectPetRest(latest.current.pet).mode !== 'awake') return;
@@ -192,7 +226,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = (file = 'arucon-reboot-evidence.json') => {
-    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-emotion-v10', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, quiet, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-context-v11', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, quiet, contextDay, contextMinute, bubbleScale, finalSize: null, finalRenderProfile: null },
       comparison: controlled ? { baseline: comparisonBaseline(controlled), id: controlled.id, petId: controlled.petId, pacing: comparisonPacing,
         culling: comparisonCulling ? 'closed_opaque_front' : 'source',
         initialState: comparisonInitialState.current,
@@ -238,7 +272,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   return <View style={styles.root}>
     <AruconRoom rendererProfileId={renderProfile} rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
       sizeCandidate, artCandidate, artComparison: artComparison ? { ...artComparison, paused: artComparison.paused || menu !== null } : undefined, familiarHandId: familiarHand?.eventId,
-      cushion: memory.cushion, handOffered: hand, command,
+      cushion: memory.cushion, handOffered: hand, command, contextGeneration: epoch.current, contextSpeechReading: speechReading,
       comparisonHold: !!controlled && !comparisonToken,
       comparisonHullCulling: !!controlled && comparisonCulling,
       comparisonProtocol: controlled && comparisonToken ? { token: comparisonToken, warmupMs: 30000, captureMs: 60000, pacing: comparisonPacing } : undefined,
@@ -247,16 +281,18 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       formId={pet.formId} restMode={rest.mode} reducedMotion={reduced} interactionEnabled={menu === null && !artComparison}
       topOcclusion={insets.top + 78} bottomOcclusion={insets.bottom + 70}
       rebootPlacement={placement && !artComparison} onRebootPlacement={moveCushion}
-      onInteractionIntent={kind => { if (kind === 'pet' || kind === 'move') { setHand(false); setBubble(''); } }}
+      onInteractionIntent={kind => { if (kind === 'pet' || kind === 'move') { epoch.current++; setCommand(undefined); setHand(false); dismissSpeech(); } }}
       onPetTouch={() => { const id = token('touch'); void run(async () => ({ state: await service.current!.interact(now(), id, 'touch', utcFixtureDay(now()).id) })); }}
-      onStatus={setBubble} onFurnitureHit={kind => { if (kind === 'cushion' && (!controlled || comparisonStage?.phase !== 'warmup' && comparisonToken)) setCommand({ token: token('rest'), kind: 'rest', sourceRevision: memory.revision, target: memory.cushion, itemRevision: memory.cushion.revision }); }}
-      reactionBubbleWidth={babyReview ? 164 : undefined} reactionBubbleHeadClearance={babyReview ? 50 : undefined}
-      reactionBubble={!quiet && bubble ? <View style={styles.bubble}><Text style={styles.bubbleText}>{bubble}</Text><Pressable accessibilityLabel="말풍선 닫기" hitSlop={9} onPress={() => { ++bubbleToken.current; clearTimeout(bubbleTimer.current); setBubble(''); }} style={styles.bubbleClose}><Text style={styles.bubbleCloseText}>×</Text></Pressable></View> : undefined}
+      onStatus={showSpeech} onFurnitureHit={kind => { if (kind === 'cushion' && (!controlled || comparisonStage?.phase !== 'warmup' && comparisonToken)) setCommand({ token: token('rest'), kind: 'rest', sourceRevision: memory.revision, target: memory.cushion, itemRevision: memory.cushion.revision }); }}
+      reactionBubbleHeadClearance={babyReview ? 50 : undefined}
+      petSpeech={!quiet && bubble ? { id: speechId, text: bubble, fontScale: bubbleScale, reducedMotion: reduced,
+        onDismiss: dismissSpeech, onReadingHoldChange: setSpeechReading,
+        onMeasure: size => { trace.current.push({ speechMeasure: { id: speechId, text: bubble, ...size, fontScale: bubbleScale }, atMs: Date.now() }); trace.current = trace.current.slice(-256); } } : undefined}
       onPerformanceSummary={x => { perf.current = x; }} performanceCaptureToken={captureToken} performanceCaptureDurationMs={captureDuration} onPerformanceCapture={x => { capture.current = x; if (controlled) setCompletedCapture(x); }}
       onComparisonWindow={controlled ? onComparisonWindow : undefined}
       onRuntimeSnapshot={x => { runtime.current = x; }} />
     <View pointerEvents="box-none" style={[styles.header, { top: insets.top + 8 }]}>
-      <View><Text style={styles.name}>{pet.givenName}</Text><Text style={styles.level}>Lv.{growth.level}</Text><View style={styles.track}><View style={[styles.progress, { width: `${Math.max(0, Math.min(100, (growth.atFinalLevel ? 1 : growth.expIntoLevelUnits / Math.max(1, growth.expIntoLevelUnits + (growth.expToNextLevelUnits ?? 0))) * 100))}%` }]} /></View></View>
+      <View><Text style={styles.name}>{pet.givenName}</Text><Text style={styles.level}>Lv.{growth.level} · 합성 체험</Text><View style={styles.track}><View style={[styles.progress, { width: `${Math.max(0, Math.min(100, (growth.atFinalLevel ? 1 : growth.expIntoLevelUnits / Math.max(1, growth.expIntoLevelUnits + (growth.expToNextLevelUnits ?? 0))) * 100))}%` }]} /></View></View>
       <Pressable accessibilityLabel="리부트 메뉴 열기" style={styles.menuButton} onPress={() => { setHand(false); setPlacement(false); setMenu('main'); }}><Text>☰</Text></Pressable>
     </View>
     <View style={[styles.bottom, { bottom: insets.bottom + 10, width: artComparison ? '92%' : undefined }]}>
@@ -270,9 +306,30 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
     {!!error && <View style={[styles.error, { bottom: insets.bottom + 76 }]}><Text accessibilityRole="alert">{error}</Text><Pressable accessibilityLabel="저장 다시 시도" onPress={() => { if (retry.current) void run(retry.current); }}><Text>다시 저장</Text></Pressable></View>}
     <Modal visible={menu !== null} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
       <View style={[styles.backdrop, { paddingTop: insets.top + 14, paddingBottom: insets.bottom + 14 }]}><View accessibilityViewIsModal style={styles.sheet}>
-        <View style={styles.sheetHeading}><Text style={styles.heading}>{menu === 'pet' ? '우리 아이' : menu === 'objects' ? '상점·꾸미기' : menu === 'settings' ? '설정' : menu === 'render' ? '렌더 비교' : '우리 방'}</Text><Pressable accessibilityLabel="리부트 패널 닫기" onPress={() => setMenu(null)} style={styles.menuButton}><Text>닫기</Text></Pressable></View>
+        <View style={styles.sheetHeading}><Text style={styles.heading}>{menu === 'context' ? '생활 상황 체험' : menu === 'bubble' ? '말풍선 검토' : menu === 'pet' ? '우리 아이' : menu === 'objects' ? '상점·꾸미기' : menu === 'settings' ? '설정' : menu === 'render' ? '렌더 비교' : '우리 방'}</Text><Pressable accessibilityLabel="리부트 패널 닫기" onPress={() => setMenu(null)} style={styles.menuButton}><Text>닫기</Text></Pressable></View>
         <ScrollView contentContainerStyle={{ gap: 10 }}>
           {menu === 'main' && <>{(['pet', 'objects', 'settings'] as const).filter(x => !controlled || x !== 'objects').map(x => <Pressable key={x} style={styles.row} accessibilityLabel={{pet:'우리 아이',objects:'상점·꾸미기',settings:'리부트 설정'}[x]} onPress={() => setMenu(x)}><Text>{{pet:'우리 아이',objects:'상점·꾸미기',settings:'설정'}[x]}</Text></Pressable>)}</>}
+          {menu === 'main' && personalityReview && <Pressable style={styles.row} accessibilityLabel="합성 생활 상황" onPress={() => setMenu('context')}><Text>생활 상황 체험</Text></Pressable>}
+          {menu === 'context' && <>
+            <Text>합성 데이터만 사용해요. 실제 걸음·활동·수면은 연결하지 않았어요. 표시용 합성 날 {contextDay + 1}, 관찰 시각 +{contextMinute}분. 게임 시간·먹이·EXP는 그대로예요.</Text>
+            <View style={{ flexDirection: 'row', gap: 6 }}>{(['activity', 'sleep', 'records'] as const).map(group => <Pressable key={group}
+              style={[styles.row, { flex: 1, padding: 8 }]} accessibilityRole="button" accessibilityState={{ selected: contextGroup === group }}
+              accessibilityLabel={`생활 상황 ${group}`} onPress={() => setContextGroup(group)}><Text>{{ activity: '활동', sleep: '수면·휴식', records: '기록 상태' }[group]}</Text></Pressable>)}</View>
+            {SYNTHETIC_CONTEXT_CASES.filter(([name]) => contextGroup === 'activity' ? ['remaining', 'goal', 'run', 'morning'].includes(name)
+              : contextGroup === 'sleep' ? ['reported_sleep', 'short_sleep', 'rest'].includes(name) : ['missing', 'delayed', 'failed', 'permission'].includes(name))
+              .map(([name, label]) => <Pressable key={name} style={styles.row} accessibilityLabel={`합성 상황 ${name}`} disabled={busy || rest.mode !== 'awake'} onPress={() => selectLifeContext(name)}><Text>{label}</Text></Pressable>)}
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              <Pressable style={[styles.row, { flex: 1 }]} accessibilityLabel="합성 관찰 15분 진행" onPress={() => setContextMinute(x => Math.min(60, x + 15))}><Text>관찰만 +15분</Text></Pressable>
+              <Pressable style={[styles.row, { flex: 1 }]} accessibilityLabel="다음 합성 날" onPress={() => { cancel(); setContextDay(x => Math.min(30_000, x + 1)); setContextMinute(0); }}><Text>다음 합성 날</Text></Pressable>
+            </View>
+            <Pressable style={styles.row} accessibilityLabel={memory.lifeContext?.lessTalk ? '생활 상황 말줄이기 해제' : '생활 상황 말줄이기'} onPress={() => { cancel(); void run(async () => ({ memory: await memories.current!.contextLessTalk(!memory.lifeContext?.lessTalk) })); }}><Text>생활 상황 말 줄이기 {memory.lifeContext?.lessTalk ? '켜짐' : '꺼짐'}</Text></Pressable>
+            {!!contextFeedback && <Text>{contextFeedback}</Text>}
+          </>}
+          {menu === 'bubble' && <>
+            <Text>말풍선 레이아웃만 확인해요. 게임 보상이나 완료 기억을 만들지 않아요.</Text>
+            {['히히!', '기운 있으면, 같이 한 바퀴?', '구경하던 곳은 여기야.\n기운이 있으면 함께 천천히 걸을까? 🐾'].map((line, i) => <Pressable key={line} style={styles.row} accessibilityLabel={`말풍선 길이 ${i + 1}`} onPress={() => { setMenu(null); showSpeech(line); trace.current.push({ bubbleLayoutProbe: i + 1, atMs: Date.now() }); }}><Text>{line}</Text></Pressable>)}
+            <Pressable style={styles.row} accessibilityLabel="말풍선 큰 글자 비교" onPress={() => setBubbleScale(x => x === 1 ? 1.6 : 1)}><Text>검토용 큰 글자 {bubbleScale === 1 ? '꺼짐' : '1.6배'}</Text></Pressable>
+          </>}
           {menu === 'pet' && !personalityReview && babyReview && <>
             <Text>REBOOT-03.1 · 선호한 A의 디자인에 Blender 리깅을 더한 C를 비교해요. 기본은 A이며 최종 채택 전이에요.</Text>
             {BABY_ART_CHOICES.map(({ id, label, accessibility }) => <Pressable key={id} accessibilityLabel={accessibility} style={styles.row} onPress={() => { cancel(); setArtCandidate(id); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null); }}><Text>{label}{artCandidate === id ? ' · 비교 중' : ''}</Text></Pressable>)}
@@ -311,13 +368,14 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
             <Pressable style={styles.row} accessibilityLabel="자동 렌더 설정 복원" onPress={() => { cancel(); setCaptureToken(undefined); capture.current = undefined; setRenderProfile('automatic'); setMenu(null); }}><Text>기존 자동 설정으로 돌아가기</Text></Pressable>
           </>}
           {menu === 'settings' && <><Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 일반 방과 저장이 분리돼요.</Text>
+            <Pressable style={styles.row} accessibilityLabel="말풍선 레이아웃 검토" onPress={() => setMenu('bubble')}><Text>말풍선 길이·큰 글자 검토</Text></Pressable>
             {controlled && <><Text>합성 고정 시계 · 준비30초/측정60초 · 성격 라벨/말풍선 숨김. 정상 선택기와 사용자 입력을 사용해요.</Text>
               <Pressable style={styles.row} accessibilityLabel="프레임 예약 tail 비교" onPress={() => onComparisonPacing?.('tail')}><Text>기존 프레임 예약{comparisonPacing==='tail'?' · 선택':''}</Text></Pressable>
               <Pressable style={styles.row} accessibilityLabel="프레임 예약 ahead 비교" onPress={() => onComparisonPacing?.('ahead')}><Text>예약 시점 실험{comparisonPacing==='ahead'?' · 선택':''}</Text></Pressable></>}
             {controlled && <><Pressable style={styles.row} accessibilityLabel="닫힌 불투명 뒷면 제외 비교" onPress={() => onComparisonCulling?.(true)}><Text>닫힌 몸의 내부 뒷면 제외 실험</Text></Pressable>
               <Pressable style={styles.row} accessibilityLabel="원래 양면 렌더 비교" onPress={() => onComparisonCulling?.(false)}><Text>원래 양면 렌더로 비교</Text></Pressable></>}
             {!personalityReview && <Pressable style={styles.row} accessibilityLabel={babyReview ? '이전 REBOOT-01 세 모습 비교' : 'REBOOT-02 아기 검토로 돌아가기'} onPress={() => { cancel(); setArtComparison(undefined); setBabyReview(x => !x); setMenu(null); }}><Text>{babyReview ? '이전 세 모습 비교' : '아기 검토로 돌아가기'}</Text></Pressable>}
-            <Pressable style={styles.row} accessibilityLabel={quiet ? '말풍선 켜기' : '말풍선 가리기'} onPress={() => setQuiet(x => !x)}><Text>{quiet ? '말풍선 켜기' : '말풍선 가리기'}</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel={quiet ? '말풍선 켜기' : '말풍선 가리기'} onPress={() => { dismissSpeech(); setQuiet(x => !x); }}><Text>{quiet ? '말풍선 켜기' : '말풍선 가리기'}</Text></Pressable>
             <Pressable style={styles.row} accessibilityLabel={reduced ? '동작 줄이기 끄기' : '동작 줄이기 켜기'} onPress={() => setReduced(x => !x)}><Text>동작 줄이기 {reduced ? '켜짐' : '꺼짐'}</Text></Pressable>
             {babyReview && !controlled && <Pressable style={styles.row} accessibilityLabel="렌더 품질 비교" onPress={() => setMenu('render')}><Text>렌더 품질 비교</Text></Pressable>}
             <Pressable disabled={busy} style={styles.row} accessibilityLabel={rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'} onPress={restAction}><Text>{rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'}</Text></Pressable>
@@ -350,8 +408,6 @@ const styles = StyleSheet.create({
   compareAction: { flex: 1, minWidth: 0, paddingHorizontal: 6 },
   bottom: { position: 'absolute', alignSelf: 'center' }, action: { minHeight: 46, minWidth: 140, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: '#faf6eff0', paddingHorizontal: 16 },
   reviewToolLabel: { fontSize: 10, color: '#7d776f', textAlign: 'center', marginBottom: 4 },
-  bubble: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingLeft: 12, paddingRight: 4, borderRadius: 18, borderWidth: 1, borderColor: '#eaded4', backgroundColor: '#fff9ed', shadowColor: '#655750', shadowOpacity: .08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
-  bubbleText: { flexShrink: 1, color: '#514658', fontSize: 14, lineHeight: 19 }, bubbleClose: { width: 26, minHeight: 30, alignItems: 'center', justifyContent: 'center' }, bubbleCloseText: { color: '#a4999f', fontSize: 16 },
   backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: '#18203566', paddingHorizontal: 16 }, sheet: { maxHeight: '80%', borderRadius: 22, backgroundColor: '#fffaf2', padding: 18, gap: 14 },
   sheetHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, heading: { fontWeight: '700', fontSize: 20, color: '#424d61' },
   row: { minHeight: 48, padding: 13, borderRadius: 13, backgroundColor: '#e7ebec', justifyContent: 'center' }, error: { position: 'absolute', left: 20, right: 20, padding: 12, borderRadius: 12, backgroundColor: '#f6dedb' },

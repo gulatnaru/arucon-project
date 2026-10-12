@@ -59,7 +59,7 @@ export class RebootDirector {
     const sinceTouch = this.now() - this.lastTouchAt;
     const repeated = command.kind === 'hand' && this.lastTouchRegion === this.touchRegion && sinceTouch >= 0 && sinceTouch < 8_000;
     if (command.kind === 'hand') this.touchBurst = repeated ? this.touchBurst + 1 : 0;
-    const baby = this.view?.babyCharm && this.view.stage === 'baby' ? (this.view.personality ? personalityPlan(this.view.personality.foundation.profileId, command.kind, this.touchRegion, this.recentTouchStyles, interrupted, this.view.familiarHandId) : undefined) ?? babyPlan(command.kind, this.touchRegion,
+    const baby = command.kind === 'life_context' ? command.contextCue?.plan : this.view?.babyCharm && this.view.stage === 'baby' ? (this.view.personality ? personalityPlan(this.view.personality.foundation.profileId, command.kind, this.touchRegion, this.recentTouchStyles, interrupted, this.view.familiarHandId) : undefined) ?? babyPlan(command.kind, this.touchRegion,
       repeated, interrupted, this.view.familiarHandId, this.touchBurst, this.recentTouchStyles) : undefined;
     if (baby?.touchStyle) { this.recentTouchStyles.push(baby.touchStyle); this.recentTouchStyles = this.recentTouchStyles.slice(-3); }
     if (command.kind === 'hand') { this.lastTouchAt = this.now(); this.lastTouchRegion = this.touchRegion; }
@@ -86,11 +86,13 @@ export class RebootDirector {
     if (!w.enabled) {
       // Opening a panel cancels a hand exchange; closing it must not turn a
       // canceled gesture into completed experience or resume the old contact.
-      if (this.intent?.handPlan) { this.cancel(); this.hand = false; this.touching = false; }
+      if (this.intent?.handPlan || this.intent?.command.kind === 'life_context') { this.cancel(); this.hand = false; this.touching = false; }
       return;
     }
+    if (this.intent?.command.kind === 'life_context' && this.intent.command.contextGeneration !== w.view.contextGeneration) this.cancel();
     if (w.view.command && w.view.command.token !== this.lastCommand) {
-      this.lastCommand = w.view.command.token; this.begin(w.view.command, false);
+      this.lastCommand = w.view.command.token;
+      if (w.view.command.kind !== 'life_context' || w.view.command.contextGeneration === w.view.contextGeneration) this.begin(w.view.command, w.view.command.kind === 'life_context');
     }
     if (w.view.handOffered !== this.hand) {
       this.hand = w.view.handOffered;
@@ -152,6 +154,7 @@ export class RebootDirector {
       this.pose.gazeTarget = ['look_back', 'paw_offer', 'lean', 'side_nuzzle'].includes(currentBeat?.beat.id ?? '') || i.phase === 'recover'
         ? { x: 0, z: 4.3 } : i.command.kind === 'cushion_changed' ? w.view.cushion : i.command.target;
     }
+    if (i.command.kind === 'life_context') this.pose.gazeTarget = { x: 0, z: 4.3 };
     if (i.handPlan?.profile === 'poised' && i.phase === 'recover' && i.elapsed > .25 && this.touched?.command.target)
       this.pose.gazeTarget = this.touched.command.target;
     // Remembered coordinates are a glance only; route/dock always use current truth.
@@ -168,6 +171,7 @@ export class RebootDirector {
       else if (i.elapsed > 12) this.cancel();
     } else if (i.phase === 'contact') {
       if (i.command.kind === 'hand' && (this.touching || this.hand)) return;
+      if (i.command.kind === 'life_context' && w.view.contextSpeechReading) return;
       const duration = contactDuration;
       if (i.elapsed >= duration) this.transition('recover');
     } else if (i.phase === 'recover' && i.elapsed >= recoveryDuration) {

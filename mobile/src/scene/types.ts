@@ -9,6 +9,7 @@ import type { LifeCommand, LifeEvent, LifeScene } from '../living/life';
 import type { PetRestMode } from '../presentation/petRest';
 import type { RoomInteraction } from './interactionLifecycle';
 import type { RebootEvent, RebootView } from '../reboot/contracts';
+import type { PetSpeech } from '../presentation/PetSpeechBubble';
 
 export type { ComparisonCameraAngle, RoomPresentationBatch, RoomVisualCommand } from './presentationBridge';
 
@@ -73,6 +74,7 @@ export type RoomProps = {
   topOcclusion?: number;
   bottomOcclusion?: number;
   reactionBubble?: ReactNode;
+  petSpeech?: PetSpeech;
   reactionBubbleWidth?: number;
   reactionBubbleHeadClearance?: number;
   /** Reversible common-form comparison; it never mutates formId or saved state. */

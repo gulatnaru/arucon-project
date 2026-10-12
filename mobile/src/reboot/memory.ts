@@ -2,6 +2,7 @@ import type { SqlConnection } from '../storage/sqlite';
 import type { FloorPoint } from '../scene/types';
 import { newPersonality, validPersonality, personalityOwnsPet, type PersonalityId } from './personality';
 import { type RebootFact, type RebootSnapshot, type RebootStage } from './contracts';
+import { acknowledgeContext, emptyContextHistory, evaluateLifeContext, validContextHistory, type LifeContext, type ContextCue } from './lifeContext';
 
 /** Keep first/latest completed experience per object within the same 64-fact budget.
  * Quiet cushion repeats must not turn a familiar hat into a first encounter.
@@ -28,7 +29,7 @@ export class RebootMemoryStore {
   private validate(x: RebootSnapshot) {
     if (x.schemaVersion !== 1 || x.petId !== this.petId || !Number.isSafeInteger(x.revision) || x.revision < 0 ||
       (this.personalityId ? !validPersonality(x.personality, this.petId) || x.personality?.profileId !== this.personalityId || !Number.isSafeInteger(x.randomState) || x.randomState! < 0 || x.randomState! > 0xffffffff : x.personality !== undefined) ||
-      typeof x.hatWorn !== 'boolean' || !['baby', 'growing', 'evolved'].includes(x.previewStage) ||
+      typeof x.hatWorn !== 'boolean' || x.lifeContext !== undefined && !validContextHistory(x.lifeContext) || !['baby', 'growing', 'evolved'].includes(x.previewStage) ||
       !Number.isSafeInteger(x.cushion.revision) || !Number.isFinite(x.cushion.x) || !Number.isFinite(x.cushion.z) ||
       Math.abs(x.cushion.x) > 2.1 || x.cushion.z < -.9 || x.cushion.z > 3 ||
       !Array.isArray(x.events) || x.events.length > 64 || JSON.stringify(x).length > 32768 || x.events.some(e => e.petId !== this.petId || e.completed !== true ||
@@ -75,6 +76,31 @@ export class RebootMemoryStore {
     if (!Number.isFinite(at.x) || !Number.isFinite(at.z)) return Promise.reject(new Error('유효한 바닥에 놓아 주세요.'));
     const x = Math.max(-2.1, Math.min(2.1, at.x)), z = Math.max(-.9, Math.min(3, at.z));
     return this.mutate(s => expectedRevision !== undefined && s.revision !== expectedRevision || s.cushion.x === x && s.cushion.z === z ? s : ({ ...s, revision: s.revision + 1, cushion: { x, z, revision: s.cushion.revision + 1 } }));
+  }
+  /** Durable at-most-once presentation claim, independent of economic ledgers.
+   * Claim before acting: a cancellation is not a completed experience and cannot
+   * replay a health suggestion after restart. No raw health input is persisted. */
+  async claimLifeContext(input: LifeContext, nowMs: number): Promise<{ memory: RebootSnapshot; cue?: ContextCue; reason: string }> {
+    let cue: ContextCue | undefined, reason = 'PROFILE_REQUIRED';
+    const memory = await this.mutate(x => {
+      if (!this.personalityId) return x;
+      const h = x.lifeContext ?? emptyContextHistory(), result = evaluateLifeContext(input, h, this.personalityId, nowMs);
+      reason = result.reason; cue = result.cue;
+      if (!cue) {
+        if (!result.safetyIntent) return x;
+        // A quiet/minimized response still suppresses invitations; silence is
+        // not evidence that a valid sleep concern was absent or rest was chosen.
+        const next = h.day === input.day ? { ...h, seen: { ...h.seen } } : { ...emptyContextHistory(), day: input.day, lessTalk: h.lessTalk };
+        next.seen[input.eventId] = input.revision; next.avoidInvites = true;
+        return { ...x, revision: x.revision + 1, lifeContext: next };
+      }
+      return { ...x, revision: x.revision + 1, lifeContext: acknowledgeContext(h, cue, nowMs) };
+    });
+    return { memory, cue, reason };
+  }
+  contextLessTalk(enabled: boolean) {
+    return this.mutate(x => { const h = x.lifeContext ?? emptyContextHistory(); return h.lessTalk === enabled ? x :
+      { ...x, revision: x.revision + 1, lifeContext: { ...h, lessTalk: enabled } }; });
   }
   complete(event: RebootFact, expectedRevision: number, randomState?: number): Promise<RebootSnapshot> {
     if (event.petId !== this.petId || !event.completed || randomState !== undefined && (!Number.isSafeInteger(randomState) || randomState < 0 || randomState > 0xffffffff)) return Promise.reject(new Error('다른 아이·취소된 사건은 기억하지 않아요.'));

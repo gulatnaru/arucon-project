@@ -9,6 +9,7 @@ import { roomRenderSurfaceScale, resolveRoomRendererProfile } from './rendererCo
 import type { RoomProps } from './types';
 import { PetGestureSession } from './interactionLifecycle';
 import { projectPetRest } from '../presentation/petRest';
+import { PetSpeechBubble } from '../presentation/PetSpeechBubble';
 
 export type { RoomProps } from './types';
 
@@ -24,10 +25,14 @@ export function AruconRoom(props: RoomProps) {
   const [error, setError] = useState<string | null>(null);
   const [systemReduced, setSystemReduced] = useState(false);
   const [bubbleHeight, setBubbleHeight] = useState(100);
+  const [speechSize, setSpeechSize] = useState({ width: 120, height: 60 });
+  const onSpeechSize = useCallback((next: { width: number; height: number }) => setSpeechSize(prior =>
+    Math.abs(prior.width - next.width) < .5 && Math.abs(prior.height - next.height) < .5 ? prior : next), []);
   const topLimit = props.topOcclusion ?? insets.top + 74;
   const bottomLimit = size.height - (props.bottomOcclusion ?? insets.bottom + 94);
-  const bubble = petBubbleBounds(hits?.pet ?? { x: size.width / 2, y: size.height / 2 }, size.width, topLimit, bottomLimit, bubbleHeight,
-    props.reactionBubbleWidth, props.reactionBubbleHeadClearance);
+  const speechMaxWidth = Math.max(44, Math.min(280, size.width - 24));
+  const bubble = petBubbleBounds(hits?.pet ?? { x: size.width / 2, y: size.height / 2 }, size.width, topLimit, bottomLimit,
+    props.petSpeech ? speechSize.height : bubbleHeight, props.petSpeech ? speechSize.width : props.reactionBubbleWidth, props.reactionBubbleHeadClearance);
   const rendererProfileId = props.rendererProfileId ?? 'automatic';
   const requestedRendererProfile = useRef(rendererProfileId);
   const [effectiveRendererProfileId, setEffectiveRendererProfileId] = useState(rendererProfileId);
@@ -268,12 +273,12 @@ export function AruconRoom(props: RoomProps) {
       {!!props.poopCount && hits?.cleanup?.visible && <Pressable accessibilityRole="button" accessibilityLabel="남아 있는 배설물 치우기"
         style={[styles.furnitureHit, { left: hits.cleanup.x - 26, top: hits.cleanup.y - 26 }]}
         onPress={() => { if (latest.current.interactionEnabled ?? true) latest.current.onCleanup?.(); }} />}
-      {!!props.reactionBubble && hits?.pet.visible && bubble.maxHeight > 0 && <View
+      {!!(props.reactionBubble || props.petSpeech) && hits?.pet.visible && bubble.maxHeight > 0 && <View
         pointerEvents="box-none"
         style={{ position: 'absolute', left: bubble.left, top: bubble.top, width: bubble.width, maxHeight: bubble.maxHeight }}
       >
         <View onLayout={event => setBubbleHeight(event.nativeEvent.layout.height)} style={{ maxHeight: bubble.maxHeight }}>
-          {props.reactionBubble}
+          {props.petSpeech ? <PetSpeechBubble speech={props.petSpeech} maxWidth={speechMaxWidth} maxHeight={bubble.maxHeight} onSize={onSpeechSize} /> : props.reactionBubble}
         </View>
         <View pointerEvents="none" style={{ position: 'absolute', left: bubble.tailLeft,
           ...(bubble.below ? { top: -7, transform: [{ rotate: '180deg' }] } : { bottom: -7 }),
