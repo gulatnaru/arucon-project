@@ -3820,7 +3820,7 @@
   "videoDelivery": {
     "rule": "docs/remote-video-delivery.md",
     "videoStatus": "VIDEO_READY",
-    "deliveryStatus": "DELIVERY_BLOCKED",
+    "deliveryStatus": "DELIVERY_BLOCKED_ACCOUNT_CONFIRMATION",
     "mobilePlayback": "NOT_VERIFIED",
     "build": "reboot-04-emotion-v10",
     "source": "ef32ac36c0532d83120636bedb1fea2fe4e4e503",
@@ -3830,9 +3830,20 @@
     "bytes": 19791087,
     "sha256": "1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4",
     "actualUpload": false,
-    "approvedPrivateRoute": null,
+    "approvedPrivateRoute": {
+      "provider": "personal iCloud Drive",
+      "relativeFolder": "Arucon/Reviews",
+      "allowed": [
+        "review MP4",
+        "short scene guide if needed"
+      ],
+      "status": "USER_APPROVED_ACCOUNT_CONFIRMATION_PENDING"
+    },
     "routeConfirmationRequestedOnce": true,
     "directAttachmentBlock": "No exposed MP4 chat attachment tool; actual Codex UI access rejected by CUA safety policy",
-    "rebuildReinstallDbReset": "NONE"
+    "rebuildReinstallDbReset": "NONE",
+    "accountConfirmationRequestedOnce": true,
+    "icloudDriveSyncObserved": "ON_IN_SYSTEM_SETTINGS",
+    "localCopy": false
   }
 }
