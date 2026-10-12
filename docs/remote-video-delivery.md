@@ -71,4 +71,6 @@
 - 원본과 복사본의 크기·SHA-256을 비교한다. macOS에서 확인 가능한 iCloud 업로드·오류·공유 상태를 기록한다. 로컬 복사만 확인됐으면 `LOCAL_COPY_VERIFIED / UPLOAD_PENDING_OR_UNVERIFIED`이며 원격 전달 완료로 올리지 않는다.
 - iCloud 업로드가 확인되면 `DELIVERY_SENT / MOBILE_NOT_VERIFIED`로 기록한다. 사용자 iPhone에서 다운로드·재생 확인을 받은 경우에만 `MOBILE_CONFIRMED`로 바꾼다.
 
-최초 확인 진행: 설정 화면에서 현재 Mac의 iCloud Drive '이 Mac 동기화' ON을 확인했다. 계정의 개인 소유와 대상 iPhone 일치 여부는 한 번 요청한 확인에 대한 답변을 기다린다. 답변 전 폴더 생성/MP4 복사는 하지 않는다. 실행 상태와 다음 전달 작업은 NEXT-RESUME 및 로컬 전달 감사에 남긴다.
+최초 계정 확인 완료: 사용자가 현재 Mac의 계정이 개인 계정이며 받을 iPhone도 같은 계정이라고 확인했다. 설정 화면에서 iCloud Drive '이 Mac 동기화' ON을 확인했다. 이 승인된 계정과 폴더 범위는 이후 검토에도 재사용한다. 계정이 바뀌거나 공유 상태가 달라질 때만 다시 확인한다.
+
+첫 전달 완료: `2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4`와 같은 이름의 `_scenes.txt` 안내문을 새 비공개 `Arucon/Reviews`에 비덮어쓰기 복사했다. MP4는 124초, 19,791,087bytes(18.87MiB), 1170×2532다. 원본과 복사본의 크기·SHA-256이 일치했고, macOS URL 리소스 API에서 폴더와 두 파일 모두 `IsShared=false`, `IsUploaded=true`, `IsUploading=false`, 업로드 오류 없음으로 확인했다. **DELIVERY_SENT / MOBILE_NOT_VERIFIED**다. iPhone 재생은 사용자의 실제 확인을 기다린다. 원본은 이동·삭제하지 않았다.

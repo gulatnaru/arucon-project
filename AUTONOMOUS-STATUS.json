@@ -3820,8 +3820,8 @@
   "videoDelivery": {
     "rule": "docs/remote-video-delivery.md",
     "videoStatus": "VIDEO_READY",
-    "deliveryStatus": "DELIVERY_BLOCKED_ACCOUNT_CONFIRMATION",
-    "mobilePlayback": "NOT_VERIFIED",
+    "deliveryStatus": "DELIVERY_SENT",
+    "mobilePlayback": "MOBILE_NOT_VERIFIED",
     "build": "reboot-04-emotion-v10",
     "source": "ef32ac36c0532d83120636bedb1fea2fe4e4e503",
     "fileName": "arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
@@ -3829,7 +3829,7 @@
     "durationSeconds": 124,
     "bytes": 19791087,
     "sha256": "1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4",
-    "actualUpload": false,
+    "actualUpload": true,
     "approvedPrivateRoute": {
       "provider": "personal iCloud Drive",
       "relativeFolder": "Arucon/Reviews",
@@ -3837,13 +3837,19 @@
         "review MP4",
         "short scene guide if needed"
       ],
-      "status": "USER_APPROVED_ACCOUNT_CONFIRMATION_PENDING"
+      "status": "USER_CONFIRMED_ACTIVE"
     },
     "routeConfirmationRequestedOnce": true,
     "directAttachmentBlock": "No exposed MP4 chat attachment tool; actual Codex UI access rejected by CUA safety policy",
     "rebuildReinstallDbReset": "NONE",
     "accountConfirmationRequestedOnce": true,
     "icloudDriveSyncObserved": "ON_IN_SYSTEM_SETTINGS",
-    "localCopy": false
+    "localCopy": true,
+    "accountConfirmedByUser": true,
+    "sameIPhoneAccountConfirmedByUser": true,
+    "cloudUploadConfirmed": true,
+    "shared": false,
+    "deliveredFileName": "2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
+    "uploadStatusEvidence": "NSURLUbiquitousItemIsUploaded=true; IsUploading=false; IsShared=false; UploadingError=null"
   }
 }

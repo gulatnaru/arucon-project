@@ -1,3 +1,20 @@
+# v10 iCloud 전달 완료 — iPhone 재생 확인 대기
+
+사용자가 개인 계정 및 받을 iPhone의 동일 계정 사용을 확인했다. **개인 iCloud Drive → Arucon → Reviews**에 다음 두 파일을 비덮어쓰기 복사했다.
+
+- `2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4` — 2:04 / 18.87MiB / 1170×2532
+- `2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review_scenes.txt` — 짧은 장면·컷 안내
+
+현재 **DELIVERY_SENT / MOBILE_NOT_VERIFIED**. 원본/복사본 크기·SHA-256 일치, macOS 공식 URL 리소스 API에서 두 파일 및 폴더의 공유 안 됨·업로드 완료·업로드 중 아님·오류 없음 확인. 첫 샌드박스 조회의 null을 업로드 실패로 해석하지 않았으며, 승인된 파일 경로의 정상 사용자 권한 조회로 확인했다. 보안 설정 변경 없음.
+
+MP4 SHA-256: `1a2df6b193445ea82094d5c73456b8fd3f16cc391a47c5c0a2ea5716ab4090e4`. 감사는 로컬 `evidence/remote-delivery-v10/icloud-copy-receipt.json` 및 `icloud-upload-state-authorized.json`. 로그/DB/소스/모델/evidence 전체는 iCloud로 보내지 않았다. 앱 재빌드·재촬영·DB 초기화 및 원본 삭제/이동 없음.
+
+**다음 한 작업:** 사용자 iPhone의 파일 앱 → 둘러보기 → iCloud Drive → Arucon → Reviews에서 재생 확인과 제품 평가를 받는다. 확인 전 MOBILE_CONFIRMED로 올리지 않는다. 이후 검토 MP4와 필요한 짧은 안내문은 같은 승인된 개인 비공개 경로를 재사용하며, 계정/공유/범위가 바뀌지 않으면 승인을 반복 요청하지 않는다.
+
+---
+
+## Historical — 계정 확인 대기
+
 # iCloud 전달 재개 — 계정 확인 대기
 
 사용자는 **개인 iCloud Drive / Arucon/Reviews**를 이번 및 향후 검토 MP4와 짧은 안내문에 승인했다. 아래의 '승인 경로 없음'은 과거 인계다. 설정 화면에서 '이 Mac 동기화' ON과 계정의 등록 iPhone을 확인했다. 개인 계정이며 대상 iPhone과 같은지 한 번 확인을 요청했으며, 답변을 기다린다. 같은 질문을 반복하지 않는다. 현재 외부 폴더 생성과 MP4 복사·업로드는 아직 하지 않았다.

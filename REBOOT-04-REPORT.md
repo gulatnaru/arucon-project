@@ -1,6 +1,6 @@
 # REBOOT-04 후속 — 눈·귀·감정·대사 / v10
 
-> **원격 영상 전달 후속:** [전달 규칙](docs/remote-video-delivery.md)을 저장했다. v10 실제 영상에서 `arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4` (124초/18.87MiB/native1170×2532/H.2648bit420/fast-start)를 만들고 전체 디코딩했다. **VIDEO_READY / DELIVERY_BLOCKED / MOBILE_NOT_VERIFIED**. MP4 첨부 도구 미노출, Codex 첨부 UI 접근은 도구 보안 정책으로 차단됐다. 개인 비공개 전달 폴더·계정 승인을 한 번 요청했으며 아직 미전송이다. 아래 로컬 링크를 휴대폰 전달 완료로 간주하지 않는다. 컷과 원본 시각은 NEXT-RESUME 및 로컬 delivery-manifest.json에 있다.
+> **원격 영상 전달 완료:** [전달 규칙](docs/remote-video-delivery.md)에 따라 사용자가 확인한 개인 iCloud Drive의 `Arucon/Reviews`로 `2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4`와 짧은 장면 안내문을 복사했다. **VIDEO_READY / DELIVERY_SENT / MOBILE_NOT_VERIFIED**. 124초/18.87MiB/native1170×2532/H.2648bit420/fast-start이며 원본·복사본의 크기와 SHA-256이 일치한다. macOS에서 두 파일의 공유 안 됨·업로드 완료·업로드 중 아님·오류 없음이 확인됐다. iPhone 다운로드·재생 자체는 아직 미확인이다. 앞선 직접 첨부 차단은 승인된 개인 전달 경로로 해소했으며, 원본을 이동·삭제하거나 DB/소스/로그를 보내지 않았다. 컷과 원본 시각은 함께 전달한 안내문에 있다.
 
 사용자의 v9 평가는 **REWORK_REQUIRED — 눈 균형·감정 전달·세 성격·대사·방 디자인**이다. 이전 두 발 기술 PASS가 이 평가를 대신하지 않는다. 첨부 ZIP의 MD 1개를 전체 읽고 [후속 지시](tasks/REBOOT-04-emotion-room-followup.md)에 원문 그대로 저장했다. 이번 v10은 그 평가에 대한 **수정·실제 비교 준비 / SELF_REVIEW**이며 최종 표현·아트·재미 승인은 USER_REVIEW_PENDING이다. 전체 상태는 PERF-01 미달 때문에 REWORK_REQUIRED를 유지한다.
 
