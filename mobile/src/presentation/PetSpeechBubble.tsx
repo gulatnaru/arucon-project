@@ -3,6 +3,7 @@ import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, V
 import { BubbleReadingClock, measuredSpeechWidth, speechReadingMs } from './bubbleReading';
 
 export type PetSpeech = { id: number; text: string; onDismiss: () => void; onReadingHoldChange?: (held: boolean) => void;
+  onUserInteraction?: () => void;
   fontScale?: number; reducedMotion?: boolean; onMeasure?: (size: { width: number; height: number }) => void };
 
 /** Content-sized pet speech. Presses stay here and cannot reach the floor/pet. */
@@ -54,9 +55,9 @@ export function PetSpeechBubble({ speech, maxWidth, maxHeight, onSize }: {
     </View>
     <Pressable accessibilityRole="button" accessibilityLabel={speech.text} accessibilityHint="탭하면 말풍선을 닫습니다. 읽기 중에는 길게 누를 수 있습니다."
       accessibilityActions={[{ name: 'dismiss', label: '말풍선 닫기' }]}
-      onAccessibilityAction={e => { if (['dismiss', 'activate', 'escape'].includes(e.nativeEvent.actionName)) speech.onDismiss(); }}
+      onAccessibilityAction={e => { if (['dismiss', 'activate', 'escape'].includes(e.nativeEvent.actionName)) { speech.onUserInteraction?.(); speech.onDismiss(); } }}
       onFocus={() => hold('focus')} onBlur={() => release('focus')}
-      onPressIn={() => hold('press')} onLongPress={() => { long.current = true; }} onPressOut={() => release('press')}
+      onPressIn={() => { speech.onUserInteraction?.(); hold('press'); }} onLongPress={() => { long.current = true; }} onPressOut={() => release('press')}
       onPress={() => { if (!long.current) speech.onDismiss(); long.current = false; }}
       onLayout={e => { const size = e.nativeEvent.layout; onSize({ width: size.width, height: size.height }); speech.onMeasure?.({ width: size.width, height: size.height }); }}
       style={[styles.bubble, { width, maxHeight }]}>

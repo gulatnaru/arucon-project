@@ -1,6 +1,7 @@
 import type { BabyExpression, RebootIntent, TouchRegion } from './contracts';
 import type { FloorPoint } from '../scene/types';
 import type { PersonalityId } from './personality';
+import { LIVING_TUNING, type LivingScene } from './autonomy';
 
 export const BABY_SIZE_CANDIDATES = [1.15, 1.25, 1.35] as const;
 export const BABY_SIZE_APPROVAL = { finalSize: null, status: 'USER_REVIEW_PENDING' } as const;
@@ -91,7 +92,36 @@ export class BabyLines {
   private lastToken = '';
   private lastSpokenAt = -Infinity;
   private recentText: string[] = [];
+  private recentMeaning: string[] = [];
   lastDecision = 'NOT_SELECTED';
+  private contextual(choices: readonly string[], meaning: string, token: string, automatic: boolean, atMs: number) {
+    if (automatic && atMs - this.lastAutoAt < LIVING_TUNING.speechGapMs || !automatic && this.lastToken === token) {
+      this.lastDecision = 'RECENT_SPEECH'; return null;
+    }
+    if (automatic && this.recentMeaning.slice(-2).includes(meaning)) { this.lastDecision = 'RECENT_MEANING'; return null; }
+    const fresh = choices.map((text, i) => ({ text, lineId: `${meaning}:${i}` })).filter(x => !this.recentText.slice(-3).includes(x.text));
+    if (!fresh.length) { this.lastDecision = 'RECENT_MEANING'; return null; }
+    let hash = 2166136261; for (const c of token + meaning) hash = Math.imul(hash ^ c.charCodeAt(0), 16777619);
+    const line = fresh[(hash >>> 0) % fresh.length]; this.recentText = [...this.recentText, line.text].slice(-8);
+    this.recentMeaning = [...this.recentMeaning, meaning].slice(-8); this.lastToken = token; this.lastSpokenAt = atMs;
+    if (automatic) this.lastAutoAt = atMs;
+    this.lastDecision = 'SELECTED_CONTEXTUAL'; return line;
+  }
+  selectScene(scene: LivingScene, beat: string, token: string, atMs: number) {
+    if (!scene.speechBeat || scene.speechBeat !== beat) { this.lastDecision = 'QUIET_SCENE_OR_NON_SPEECH_BEAT'; return null; }
+    return this.contextual(scene.lines, scene.meaning, token, true, atMs);
+  }
+  selectHand(key: string, token: string, atMs: number, id: PersonalityId, region: TouchRegion, interrupted?: RebootIntent, familiar = false) {
+    if (key === 'hand_silent') { this.lastDecision = 'NONVERBAL_BEAT'; return null; }
+    const head = region === 'head', exploring = !!interrupted?.startsWith('baby_');
+    const choices = id === 'playful' ? head ? ['머리가 간질간질!', '거기! 살짝만.', '내 발도 해 볼까?', '조금 더 가까이!']
+      : exploring ? ['구경하다 네 손 봤어!', '이번엔 손이랑 장난칠래.', '이쪽도 봐 줘!', '발로 톡, 했지!'] : ['히히, 옆구리!', '꼼지락했지?', '이번엔 내가 먼저!', '이쪽도 간질간질.']
+      : id === 'warm' ? head ? ['머리도 편안해.', '거기, 포근하다.', '천천히 이렇게.', '고개를 맡길게.']
+        : familiar ? ['그 손, 또 왔네.', '이쪽으로 기대 볼게.', '아까처럼 포근해.', '옆에 편하게 있을래.'] : ['여기 기대도 돼?', '몸이 편안해.', '조금만 같이 있자.', '천천히 가까이.']
+      : head ? ['머리는 살짝만.', '음, 거기네.', '잠깐 이렇게.', '너무 급하진 않게.']
+        : exploring ? ['구경하던 건 잠깐 뒤에.', '손은 따뜻하네.', '잠깐만 들른 거야.', '살짝 인사하고 갈게.'] : ['여기까지만 와 봤어.', '조금만 이렇게.', '보고 있던 데도 볼래.', '음, 괜찮네.'];
+    return this.contextual(choices, `hand:${id}:${head ? 'head' : exploring ? 'interrupted' : familiar ? 'familiar' : 'body'}`, token, false, atMs);
+  }
   select(key: string, token: string, automatic: boolean, atMs: number, personality?: PersonalityId): { lineId: string; text: string } | null {
     // A free-life lean has no physical hand to describe.
     if (automatic && ['head_lean', 'side_nuzzle', 'lean', 'body_wiggle', 'paw_offer'].includes(key)) key = 'look_back';

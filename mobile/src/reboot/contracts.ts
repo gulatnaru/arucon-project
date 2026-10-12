@@ -3,6 +3,7 @@ import type { ArtComparison, BabyArt } from './artComparison';
 import type { HandActingPose } from './handActing';
 import type { PersonalityFoundation, PersonalityAxes, PersonalityId } from './personality';
 import type { ContextCue, ContextHistory } from './lifeContext';
+import type { LivingScene, LivingFocus, LivingOutcome } from './autonomy';
 
 export type RebootStage = 'baby' | 'growing' | 'evolved';
 export type RebootIntent = 'arrival' | 'explore' | 'dash' | 'stretch' | 'rest' | 'company' | 'hand' | 'life_context'
@@ -13,16 +14,16 @@ export type TouchRegion = 'head' | 'body' | 'unknown';
 export const RESUMABLE_REBOOT_INTENTS = ['explore', 'dash', 'stretch', 'baby_scout', 'baby_discover', 'baby_sneak', 'baby_silly', 'baby_peek'] as const;
 export type ResumableIntent = typeof RESUMABLE_REBOOT_INTENTS[number];
 export type RebootFact = Readonly<{ eventId: string; petId: string; kind: 'hat_used' | 'cushion_used' | 'hand' | 'personality_scene';
-  itemId: string; atMs: number; completed: true; stage: RebootStage; context?: RebootIntent; itemRevision?: number; position?: FloorPoint; touchRegion?: TouchRegion; origin?: 'synthetic_comparison' }>;
+  itemId: string; atMs: number; completed: true; stage: RebootStage; context?: RebootIntent; itemRevision?: number; position?: FloorPoint; touchRegion?: TouchRegion; origin?: 'synthetic_comparison'; sceneId?: string; focus?: LivingFocus; outcome?: LivingOutcome }>;
 export type RebootSnapshot = { schemaVersion: 1; petId: string; revision: number; hatWorn: boolean;
   cushion: FloorPoint & { revision: number }; previewStage: RebootStage; events: RebootFact[];
   personality?: PersonalityFoundation; randomState?: number; lifeContext?: ContextHistory };
 export type RebootCommand = Readonly<{ token: string; kind: RebootIntent; sourceRevision: number;
-  target?: FloorPoint; resume?: ResumableIntent; resumeTarget?: FloorPoint; itemRevision?: number; observation?: 'witnessed' | 'remembered'; contextCue?: ContextCue; contextGeneration?: number }>;
+  target?: FloorPoint; resume?: ResumableIntent; resumeTarget?: FloorPoint; itemRevision?: number; observation?: 'witnessed' | 'remembered'; contextCue?: ContextCue; contextGeneration?: number; scene?: LivingScene }>;
 export type RebootEvent = Readonly<{ token: string; kind: RebootIntent; phase: 'start' | 'look' | 'approach' | 'contact' | 'recover' | 'complete' | 'cancel';
   automatic: boolean; stage: RebootStage; sourceRevision: number; itemRevision?: number; target?: FloorPoint;
   rememberedPosition?: FloorPoint; currentTarget?: FloorPoint; observation?: 'witnessed' | 'remembered'; contextCue?: ContextCue; contextGeneration?: number; babyMode?: boolean; babyBeat?: string; expression?: BabyExpression; touchRegion?: TouchRegion; memoryIds?: readonly string[];
-  personalityId?: PersonalityId; selectionReason?: string; randomState?: number; handActing?: HandActingPose; handContext?: RebootIntent; handStyle?: string }>;
+  personalityId?: PersonalityId; selectionReason?: string; randomState?: number; handActing?: HandActingPose; handContext?: RebootIntent; handStyle?: string; scene?: LivingScene }>;
 export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revision: number;
   cushion: FloorPoint & { revision: number }; handOffered: boolean; command?: RebootCommand;
   babyCharm?: boolean; sizeCandidate?: 1.15 | 1.25 | 1.35; familiarHandId?: string;
@@ -31,6 +32,9 @@ export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revisi
   comparisonHold?: boolean;
   contextGeneration?: number;
   contextSpeechReading?: boolean;
+  livingCharm?: boolean;
+  recentExperience?: readonly RebootFact[];
+  cameraReview?: 'original' | 'close';
   comparisonHullCulling?: boolean;
   personality?: { foundation: PersonalityFoundation; axes: PersonalityAxes; randomState: number; evidenceIds: readonly string[] } }>;
 export const REBOOT_SCALE: Record<RebootStage, number> = { baby: .53, growing: .48, evolved: .43 };

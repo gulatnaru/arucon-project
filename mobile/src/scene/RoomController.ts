@@ -41,6 +41,7 @@ import type { PetRestMode } from '../presentation/petRest';
 import { applyPetMaterialProfile } from './rendererMaterials';
 import { vertexLitMaterial } from './vertexLitMaterial';
 import { batchStaticRoom } from './staticRoomBatch';
+import { loadSunlitRoom, type SunlitRoom } from './sunlitRoom';
 import {
   DEFAULT_CHARACTER_CANDIDATE_ID,
   getCharacterCandidate,
@@ -97,6 +98,13 @@ const QUAD_BABY_ASSET = require('../../assets/reboot-04/common-quad.glb') as num
 const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? view.sizeCandidate ?? 1.25 : 1);
 
 export class RoomController {
+  private legacyStaticRoom?: THREE.Object3D;
+  private legacyRoomChildren: Partial<Record<'cushion'|'toilet'|'table', THREE.Object3D[]>> = {};
+  private sunlitRoom?: SunlitRoom;
+  private roomLoading = false;
+  private requestedRoom: 'original'|'sunlit' = 'original';
+  private roomFailure?: string;
+  private cameraReview: 'original'|'close' = 'original';
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.OrthographicCamera();
   readonly renderer: THREE.WebGLRenderer;
@@ -310,7 +318,7 @@ export class RoomController {
   resize(width: number, height: number) {
     if (width <= 0 || height <= 0) return;
     this.width = width; this.height = height;
-    const halfHeight = 6.8;
+    const halfHeight = this.cameraReview === 'close' ? 6.3 : 6.8;
     const halfWidth = halfHeight * (width / height);
     Object.assign(this.camera, { left: -halfWidth, right: halfWidth, top: halfHeight, bottom: -halfHeight });
     this.camera.updateProjectionMatrix();
@@ -321,6 +329,20 @@ export class RoomController {
   resolvedRendererProfile() { return this.rendererConfig; }
 
   setPresentation(props: RoomProps) {
+    const camera = props.rebootView?.cameraReview ?? 'original';
+    if (camera !== this.cameraReview) { this.cameraReview = camera; this.resize(this.width, this.height); this.lastPublishedProjection = null; }
+    this.requestedRoom = props.roomCandidate ?? 'original';
+    if (this.requestedRoom === 'sunlit' && !this.sunlitRoom && !this.roomLoading) {
+      this.roomLoading = true;
+      void loadSunlitRoom(this.rendererConfig.roomMaterial).then(room => {
+        if (this.disposed) { Object.values(room).forEach(disposeSceneObject); return; }
+        this.sunlitRoom = room; this.scene.add(room.RoomStatic);
+        this.furniture.cushion!.add(room.Cushion); this.furniture.toilet!.add(room.Toilet); this.furniture.table!.add(room.Table);
+        this.setRoomVisibility(); this.submissions.markDirty(); this.lastPublishedProjection = null;
+      }).catch(error => { this.roomFailure = String(error).slice(0, 1000); if (!this.disposed) this.onError('방 후보를 열지 못했어요. 기존 방을 유지해요. 검토 기록에서 원인을 확인할 수 있어요.'); })
+        .finally(() => { this.roomLoading = false; });
+    }
+    this.setRoomVisibility();
     const oldRebootStage = this.rebootView?.stage;
     const oldBabyCharm = this.rebootView?.babyCharm;
     const oldRebootSize = this.rebootView?.sizeCandidate;
@@ -500,6 +522,15 @@ export class RoomController {
     const batch = batchStaticRoom(staticObjects, this.rendererConfig.roomMaterial);
     for (const object of staticObjects) { this.scene.remove(object); disposeSceneObject(object); }
     this.scene.add(batch);
+    this.legacyStaticRoom = batch;
+    for (const role of ['cushion', 'toilet', 'table'] as const) this.legacyRoomChildren[role] = [...this.furniture[role]!.children];
+  }
+
+  private setRoomVisibility() {
+    const candidate = this.requestedRoom === 'sunlit' && !!this.sunlitRoom;
+    if (this.legacyStaticRoom) this.legacyStaticRoom.visible = !candidate;
+    for (const role of ['cushion', 'toilet', 'table'] as const) for (const child of this.legacyRoomChildren[role] ?? []) child.visible = !candidate;
+    if (this.sunlitRoom) for (const root of Object.values(this.sunlitRoom)) root.visible = candidate;
   }
 
   private petAsset() {
@@ -759,7 +790,8 @@ export class RoomController {
       logicalWidth: this.width, logicalHeight: this.height, deviceDpr: PixelRatio.get(),
       bufferWidth: this.gl.drawingBufferWidth, bufferHeight: this.gl.drawingBufferHeight,
       requestedMsaa: this.rendererConfig.msaaSamples, postprocessAa: this.fxaa ? 'fxaa' : 'none',
-      roomCurves: this.rendererConfig.id === 'quality_225_legacy' ? 'legacy24' : 'refined', ...this.glValidation },
+      roomCurves: this.rendererConfig.id === 'quality_225_legacy' ? 'legacy24' : 'refined', roomCandidate: this.sunlitRoom && this.requestedRoom === 'sunlit' ? 'sunlit' : 'original',
+      requestedRoom: this.requestedRoom, roomFailure: this.roomFailure, cameraReview: this.cameraReview, verticalSpan: this.camera.top * 2, ...this.glValidation },
       restMode: this.restMode, sleeping: this.sleeping, interactionEnabled: this.interactionEnabled,
       interaction, clip: this.activeAction?.getClip().name ?? null,
       blockedBy: !this.frames.running ? 'background' : interaction === 'panel' ? 'panel'
@@ -906,7 +938,7 @@ export class RoomController {
     const decisionStart = performance.now();
     if (this.rebootView && this.modelReady && !this.rebootView.artComparison) this.reboot.update(dt, {
       awake: !this.sleeping, moving: !!this.path.length, touching: this.touchHolding || this.petPulseRemaining > 0,
-      position: this.position, view: this.rebootView, touchRegion: this.rebootTouchRegion, interruptedForTouch: this.rebootInterruptedForTouch,
+      position: this.position, facing: this.facing, view: this.rebootView, touchRegion: this.rebootTouchRegion, interruptedForTouch: this.rebootInterruptedForTouch,
       enabled: this.interactionEnabled && !this.rebootView.comparisonHold && (!this.comparisonWindow || this.comparisonWindow.actorEnabled) });
     if (this.livingEnabled) this.life.update(dt, this.lifeWorld());
     this.performanceProbe.recordPhase('decision', performance.now() - decisionStart);

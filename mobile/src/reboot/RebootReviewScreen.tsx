@@ -25,8 +25,9 @@ import { expressPersonality, PERSONALITY_IDS, PERSONALITY_PROFILES, type Persona
 import { comparisonBaseline, type ComparisonCase } from './comparison';
 import { SYNTHETIC_CONTEXT_CASES, syntheticLifeContext, type SyntheticCase } from './lifeContext';
 import type { ComparisonWindowEvent } from '../scene/comparisonWindow';
+import { LivingObservation } from './observation';
 const stageName: Record<RebootStage, string> = { baby: '아기', growing: '성장기', evolved: '1차 진화 후' };
-type Menu = 'main' | 'pet' | 'objects' | 'settings' | 'render' | 'context' | 'bubble' | null;
+type Menu = 'main' | 'pet' | 'objects' | 'settings' | 'render' | 'context' | 'bubble' | 'scene' | 'checks' | null;
 type CommandResult = { state?: PetState; memory?: RebootSnapshot; command?: RebootCommand };
 
 export function RebootReviewScreen({ onExit, personalityReview, onPersonality, onComparison, controlled, comparisonPacing = 'tail', onComparisonPacing, comparisonCulling = false, onComparisonCulling, onControlledRestart }: {
@@ -43,6 +44,9 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   const [speechReading, setSpeechReading] = useState(false);
   const [contextDay, setContextDay] = useState(0), [contextMinute, setContextMinute] = useState(0), [contextFeedback, setContextFeedback] = useState('');
   const [contextGroup, setContextGroup] = useState<'activity' | 'sleep' | 'records'>('activity');
+  const [roomCandidate, setRoomCandidate] = useState<'original' | 'sunlit'>('original');
+  const [cameraReview, setCameraReview] = useState<'original' | 'close'>('original');
+  const observation = useRef(new LivingObservation());
   const contextInitialized = useRef(false), speechActive = useRef(false), speechOwner = useRef<string | undefined>(undefined);
   const contextSpeechTokens = useRef<string[]>([]);
   const [quiet, setQuiet] = useState(!!controlled), [reduced, setReduced] = useState(false), [busy, setBusy] = useState(false);
@@ -120,6 +124,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
 
   const onEvent = useCallback((event: RebootEvent) => {
     if (!alive.current) return;
+    observation.current.record(event, Date.now());
     trace.current.push({ ...event, atMs: Date.now() }); trace.current = trace.current.slice(-256);
     if (event.phase === 'cancel' && speechOwner.current === event.token || event.phase === 'start' && event.kind === 'life_context') dismissSpeech();
     if (event.phase === 'start') activeIntent.current = event;
@@ -140,9 +145,12 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
         ? event.observation === 'witnessed' ? 'cushion_seen' : 'cushion_changed'
         : event.handActing ? ['paw_offer', 'paw_flick', 'side_nuzzle'].includes(event.babyBeat) ? `hand_${event.babyBeat}` : 'hand_silent'
           : event.babyBeat;
-      const spoken = quiet || speechActive.current ? null : voice.select(key, event.token, event.automatic, Date.now(), personalityReview);
+      const spoken = quiet || speechActive.current ? null : event.scene ? voice.selectScene(event.scene, event.babyBeat, event.token, Date.now())
+        : event.handActing && personalityReview ? voice.selectHand(key, event.token, Date.now(), personalityReview, event.touchRegion ?? 'unknown', event.handContext, !!event.memoryIds?.length)
+          : voice.select(key, event.token, event.automatic, Date.now(), personalityReview);
       trace.current.push({ speechDecision: { key, reason: quiet ? 'COMPARISON_HIDDEN' : speechActive.current ? 'READING_CURRENT_LINE' : voice.lastDecision }, token: event.token, atMs: Date.now() });
       if (spoken) {
+        observation.current.speech(event.token, Date.now(), event.automatic ? 'autonomous' : 'interaction');
         showSpeech(spoken.text, event.token); trace.current.push({ lineId: spoken.lineId, token: event.token, shown: !quiet, atMs: Date.now() });
       }
     } else if (event.phase === 'contact' && !event.automatic) {
@@ -159,6 +167,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
     void run(async () => ({ memory: await memories.current!.complete({ petId: PET_ID, eventId: event.token, kind,
       itemId: kind === 'hat_used' ? REBOOT_ITEM.hat : kind === 'cushion_used' ? REBOOT_ITEM.cushion : kind==='personality_scene' ? 'review:personality' : 'user:hand',
       atMs: Date.now(), completed: true, stage: event.stage, context: event.kind,
+      ...(event.scene ? { sceneId: event.scene.id, focus: event.scene.focus, outcome: event.scene.outcome } : {}),
       ...(kind === 'hand' && event.touchRegion ? { touchRegion: event.touchRegion } : {}),
       ...(kind === 'cushion_used' ? { itemRevision: event.itemRevision ?? captured.cushion.revision, position: { x: captured.cushion.x, z: captured.cushion.z } } : {}),
     }, event.sourceRevision, event.randomState) }));
@@ -226,7 +235,8 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = (file = 'arucon-reboot-evidence.json') => {
-    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-context-v11', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, quiet, contextDay, contextMinute, bubbleScale, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-05-charm-v13', review: { personalityReview, babyReview, sizeCandidate, renderProfile, artCandidate, artComparison, reduced, quiet, contextDay, contextMinute, bubbleScale, roomCandidate, cameraReview, finalSize: null, finalRenderProfile: null },
+      observation: observation.current.snapshot(Date.now()),
       comparison: controlled ? { baseline: comparisonBaseline(controlled), id: controlled.id, petId: controlled.petId, pacing: comparisonPacing,
         culling: comparisonCulling ? 'closed_opaque_front' : 'source',
         initialState: comparisonInitialState.current,
@@ -237,6 +247,19 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
     catch (cause) { setError(`검토 기록 저장에 실패했어요: ${String(cause)}`); }
   };
   evidenceExporter.current = exportEvidence;
+  useEffect(() => {
+    if (menu !== null && observation.current.running) observation.current.stop(Date.now(), 'PANEL_OPENED');
+  }, [menu]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!observation.current.running) return;
+      const result = observation.current.snapshot(Date.now());
+      if (AppState.currentState !== 'active') observation.current.stop(Date.now(), 'APP_INACTIVE');
+      else if (result.elapsedMs >= 600_000) observation.current.stop(Date.now());
+      if (!observation.current.running || Math.floor(result.elapsedMs / 1000) % 60 === 0) evidenceExporter.current('arucon-r05-observation.json');
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => { if (comparisonCaseId && completedCapture) evidenceExporter.current(`arucon-compare-${comparisonCaseId}.json`); }, [completedCapture, comparisonCaseId]); // snapshot after the measured frame, never SQL/file IO per frame
   const onComparisonWindow = useCallback((event: ComparisonWindowEvent) => {
     comparisonEvents.current.push(event); setComparisonStage(event);
@@ -270,7 +293,8 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   const expressed = memory.personality ? expressPersonality(memory.personality, expressionMemory.events, viewStage) : undefined;
   const familiarHand = eligibleMemories(expressionMemory, 'user:hand').filter(e => now() - e.atMs >= 0 && now() - e.atMs < 45 * 60_000).at(-1);
   return <View style={styles.root}>
-    <AruconRoom rendererProfileId={renderProfile} rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
+    <AruconRoom rendererProfileId={renderProfile} roomCandidate={roomCandidate} rebootView={{ stage: viewStage, hatWorn: memory.hatWorn, revision: memory.revision, babyCharm: babyReview,
+      livingCharm: !!personalityReview, recentExperience: expressionMemory.events, cameraReview,
       sizeCandidate, artCandidate, artComparison: artComparison ? { ...artComparison, paused: artComparison.paused || menu !== null } : undefined, familiarHandId: familiarHand?.eventId,
       cushion: memory.cushion, handOffered: hand, command, contextGeneration: epoch.current, contextSpeechReading: speechReading,
       comparisonHold: !!controlled && !comparisonToken,
@@ -281,12 +305,12 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       formId={pet.formId} restMode={rest.mode} reducedMotion={reduced} interactionEnabled={menu === null && !artComparison}
       topOcclusion={insets.top + 78} bottomOcclusion={insets.bottom + 70}
       rebootPlacement={placement && !artComparison} onRebootPlacement={moveCushion}
-      onInteractionIntent={kind => { if (kind === 'pet' || kind === 'move') { epoch.current++; setCommand(undefined); setHand(false); dismissSpeech(); } }}
+      onInteractionIntent={kind => { observation.current.stop(Date.now(), 'USER_INPUT'); if (kind === 'pet' || kind === 'move') { epoch.current++; setCommand(undefined); setHand(false); dismissSpeech(); } }}
       onPetTouch={() => { const id = token('touch'); void run(async () => ({ state: await service.current!.interact(now(), id, 'touch', utcFixtureDay(now()).id) })); }}
       onStatus={showSpeech} onFurnitureHit={kind => { if (kind === 'cushion' && (!controlled || comparisonStage?.phase !== 'warmup' && comparisonToken)) setCommand({ token: token('rest'), kind: 'rest', sourceRevision: memory.revision, target: memory.cushion, itemRevision: memory.cushion.revision }); }}
       reactionBubbleHeadClearance={babyReview ? 50 : undefined}
       petSpeech={!quiet && bubble ? { id: speechId, text: bubble, fontScale: bubbleScale, reducedMotion: reduced,
-        onDismiss: dismissSpeech, onReadingHoldChange: setSpeechReading,
+        onDismiss: dismissSpeech, onUserInteraction: () => observation.current.stop(Date.now(), 'SPEECH_INPUT'), onReadingHoldChange: setSpeechReading,
         onMeasure: size => { trace.current.push({ speechMeasure: { id: speechId, text: bubble, ...size, fontScale: bubbleScale }, atMs: Date.now() }); trace.current = trace.current.slice(-256); } } : undefined}
       onPerformanceSummary={x => { perf.current = x; }} performanceCaptureToken={captureToken} performanceCaptureDurationMs={captureDuration} onPerformanceCapture={x => { capture.current = x; if (controlled) setCompletedCapture(x); }}
       onComparisonWindow={controlled ? onComparisonWindow : undefined}
@@ -306,10 +330,11 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
     {!!error && <View style={[styles.error, { bottom: insets.bottom + 76 }]}><Text accessibilityRole="alert">{error}</Text><Pressable accessibilityLabel="저장 다시 시도" onPress={() => { if (retry.current) void run(retry.current); }}><Text>다시 저장</Text></Pressable></View>}
     <Modal visible={menu !== null} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
       <View style={[styles.backdrop, { paddingTop: insets.top + 14, paddingBottom: insets.bottom + 14 }]}><View accessibilityViewIsModal style={styles.sheet}>
-        <View style={styles.sheetHeading}><Text style={styles.heading}>{menu === 'context' ? '생활 상황 체험' : menu === 'bubble' ? '말풍선 검토' : menu === 'pet' ? '우리 아이' : menu === 'objects' ? '상점·꾸미기' : menu === 'settings' ? '설정' : menu === 'render' ? '렌더 비교' : '우리 방'}</Text><Pressable accessibilityLabel="리부트 패널 닫기" onPress={() => setMenu(null)} style={styles.menuButton}><Text>닫기</Text></Pressable></View>
+        <View style={styles.sheetHeading}><Text style={styles.heading}>{menu === 'scene' ? '방·시점 비교' : menu === 'checks' ? '생활 검토' : menu === 'context' ? '생활 상황 체험' : menu === 'bubble' ? '말풍선 검토' : menu === 'pet' ? '우리 아이' : menu === 'objects' ? '상점·꾸미기' : menu === 'settings' ? '설정' : menu === 'render' ? '렌더 비교' : '우리 방'}</Text><Pressable accessibilityLabel="리부트 패널 닫기" onPress={() => setMenu(null)} style={styles.menuButton}><Text>닫기</Text></Pressable></View>
         <ScrollView contentContainerStyle={{ gap: 10 }}>
           {menu === 'main' && <>{(['pet', 'objects', 'settings'] as const).filter(x => !controlled || x !== 'objects').map(x => <Pressable key={x} style={styles.row} accessibilityLabel={{pet:'우리 아이',objects:'상점·꾸미기',settings:'리부트 설정'}[x]} onPress={() => setMenu(x)}><Text>{{pet:'우리 아이',objects:'상점·꾸미기',settings:'설정'}[x]}</Text></Pressable>)}</>}
           {menu === 'main' && personalityReview && <Pressable style={styles.row} accessibilityLabel="합성 생활 상황" onPress={() => setMenu('context')}><Text>생활 상황 체험</Text></Pressable>}
+          {menu === 'main' && personalityReview && <Pressable style={styles.row} accessibilityLabel="방과 시점 비교" onPress={() => setMenu('scene')}><Text>방·시점 비교</Text></Pressable>}
           {menu === 'context' && <>
             <Text>합성 데이터만 사용해요. 실제 걸음·활동·수면은 연결하지 않았어요. 표시용 합성 날 {contextDay + 1}, 관찰 시각 +{contextMinute}분. 게임 시간·먹이·EXP는 그대로예요.</Text>
             <View style={{ flexDirection: 'row', gap: 6 }}>{(['activity', 'sleep', 'records'] as const).map(group => <Pressable key={group}
@@ -354,6 +379,15 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
             {controlled && <><Text>새 합성 개체예요. 상태·기억·난수·가구·외형을 맞추고 성격만 달리해요. 기존 아이의 경험은 유지돼요. 성장에 따른 형성 시험은 아니에요.</Text>
               <Pressable style={styles.row} accessibilityLabel="새 동일조건 비교" onPress={onControlledRestart}><Text>새 조건으로 다시 비교 · 기존 사례 보존</Text></Pressable></>}
           </>}
+          {menu === 'scene' && <>
+            <Text>같은 두 발 아기의 성격·방·화면 크기를 비교해요. 최종 채택은 아직 하지 않았어요.</Text>
+            <View style={{ flexDirection: 'row', gap: 6 }}>{(['original', 'sunlit'] as const).map(room => <Pressable key={room} style={[styles.row, { flex: 1 }]}
+              accessibilityLabel={`방 ${room === 'original' ? 'A 기존' : 'B 햇살 후보'}`} onPress={() => { cancel(); setRoomCandidate(room); setMenu(null); }}><Text>{room === 'original' ? 'A · 기존 방' : 'B · 햇살 후보'}</Text></Pressable>)}</View>
+            <View style={{ flexDirection: 'row', gap: 6 }}>{([1.25, 1.35] as const).map(size => <Pressable key={size} style={[styles.row, { flex: 1 }]}
+              accessibilityLabel={`아기 크기 +${Math.round((size - 1) * 100)}%`} onPress={() => { cancel(); setSizeCandidate(size); setMenu(null); }}><Text>+{Math.round((size - 1) * 100)}%</Text></Pressable>)}</View>
+            <View style={{ flexDirection: 'row', gap: 6 }}>{(['original', 'close'] as const).map(camera => <Pressable key={camera} style={[styles.row, { flex: 1 }]}
+              accessibilityLabel={`시점 ${camera === 'original' ? 'A 기존' : 'B 가까이'}`} onPress={() => { cancel(); setCameraReview(camera); setMenu(null); }}><Text>{camera === 'original' ? '기존 시점' : '조금 가까이'}</Text></Pressable>)}</View>
+          </>}
           {menu === 'objects' && <><Text>별도 검토용 모자와 쿠션이에요. 코인 구매·소유권 이전은 없어요.</Text>
             <Pressable disabled={busy || rest.mode !== 'awake'} style={styles.row} accessibilityLabel={memory.hatWorn ? '검토 모자 벗기' : '검토 모자 쓰기'} onPress={wear}><Text>{memory.hatWorn ? '모자 벗기' : '모자 쓰기'}</Text></Pressable>
             <Pressable disabled={rest.mode !== 'awake'} style={styles.row} accessibilityLabel="쿠션 옮기기" onPress={() => { setMenu(null); setPlacement(true); }}><Text>쿠션 옮기기</Text></Pressable>
@@ -366,6 +400,20 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
                 setRenderProfile(x.id); if (artComparison) setArtComparison({ ...artComparison, token: token('art'), paused: false }); setMenu(null);
               }}><Text>{x.label}{renderProfile === x.id ? ' · 비교 중' : ''}</Text></Pressable>)}
             <Pressable style={styles.row} accessibilityLabel="자동 렌더 설정 복원" onPress={() => { cancel(); setCaptureToken(undefined); capture.current = undefined; setRenderProfile('automatic'); setMenu(null); }}><Text>기존 자동 설정으로 돌아가기</Text></Pressable>
+          </>}
+          {menu === 'checks' && <>
+            <Text>같은 앱의 정상 선택기를 관찰해요. 게임 시간이나 저장을 초기화하지 않아요.</Text>
+            <Pressable disabled={busy || rest.mode !== 'awake' || !runtime.current?.clip || !!artComparison} style={styles.row} accessibilityLabel="10분 무입력 관찰 시작" onPress={() => { cancel(); setMenu(null); observation.current.start(Date.now()); }}><Text>10분 무입력 관찰 기록</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel="60초 리부트 성능 측정" onPress={() => { setCaptureDuration(60_000); setCaptureToken(token('performance')); setMenu(null); }}><Text>60초 검토 성능 기록</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel="180초 연속 플레이 성능 측정" onPress={() => { setCaptureDuration(180_000); setCaptureToken(token('performance')); setMenu(null); }}><Text>3분 연속 플레이 기록</Text></Pressable>
+            <Pressable disabled={storageCheckRunning} style={styles.row} accessibilityLabel="격리 저장 신뢰성 검사" onPress={() => { if(storageCheckActive.current)return;storageCheckActive.current=true;setStorageCheckRunning(true);setEvidenceStatus('격리 저장 복구 검사 중이에요.');void import('../storage/nativeReliabilityCheck').then(x=>x.checkNativeReliability()).then(x=>{
+              new File(Paths.cache,'arucon-storage-reliability.json').write(JSON.stringify(x,null,2));setEvidenceStatus('격리 저장 복구 검사를 마쳤어요. 일반 저장은 유지돼요.');
+            }).catch(e=>{setError(`격리 저장 검사 실패: ${String(e)}`);setEvidenceStatus(`격리 저장 검사 실패: ${String(e)}`);}).finally(()=>{storageCheckActive.current=false;setStorageCheckRunning(false);}); }}><Text>격리 저장 복구 검사</Text></Pressable>
+            <Pressable disabled={storageCheckRunning} style={styles.row} accessibilityLabel="격리 기존 저장 경합 검사" onPress={() => { if(storageCheckActive.current)return;storageCheckActive.current=true;setStorageCheckRunning(true);setEvidenceStatus('격리 경합 검사 중이에요.');void import('../storage/nativeContentionCheck').then(x=>x.checkNativeContention()).then(x=>{
+              new File(Paths.cache,'arucon-storage-contention.json').write(JSON.stringify(x,null,2));setEvidenceStatus('격리 경합 검사를 마쳤어요. 일반 저장은 유지돼요.');
+            }).catch(e=>{setError(`격리 경합 검사 실패: ${String(e)}`);setEvidenceStatus(`격리 경합 검사 실패: ${String(e)}`);}).finally(()=>{storageCheckActive.current=false;setStorageCheckRunning(false);}); }}><Text>격리 기존 경합 검사</Text></Pressable>
+            <Pressable style={styles.row} accessibilityLabel="리부트 검토 기록 저장" onPress={() => exportEvidence()}><Text>검토 기록 저장</Text></Pressable>
+            {!!evidenceStatus && <Text accessibilityLiveRegion="polite">{evidenceStatus}</Text>}
           </>}
           {menu === 'settings' && <><Text>체험 모드 — 실제 걸음·수면은 연결하지 않았어요. 일반 방과 저장이 분리돼요.</Text>
             <Pressable style={styles.row} accessibilityLabel="말풍선 레이아웃 검토" onPress={() => setMenu('bubble')}><Text>말풍선 길이·큰 글자 검토</Text></Pressable>
@@ -381,16 +429,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
             <Pressable disabled={busy} style={styles.row} accessibilityLabel={rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'} onPress={restAction}><Text>{rest.mode === 'awake' ? '잠자기' : rest.mode === 'sleeping' ? '깨우기' : '다시 함께하기'}</Text></Pressable>
             <Text>{modelStatus}</Text>
             {!personalityReview && <Pressable style={styles.row} accessibilityLabel={backend === 'A' ? '로컬 검색 B 준비' : '구조화된 기억 A 사용'} onPress={() => { void chooseBackend(); }}><Text>{backend === 'A' ? '로컬 검색 B 준비 / 비교' : '구조화된 기억 A로 비교'}</Text></Pressable>}
-            <Pressable style={styles.row} accessibilityLabel="60초 리부트 성능 측정" onPress={() => { setCaptureDuration(60_000); setCaptureToken(token('performance')); setMenu(null); }}><Text>60초 검토 성능 기록</Text></Pressable>
-            <Pressable style={styles.row} accessibilityLabel="180초 연속 플레이 성능 측정" onPress={() => { setCaptureDuration(180_000); setCaptureToken(token('performance')); setMenu(null); }}><Text>3분 연속 플레이 기록</Text></Pressable>
-            <Pressable disabled={storageCheckRunning} style={styles.row} accessibilityLabel="격리 저장 신뢰성 검사" onPress={() => { if(storageCheckActive.current)return;storageCheckActive.current=true;setStorageCheckRunning(true);setEvidenceStatus('격리 저장 복구 검사 중이에요.');void import('../storage/nativeReliabilityCheck').then(x=>x.checkNativeReliability()).then(x=>{
-              new File(Paths.cache,'arucon-storage-reliability.json').write(JSON.stringify(x,null,2));setEvidenceStatus('격리 저장 복구 검사를 마쳤어요. 일반 저장은 유지돼요.');
-            }).catch(e=>{setError(`격리 저장 검사 실패: ${String(e)}`);setEvidenceStatus(`격리 저장 검사 실패: ${String(e)}`);}).finally(()=>{storageCheckActive.current=false;setStorageCheckRunning(false);}); }}><Text>격리 저장 복구 검사</Text></Pressable>
-            <Pressable disabled={storageCheckRunning} style={styles.row} accessibilityLabel="격리 기존 저장 경합 검사" onPress={() => { if(storageCheckActive.current)return;storageCheckActive.current=true;setStorageCheckRunning(true);setEvidenceStatus('격리 경합 검사 중이에요.');void import('../storage/nativeContentionCheck').then(x=>x.checkNativeContention()).then(x=>{
-              new File(Paths.cache,'arucon-storage-contention.json').write(JSON.stringify(x,null,2));setEvidenceStatus('격리 경합 검사를 마쳤어요. 일반 저장은 유지돼요.');
-            }).catch(e=>{setError(`격리 경합 검사 실패: ${String(e)}`);setEvidenceStatus(`격리 경합 검사 실패: ${String(e)}`);}).finally(()=>{storageCheckActive.current=false;setStorageCheckRunning(false);}); }}><Text>격리 기존 경합 검사</Text></Pressable>
-            <Pressable style={styles.row} accessibilityLabel="리부트 검토 기록 저장" onPress={() => exportEvidence()}><Text>검토 기록 저장</Text></Pressable>
-            {!!evidenceStatus && <Text accessibilityLiveRegion="polite">{evidenceStatus}</Text>}
+            <Pressable style={styles.row} accessibilityLabel="생활 검증 도구" onPress={() => setMenu('checks')}><Text>생활 검토 기록</Text></Pressable>
             <Pressable disabled={busy} style={styles.row} accessibilityLabel="원래 방으로 돌아가기" onPress={() => { cancel(); onExit(); }}><Text>원래 방으로 돌아가기</Text></Pressable>
           </>}
         </ScrollView>

@@ -38,6 +38,9 @@ export class RebootMemoryStore {
         e.position && (!Number.isFinite(e.position.x) || !Number.isFinite(e.position.z)) ||
         typeof e.eventId !== 'string' || e.eventId.length > 120 || !['baby', 'growing', 'evolved'].includes(e.stage) ||
         e.touchRegion !== undefined && !['head', 'body', 'unknown'].includes(e.touchRegion) ||
+        e.sceneId !== undefined && (typeof e.sceneId !== 'string' || !/^(window|plant|paws|user|cushion|quiet_floor):[0-2]$/u.test(e.sceneId)) ||
+        e.focus !== undefined && !['window', 'plant', 'paws', 'user', 'cushion', 'quiet_floor'].includes(e.focus) ||
+        e.outcome !== undefined && !['discovered', 'startled', 'amused', 'settled', 'shared'].includes(e.outcome) ||
         e.origin !== undefined && (e.origin !== 'synthetic_comparison' || !this.petId.startsWith('reboot-04:compare:')))) {
       throw new Error('기억 형식을 확인할 수 없어 저장을 보존했어요.');
     }

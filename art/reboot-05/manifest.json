@@ -1,0 +1,29 @@
+{
+  "candidate": "B_sunlit",
+  "approval": "USER_REVIEW_PENDING",
+  "sourceConcept": "art/reboot-04/room_concept.py",
+  "asset": "mobile/assets/reboot-05/sunlit-room.glb",
+  "sha256": "d1979273cb51adea45e87c40ebad2911730109b3da85c252f2093e81e4647367",
+  "roles": [
+    "RoomStatic",
+    "Cushion",
+    "Toilet",
+    "Table"
+  ],
+  "camera": [
+    0,
+    9.2,
+    13.5
+  ],
+  "lookAt": [
+    0,
+    0,
+    1.4
+  ],
+  "verticalSpan": 13.6,
+  "defaultRoomChanged": false,
+  "textures": "NONE",
+  "runtimeShadow": "procedural contact shadow; no GPU shadow-map",
+  "estimatedTriangleCount": 14966,
+  "scope": "authored game meshes, same facilities/navigation; no new items"
+}

@@ -50,7 +50,10 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(time * 12)) * .065;
     targetRotation.z = grounded ? 0 : Math.sin(time * 6) * .04 * soft;
   } else if (contact || recovering) {
-    if (['tiny_hops', 'paw_flick', 'hat_test_step'].includes(id)) {
+    if (id === 'settle_floor') {
+      targetRotation.z = (pose?.personalityId === 'poised' ? .025 : -.065) * Math.min(1, p * 5) * weight * soft;
+      targetRotation.x = .025 * Math.min(1, p * 5) * weight * soft;
+    } else if (['tiny_hops', 'paw_flick', 'hat_test_step'].includes(id)) {
       targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(p * Math.PI * 4)) * .13 * weight;
       targetRotation.z = Math.sin(p * Math.PI * 2) * .13 * weight * soft;
     } else if (['too_close', 'oops'].includes(id)) {
@@ -93,8 +96,8 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
   // An awake idle is neutral. Authored asymmetric keys remain in original assets.
   const targets: Record<string, number> = neutral || !baby ? {} : { ...faceTargets[expression], ...(style && !hand ? {
-    Smile: style.smile, Happy: Math.max(faceTargets[expression].Happy ?? 0, style.happy),
-    Mischief: Math.max(faceTargets[expression].Mischief ?? 0, style.mischief) } : {}) };
+    ...(['content', 'excited', 'playful'].includes(expression) ? { Smile: Math.max(faceTargets[expression].Smile ?? 0, style.smile), Happy: Math.max(faceTargets[expression].Happy ?? 0, style.happy) } : {}),
+    ...(expression === 'playful' ? { Mischief: Math.max(faceTargets[expression].Mischief ?? 0, style.mischief) } : {}) } : {}) };
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
     rig.weights[name] = (rig.weights[name] ?? 0) + ((targets[name] ?? 0) * (hand?.faceStrength ?? 1) - (rig.weights[name] ?? 0)) * alpha;
   const blink = Math.pow(Math.max(0, Math.sin(time * (expression === 'sleepy' ? .7 : 1.3))), 24);
@@ -119,7 +122,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     expression === 'curious' ? .15 : expression === 'excited' ? .23 : expression === 'surprised' ? .30 :
       expression === 'content' ? -.13 : expression === 'embarrassed' ? -.18 : expression === 'sleepy' ? -.23 : .09;
   const earForward = neutral || !baby ? 0 : attending ? -.13 : expression === 'content' || expression === 'sleepy' ? .10 : -.08;
-  const earCheck = hand ? Math.sin(hand.yaw) * .10 : id === 'look_back' ? .045 * pulse : 0;
+  const earCheck = hand ? Math.sin(hand.yaw) * .10 : (pose?.attentionSide ?? 0) * .07 + (id === 'look_back' ? .045 * pulse : 0);
   rig.ears.forEach((ear, i) => {
     const sign = i ? -1 : 1;
     ear.rotation.z += (sign * (earSpread + sign * earCheck) * soft - ear.rotation.z) * alpha;

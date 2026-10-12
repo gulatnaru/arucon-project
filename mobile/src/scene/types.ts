@@ -17,7 +17,8 @@ export type RoomRuntimeSnapshot = Readonly<{
   renderer?: Readonly<{ profileId: string; requestedDpr: number; logicalWidth: number; logicalHeight: number;
     identity?: Readonly<{ renderer: string; vendor: string; version: string }>; cpuMorphs?: boolean;
     deviceDpr: number; bufferWidth: number; bufferHeight: number; requestedMsaa: number; postprocessAa: string;
-    roomCurves: string; maxSamples?: number; sampleBuffers?: number; samples?: number; framebufferStatus?: number; error?: number }>;
+    roomCurves: string; roomCandidate?: string; requestedRoom?: string; roomFailure?: string; cameraReview?: string; verticalSpan?: number;
+    maxSamples?: number; sampleBuffers?: number; samples?: number; framebufferStatus?: number; error?: number }>;
   restMode: PetRestMode; sleeping: boolean; interactionEnabled: boolean;
   interaction: RoomInteraction; clip: string | null; paused: boolean;
   blockedBy: 'background' | 'panel' | 'sleeping' | 'hibernating' | 'committed_cue' | null;
@@ -37,6 +38,8 @@ export type RoomRuntimeSnapshot = Readonly<{
 
 /** APP-01 presentation port. Callbacks do not award resources or advance game time. */
 export type RoomProps = {
+  /** Separate, reversible room asset candidate. It cannot change ownership. */
+  roomCandidate?: 'original' | 'sunlit';
   /** Opt-in isolated review. Does not replace any legacy room or saved form. */
   rebootView?: RebootView;
   onRebootEvent?: (event: RebootEvent) => void;
