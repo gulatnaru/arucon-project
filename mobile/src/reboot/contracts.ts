@@ -34,7 +34,7 @@ export type RebootView = Readonly<{ stage: RebootStage; hatWorn: boolean; revisi
   contextSpeechReading?: boolean;
   livingCharm?: boolean;
   recentExperience?: readonly RebootFact[];
-  cameraReview?: 'original' | 'close';
+  cameraReview?: 'original' | 'close' | 'face_floor';
   comparisonHullCulling?: boolean;
   personality?: { foundation: PersonalityFoundation; axes: PersonalityAxes; randomState: number; evidenceIds: readonly string[] } }>;
 export const REBOOT_SCALE: Record<RebootStage, number> = { baby: .53, growing: .48, evolved: .43 };

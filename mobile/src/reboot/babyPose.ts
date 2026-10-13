@@ -43,7 +43,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   const contact = pose?.phase === 'contact';
   const weight = contact ? 1 : recovering ? 1 - p * p * (3 - 2 * p) : 0;
   const id = baby?.beat.id ?? 'notice';
-  const cheer = pose?.personalityId && contact && isCelebrationBeat(id) ? celebrationAct(id, p, pose.personalityId) : undefined;
+  const cheer = pose?.personalityId && isCelebrationBeat(id) ? celebrationAct(id, p, pose.personalityId) : undefined;
   const targetPosition = rig.targetPosition.set(0, 0, 0), targetRotation = rig.targetRotation.set(0, 0, 0);
   if (hand && !moving) {
     targetPosition.set((hand.x + (twoPawSupport ? hand.supportX : 0)) * soft, 0, hand.z * soft); targetRotation.set(hand.pitch * soft, hand.yaw * soft, hand.roll * soft);
@@ -51,6 +51,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   } else if (cheer) {
     targetPosition.set(cheer.x * soft, 0, cheer.z * soft);
     targetRotation.set(cheer.pitch * soft, cheer.yaw * soft, cheer.roll * soft);
+    orientation.scale.x *= 1 + cheer.compression * .45 * soft; orientation.scale.y *= 1 - cheer.compression * soft; orientation.scale.z *= 1 + cheer.compression * .45 * soft;
   } else if (moving) {
     targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(time * 12)) * .065;
     targetRotation.z = grounded ? 0 : Math.sin(time * 6) * .04 * soft;
@@ -126,8 +127,8 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   const earSpread = neutral || !baby ? 0 : cheer ? cheer.earLift : attending ? .14 :
     expression === 'curious' ? .15 : expression === 'excited' ? .23 : expression === 'surprised' ? .30 :
       expression === 'content' ? -.13 : expression === 'embarrassed' ? -.18 : expression === 'sleepy' ? -.23 : .09;
-  const earForward = neutral || !baby ? 0 : cheer ? -.15 * (cheer.earLift / .23) : attending ? -.13 : expression === 'content' || expression === 'sleepy' ? .10 : -.08;
-  const earCheck = hand ? Math.sin(hand.yaw) * .10 : (pose?.attentionSide ?? 0) * .07 + (id === 'look_back' ? .045 * pulse : 0);
+  const earForward = neutral || !baby ? 0 : cheer ? cheer.earForward : attending ? -.13 : expression === 'content' || expression === 'sleepy' ? .10 : -.08;
+  const earCheck = cheer ? cheer.earAside : hand ? Math.sin(hand.yaw) * .10 : (pose?.attentionSide ?? 0) * .07 + (id === 'look_back' ? .045 * pulse : 0);
   rig.ears.forEach((ear, i) => {
     const sign = i ? -1 : 1;
     ear.rotation.z += (sign * (earSpread + sign * earCheck) * soft - ear.rotation.z) * alpha;

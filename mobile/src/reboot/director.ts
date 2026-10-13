@@ -4,7 +4,7 @@ import { personalityPlan, personalitySelection, personalityPoseStyle, type Perso
 import { makeHandActingPlan, sampleHandContact, sampleHandRelease, type HandActingPlan, type HandActingPose } from './handActing';
 import { BABY_AUTONOMOUS, babyPlan, babyTarget, currentBabyBeat, type BabyPlan, type BabyBeat } from './babyLife';
 import { selectLivingScene, type LivingOutcome } from './autonomy';
-import { CELEBRATION_TUNING } from './celebration';
+import { CELEBRATION_TUNING, celebrationTiming } from './celebration';
 
 export type RebootWorld = { enabled: boolean; awake: boolean; moving: boolean; touching: boolean; position: FloorPoint; facing?: number; view: RebootView; touchRegion?: TouchRegion; interruptedForTouch?: RebootIntent };
 export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number; gazeTarget?: FloorPoint; dockTarget?: FloorPoint;
@@ -139,7 +139,9 @@ export class RebootDirector {
     if (i.command.kind.startsWith('hat') && !w.view.hatWorn) { this.cancel(); return; }
     if (['rest', 'cushion_changed'].includes(i.command.kind) && i.command.itemRevision !== undefined &&
         i.command.itemRevision !== w.view.cushion.revision) { this.cancel(); return; }
-    const recoveryDuration = i.handPlan?.recoverySeconds ?? (w.view.stage === 'baby' ? 1.4 : 2.2);
+    const goalTiming = i.command.contextCue?.intent === 'goal' && w.view.personality ? celebrationTiming(w.view.personality.foundation.profileId) : undefined;
+    const lookDuration = i.command.kind === 'cushion_changed' ? 1.1 : goalTiming?.look ?? (w.view.personality ? personalityPoseStyle(w.view.personality.foundation.profileId, 'curious').lookSeconds : w.view.stage === 'baby' ? .65 : .30);
+    const recoveryDuration = goalTiming?.recover ?? i.handPlan?.recoverySeconds ?? (w.view.stage === 'baby' ? 1.4 : 2.2);
     const contactDuration = i.baby ? i.baby.beats.reduce((sum, b) => sum + b.seconds, 0) : this.contactDuration(i.command.kind);
     const currentBeat = i.baby ? currentBabyBeat(i.baby, i.elapsed) : undefined;
     const handActing = i.handPlan && i.phase === 'contact' ? sampleHandContact(i.handPlan, i.elapsed)
@@ -152,9 +154,9 @@ export class RebootDirector {
       releaseFrom: i.releaseFrom, stage: w.view.stage, held: this.touching || this.hand,
       ...(handActing ? { handActing } : {}),
       ...(currentBeat ? { baby: { beat: i.phase === 'approach' ? { id: 'travel', seconds: 1, expression: 'excited' as const }
-          : i.phase === 'look' ? { id: i.command.kind === 'cushion_changed' ? 'old_place' : 'notice', seconds: 1, expression: i.command.contextCue?.intent === 'goal' ? 'excited' as const : 'curious' as const }
-            : i.phase === 'recover' ? { id: 'look_back', seconds: recoveryDuration, expression: 'content' as const } : currentBeat.beat,
-        progress: i.phase === 'contact' ? currentBeat.progress : Math.min(1, i.elapsed / recoveryDuration), touchStyle: i.baby?.touchStyle,
+          : i.phase === 'look' ? { id: i.command.kind === 'cushion_changed' ? 'old_place' : goalTiming ? 'cheer_intro' : 'notice', seconds: 1, expression: i.command.contextCue?.intent === 'goal' ? 'excited' as const : 'curious' as const }
+            : i.phase === 'recover' ? { id: goalTiming ? 'cheer_exit' : 'look_back', seconds: recoveryDuration, expression: 'content' as const } : currentBeat.beat,
+        progress: i.phase === 'contact' ? currentBeat.progress : Math.min(1, i.elapsed / (i.phase === 'look' ? lookDuration : recoveryDuration)), touchStyle: i.baby?.touchStyle,
         rememberedHandId: i.baby?.rememberedHandId } } : {}),
       ...(i.command.target && (i.phase === 'look' || i.command.kind === 'hand') ? { gazeTarget: i.command.target } : {}),
       ...(i.command.kind === 'cushion_changed' && i.phase === 'look' ? { gazeTarget: i.command.observation === 'witnessed' ? w.view.cushion : i.command.target ?? w.view.cushion } : {}),
@@ -176,7 +178,6 @@ export class RebootDirector {
     if (i.handPlan?.profile === 'poised' && i.phase === 'recover' && i.elapsed > .25 && this.touched?.command.target)
       this.pose.gazeTarget = this.touched.command.target;
     // Remembered coordinates are a glance only; route/dock always use current truth.
-    const lookDuration = i.command.kind === 'cushion_changed' ? 1.1 : w.view.personality ? personalityPoseStyle(w.view.personality.foundation.profileId, 'curious').lookSeconds : w.view.stage === 'baby' ? .65 : .30;
     if (i.phase === 'look' && i.elapsed >= lookDuration) {
       const handOffset = w.view.babyCharm ? .64 * .53 * (w.view.sizeCandidate ?? 1.25) * (w.view.readabilityCandidate ? CELEBRATION_TUNING.readabilityMultiplier : 1) + .205 : .48;
       const target = i.command.kind === 'hand' ? { x: REBOOT_HAND.x, z: REBOOT_HAND.z - handOffset }

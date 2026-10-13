@@ -46,7 +46,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
   const [contextDay, setContextDay] = useState(0), [contextMinute, setContextMinute] = useState(0), [contextFeedback, setContextFeedback] = useState('');
   const [contextGroup, setContextGroup] = useState<'activity' | 'sleep' | 'records'>('activity');
   const [roomCandidate, setRoomCandidate] = useState<'original' | 'sunlit'>('original');
-  const [cameraReview, setCameraReview] = useState<'original' | 'close'>('original');
+  const [cameraReview, setCameraReview] = useState<'original' | 'close' | 'face_floor'>('original');
   const [readabilityCandidate, setReadabilityCandidate] = useState(false);
   const interestBeforeMenu = useRef<RebootEvent | null>(null);
   const observation = useRef(new LivingObservation());
@@ -243,7 +243,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       : rest.mode === 'sleeping' ? await service.current!.wake(now(), request) : await service.current!.sleep(now(), request) }));
   };
   const exportEvidence = (file = 'arucon-reboot-evidence.json') => {
-    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-celebration-v15', review: { personalityReview, babyReview, sizeCandidate, readabilityCandidate, readabilityMultiplier: readabilityCandidate ? CELEBRATION_TUNING.readabilityMultiplier : 1, renderProfile, artCandidate, artComparison, reduced, quiet, contextDay, contextMinute, bubbleScale, roomCandidate, cameraReview, finalSize: null, finalRenderProfile: null },
+    try { new File(Paths.cache, file).write(JSON.stringify({ build: 'reboot-04-expression-v17', review: { personalityReview, babyReview, sizeCandidate, readabilityCandidate, readabilityMultiplier: readabilityCandidate ? CELEBRATION_TUNING.readabilityMultiplier : 1, renderProfile, artCandidate, artComparison, reduced, quiet, contextDay, contextMinute, bubbleScale, roomCandidate, cameraReview, finalSize: null, finalRenderProfile: null },
       observation: observation.current.snapshot(Date.now()),
       comparison: controlled ? { baseline: comparisonBaseline(controlled), mode: ordinaryComparison ? 'ORDINARY_CONTEXT_INPUT' : 'PERFORMANCE_WINDOW', id: controlled.id, petId: controlled.petId, pacing: comparisonPacing,
         culling: comparisonCulling ? 'closed_opaque_front' : 'source',
@@ -331,6 +331,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
       <Text style={styles.reviewToolLabel}>REBOOT 교감 비교 도구</Text>
       {controlled && !comparisonToken && !ordinaryComparison ? <View style={{ gap: 8 }}>
         <Pressable style={styles.action} accessibilityLabel="대사 ON 축하 비교 준비" onPress={() => { cancel(); setQuiet(false); setOrdinaryComparison(true); setMenu('context'); }}><Text>대사 ON · 같은 상황 비교</Text></Pressable>
+        <Pressable style={styles.action} accessibilityLabel="대사 OFF 축하 비교 준비" onPress={() => { cancel(); setQuiet(true); setOrdinaryComparison(true); setMenu('context'); }}><Text>대사 없이 · 같은 상황 비교</Text></Pressable>
         <Pressable style={styles.action} accessibilityLabel="동일 조건 비교 시작" onPress={() => { cancel(); setComparisonToken(token('matched')); }}><Text>성능 비교 · 30초 준비</Text></Pressable></View>
         : controlled && comparisonStage?.phase === 'warmup' ? <Text>같은 조건으로 30초 준비 중이에요.</Text> : null}
       {(!controlled || ordinaryComparison || !!comparisonToken && comparisonStage?.phase !== 'warmup') && (artComparison && rest.mode === 'awake' ? <View style={{ flexDirection: 'row', gap: 6, width: '100%' }}><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel="A B C 같은 장면 다시 재생" onPress={() => setArtComparison({ ...artComparison, token: token('art'), paused: false })}><Text>다시 재생</Text></Pressable><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel={artComparison.paused ? '비교 장면 계속' : '비교 장면 멈춤'} onPress={() => setArtComparison({ ...artComparison, paused: !artComparison.paused })}><Text>{artComparison.paused ? '계속' : '멈춤'}</Text></Pressable><Pressable style={[styles.action, styles.compareAction]} accessibilityLabel="A B C 비교 끝내기" onPress={() => { cancel(); setArtComparison(undefined); }}><Text>비교 끝</Text></Pressable></View> : rest.mode !== 'awake' ? <Pressable style={styles.action} onPress={restAction} accessibilityLabel={rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}><Text>{rest.label} · {rest.mode === 'hibernating' ? '다시 함께하기' : '깨우기'}</Text></Pressable>
@@ -396,6 +397,7 @@ export function RebootReviewScreen({ onExit, personalityReview, onPersonality, o
               accessibilityLabel={`방 ${room === 'original' ? 'A 기존' : 'B 햇살 후보'}`} onPress={() => { cancel(); setRoomCandidate(room); setMenu(null); }}><Text>{room === 'original' ? 'A · 기존 방' : 'B · 햇살 후보'}</Text></Pressable>)}</View>
             <View style={{ flexDirection: 'row', gap: 6 }}>{([1.25, 1.35] as const).map(size => <Pressable key={size} style={[styles.row, { flex: 1 }]}
               accessibilityLabel={`아기 크기 +${Math.round((size - 1) * 100)}%`} onPress={() => { cancel(); setSizeCandidate(size); setMenu(null); }}><Text>+{Math.round((size - 1) * 100)}%</Text></Pressable>)}</View>
+            <Pressable style={styles.row} accessibilityLabel="구도 후보 얼굴과 바닥" onPress={() => { cancel(); setCameraReview('face_floor'); setMenu(null); }}><Text>구도 후보 · 얼굴과 넓은 바닥</Text></Pressable>
             <View style={{ flexDirection: 'row', gap: 6 }}>{(['original', 'close'] as const).map(camera => <Pressable key={camera} style={[styles.row, { flex: 1 }]}
               accessibilityLabel={`시점 ${camera === 'original' ? 'A 기존' : 'B 가까이'}`} onPress={() => { cancel(); setCameraReview(camera); setMenu(null); }}><Text>{camera === 'original' ? '기존 시점' : '조금 가까이'}</Text></Pressable>)}</View>
           </>}

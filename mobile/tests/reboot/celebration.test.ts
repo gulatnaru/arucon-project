@@ -24,7 +24,7 @@ test('same goal celebrates hands-free, then settles; a new real synthetic day ca
   }
   assert.equal(celebrationPlan('playful').beats.filter(b => b.id === 'cheer_bounce').length, 1);
   const warm = celebrationAct('cheer_share', .4, 'warm'), poised = celebrationAct('cheer_salute', .4, 'poised');
-  assert.ok(warm.z > poised.z); assert.ok(poised.pawLift > warm.pawLift); assert.ok(warm.x < 0 && poised.x < 0);
+  assert.ok(warm.z > poised.z); assert.ok(poised.pawLift > warm.pawLift); assert.equal(warm.x, 0); assert.ok(poised.x < 0); // Warm now shares on two planted paws.
 });
 test('paws and weight return to support at beat boundaries, with no constant wink or unsupported hand lean', () => {
   for (const profile of PERSONALITY_IDS) for (const b of celebrationPlan(profile, 1).beats) {
@@ -83,5 +83,19 @@ test('actual two-paw facial morphs remain symmetric through goal/cancel recovery
     }
     for (let i = 0; i < 60; i++) { o.scale.setScalar(1); applyBabyPose(o, gltf.scene, undefined, i * .05, .05, false, false, true); }
     assert.ok(babyExpressionSnapshot(gltf.scene)!.eyes.every(e => e.weights.Happy < .001));
+  }
+});
+
+
+test('the same goal has distinct body/ear/face phases, not three strengths of one pose', () => {
+  const p = celebrationAct('cheer_peek', .4, 'playful'), w = celebrationAct('cheer_share', .4, 'warm'), d = celebrationAct('cheer_salute', .4, 'poised');
+  assert.ok(p.roll < -.1 && p.earLift > .3);
+  assert.ok(w.earLift < -.2 && w.pitch > .1 && w.pawLift === 0);
+  assert.ok(d.pawLift > .24 && d.pawReach > .45 && d.yaw > .2 && d.x < -.1);
+  for (const profile of PERSONALITY_IDS) {
+    const intro = celebrationAct('cheer_intro', .5, profile), exit = celebrationAct('cheer_exit', 1, profile);
+    assert.notDeepEqual(intro.face, celebrationAct(celebrationPlan(profile).beats[1].id, .5, profile).face);
+    assert.equal(exit.pawLift, 0); assert.ok(Math.abs(exit.earLift) < 1e-8);
+    assert.ok(Math.abs(exit.yaw) < 1e-8 && Math.abs(exit.pitch) < 1e-8);
   }
 });

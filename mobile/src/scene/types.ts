@@ -17,7 +17,7 @@ export type RoomRuntimeSnapshot = Readonly<{
   renderer?: Readonly<{ profileId: string; requestedDpr: number; logicalWidth: number; logicalHeight: number;
     identity?: Readonly<{ renderer: string; vendor: string; version: string }>; cpuMorphs?: boolean;
     deviceDpr: number; bufferWidth: number; bufferHeight: number; requestedMsaa: number; postprocessAa: string;
-    roomCurves: string; roomCandidate?: string; requestedRoom?: string; roomFailure?: string; cameraReview?: string; verticalSpan?: number;
+    roomCurves: string; roomCandidate?: string; requestedRoom?: string; roomFailure?: string; cameraReview?: string; cameraPosition?: number[]; verticalSpan?: number;
     maxSamples?: number; sampleBuffers?: number; samples?: number; framebufferStatus?: number; error?: number }>;
   restMode: PetRestMode; sleeping: boolean; interactionEnabled: boolean;
   interaction: RoomInteraction; clip: string | null; paused: boolean;

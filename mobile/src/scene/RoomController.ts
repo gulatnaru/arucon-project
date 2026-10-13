@@ -5,7 +5,7 @@ import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { RebootDirector } from '../reboot/director';
 import { applyRebootPose, rebootFacing } from '../reboot/pose';
 import { applyBabyPose, resetBabyPose, babyExpressionSnapshot } from '../reboot/babyPose';
-import { CELEBRATION_TUNING } from '../reboot/celebration';
+import { CELEBRATION_TUNING, isCelebrationBeat } from '../reboot/celebration';
 import { BabyGaitRig } from '../reboot/babyGait';
 import { BlenderBabyRig } from '../reboot/blenderRig';
 import { sampleArtComparison } from '../reboot/artComparison';
@@ -43,6 +43,7 @@ import { applyPetMaterialProfile } from './rendererMaterials';
 import { vertexLitMaterial } from './vertexLitMaterial';
 import { batchStaticRoom } from './staticRoomBatch';
 import { loadSunlitRoom, type SunlitRoom } from './sunlitRoom';
+import { configureReviewCamera, type ReviewFraming } from './reviewFraming';
 import {
   DEFAULT_CHARACTER_CANDIDATE_ID,
   getCharacterCandidate,
@@ -105,7 +106,7 @@ export class RoomController {
   private roomLoading = false;
   private requestedRoom: 'original'|'sunlit' = 'original';
   private roomFailure?: string;
-  private cameraReview: 'original'|'close' = 'original';
+  private cameraReview: ReviewFraming = 'original';
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.OrthographicCamera();
   readonly renderer: THREE.WebGLRenderer;
@@ -319,10 +320,7 @@ export class RoomController {
   resize(width: number, height: number) {
     if (width <= 0 || height <= 0) return;
     this.width = width; this.height = height;
-    const halfHeight = this.cameraReview === 'close' ? 6.3 : 6.8;
-    const halfWidth = halfHeight * (width / height);
-    Object.assign(this.camera, { left: -halfWidth, right: halfWidth, top: halfHeight, bottom: -halfHeight });
-    this.camera.updateProjectionMatrix();
+    configureReviewCamera(this.camera, width, height, this.cameraReview);
     this.submissions.markDirty();
     if (this.submissionIntervalMs === 0) this.publishProjection();
   }
@@ -793,7 +791,7 @@ export class RoomController {
       bufferWidth: this.gl.drawingBufferWidth, bufferHeight: this.gl.drawingBufferHeight,
       requestedMsaa: this.rendererConfig.msaaSamples, postprocessAa: this.fxaa ? 'fxaa' : 'none',
       roomCurves: this.rendererConfig.id === 'quality_225_legacy' ? 'legacy24' : 'refined', roomCandidate: this.sunlitRoom && this.requestedRoom === 'sunlit' ? 'sunlit' : 'original',
-      requestedRoom: this.requestedRoom, roomFailure: this.roomFailure, cameraReview: this.cameraReview, verticalSpan: this.camera.top * 2, ...this.glValidation },
+      requestedRoom: this.requestedRoom, roomFailure: this.roomFailure, cameraReview: this.cameraReview, cameraPosition: this.camera.position.toArray(), verticalSpan: this.camera.top * 2, ...this.glValidation },
       restMode: this.restMode, sleeping: this.sleeping, interactionEnabled: this.interactionEnabled,
       interaction, clip: this.activeAction?.getClip().name ?? null,
       blockedBy: !this.frames.running ? 'background' : interaction === 'panel' ? 'panel'
@@ -1028,7 +1026,8 @@ export class RoomController {
     const moving = art?.moving ?? !!this.path.length, pose = art?.pose ?? (art ? undefined : this.reboot.pose);
     const hop = art ? art.hop : pose?.phase === 'contact' && pose.baby?.beat.id === 'cheer_bounce' ? pose.baby.progress * .499999
       : pose?.phase === 'contact' && ['tiny_hops', 'hat_test_step'].includes(pose.baby?.beat.id ?? '') ? pose.baby?.progress : undefined;
-    const cheerSupport = pose?.phase === 'contact' && ['cheer_share', 'cheer_salute', 'cheer_playful_wave'].includes(pose.baby?.beat.id ?? '');
+    const cheerSupport = !!pose?.baby && isCelebrationBeat(pose.baby.beat.id) && hop === undefined;
+    const cheerFreePaw = !!pose?.baby && ['cheer_salute', 'cheer_playful_wave', 'cheer_peek'].includes(pose.baby.beat.id);
     if (this.blenderRig || art) {
       const name = this.sleeping ? 'sleep' : moving ? 'walk' : hop !== undefined ? 'baby_hop'
         : pose?.kind === 'hand' ? pose.handActing ? `idle_${this.profile}` : pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}`
@@ -1064,7 +1063,7 @@ export class RoomController {
     if (this.babyGaitRig && this.rebootView) {
       this.babyGaitRig.apply(this.petOrientation, { position: this.position, facing: this.facing,
         scale: rebootScale(this.rebootView), dt: comparison?.paused ? 0 : dt, moving: moving && !this.sleeping, reduced: this.reducedMotion, hop: this.sleeping ? undefined : hop }, !this.sleeping || !!this.blenderRig,
-        (!!pose?.handActing || cheerSupport) && !moving, cheerSupport || !!pose?.handActing && pose.handActing.pawLift > .01);
+        (!!pose?.handActing || cheerSupport) && !moving, cheerFreePaw || !!pose?.handActing && pose.handActing.pawLift > .01);
     }
     if (this.blenderRig && this.activeAction) {
       const clip = this.activeAction.getClip();
