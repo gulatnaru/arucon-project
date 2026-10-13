@@ -3,6 +3,7 @@
 제품 기준은 `docs/arucon-SRS.md` v1.9다. 2026-09-19 사용자 승인 여섯 MVP 기본 정책과 가역 config/ADR 위임을 적용한다. **2026-10-04 현재 직접 개발 책임자의 요청 모델은 GPT-6.1 Sol Max이며 SOL_DIRECT / AUTONOMOUS PRODUCT HARDENING으로 운영한다.** 직접 설계·구현·디버깅·실제 앱 검증과 SELF_REVIEW를 책임지고 새 subagent를 기본적으로 생성하지 않는다. 설정의 요청 모델과 실제 effective model 확인은 구분한다. 2026-09-28 이후 ASTRA_DIRECT의 완료 증거·과거 ENG-03 역할 설정·결정 이력은 보존한다.
 
 ## 현재 제품 품질 강화
+- 현재 축하 표현 후속은 `tasks/REBOOT-04-celebration-readability-followup.md`다. 더 최신인 REBOOT-05 소스/설치/저장/방 후보를 보존하고 같은 합성 목표 달성의 대표3종 축하·현재 대비 약12% 읽기성 후보 하나만 비교한다. 새 방 제작/16유형/성장형/상점 확장 없이 정상 claim/취소/경제 경계를 유지하고 최신 실제 MP4를 승인된 개인 iCloud 경로에 전달한다. 최종 표현/크기·PERF-01/STORAGE-01·실기기 판정은 별도다.
 - 2026-10-13 REBOOT-05는 `tasks/REBOOT-05-living-pet-charm.md`다. v11과 두발/3성격/원본/저장/정책을 보존하며 감정 의도로 연결된 자율생활·교감·한국어와 실제 햇살 방 B 후보를 제작하고 기존 A와 비교한다. 최소10분 무입력·최신 Release·자원/기억/시간 회귀·성능·개인 iCloud MP4를 검증한다. 이전 방 시안까지만 허용한 범위는 이번 명시 제작 승인으로 갱신한다. 최종 재미/아트/성격/크기/카메라/방은 USER_REVIEW_PENDING, PERF-01/STORAGE-01은 근거 없이 닫지 않는다.
 - 2026-10-13 생활 맥락·대사·말풍선 후속은 `tasks/REBOOT-04-life-context-dialogue-and-bubbles.md`다. 실제 건강 읽기 OFF에서 합성 사실/기록 불명확/쉬기 선택을 구분하고 기존 대표3종·두발·기억·경제를 보존한다. 콘텐츠 폭의 말풍선·X 제거·취소/읽기 복귀를 실제 Release에서 검증하고 승인된 개인 iCloud 검토 영상 경로를 쓴다. PERF-01/STORAGE-01 VFS는 OPEN, 재미/아트는 USER_REVIEW_PENDING이다.
 - 2026-10-11 사용자 감정·방 후속 평가: `tasks/REBOOT-04-emotion-room-followup.md`를 적용한다. 두 발/세 성격/기억은 보존하며 눈 균형·사건에 맞는 귀/시선/몸/대사와 정상 발화를 개선한다. 현재 펫을 넣은 방 시안 한 개만 비교하고 기본 방 교체는 검토 뒤로 둔다. 과거 기술 PASS와 사용자 표현 REWORK_REQUIRED를 분리하며 PERF-01/CANTOPEN VFS 원인은 OPEN이다.

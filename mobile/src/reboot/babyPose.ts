@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { RebootPose } from './director';
 import type { BabyExpression } from './contracts';
 import { personalityPoseStyle } from './personality';
+import { celebrationAct, isCelebrationBeat } from './celebration';
 
 type Rig = { eyes: THREE.Mesh[]; mouth?: THREE.Mesh; brows: THREE.Mesh[]; cheeks: THREE.Mesh[];
   ears: THREE.Object3D[]; hat?: THREE.Object3D; paw?: THREE.Object3D; leftPaw?: THREE.Object3D; pawLift: number; leftPawLift: number; pawReach: number; position: THREE.Vector3; rotation: THREE.Vector3;
@@ -42,10 +43,14 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   const contact = pose?.phase === 'contact';
   const weight = contact ? 1 : recovering ? 1 - p * p * (3 - 2 * p) : 0;
   const id = baby?.beat.id ?? 'notice';
+  const cheer = pose?.personalityId && contact && isCelebrationBeat(id) ? celebrationAct(id, p, pose.personalityId) : undefined;
   const targetPosition = rig.targetPosition.set(0, 0, 0), targetRotation = rig.targetRotation.set(0, 0, 0);
   if (hand && !moving) {
     targetPosition.set((hand.x + (twoPawSupport ? hand.supportX : 0)) * soft, 0, hand.z * soft); targetRotation.set(hand.pitch * soft, hand.yaw * soft, hand.roll * soft);
     orientation.scale.x *= 1 + hand.compression * .45 * soft; orientation.scale.y *= 1 - hand.compression * soft; orientation.scale.z *= 1 + hand.compression * .45 * soft;
+  } else if (cheer) {
+    targetPosition.set(cheer.x * soft, 0, cheer.z * soft);
+    targetRotation.set(cheer.pitch * soft, cheer.yaw * soft, cheer.roll * soft);
   } else if (moving) {
     targetPosition.y = reduced || grounded ? 0 : Math.max(0, Math.sin(time * 12)) * .065;
     targetRotation.z = grounded ? 0 : Math.sin(time * 6) * .04 * soft;
@@ -76,7 +81,7 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     } else if (id === 'yawn') targetRotation.x = -.085 * pulse * weight * soft;
     else if (id === 'look_back' || id === 'hat_show') targetRotation.z = .07 * pulse * weight * soft;
   } else if (pose?.phase === 'look') targetRotation.x = -.035 * soft;
-  if (style && !hand) {
+  if (style && !hand && !cheer) {
     targetPosition.multiplyScalar(style.bodyAmplitude); targetRotation.multiplyScalar(style.bodyAmplitude);
     if (pose?.phase === 'look') targetRotation.y += style.gazeAside;
     if ((contact || recovering) && pose?.kind === 'hand') {
@@ -86,16 +91,16 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
     }
   }
   rig.position.lerp(targetPosition, alpha); rig.rotation.lerp(targetRotation, alpha);
-  const pawTarget = hand ? hand.pawLift * soft : (id === 'paw_offer' ? .18 : id === 'paw_flick' ? .22 * Math.max(0, Math.sin(p * Math.PI * 2))
+  const pawTarget = cheer ? cheer.pawLift * soft : hand ? hand.pawLift * soft : (id === 'paw_offer' ? .18 : id === 'paw_flick' ? .22 * Math.max(0, Math.sin(p * Math.PI * 2))
     : id === 'cushion_knead' ? .10 * Math.max(0, Math.sin(p * Math.PI * 4)) : id === 'sneak' ? .12 * pulse : 0) * weight * soft;
   const leftPawTarget = hand ? 0 : (id === 'cushion_knead' ? .10 * Math.max(0, Math.sin(p * Math.PI * 4 + Math.PI)) : 0) * weight * soft;
   rig.pawLift += (pawTarget - rig.pawLift) * alpha; rig.leftPawLift += (leftPawTarget - rig.leftPawLift) * alpha;
-  rig.pawReach += ((hand ? hand.pawReach * soft : id === 'paw_flick' ? .16 * pulse * weight * soft : 0) - rig.pawReach) * alpha;
+  rig.pawReach += ((cheer ? cheer.pawReach * soft : hand ? hand.pawReach * soft : id === 'paw_flick' ? .16 * pulse * weight * soft : 0) - rig.pawReach) * alpha;
   if (rig.paw) { rig.paw.position.y += rig.pawLift; rig.paw.position.z += rig.pawReach; }
   if (rig.leftPaw) rig.leftPaw.position.y += rig.leftPawLift;
   orientation.position.add(rig.position); orientation.rotation.x += rig.rotation.x; orientation.rotation.y += rig.rotation.y; orientation.rotation.z += rig.rotation.z;
   // An awake idle is neutral. Authored asymmetric keys remain in original assets.
-  const targets: Record<string, number> = neutral || !baby ? {} : { ...faceTargets[expression], ...(style && !hand ? {
+  const targets: Record<string, number> = neutral || !baby ? {} : cheer ? cheer.face : { ...faceTargets[expression], ...(style && !hand ? {
     ...(['content', 'excited', 'playful'].includes(expression) ? { Smile: Math.max(faceTargets[expression].Smile ?? 0, style.smile), Happy: Math.max(faceTargets[expression].Happy ?? 0, style.happy) } : {}),
     ...(expression === 'playful' ? { Mischief: Math.max(faceTargets[expression].Mischief ?? 0, style.mischief) } : {}) } : {}) };
   for (const name of ['Curious', 'Lift', 'Smile', 'Happy', 'Mischief', 'Playful', 'Surprised', 'Open', 'Bashful', 'Sleepy'])
@@ -118,10 +123,10 @@ export function applyBabyPose(orientation: THREE.Group, model: THREE.Object3D, p
   // free-running flap oscillator. The Blender bridge applies these deltas at
   // the real ear rest bones, so their skin remains attached to the head.
   const attending = pose?.phase === 'look' || pose?.phase === 'approach';
-  const earSpread = neutral || !baby ? 0 : attending ? .14 :
+  const earSpread = neutral || !baby ? 0 : cheer ? cheer.earLift : attending ? .14 :
     expression === 'curious' ? .15 : expression === 'excited' ? .23 : expression === 'surprised' ? .30 :
       expression === 'content' ? -.13 : expression === 'embarrassed' ? -.18 : expression === 'sleepy' ? -.23 : .09;
-  const earForward = neutral || !baby ? 0 : attending ? -.13 : expression === 'content' || expression === 'sleepy' ? .10 : -.08;
+  const earForward = neutral || !baby ? 0 : cheer ? -.15 * (cheer.earLift / .23) : attending ? -.13 : expression === 'content' || expression === 'sleepy' ? .10 : -.08;
   const earCheck = hand ? Math.sin(hand.yaw) * .10 : (pose?.attentionSide ?? 0) * .07 + (id === 'look_back' ? .045 * pulse : 0);
   rig.ears.forEach((ear, i) => {
     const sign = i ? -1 : 1;

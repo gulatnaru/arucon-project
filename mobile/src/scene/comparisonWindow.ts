@@ -18,7 +18,10 @@ export class ComparisonWindow {
   }
   finish(wall: number) { if (this.phase !== 'measure') return undefined; this.phase = 'complete'; return this.event(wall); }
   interrupt(wall: number) { if (!['warmup','measure'].includes(this.phase)) return undefined; this.phase = 'interrupted'; return this.event(wall); }
+  // The benchmark stays interrupted, but ordinary play can resume when its
+  // panel closes. An invalid timing window must not become a permanent input lock.
   get actorEnabled() { return this.phase === 'measure' || this.phase === 'complete'; }
+  get ordinaryPlayEnabled() { return this.actorEnabled || this.phase === 'interrupted'; }
   private event(wall: number): ComparisonWindowEvent { return { token: this.token, phase: this.phase as ComparisonWindowEvent['phase'],
     atMs: wall, warmupStartedAtMs: this.warmWall, measureStartedAtMs: this.measureWall, warmupMs: this.warmupMs, captureMs: this.captureMs }; }
 }

@@ -5,6 +5,7 @@ import { growthGesture, levelExpression } from '../living/levelExpressions';
 import { RebootDirector } from '../reboot/director';
 import { applyRebootPose, rebootFacing } from '../reboot/pose';
 import { applyBabyPose, resetBabyPose, babyExpressionSnapshot } from '../reboot/babyPose';
+import { CELEBRATION_TUNING } from '../reboot/celebration';
 import { BabyGaitRig } from '../reboot/babyGait';
 import { BlenderBabyRig } from '../reboot/blenderRig';
 import { sampleArtComparison } from '../reboot/artComparison';
@@ -95,7 +96,7 @@ const TWO_PAW_BABY_ASSET = require('../../assets/reboot-04/baby-two-paws.glb') a
 // Preserved four-paw reference uses the same Metro static-asset mechanism.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const QUAD_BABY_ASSET = require('../../assets/reboot-04/common-quad.glb') as number;
-const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? view.sizeCandidate ?? 1.25 : 1);
+const rebootScale = (view: RebootView) => REBOOT_SCALE[view.stage] * (view.babyCharm && view.stage === 'baby' ? (view.sizeCandidate ?? 1.25) * (view.readabilityCandidate ? CELEBRATION_TUNING.readabilityMultiplier : 1) : 1);
 
 export class RoomController {
   private legacyStaticRoom?: THREE.Object3D;
@@ -346,6 +347,7 @@ export class RoomController {
     const oldRebootStage = this.rebootView?.stage;
     const oldBabyCharm = this.rebootView?.babyCharm;
     const oldRebootSize = this.rebootView?.sizeCandidate;
+    const oldReadability = this.rebootView?.readabilityCandidate;
     const oldArt = this.rebootView?.artCandidate;
     const oldArtToken = this.rebootView?.artComparison?.token;
     this.rebootView = props.rebootView;
@@ -370,7 +372,7 @@ export class RoomController {
     const nextCandidateId = props.characterCandidateId ?? DEFAULT_CHARACTER_CANDIDATE_ID;
     const petAssetChanged = nextFormPresentation.assetKey !== this.formPresentation.assetKey ||
       nextCandidateId !== this.characterCandidateId || oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm || oldArt !== this.rebootView?.artCandidate;
-    const sizeComparisonChanged = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' && oldRebootSize !== this.rebootView.sizeCandidate;
+    const sizeComparisonChanged = this.rebootView?.babyCharm && this.rebootView.stage === 'baby' && (oldRebootSize !== this.rebootView.sizeCandidate || oldReadability !== this.rebootView.readabilityCandidate);
     if (oldRebootStage !== this.rebootView?.stage || oldBabyCharm !== this.rebootView?.babyCharm || sizeComparisonChanged || oldArt !== this.rebootView?.artCandidate || oldArtToken !== this.rebootView?.artComparison?.token) {
       this.artTime = 0;
       this.reboot.cancel(); this.cancelPet(); this.rebootDockOffset.set(0, 0, 0);
@@ -939,7 +941,7 @@ export class RoomController {
     if (this.rebootView && this.modelReady && !this.rebootView.artComparison) this.reboot.update(dt, {
       awake: !this.sleeping, moving: !!this.path.length, touching: this.touchHolding || this.petPulseRemaining > 0,
       position: this.position, facing: this.facing, view: this.rebootView, touchRegion: this.rebootTouchRegion, interruptedForTouch: this.rebootInterruptedForTouch,
-      enabled: this.interactionEnabled && !this.rebootView.comparisonHold && (!this.comparisonWindow || this.comparisonWindow.actorEnabled) });
+      enabled: this.interactionEnabled && !this.rebootView.comparisonHold && (!this.comparisonWindow || this.comparisonWindow.ordinaryPlayEnabled) });
     if (this.livingEnabled) this.life.update(dt, this.lifeWorld());
     this.performanceProbe.recordPhase('decision', performance.now() - decisionStart);
     const poseStart = performance.now();
@@ -1024,7 +1026,9 @@ export class RoomController {
       this.petAnchor.scale.set(1+squeeze*.04, 1-squeeze*.08, 1+squeeze*.04);
     }
     const moving = art?.moving ?? !!this.path.length, pose = art?.pose ?? (art ? undefined : this.reboot.pose);
-    const hop = art ? art.hop : pose?.phase === 'contact' && ['tiny_hops', 'hat_test_step'].includes(pose.baby?.beat.id ?? '') ? pose.baby?.progress : undefined;
+    const hop = art ? art.hop : pose?.phase === 'contact' && pose.baby?.beat.id === 'cheer_bounce' ? pose.baby.progress * .499999
+      : pose?.phase === 'contact' && ['tiny_hops', 'hat_test_step'].includes(pose.baby?.beat.id ?? '') ? pose.baby?.progress : undefined;
+    const cheerSupport = pose?.phase === 'contact' && ['cheer_share', 'cheer_salute', 'cheer_playful_wave'].includes(pose.baby?.beat.id ?? '');
     if (this.blenderRig || art) {
       const name = this.sleeping ? 'sleep' : moving ? 'walk' : hop !== undefined ? 'baby_hop'
         : pose?.kind === 'hand' ? pose.handActing ? `idle_${this.profile}` : pose.phase === 'recover' ? 'baby_release' : `pet_${this.profile}`
@@ -1060,7 +1064,7 @@ export class RoomController {
     if (this.babyGaitRig && this.rebootView) {
       this.babyGaitRig.apply(this.petOrientation, { position: this.position, facing: this.facing,
         scale: rebootScale(this.rebootView), dt: comparison?.paused ? 0 : dt, moving: moving && !this.sleeping, reduced: this.reducedMotion, hop: this.sleeping ? undefined : hop }, !this.sleeping || !!this.blenderRig,
-        !!pose?.handActing && !moving, !!pose?.handActing && pose.handActing.pawLift > .01);
+        (!!pose?.handActing || cheerSupport) && !moving, cheerSupport || !!pose?.handActing && pose.handActing.pawLift > .01);
     }
     if (this.blenderRig && this.activeAction) {
       const clip = this.activeAction.getClip();

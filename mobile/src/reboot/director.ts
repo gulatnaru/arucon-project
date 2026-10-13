@@ -4,6 +4,7 @@ import { personalityPlan, personalitySelection, personalityPoseStyle, type Perso
 import { makeHandActingPlan, sampleHandContact, sampleHandRelease, type HandActingPlan, type HandActingPose } from './handActing';
 import { BABY_AUTONOMOUS, babyPlan, babyTarget, currentBabyBeat, type BabyPlan, type BabyBeat } from './babyLife';
 import { selectLivingScene, type LivingOutcome } from './autonomy';
+import { CELEBRATION_TUNING } from './celebration';
 
 export type RebootWorld = { enabled: boolean; awake: boolean; moving: boolean; touching: boolean; position: FloorPoint; facing?: number; view: RebootView; touchRegion?: TouchRegion; interruptedForTouch?: RebootIntent };
 export type RebootPose = { kind: RebootIntent; phase: string; progress: number; stage: RebootStage; held: boolean; releaseFrom?: number; gazeTarget?: FloorPoint; dockTarget?: FloorPoint;
@@ -151,7 +152,7 @@ export class RebootDirector {
       releaseFrom: i.releaseFrom, stage: w.view.stage, held: this.touching || this.hand,
       ...(handActing ? { handActing } : {}),
       ...(currentBeat ? { baby: { beat: i.phase === 'approach' ? { id: 'travel', seconds: 1, expression: 'excited' as const }
-          : i.phase === 'look' ? { id: i.command.kind === 'cushion_changed' ? 'old_place' : 'notice', seconds: 1, expression: 'curious' as const }
+          : i.phase === 'look' ? { id: i.command.kind === 'cushion_changed' ? 'old_place' : 'notice', seconds: 1, expression: i.command.contextCue?.intent === 'goal' ? 'excited' as const : 'curious' as const }
             : i.phase === 'recover' ? { id: 'look_back', seconds: recoveryDuration, expression: 'content' as const } : currentBeat.beat,
         progress: i.phase === 'contact' ? currentBeat.progress : Math.min(1, i.elapsed / recoveryDuration), touchStyle: i.baby?.touchStyle,
         rememberedHandId: i.baby?.rememberedHandId } } : {}),
@@ -165,6 +166,8 @@ export class RebootDirector {
         ? { x: 0, z: 4.3 } : i.command.kind === 'cushion_changed' ? w.view.cushion : i.command.target;
     }
     if (i.command.kind === 'life_context') this.pose.gazeTarget = { x: 0, z: 4.3 };
+    if (i.command.contextCue?.intent === 'goal' && this.pose.personalityId === 'poised' && i.phase === 'recover' && i.elapsed > .35)
+      this.pose.gazeTarget = i.command.resumeScene?.focusPoint ?? i.command.resumeTarget ?? this.pose.gazeTarget;
     if (i.command.scene && ['look', 'contact'].includes(i.phase)) {
       const userBeat = ['look_back', 'lean', 'paw_offer', 'side_nuzzle', 'settle_floor'].includes(currentBeat?.beat.id ?? '');
       this.pose.gazeTarget = i.phase === 'contact' && userBeat ? { x: 0, z: 4.3 } : i.command.scene.focusPoint;
@@ -175,11 +178,11 @@ export class RebootDirector {
     // Remembered coordinates are a glance only; route/dock always use current truth.
     const lookDuration = i.command.kind === 'cushion_changed' ? 1.1 : w.view.personality ? personalityPoseStyle(w.view.personality.foundation.profileId, 'curious').lookSeconds : w.view.stage === 'baby' ? .65 : .30;
     if (i.phase === 'look' && i.elapsed >= lookDuration) {
-      const handOffset = w.view.babyCharm ? .64 * .53 * (w.view.sizeCandidate ?? 1.25) + .205 : .48;
+      const handOffset = w.view.babyCharm ? .64 * .53 * (w.view.sizeCandidate ?? 1.25) * (w.view.readabilityCandidate ? CELEBRATION_TUNING.readabilityMultiplier : 1) + .205 : .48;
       const target = i.command.kind === 'hand' ? { x: REBOOT_HAND.x, z: REBOOT_HAND.z - handOffset }
         : i.command.kind === 'cushion_changed' ? w.view.cushion
           : i.command.kind === 'hat_first' ? { x: Math.min(1.6, w.position.x + .38), z: Math.max(-.3, w.position.z - .25) } : i.command.target;
-      const needsApproach = !!target && (!i.command.scene || Math.hypot(target.x - w.position.x, target.z - w.position.z) > .06);
+      const needsApproach = !!target && (!(i.command.scene || i.command.contextCue?.intent === 'goal') || Math.hypot(target.x - w.position.x, target.z - w.position.z) > .06);
       if (needsApproach && !this.ports.navigate(target!)) { this.cancel(); return; }
       this.transition(needsApproach ? 'approach' : 'contact');
     } else if (i.phase === 'approach') {
@@ -191,15 +194,18 @@ export class RebootDirector {
       const duration = contactDuration;
       if (i.elapsed >= duration) this.transition('recover');
     } else if (i.phase === 'recover' && i.elapsed >= recoveryDuration) {
-      const done = i.command, resume = done.resume ?? (done.kind === 'hand' ? this.touched?.command.kind : undefined);
+      const done = i.command, resume = done.resume ?? (done.contextCue?.intent === 'goal' ? done.resumeScene?.kind : undefined) ?? (done.kind === 'hand' ? this.touched?.command.kind : undefined);
       const resumeTarget = done.resumeTarget ?? this.touched?.command.target ?? { x: .8, z: 1 };
       this.emit('complete'); this.recent.push(done.kind); this.recent = this.recent.slice(-4);
       if (done.scene) { this.recentScenes = [...this.recentScenes, done.scene.id].slice(-12); this.lastOutcome = done.scene.outcome;
         this.activeScenes = ['cushion', 'quiet_floor', 'user'].includes(done.scene.focus) ? 0 : this.activeScenes + 1; }
       else if (done.kind === 'hand') this.lastOutcome = 'shared';
       this.intent = undefined; this.pose = undefined; this.touched = undefined; this.idle = done.scene?.pauseSeconds ?? (w.view.personality ? personalityPoseStyle(w.view.personality.foundation.profileId, 'content').pauseSeconds : 3.5) + this.draw() * 3;
-      if (resume && (RESUMABLE_REBOOT_INTENTS as readonly string[]).includes(resume)) this.begin({ token: `${this.session}:resume:${++this.token}`,
-        kind: resume as RebootIntent, sourceRevision: w.view.revision, target: resumeTarget }, true);
+      const resumedScene = done.resumeScene;
+      const stillValid = !resumedScene || resumedScene.focus !== 'cushion' || Math.hypot(resumedScene.target.x - w.view.cushion.x, resumedScene.target.z - w.view.cushion.z) < .01;
+      if (resume && stillValid && ((RESUMABLE_REBOOT_INTENTS as readonly string[]).includes(resume) || done.contextCue?.intent === 'goal' && resumedScene?.kind === resume)) this.begin({ token: `${this.session}:resume:${++this.token}`,
+        kind: resume as RebootIntent, sourceRevision: w.view.revision, target: resumeTarget,
+        ...(resumedScene ? { scene: resumedScene } : {}), ...(resume === 'rest' ? { itemRevision: w.view.cushion.revision } : {}) }, true);
     }
   }
 }

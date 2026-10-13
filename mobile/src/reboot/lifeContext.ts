@@ -1,5 +1,6 @@
 import type { BabyPlan } from './babyLife';
 import type { PersonalityId } from './personality';
+import { celebrationPlan } from './celebration';
 
 /** Presentation-only synthetic observations. Never connected to a health reader. */
 export type LifeContext = Readonly<{
@@ -29,8 +30,9 @@ const words: Record<ContextIntent, Record<PersonalityId, string>> = {
   care_recorded: { playful: '수면 기록이 짧네. 오늘은 살살?', warm: '기준보다 짧은 기록이네. 지금은 어때?', poised: '기록은 짧네. 무리할 필요는 없어.' },
   rest: { playful: '좋아! 오늘은 느긋하게.', warm: '응, 편하게 쉬자.', poised: '좋아. 오늘은 쉬는 거야.' },
 };
-function plan(intent: ContextIntent, profile: PersonalityId): BabyPlan {
-  const celebration = intent === 'goal' || intent === 'run';
+function plan(intent: ContextIntent, profile: PersonalityId, variation = 0): BabyPlan {
+  if (intent === 'goal') return celebrationPlan(profile, variation);
+  const celebration = intent === 'run';
   if (celebration) return { beats: profile === 'playful' ? [
     { id: 'tiny_hops', seconds: 1, expression: 'excited' }, { id: 'paw_flick', seconds: .8, expression: 'playful' }, { id: 'look_back', seconds: 2.8, expression: 'content' },
   ] : profile === 'warm' ? [
@@ -77,8 +79,12 @@ export function evaluateLifeContext(c: LifeContext, h: ContextHistory, profile: 
   if (intent === 'invite' && (h.lessTalk || sameDay && (h.rested || h.avoidInvites || h.invited))) return { reason: 'REST_OR_INVITE_LIMIT' };
   if (h.lessTalk && intent !== 'rest') return { reason: 'LESS_TALK_CHOICE', safetyIntent };
   if (sameDay && intent !== 'rest' && intent !== 'care_reported' && nowMs - h.lastSpokenAtMs < CONTEXT_TUNING.autoGapMs) return { reason: 'HEALTH_TOPIC_QUIET_GAP', safetyIntent };
-  const acting = plan(intent, profile);
-  return { cue: { eventId: c.eventId, revision: c.revision, day: c.day, intent, text: words[intent][profile], plan: acting, speechBeat: acting.beats[1].id }, reason: 'SUPPORTED_SYNTHETIC_FACT' };
+  const variation = (c.day + Object.keys(h.seen).length) % 2;
+  const acting = plan(intent, profile, variation);
+  const goalWords = { playful: ['해냈네! 나도 신나!', '목표 채웠네! 같이 신나자!'],
+    warm: ['오늘 목표 채웠네. 잘했어.', '해냈구나. 나도 기뻐.'],
+    poised: ['흠, 해냈네. 제법인데?', '목표 채웠네. 잘했어.'] };
+  return { cue: { eventId: c.eventId, revision: c.revision, day: c.day, intent, text: intent === 'goal' ? goalWords[profile][variation] : words[intent][profile], plan: acting, speechBeat: acting.beats[1].id }, reason: 'SUPPORTED_SYNTHETIC_FACT' };
 }
 
 export function acknowledgeContext(h: ContextHistory, cue: ContextCue, atMs: number): ContextHistory {
