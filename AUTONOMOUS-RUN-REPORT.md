@@ -1,3 +1,15 @@
+# 최신 실행 — REBOOT-05 charm v13 / 2026-10-13
+
+[실제 결과](REBOOT-05-REPORT.md), [범위](tasks/REBOOT-05-living-pet-charm.md). 소스8a95a38/설치v13/237입력 해시 일치. 관심→접근→실행→결과→휴식/다음 관심, 완료 경험·성격 축 기반6목표와72짧은 후보/침묵, 기본 눈·감정 전환/귀 의도 연결, 실제 Blender 게임용 방B/기존A 보존. 정상10분0.553초/29완료/6관심/7발화,3종 대사ON·직접 머리/몸·취소/복귀·수면/콜드,실제A/B/+25/+35/시점비교. SELF_REVIEW 검토 준비 REBOOT_05_CHARM_REVIEW_READY / USER_REVIEW_PENDING;전체MVP 성능/실기기미완료.
+
+fresh490/490·lint/types·iOSRelease exit0·AndroidJS·CNG27STATIC·workflow42+direct1. 기존65저장/5원장/원본50/3DBok,64기억보관 정상정리,기존8진단전체 baseline보존(활성8ring은원래6+이번합성2). 격리native150중복방지/복구PASS;원래CANTOPEN VFS OPEN. 6개완료60초 OFF RAFp95 29.33~33.26ms·gap>500=0;첫B입력3표본부족/나머지5~6통과. GLqueue우세·실제GPU/물리지연/실기기NOT_RUN,PERF-01 OPEN 유지.
+
+개인iCloudArucon/Reviews: 최신173초 시연/60초 방비교/짧은안내문만 해시·비공유·업로드확인, DELIVERY_SENT / MOBILE_NOT_VERIFIED. 원본/DB/로그/소스/evidence전체외부전송없음. 요청GPT-6.1SolMax/effectiveROUTING_UNVERIFIED/subagent0/SOL_DIRECT. 원래v11검증·Astra역사보존. 앱소스checkpoint일반push 확인,종료문서checkpoint해시는직접조회한다.
+
+---
+
+## Historical — REBOOT-04 v11
+
 # 최신 실행 — REBOOT-04 생활 맥락·말풍선 / 2026-10-13
 
 [실제 결과/영상 전달](REBOOT-04-REPORT.md), 소스317ca1e/v11/230입력·설치JS/native해시일치. 합성 사실→3종 의도/몸/눈/귀/말, unknown≠부족, rest/말줄이기/동일사건·콜드 중복 차단, native 콘텐츠 폭/X 없는 말풍선. 짧은 대사 테두리 폭/여러줄 폭 문제를 실제 수정. 실패한 이모지 글꼴 실험 제거·동일 해시복원. 3종 실제 영상·trace,수면/깨우기/이동/접촉/복귀. 원래65저장·5원장·원본50·진단8보존/3DBok; bounded기억정리 별도기록. 이번482/482·linter/types·iOSRelease·AndroidJS·CNG27STATIC·workflow42+direct1 PASS.

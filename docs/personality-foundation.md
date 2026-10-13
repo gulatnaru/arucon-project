@@ -102,3 +102,8 @@ Context7 plugin MCP의 공개 문서 조회를 실제 실행했다. SDK55 선택
 `RebootSnapshot.lifeContext` optional(version1, day, bounded64eventId/revision, invited/rested/avoidInvites/lessTalk/lastSpoken). 기존 대기열/transaction에서 먼저 claim, 실패 rollback, stale epoch는 acting으로 가지 않음. 취소는 완료 경험이 아니고 같은 사건은 새revision/재실행으로 재발화하지 않는다. 과거day는 버린다. 별도 DB/schema/경제 원장 없음. 건강 주제10분/초대1회·합성개인목표6000/수면420분은 검토 config/fixture이며 의료·출시 기준이 아니다. 실제 도메인 시계와 무관하다.
 
 말풍선은 `onTextLayout` native 폭+padding/border; multiline은 원래 폭 유지. 실제세트 width/height 기반 안전앵커, X없음, tap/dismiss, nested읽기hold, ID로stale timer폐기. 장식렌더/호흡은 읽기와 공존, 일반저장오류는자동소멸하지않음. 한국어개행/1.6검토글자/탭은실제검토했으며 이모지/실제긴누르기/VoiceOver는미완료범위를별도기록한다. Renderer/GLcontext를말마다재생성하거나프레임마다SQLite조회하지않는다.
+
+
+## REBOOT-05 — 2026-10-13 현재 후속
+
+기존두발/3종/성격축/저장과원본을보존하고관심목표·완료경험·직전결과·휴식리듬으로의도를유지한다. 기본눈의상시Mischief혼입과미소덮임을제한하고관심상대귀·시선·몸·자발/교감발화를연결했다. 같은v13 실제10분/3종대사ON/손·직접접촉/취소/수면/cold·Blender방B 비교를완료했다. 새동일기억반사실시험이나성장에따른최종16형성완료로기록하지않는다. [실제증거](../REBOOT-05-REPORT.md). SELF_REVIEW 검토준비/최종성격·재미·아트USER_REVIEW_PENDING,PERF-01/STORAGE-01 원인OPEN.

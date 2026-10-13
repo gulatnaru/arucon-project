@@ -1,3 +1,19 @@
+# 재개 지점 — REBOOT-05 검토 준비 v13
+
+[현재 보고](REBOOT-05-REPORT.md) / [범위](tasks/REBOOT-05-living-pet-charm.md). 앱소스8a95a38·설치reboot-05-charm-v13·입력237/설치JS a07a069d… 일치. 현재HEAD/dirty/설치해시를확인하고이전SHA로reset하지않는다. 같으면재빌드/재설치/DB초기화부터하지않는다.
+
+REBOOT_05_CHARM_REVIEW_READY는현재Simulator검토범위다. 원래65개저장/5경제원장/원본50·기존성격/두발/성장정책 유지. 일반방설정→REBOOT-04성격검토판→우리아이. 방과시점비교에서기존A/햇살B·+25/+35·기존/가까운시점. 방B는검토선택이며cold뒤기본A,최종기본/아트/성격/재미/크기/시점USER_REVIEW_PENDING.
+
+다음한작업: iPhone파일앱→iCloud Drive→Arucon→Reviews의`2026-10-13_arucon_REBOOT05_charm_v13_8a95a38_review_r2.mp4`(2:53/27.92MiB)와`…room_compare.mp4`(1:00/8.08MiB)를재생해제품평가한다. 최신scenes_r2.txt에컷/원본시각·관찰/녹화길이구분이있다. 원본1170×2532/정상속도/합성데이터만,두영상전체decode/해시/비공유/업로드확인. DELIVERY_SENT / MOBILE_NOT_VERIFIED. 사용자재생확인전MOBILE_CONFIRMED로올리지않는다.
+
+실제관찰10분0.553초(영상599.563초·녹화요청은시작17.35초후,전체동일창연속영상아님) 무입력29완료·6관심·7발화/3성격대사ON/머리·몸접촉/취소/수면·전경·cold복원/기존정산보존을현재v13에서검토했다. fresh490/490·lint/types·iOSRelease·AndroidJS·CNG27STATIC·workflow42+direct1. 6개60초OFF RAFp95 29.33~33.26/첫B입력표본부족/나머지5~6≤100ms/gap>500=0. PERF-01 OPEN(과거실패/장기·GPU·실기기미검증). STORAGE-01정확한원래VFS원인OPEN;격리복구PASS를전체해결로해석하지않는다. 기존8진단전체baseline보존,현재8ring은원래6+이번합성2이며64경험정리는기존정책이다.
+
+원본/미디어/DB는로컬evidence/reboot-05-2026-10-13에보존. 현재화면접근결과로판정하고과거BLOCKED를복사하지않는다. 필요결함만SOL_DIRECT로수정·영향검사·같은Release재검증. 실제건강/외부AI OFF,subagent기본생성없음/SELF_REVIEW. 사용자평가전8·16유형/성장형/진화형/상점확장없음. featurecheckpoint/일반push만승인,main/merge/force/tag/release/배포/실건강/결제/보안변경금지.
+
+---
+
+## Historical — v11 재개
+
 # 재개 지점 — 생활 맥락·말풍선 v11
 
 [현재 보고](REBOOT-04-REPORT.md), [전체 지시](tasks/REBOOT-04-life-context-dialogue-and-bubbles.md). 앱 소스317ca1e / reboot-04-context-v11 Release, JS1d5e1871… / native10c905b1… / 입력230. 실제 HEAD·dirty·설치 해시를 직접 대조한다. 같으면 재빌드/재설치/DB 초기화부터 하지 않는다. 기존65개 저장·두발·3성격·경제·원본50·진단8을 보존했다.

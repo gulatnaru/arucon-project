@@ -61,3 +61,20 @@ performance-summary.json은 완료된60초 capture.summary만 사용한다. 최�
 ## 2026-10-13 context-v11 기능창 — OPEN 유지
 
 소스317ca1e/JS1d5e1871…/DPR2.5 AA0 +35/실제software Simulator. 녹화ON·60초: P RAFp95 35.833msFAIL/max84.951,GLqueuep95 31.776,morph1.047,draw1.346,decision.047ms;2입력은표본부족. W RAFp95 29.576/max55.654,GLqueue26.135,morph1.005,draw1.243,decision.043ms;6입력→제출p95 47.593ms. 두창500ms초과gap0. 쿠션좌표·메뉴/입력순서·호스트부하가통제된ON/OFF벤치아니며D새60초NOT_RUN. 과거측정과합치지않았고글꼴실험제거후소스/설치해시동일확인. 해상도/표정/기준을낮추지않았다. 실제GPU/표시FPS/물리입력·실기기미검증. 원본 `evidence/reboot-04-life-context-v11/{playful,warm}-final.json` capture.summary.
+
+
+## 2026-10-13 REBOOT-05 v13 fresh OFF — OPEN 유지
+
+소스8a95a38/JS a07a069d…/DPR2.5 AA0 975×2110 +35 기존시점/tail/정상모션. 도도B-A-A-B 순서·후속P/W,로드후30초이상/완료60초OFF·동일좌표입력2~6번/host동시기록. 첫B3입력표본부족,그뒤5~6. 실제생활·누적기억/쿠션위치는보존하여완전고정상태·단일원인개선율로해석하지않는다.
+
+| 구간 | 방/성격 | 제출 proxy Hz | RAF p95/max ms | 입력→제출 p95 ms(표본) | GL 대기 p95 ms |
+|---|---|---:|---:|---:|---:|
+| perf-1-B | sunlit/poised | 39.78 | 33.19/77.77 | 35.16 (3) · 표본부족 | 30.15 |
+| perf-2-A | original/poised | 44.54 | 29.34/67.67 | 32.10 (5) | 25.79 |
+| perf-3-A | original/poised | 43.63 | 29.56/94.66 | 31.83 (6) | 26.46 |
+| perf-4-B | sunlit/poised | 38.77 | 33.26/51.99 | 44.77 (5) | 30.08 |
+| perf-5-playful-B | sunlit/playful | 42.74 | 29.33/72.34 | 58.99 (5) | 25.58 |
+| perf-6-warm-B | sunlit/warm | 40.34 | 32.83/66.12 | 39.45 (5) | 29.62 |
+
+
+판단/pose/morph/draw p95보다GLqueue drain25.58~30.15ms가우세,실제GPU시간아님.6RAF기준통과/gap>500=0,첫B입력insufficient_data.여유작음·과거실패/전체장기·실기기미검증으로OPEN유지.해상도/표정/행동/기준완화없음.실제GPU/표시FPS/물리지연/기기발열·배터리NOT_RUN.원본6개capture와host·실패/표본부족은evidence/reboot-05-2026-10-13/performance-summary.json.과거값과합산하지않았다.

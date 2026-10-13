@@ -2,13 +2,13 @@
   "schemaVersion": 6,
   "runDate": "2026-10-13",
   "timezone": "Asia/Seoul",
-  "status": "REWORK_REQUIRED",
+  "status": "REBOOT_05_CHARM_REVIEW_READY",
   "overallGate": "MVP_NOT_COMPLETE_PERFORMANCE_OPEN",
-  "definition": "Synthetic life context / personality expressions / content-sized pet speech native review; overall performance and user expression approval pending",
-  "reason": "Synthetic life context and content-sized X-less bubbles native reviewed; emoji/actual reading/device gates incomplete; PERF-01 and original VFS cause OPEN; expression/fun/art pending",
-  "sourceBaseline": "57368d7",
-  "sourceCheckpoint": "317ca1eca6bb74632a04f631ede9c0c7793fb46b",
-  "currentLivingReport": "REBOOT-04-REPORT.md",
+  "definition": "Scoped iOS Simulator living charm review; original engine/save/assets preserved; product adoption pending",
+  "reason": "Latest v13 actual600.553s normal autonomy/three profiles/contact/cancel/rest/cold/room AB reviewed; six60s proxies documented; physical/GPU/long-term and original VFS gates remain open",
+  "sourceBaseline": "8be75a7c92d3241f47bf63b96f84432b9e78204c",
+  "sourceCheckpoint": "8a95a38145319e1a02a08438803ba3b74e8e837d",
+  "currentLivingReport": "REBOOT-05-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
     "baselineCommit": "31a307fbaffda9bc5dba3bdf912d25c9084e26df",
@@ -3951,5 +3951,86 @@
       "deliveredFileName": "2026-10-12_arucon_REBOOT04_emotion_v10_ef32ac3_review.mp4",
       "uploadStatusEvidence": "NSURLUbiquitousItemIsUploaded=true; IsUploading=false; IsShared=false; UploadingError=null"
     }
+  },
+  "reboot05": {
+    "status": "REBOOT_05_CHARM_REVIEW_READY",
+    "scope": "isolated existing three personality review pets; common two-paw baby and original game engine; roomA retained/B review only",
+    "sourceCommit": "8a95a38145319e1a02a08438803ba3b74e8e837d",
+    "build": "reboot-05-charm-v13",
+    "bundleSha256": "a07a069dfdf437a9a5eb05e3e05eae184872d1f512fae5a86d48939c9333412d",
+    "sourceInputs": 237,
+    "autonomy": {
+      "elapsedMs": 600553,
+      "completedScenes": 29,
+      "focuses": 6,
+      "speeches": 7,
+      "inputInterruptions": 0,
+      "proof": "normal selection / original600s native video / bounded goal trace, not forced scene or domain time acceleration",
+      "nativeVideoDurationSeconds": 599.5633333333334,
+      "recordRequestedAfterObservationStartMs": 17350.295166015625,
+      "evidenceCoverage": "initial actual screen/goal trace +599.563s native movie; entire600.553s observation window not claimed as one continuous movie"
+    },
+    "normalInput": "three profiles dialogueON, directhead/body, handhold/release, cancel/menu, sleep/wake, background/cold; existing memory retained with unchanged64 ring",
+    "freshValidation": {
+      "tests": "490/490 fail0 skip0",
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iosRelease": "XCODEBUILD_EXIT0_AND_ACTUAL_SIMULATOR",
+      "android": "JS_BUNDLE_PASS_NATIVE_NOT_RUN_THIS_SCOPE",
+      "CNG": "27/27_STATIC",
+      "workflow": "42/42_DIRECT_SELFTEST1/1",
+      "nativeContention": "150_JOBS_RETRY_NO_DUPLICATE",
+      "nativeResourceRecovery": "PASS_ISOLATED_NOT_ORIGINAL_VFS_CAUSE"
+    },
+    "preservation": {
+      "originalPets": 65,
+      "economicLedgers": "five perDB unchanged",
+      "originalAssetsSha256": 50,
+      "databases": "three integrityOK",
+      "diagnosticOriginalRecords": 8,
+      "diagnosticActiveOriginalRecords": 6,
+      "diagnosticActiveSyntheticNewRecords": 2,
+      "originalDiagnosticFullBaselinePreserved": true,
+      "boundedExperienceRetention": "unchanged64; retired IDs audited"
+    },
+    "performance": {
+      "evidence": "evidence/reboot-05-2026-10-13/performance-summary.json",
+      "completeWindows": 6,
+      "durationMsEach": 60000,
+      "recording": "OFF",
+      "allRafP95Ms": [
+        33.19237494468689,
+        29.339915990829468,
+        29.5622501373291,
+        33.259292125701904,
+        29.33150005340576,
+        32.83295798301697
+      ],
+      "firstInputStatus": "INSUFFICIENT_DATA_3",
+      "remainingInputStatus": "PASS_5_TO_6",
+      "gapOver500": 0,
+      "perf01": "OPEN",
+      "actualGPUVisibleFPSPhysicalLatency": "NOT_RUN"
+    },
+    "delivery": {
+      "status": "DELIVERY_SENT",
+      "route": "personal iCloud Drive Arucon/Reviews",
+      "files": [
+        "2026-10-13_arucon_REBOOT05_charm_v13_8a95a38_review_r2.mp4",
+        "2026-10-13_arucon_REBOOT05_charm_v13_8a95a38_room_compare.mp4",
+        "2026-10-13_arucon_REBOOT05_charm_v13_8a95a38_scenes_r2.txt"
+      ],
+      "sourceCopyShaMatched": true,
+      "unsharedUploadedNoError": true,
+      "mobilePlayback": "NOT_VERIFIED"
+    },
+    "reviewMode": "SELF_REVIEW",
+    "requestedModel": "GPT-6.1 Sol Max",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "subagents": 0,
+    "healthExternalAI": "OFF",
+    "funArtPersonalityRoomSizeCamera": "USER_REVIEW_PENDING",
+    "originalCantopenVfs": "OPEN",
+    "futureTypesGrowthFormsShop": "OUT_OF_SCOPE"
   }
 }

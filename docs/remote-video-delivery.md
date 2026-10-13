@@ -77,3 +77,10 @@
 
 
 생활 맥락 v11 전달: `2026-10-13_arucon_REBOOT04_context_v11_317ca1e_review.mp4` 및 `_scenes.txt`. 152초/27,637,408bytes(26.36MiB)/1170×2532/H.2648bit420/fast-start/무음·정상속도발췌·합성데이터만. MP4 SHA256 `f9d6165837f755e52f9990aaf53d8b8d0d0f26f616852ff3e6be2faf7c1d9174`. 같은승인폴더에비덮어쓰기복사,원본/복사본해시일치,공식URL리소스IsSharedfalse/IsUploadedtrue/IsUploadingfalse/errornull. DELIVERY_SENT / MOBILE_NOT_VERIFIED. 원본/과거영상유지,MP4+짧은안내문외복사없음.
+
+
+REBOOT-05 v13 전달 — 2026-10-13: `2026-10-13_arucon_REBOOT05_charm_v13_8a95a38_review_r2.mp4`(173초/27.92MiB), `2026-10-13_arucon_REBOOT05_charm_v13_8a95a38_room_compare.mp4`(60초/8.08MiB),짧은scenes.txt만기존승인개인iCloudArucon/Reviews에비덮어쓰기복사했다. 같은승인계정확인/원본·복사본SHA일치/공식URL리소스IsSharedfalse·IsUploadedtrue·IsUploadingfalse·errornull. DELIVERY_SENT / MOBILE_NOT_VERIFIED. 원본1170×2532/H.264/fast-start/전체decode/정상속도발췌/합성데이터만. mainSHA `67ef3f56a4cc944dd42dfcc9df1b37aaf8496af517974aa6d1c2155ad7deeb73`, roomSHA `9f9929363199eec13bde37ea86bd63330da58f3ba089da05b9b931cca85e23d6`.원본/DB/로그/소스/evidence전체는복사·삭제·이동하지않았다.
+
+현재REBOOT-05 최신안내문은scenes_r2.txt다. 관찰600.553초/원본녹화599.563초·녹화요청17.35초후를구분한다. 전체동일관찰창이단일영상에모두포함됐다고기재하지않는다. 이전안내문·원본은덮어쓰거나삭제하지않는다.
+
+정정scenes_r2.txt는첫업로드조회에서일시적NSCocoa4355/업로드중이었다가재조회에서IsUploadedtrue/IsSharedfalse/IsUploadingfalse/errornull을확인했다. 계정·보안설정변경없음. 두MP4와최신정정안내문전달은DELIVERY_SENT/MOBILE_NOT_VERIFIED다.

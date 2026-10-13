@@ -1,3 +1,23 @@
+# 최신 후속 — REBOOT-05 v13
+
+| 범위 | 실제 상태 |
+|---|---|
+| 의도 기반 자율생활 | PASS_SCOPED_SIMULATOR / 같은 v13 무입력600.553초,29완료/6관심/7발화;강제대본·시간압축없음 |
+| 눈/귀/몸/말·3성격 | SELF_REVIEW_REVIEW_PREPARED / 대사ON 정상3개체·머리/몸·손·취소·복귀;동일기억새반사실시험아님 |
+| 방·크기/시점 | B게임용Blender/.blend/GLB/원본A 보존·nativeA/B/+25/+35/가까운PNG비교;최종채택대기 |
+| 시간/저장/경제/성장 | fresh자동490·native격리150/복구·수면/wake/cold·65/5원장/원본50/3DBok;성장규칙변경없음 |
+| 진단 보존 | 원래8개baseline전부보존;기존8ring현재원래6+이번합성2(2개기기활성ring퇴역명시) |
+| PERF-01 | OPEN / fresh6개60초OFF RAFp95 29.33~33.26,첫B입력부족;GPU/실기기·장기전체미확인 |
+| STORAGE-01 | OPEN / 원래CANTOPEN VFS인과원인미확정 |
+| 전달 | DELIVERY_SENT / 개인iCloud 두MP4+안내문/해시·비공유·업로드;MOBILE_NOT_VERIFIED |
+| 플랫폼/제품 선택 | Simulator검토준비REBOOT_05_CHARM_REVIEW_READY;Androidnative새실행·실기기/GPU/물리입력NOT_RUN;재미/아트/성격/방/크기/시점USER_REVIEW_PENDING |
+
+[현재 상세](REBOOT-05-REPORT.md). 기존v11/과거검증은이력으로보존하며전체MVP완료로올리지않는다.
+
+---
+
+## Historical — v11 gap
+
 # 최신 후속 — 생활 맥락·말풍선 v11
 
 | 범위 | 이번 상태 / 근거 |
