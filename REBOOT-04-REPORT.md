@@ -1,3 +1,79 @@
+# REBOOT-04 축하·읽기성 후속 — 2026-10-14 / v15
+
+**CELEBRATION_EXPRESSION_REVIEW_READY — 범위 한정**. 같은 합성 목표에서 장난은 한 번 통통 뛰고 사용자를 확인하고, 다정은 가까운 눈맞춤과 낮은 앞발 동작으로 잠깐 함께 머물며, 도도는 짧은 앞발 인사 뒤 자기 생활로 돌아간다. 실제 이전 쿠션 생활을 중단한 도도는 축하 후 같은 쿠션 장면으로 돌아가 완료했다. 모두 손 내밀기 없이 정상 합성 관찰 입력으로 시작한다. SELF_REVIEW이며 재미·최종 성격 표현·아트·크기는 USER_REVIEW_PENDING이다.
+
+## 볼 파일과 장면
+
+승인된 개인 iCloud Drive → Arucon → Reviews:
+`2026-10-14_arucon_REBOOT04_celebration_v15_556725e_review_final.mp4`
+같은 이름의 `_scenes.txt`에 컷과 원본 시각을 기재했다. 2:30 / 30.29MiB / 1170×2532 / H.264 8-bit420 / 무음 / fast-start. 10,357프레임 전체 디코딩 PASS. 정상 속도·원본 해상도 passthrough 발췌본이며 무편집 연속 증거라고 부르지 않는다. 합성 데이터만 포함한다.
+
+- 00:00–00:06 현재 크기, 00:06–00:14 현재×1.12 후보. 같은 카메라·위치의 중립 준비 자세다.
+- 00:14–00:48 장난 / 00:48–01:19 다정 / 01:19–01:51 도도: 같은 목표 축하와 이어지는 무입력 생활.
+- 01:51–02:11 깨우기 뒤 이동·직접 몸 접촉·복원.
+- 02:11–02:30 다음 합성 사건의 말풍선을 표시 직후 탭해 닫기. 매우 짧게 나타나며 몸짓과 복원이 계속된다.
+
+**VIDEO_READY / DELIVERY_SENT**. 원본·복사본31,758,999 bytes와SHA256 `e2cf3136bdd02b0c6129a4143450cc0c32876320b1d4fe47a3bdfa3eb5766e7a` 일치. 공식 iCloud URL 메타데이터에서 두 파일 모두 업로드 완료·비공유·오류 없음 확인. 초기4355 오류/업로드 중 상태는 보존하고 정상 재조회에서 해소됐다. 새 영상의 iPhone 재생은 **MOBILE_NOT_VERIFIED**다. 원본·실패 시도·진단·DB는 로컬 `evidence/reboot-04-celebration-2026-10-13/`에 보존하고 Git/iCloud 전달에서 제외했다. 폴더 날짜는 착수일이며 파일명은 실제 KST 촬영 날짜다.
+
+## 기준·구현·원인
+
+ZIP의 MD 한 개 전체를 읽고 [지시서](tasks/REBOOT-04-celebration-readability-followup.md)에 원문 그대로 저장했다(SHA256 f76f0d696f5acd2649cafe30fa7fb85431f85f03aec7b2679c54a2adbd2d3a6f). 보고 기준317ca1e/v11보다 새로운 HEAD376d18c·앱8a95a38/v13을 확인하고 REBOOT-05 자율생활·햇살 방 후보·과거 검증을 보존했다. 초기 작업 트리는 clean, 동시 소스 작성 증거 없음. reset/DB 초기화 없음.
+
+앱 소스 **556725e4e8971d80cf94b7b62e179e0cb93e635f**, 설치 **reboot-04-celebration-v15 Release arm64 Simulator**. 빌드 시 고정한239개 파일이 커밋과 SHA256 전부 일치한다. JS `eddcd664f44023af82683532b86f0903b0b3888493b185959efcdf0fb736bc17`, native `5c289d16117d5f9454b4f624a9d62afd95587c4989878c8ee83fca4ef6ffeebe`. v14는 미설치 중간 빌드이며 최종 증거로 쓰지 않는다.
+
+- 기존 LifeContext→claim→director 경로에서 목표 축하만 조정했다. `celebration.ts`의 가역 시간/진폭으로 눈·귀·시선·몸·앞발을 묶고, 장난의 도약은 기존 두 발 접지/착지 rig를 사용한다. 다정에게 실제 손 없는 기대기 연출을 쓰지 않는다. 공통 기본 얼굴을 복구하고 지속 윙크를 만들지 않는다.
+- 도도는 메뉴를 열기 직전 실제 자동 intent를 보존한다. 목표 완료 후 새 토큰·현재 revision으로 이어가며 쿠션 위치가 바뀌면 낡은 위치를 재사용하지 않는다. 새 합성 날 변경/취소가 그 문맥을 지우는 경우 임의의 이전 관심을 꾸미지 않는다.
+- 기존 성능 비교 도구에서 메뉴 진입→측정 interrupted 뒤 actor가 영구 정지하던 결함을 v13에서 재현했다. 측정은 계속 INVALID/interrupted로 두고 패널 닫힘 뒤 일반 행동을 허용하도록 수정했다. 이는 비교 도구의 결함이며 v11 일반 목표 반응 전체가 실패했다고 확대하지 않는다.
+- 동일조건 검토에는 기존 격리 fixture를 사용하고 `대사 ON · 같은 상황 비교`가 기존 합성 상황 메뉴를 열게 했다. claim을 우회하거나 자동으로 목표를 강제 발생시키지 않는다. 세 비교 petId는 각각 새 개체다(mv6uzg4o1/playful, mv6vcu0a2/warm, mv6vhdzx3/poised). 상태·성장·4개 초기 경험·seed·쿠션 위치는 동일하다. 정상 사건 재선택은 여전히 억제된다.
+
+## 읽기성 후보와 SELF_REVIEW
+
+390×844 논리 viewport / native1170×2532 / iPhone16e Simulator iOS26.3.1 / macOS15.6 / Xcode26.3. Apple Software Renderer, DPR2.5/AA0, 실제 GL975×2110, 기존 방·기존 카메라 verticalSpan13.6이다. 현재 검토 크기1.35에만 ×1.12를 곱했다. View 확대·crop·카메라 변경은 없다. 일반 저장과 기본값은 유지되며 후보를 cold 시작에 기본 활성화하지 않는다. 손 접촉 거리/투영도 같은 실제 모델 scale을 사용한다.
+
+실제 전체 화면에서 후보의 눈·입·뿔 경계가 조금 더 읽기 쉬웠고, 넓은 바닥·이동·메뉴 여백은 남았다. 귀/앞발의 섬세한 차이를 크게 과장하지 않으며 최종 채택은 사용자 판단이다. 정면 중립 PNG와 같은 원본 영상의 전환을 보존했다. 최초75초 크기 영상에는 후보 전환이 늦게 이루어져 후보 비교 증거로 쓰지 않았고, 최종60초 원본에서 두 크기를 확인했다.
+
+장난의 도약·상대 확인은 세 종류 중 가장 빨리 읽혔다. 다정은 웃는 눈맞춤과 짧은 함께 머묾, 도도는 더 높은 앞발 인사/몸 방향/빠른 생활 복귀로 구분했다. 대사를 읽지 않고 몸·얼굴에 집중한 SELF_REVIEW이지 독립 블라인드 사용자 평가가 아니다. 기존 모델·원본·Blender 자산은 수정하지 않았다. 새 Blender/Figma/외부 AI 사용이나 제작을 주장하지 않는다.
+
+## 실제 실행과 제한
+
+- 같은 v15에서 각 목표 complete1/표시1, 이후 자동 생활의 start/complete 확인. 원본3개와 `celebration-comparison.json`.
+- `poised-interest-v15.json`: 실제 cushion rest cancel→goal complete→새 resume token의 같은 cushion rest complete. 별도65초 원본이며 동일조건 첫 비교와 구분한다.
+- 같은 개체·같은 목표 재선택 ALREADY_ACKNOWLEDGED_EVENT. 기존 `reboot-04:playful`을 cold restart해 동일 petId/context history, EXP·코인·먹이 유지와 재선택 억제를 확인했다. 새 개체를 같은 개체 재실행 증거로 바꾸지 않았다.
+- 목표 시작 뒤 Home 전환에서704ms 후 cancel, 복귀 뒤 옛 목표 재생 없음. 첫 메뉴 취소 시도들은 이미 축하가 끝났거나 Modal 전환 중 입력이 닿지 않아 도중 취소 PASS로 세지 않았다. 원본/trace를 보존한다. 메뉴 닫기→생활, 일반 잠자기→깨우기→바닥 이동→body 접촉→복원은 실제 확인했다.
+- 정상 목표 말풍선의 실제 접근 요소를 표시 중 찾아 탭: 닫힘, 바닥 이동 링/목적지 전환 없음, 축하 몸짓은 계속. 앞선 느린 탭들은 자연 소멸 뒤 바닥을 누른 시도였으므로 성공 증거에서 제외했다. 최종 `normal-tap-confirm-v15.mp4`로 구분한다.
+- 한 줄/긴 한국어·좌측 가장자리·검토용1.6배 글자 표시에서 내용 크기와 얼굴 여백 확인. 긴 경우280×123pt, 축하 도도154×43pt. X 없음. 동작 줄이기에서도 목표 완료/말 표시/생활 복귀, 이후 줄이기 OFF·글자1배 복원. 레이아웃 QA 문장은 기능 검사이며 제품의 자발적 대사로 집계하지 않는다.
+- 기존 이모지 대체 글리프는 이번 긴 문장 QA에서도 재현되어 OPEN. OS 전체 큰 글자·VoiceOver 실제 읽기·물리 긴 누르기·작은 다른 기기·실기기/GPU/물리 지연은 NOT_RUN. 동면의 새 강제 시나리오는 하지 않았고 일반 저장의 기존 동면/안내를 보존했다. 실제 건강 OFF.
+- **fresh496/496, fail0/skip0**, lint/typecheck PASS, iOS xcodebuild Release exit0, Android JS export PASS, CNG27 STATIC PASS, workflow42 + 직접 self-test1 PASS. shell 기본 Python3.9에서 tomllib 미지원으로 실패한 self-test 호출은 보존하고 기존 bundled Python으로 다시 실행했다. 검사를 삭제/완화하지 않았다. Android native/실기기 빌드는 이번에 실행하지 않았다.
+
+## 성능 — 별도 OPEN
+
+같은 Release·도도 합성 초기 상태/seed·방/쿠션·카메라·DPR2.5/AA0, 30초 warmup/60초 무입력, 녹화 OFF로 현재→후보 순서의 새 창을 측정했다. 입력0이므로 입력→RAF/제출 지연은 INSUFFICIENT_DATA다. 과거 v11 수치를 현재 증거로 합치지 않았다.
+
+| proxy (ms, p95) | 현재 | ×1.12 후보 |
+|---|---:|---:|
+| RAF 간격 | 25.67 | 25.71 |
+| GL queue 대기 | 22.63 | 21.70 |
+| 판단 | 0.033 | 0.038 |
+| pose | 0.450 | 0.445 |
+| CPU morph | 0.803 | 0.768 |
+| draw | 1.056 | 1.066 |
+| 제출 빈도 Hz | 51.35 | 49.52 |
+| 최대 RAF 간격 | 37.06 | 55.52 |
+
+둘 다 이번 창의33.34ms p95/30Hz proxy 기준 이내, >500ms gap0. 호스트 load1/5/15는3.33/3.86/4.69→4.02/3.84/4.52, memory/swap 누적 카운터는 원본에 보존했다. 같은 정상 선택기지만 시간에 따른 실제 motion/호스트 비용은 완전히 같다고 하지 않는다. 앞선 후보의 일반 생활60초(21.78ms/52.54Hz)는 별도 탐색 창이다. 단일 순서의 scoped regression 표본이며 역순 반복/장기·실제GPU 안정성을 보증하지 않는다. **PERF-01 OPEN** 유지, 해상도·표정·행동·기준을 줄이지 않았다.
+
+## 저장·권한·전달
+
+기존65개 모두 존재, SQLite integrity3개 모두ok. 새 비교용9개를 추가해 총74개(일반1/생활29/리부트44). 모든 기존 이름·형태·성격·EXP·재화·시설 유지, 5경제원장 동일(일반 meal3, 생활 meal1155 등). 일반 저장과 두 검토 개체의 revision/정상 시간 정산 값은 전경 처리로 변했으며 모든 byte가 같다고 하지 않는다. 표현 기억은 기존 bounded history 정책대로 갱신된다.
+
+기존 오류8개 목록은 primary/backup 모두 동일. primary는 byte동일, backup은 cold 세션·trace·archive/generation 메타데이터가 바뀌었다. 두 원본 전체를 착수 시 보존했다. 새 fault injection/원본DB 삭제 없음. **STORAGE-01 정확한 최초 VFS 원인 OPEN**을 유지한다.
+
+SOL_DIRECT / SELF_REVIEW / 새 subagent0, 요청 모델 GPT-6.1 Sol Max, effective model은 ROUTING_UNVERIFIED. 실제 도구는 CUA·simctl·xcodebuild·기존 Node/Python 검사·AVFoundation 미디어 처리다. 개인 비공개 경로에는 MP4+안내문만 복사하며 기존 파일/원본은 덮어쓰거나 지우지 않는다. main/merge/force/tag/배포/실건강/실결제/OS 보안 변경 없음.
+
+---
+
+## Historical — REBOOT-05와 v11 이력
+
 # 현재 후속 — REBOOT-05
 
 현재 결과는 [REBOOT-05-REPORT.md](REBOOT-05-REPORT.md)의v13이다. 아래REBOOT-04기술증거·실패·사용자평가·v11이력은보존한다.

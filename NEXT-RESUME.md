@@ -1,3 +1,21 @@
+# 재개 지점 — REBOOT-04 축하·읽기성 v15
+
+[현재 보고](REBOOT-04-REPORT.md) / [전체 지시](tasks/REBOOT-04-celebration-readability-followup.md). 앱 소스 **556725e**, 설치 **reboot-04-celebration-v15 Release**, 입력239개와 설치 JS `eddcd664…` / native `5c289d16…` 일치. 현재 HEAD/dirty/원격/설치 해시를 확인하고 더 새로운 변경을 보존한다. 같으면 재빌드·재설치·DB 초기화부터 하지 않는다. v11 보고317ca1e보다 최신인 REBOOT-05 소스8a95a38/인계376d18c에서 이어왔으며 그 작업을 보존했다.
+
+**CELEBRATION_EXPRESSION_REVIEW_READY — 범위 한정**. 다음 한 작업은 iPhone의 파일 앱 → iCloud Drive → Arucon → Reviews에서 `2026-10-14_arucon_REBOOT04_celebration_v15_556725e_review_final.mp4`와 같은 이름의 `_scenes.txt`를 열어 세 축하와 크기 후보를 제품 평가하는 것이다. 2:30 / 30.29MiB / 원본1170×2532 / 정상 속도 / 합성만. 해시·전체decode·비공유·두 파일 업로드 완료 확인, **DELIVERY_SENT / MOBILE_NOT_VERIFIED**. 휴대폰 재생 확인은 복사하지 않는다.
+
+00:00 현재 /00:06 ×1.12 후보 /00:14 장난 /00:48 다정 /01:19 도도 /01:51 이동·몸 접촉 /02:11 정상 목표 말풍선 탭·복귀. 일반 방 설정→REBOOT-04성격검토판→우리아이→합성 동일조건 성격 비교. 기존 검토 개체의 기록은 그대로다. 방·시점 비교의 `현재보다 약12% 크게 보기 · 후보`와 `대사 ON · 같은 상황 비교`를 사용한다. 같은 사건 재선택은 억제되므로 촬영용 claim 초기화 금지. 별도 새 합성 개체/날을 사용했다면 명시한다. 일반 저장 기본 크기는 바꾸지 않았다.
+
+실행: fresh496/496·lint/types·iOSRelease exit0·AndroidJS·CNG27STATIC·workflow42+직접1. 실제3성격 사건/복귀, 도도 실제쿠션→축하→같은쿠션 복귀, 중복/cold 동일개체·수면/깨우기·접촉·전경취소를 확인했다. 비교도구 측정 interrupted 뒤 일반 행동이 잠기던 결함은 수정했고 실패한 측정 창을 PASS로 바꾸지 않았다. 초기 늦은 취소·자연 소멸 뒤의 탭은 원본에 남기고 성공 증거에서 제외했다.
+
+기존65개 모두 보존 +별도 비교9개=74개. 이름/형태/성격/EXP/재화/5경제원장 유지, 정상 시간·revision과 bounded 표현 기억은 변했다. 원래8오류 목록 primary/backup 모두 동일; backup의 세션/trace metadata 갱신은 byte동일로 주장하지 않는다. 원본·DB·실패 영상은 `evidence/reboot-04-celebration-2026-10-13/`에 있다.
+
+PERF-01 OPEN: 같은 조건30초준비/60초OFF의 현재→후보 RAFp95 25.67/25.71ms, 제출51.35/49.52Hz. 단일 scoped 비교이고 입력표본0/물리·GPU·실기기 NOT_RUN. STORAGE-01 최초CANTOPEN VFS원인 OPEN, 이모지 대체글리프 OPEN. VoiceOver/실제긴누르기/OS큰글자/다른작은기기 미검증 유지. 재미·최종아트·성격표현·크기는 USER_REVIEW_PENDING. 새 계열/상점/AI/실건강으로 확대하지 않는다. SOL_DIRECT/SELF_REVIEW, subagent0, effective model ROUTING_UNVERIFIED. feature 일반 checkpoint/push만 승인; main/merge/force/tag/배포/실건강/결제/보안변경 금지.
+
+---
+
+## Historical — REBOOT-05 검토 인계
+
 # 재개 지점 — REBOOT-05 검토 준비 v13
 
 [현재 보고](REBOOT-05-REPORT.md) / [범위](tasks/REBOOT-05-living-pet-charm.md). 앱소스8a95a38·설치reboot-05-charm-v13·입력237/설치JS a07a069d… 일치. 현재HEAD/dirty/설치해시를확인하고이전SHA로reset하지않는다. 같으면재빌드/재설치/DB초기화부터하지않는다.
