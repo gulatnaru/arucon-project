@@ -1,5 +1,7 @@
 # 아루콘 모바일 로컬 MVP
 
+**현재 상태·새 개발자 실행 안내: [PROJECT-HANDOFF](../docs/PROJECT-HANDOFF.md).** 최신 앱 소스는7256e98/설치v17이며 실제 iOS Simulator 화면·입력 검증은 [REBOOT-04 보고 상단](../REBOOT-04-REPORT.md)에 있다. 아래 날짜가 있는 APP-01/2026-09-20 환경 설명은 당시 이력으로 보존하며 현재 차단 상태로 해석하지 않는다. 실제 기기/GPU와 PERF-01/STORAGE-01은 별도 미완료다.
+
 이 디렉터리는 루트 Git 저장소의 일반 하위 디렉터리입니다. 별도 Git 저장소를 만들지 않습니다. 현재 진입점은 승인된 여섯 MVP 정책을 로컬 `ApprovedMvpService`와 합성 데이터로 실행하는 앱입니다. 실제 건강정보, 법적 미성년 동의, 외부 계정, 결제, 공개 출시는 꺼져 있습니다. 승인 범위와 선택 근거는 [DECISION-SUMMARY](../DECISION-SUMMARY.md), [ADR-005](../docs/adr/ADR-005-approved-game-policy.md), [ADR-006](../docs/adr/ADR-006-single-writer-recovery.md), [ADR-007](../docs/adr/ADR-007-native-build-readiness.md)를 참고합니다.
 
 APP-01은 방/캐릭터 렌더링 기술 검증의 역사적 기록이며 현재 MVP 전체를 설명하지 않습니다. 장면 계약은 아래에 보존되어 있습니다.

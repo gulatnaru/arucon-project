@@ -1,5 +1,7 @@
 # 재개 지점 — v15 사용자 표현 평가 반영 / v17
 
+새 개발자는 [PROJECT-HANDOFF](docs/PROJECT-HANDOFF.md)에서 현재 구현/검토판/미완료, 실행법과 자산 지도를 먼저 확인한다. 2026-10-14 인수 감사는 0e40524/실제 origin clean 및 설치 v17 해시를 재확인한 문서 작업이다. 앱 소스·저장·기존 검증 판정은 변경하지 않았다.
+
 [현재 보고](REBOOT-04-REPORT.md), [추가 사용자 범위](tasks/REBOOT-04-celebration-readability-followup.md)의 2026-10-14 절. 앱 소스 **7256e98**, 설치 **reboot-04-expression-v17 Release**, 입력241/JS ff2c53ef…/native64de2495… 일치. 실제 HEAD·dirty·설치 해시를 확인하고 더 최신 변경을 보존한다. 같으면 재빌드·재설치·DB 초기화부터 하지 않는다.
 
 **CELEBRATION_EXPRESSION_REVIEW_READY — v17 범위 한정**. v15 기술 이력을 유지하되 사용자 ‘감정 차이 약함’ 평가로 표현을 재검토했다. 장난의 도약/옆 확인, 다정의 양발 인사/머묾, 도도의 옆 관심/앞발 인사를 연결했다. v16에서 발이 몸에 가려진 점을 고쳐 v17로 재검증했다. 같은 정상 합성 입력 OFF3+ON3, 동일 baseline 대조, 별도 기존/새 구도·Blender 방 B 실제 렌더와 입력을 확인했다. 기존 대사/행동 수·맥락 판단·말풍선 구조·저장/성장/경제는 유지했다.

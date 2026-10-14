@@ -2,14 +2,16 @@
 
 This index records reversible technical choices and the six MVP defaults approved by the user after checkpoint 34ab069. The scope of approval is in SRS v1.9 §0-4/§9-4; external health, legal, account, payment and release gates remain explicit.
 
+For the current implementation, setup and unresolved issues, start with [PROJECT-HANDOFF](../PROJECT-HANDOFF.md). Each ADR's validation section describes its own revision; later runtime evidence is in the current report, not retroactively asserted here.
+
 The 2026-09-19 user delegation accepts reversible technical choices under AUTO_DECIDE. The ADRs below record those choices; their native execution limits and product activation gates remain explicit.
 
 - [ADR-001 durable sync retry](ADR-001-sync-retry.md) — backoff/jitter, ordered dispatch, additive schema6, no action drop.
 - [ADR-003 synthetic notification delivery](ADR-003-notification-delivery.md) — injected policy, idempotent port, cancellation/revocation, actual delivery disabled.
 - [ADR-004 technical authority](ADR-004-technical-authority.md) — architecture/storage/test choices separated from product approvals.
 
-- [APP-01 renderer](../../mobile/docs/APP-01-shell.md) — Expo + Three renderer experimental implementation; native runtime remains unverified.
-- [APP-02 domain and storage](../../mobile/docs/APP-02-domain-storage.md) — SQLite local development contract; Node integration is validated, native SQLite runtime remains unverified.
+- [APP-01 renderer](../../mobile/docs/APP-01-shell.md) — historical Expo + Three implementation; native runtime was unverified at that stage. See the current [v17 report](../../REBOOT-04-REPORT.md) for later Simulator evidence.
+- [APP-02 domain and storage](../../mobile/docs/APP-02-domain-storage.md) — historical SQLite contract and Node validation. Later native contention evidence is in [LIFE-02](../../GROWTH-PLAYTHROUGH-REPORT.md); the original CANTOPEN VFS cause remains OPEN.
 - [Root repository layout](ADR-root-mobile-layout.md) — mobile is an ordinary root repository directory; no nested Git repository.
 - [ADR-002 native integration](ADR-002-native-integration.md) — local Expo Module and CNG plugin selection; superseded for widget target generation by ADR-007.
 - [ADR-007 native build readiness](ADR-007-native-build-readiness.md) — generated development widget targets and local build-environment evidence, with health access OFF.
@@ -18,7 +20,11 @@ The 2026-09-19 user delegation accepts reversible technical choices under AUTO_D
 - [ADR-011 Android runtime evidence classification](ADR-011-android-runtime-evidence-classification.md) — observed synthetic AVD results and explicit pending boundaries.
 - [ADR-012 iOS Simulator GL submission](ADR-012-ios-simulator-gl-submission.md) — Apple Software Renderer cadence, frame-aligned hit projection, and layout/context ordering.
 - [ADR-013 reaction memory isolation and recovery](ADR-013-reaction-memory-isolation-recovery.md) — separate bounded presentation history, known-v1 quarantine recovery, future-version preservation.
-- [ADR-014 foreground rest-state recovery](ADR-014-foreground-rest-state-recovery.md) — active-time checkpoints, consistent manual sleep/hibernation UI, preserved-save return and recovery replay fencing; runtime verification pending.
+- [ADR-014 foreground rest-state recovery](ADR-014-foreground-rest-state-recovery.md) — active-time checkpoints, consistent sleep/hibernation UI, preserved-save return and replay fencing. Initially runtime-pending; subsequent Simulator closure and later regressions are recorded in the reports/status history.
+- [ADR-015 SQLite access and growth playthrough](ADR-015-sqlite-access-and-growth-playthrough.md) — per-file access lane, transaction cleanup ownership, isolated same-pet growth and bounded error archives. STORAGE-01's original VFS cause remains OPEN.
+- [ADR-016 Blender baby rig](ADR-016-blender-baby-review-rig.md) — separate editable B candidate and runtime contract.
+- [ADR-017 Hybrid C](ADR-017-hybrid-baby-c.md) — A-derived silhouette, rig and morph cost separation; originals retained.
+- [ADR-018 global render quality](ADR-018-global-render-quality.md) — DPR/AA/curve review settings; physical GPU performance and final adoption remain unverified/pending.
 
 DEC-12/17 are approved only for local technical choices; final supported OS, legal retention, real services and release claims remain gated. DEC-31 release/environment scope remains OPEN.
 
