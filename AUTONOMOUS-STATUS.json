@@ -4,10 +4,10 @@
   "timezone": "Asia/Seoul",
   "status": "CELEBRATION_EXPRESSION_REVIEW_READY",
   "overallGate": "MVP_NOT_COMPLETE_PERFORMANCE_OPEN",
-  "definition": "Scoped same synthetic goal celebration and one readability candidate; product adoption pending",
-  "reason": "v15 same-build actual three-profile comparison, input/cold claim regression and private video delivery verified; PERF-01/STORAGE-01 and physical boundaries remain OPEN",
-  "sourceBaseline": "376d18cf7354c6cde450d6166e9b62800564e9e8",
-  "sourceCheckpoint": "556725e4e8971d80cf94b7b62e179e0cb93e635f",
+  "definition": "v17 scoped expression and wide framing comparison; user final evaluation pending",
+  "reason": "v15 user expression rework addressed through distinct phases and native OFF/ON comparison; existing Blender room reused and input verified; all external/performance/storage boundaries retained",
+  "sourceBaseline": "81b646ca26f18fbba962b3670e35fbc7a2d35e18",
+  "sourceCheckpoint": "7256e98fe3a566990abaaeedd9e741e0167bbb28",
   "currentLivingReport": "REBOOT-04-REPORT.md",
   "growthPlaythrough": {
     "status": "READY_FOR_GROWTH_PLAYTHROUGH",
@@ -546,9 +546,9 @@
     ]
   },
   "lastValidation": {
-    "sourceCommit": "556725e4e8971d80cf94b7b62e179e0cb93e635f",
+    "sourceCommit": "7256e98fe3a566990abaaeedd9e741e0167bbb28",
     "mobileTests": {
-      "passed": 496,
+      "passed": 498,
       "failed": 0,
       "skipped": 0
     },
@@ -560,7 +560,7 @@
     "workflow": "42_PASS",
     "workflowDirectSelftest": "1_PASS_BUNDLED_PYTHON",
     "physicalDeviceGpuPhysicalLatency": "NOT_RUN",
-    "scope": "fresh v15 execution; original domain/store unchanged; no historical counts reused"
+    "scope": "fresh v17 Release; six native same-baseline goals, framing/room/input checks; no historical test counts reused"
   },
   "environment": {
     "host": "macOS 15.6",
@@ -963,10 +963,10 @@
   },
   "git": {
     "branch": "feature/arucon-mobile-autonomous",
-    "appSource": "556725e4e8971d80cf94b7b62e179e0cb93e635f",
+    "appSource": "7256e98fe3a566990abaaeedd9e741e0167bbb28",
     "remote": "origin",
     "allowed": "normal feature checkpoint/push only",
-    "finalReceipt": "evidence/reboot-04-celebration-2026-10-13/final-git.json",
+    "finalReceipt": "evidence/reboot-04-expression-v16-2026-10-14/final-git.json",
     "resumeRule": "read current HEAD/status/live origin; do not reset to app source commit"
   },
   "realHealthDataRead": false,
@@ -1035,7 +1035,7 @@
       }
     }
   },
-  "evidenceDirectory": "evidence/reboot-04-celebration-2026-10-13/",
+  "evidenceDirectory": "evidence/reboot-04-expression-v16-2026-10-14/",
   "decisionAudit": {
     "originalBundles": 10,
     "autoDecisionRecords": [
@@ -3773,15 +3773,15 @@
   },
   "videoDelivery": {
     "status": "DELIVERY_SENT",
-    "file": "2026-10-14_arucon_REBOOT04_celebration_v15_556725e_review_final.mp4",
-    "durationSeconds": 149.99833333333333,
-    "bytes": 31758999,
-    "sha256": "e2cf3136bdd02b0c6129a4143450cc0c32876320b1d4fe47a3bdfa3eb5766e7a",
+    "file": "2026-10-14_arucon_REBOOT04_expression_v17_7256e98_review.mp4",
+    "durationSeconds": 138.995,
+    "bytes": 30448487,
+    "sha256": "4f8a39c0443b799a4958b6e1e6bd4c6111c806477a185cb9cdbcd98418b47600",
     "destination": "approved personal iCloud Drive/Arucon/Reviews",
-    "shared": false,
     "uploaded": true,
+    "shared": false,
     "mobilePlayback": "NOT_VERIFIED",
-    "scope": "one synthetic MP4 plus scenes guide only"
+    "scope": "one synthetic MP4 and scene guide only"
   },
   "lifeContextFollowup": {
     "status": "PARTIAL_WITH_BLOCKERS",
@@ -4110,5 +4110,80 @@
     "subagents": 0,
     "requestedModel": "GPT-6.1 Sol Max",
     "effectiveModel": "ROUTING_UNVERIFIED"
+  },
+  "historicalBeforeV17At81b646c": {
+    "runDate": "2026-10-14",
+    "status": "CELEBRATION_EXPRESSION_REVIEW_READY",
+    "definition": "Scoped same synthetic goal celebration and one readability candidate; product adoption pending",
+    "reason": "v15 same-build actual three-profile comparison, input/cold claim regression and private video delivery verified; PERF-01/STORAGE-01 and physical boundaries remain OPEN",
+    "sourceBaseline": "376d18cf7354c6cde450d6166e9b62800564e9e8",
+    "sourceCheckpoint": "556725e4e8971d80cf94b7b62e179e0cb93e635f",
+    "lastValidation": {
+      "sourceCommit": "7256e98fe3a566990abaaeedd9e741e0167bbb28",
+      "mobileTests": {
+        "passed": 498,
+        "failed": 0,
+        "skipped": 0
+      },
+      "lint": "PASS",
+      "typecheck": "PASS",
+      "iOSRelease": "PASS_XCODEBUILD_EXIT0_ACTUAL_SIMULATOR",
+      "androidJsBundle": "PASS",
+      "nativeGeneration": "27_STATIC_PASS",
+      "workflow": "42_PASS",
+      "workflowDirectSelftest": "1_PASS_BUNDLED_PYTHON",
+      "physicalDeviceGpuPhysicalLatency": "NOT_RUN",
+      "scope": "fresh v17 Release; six native same-baseline goals, framing/room/input checks; no historical test counts reused"
+    },
+    "git": {
+      "branch": "feature/arucon-mobile-autonomous",
+      "appSource": "7256e98fe3a566990abaaeedd9e741e0167bbb28",
+      "remote": "origin",
+      "allowed": "normal feature checkpoint/push only",
+      "finalReceipt": "evidence/reboot-04-expression-v16-2026-10-14/final-git.json",
+      "resumeRule": "read current HEAD/status/live origin; do not reset to app source commit"
+    },
+    "evidenceDirectory": "evidence/reboot-04-celebration-2026-10-13/",
+    "videoDelivery": {
+      "status": "DELIVERY_SENT",
+      "file": "2026-10-14_arucon_REBOOT04_celebration_v15_556725e_review_final.mp4",
+      "durationSeconds": 149.99833333333333,
+      "bytes": 31758999,
+      "sha256": "e2cf3136bdd02b0c6129a4143450cc0c32876320b1d4fe47a3bdfa3eb5766e7a",
+      "destination": "approved personal iCloud Drive/Arucon/Reviews",
+      "shared": false,
+      "uploaded": true,
+      "mobilePlayback": "NOT_VERIFIED",
+      "scope": "one synthetic MP4 plus scenes guide only"
+    }
+  },
+  "expressionRefinement": {
+    "status": "SCOPED_REVIEW_READY",
+    "source": "7256e98fe3a566990abaaeedd9e741e0167bbb28",
+    "build": "reboot-04-expression-v17",
+    "v15UserAssessment": "REWORK_REQUIRED_EXPRESSION_WEAK",
+    "v16Correction": "raised poised paw occluded by belly; lower lift after forward reach in v17",
+    "sourceInputs": 241,
+    "bundleSha256": "ff2c53ef096244dd4bd382d3e791a1ad406801081b56fd9d9425909dd19350d9",
+    "nativeSha256": "64de2495113961a038f8821903052364340d3ab09c33e4fcd34ea51cf47f418d",
+    "nativeComparison": "OFF3_ON3_SAME_FACT_STATE_EXPERIENCE_SEED_GEOMETRY_CAMERA_RENDER",
+    "camera": "face_floor candidate y7.3, span13.6 unchanged; original default preserved",
+    "room": "existing authored Blender GLB B reused; actual Simulator rendered; default A retained",
+    "readability": {
+      "multiplier": 1.12,
+      "approvedAsDefault": false
+    },
+    "existingGameSnapshotsPreserved": 74,
+    "newSyntheticPets": 14,
+    "economicLedgers": "five perDB equal",
+    "memory": "one prior comparison pet12->30 actual observations, older records retired0",
+    "diagnostics": "original8 lists equal; primary session metadata updated; backup bytes equal",
+    "nativeInput": "move/retarget/body touch, sleep/wake, reduced on/off, duplicate suppression, Home cancel735ms/foreground",
+    "performance": "A/B60sOFF RAFp95 26.37/22.98; no causality claim, input0; PERF-01 OPEN",
+    "storage": "STORAGE-01 original VFS cause OPEN",
+    "userApproval": "USER_REVIEW_PENDING",
+    "effectiveModel": "ROUTING_UNVERIFIED",
+    "reviewMode": "SELF_REVIEW",
+    "subagents": 0
   }
 }

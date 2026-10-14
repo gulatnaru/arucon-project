@@ -1,3 +1,21 @@
+# 재개 지점 — v15 사용자 표현 평가 반영 / v17
+
+[현재 보고](REBOOT-04-REPORT.md), [추가 사용자 범위](tasks/REBOOT-04-celebration-readability-followup.md)의 2026-10-14 절. 앱 소스 **7256e98**, 설치 **reboot-04-expression-v17 Release**, 입력241/JS ff2c53ef…/native64de2495… 일치. 실제 HEAD·dirty·설치 해시를 확인하고 더 최신 변경을 보존한다. 같으면 재빌드·재설치·DB 초기화부터 하지 않는다.
+
+**CELEBRATION_EXPRESSION_REVIEW_READY — v17 범위 한정**. v15 기술 이력을 유지하되 사용자 ‘감정 차이 약함’ 평가로 표현을 재검토했다. 장난의 도약/옆 확인, 다정의 양발 인사/머묾, 도도의 옆 관심/앞발 인사를 연결했다. v16에서 발이 몸에 가려진 점을 고쳐 v17로 재검증했다. 같은 정상 합성 입력 OFF3+ON3, 동일 baseline 대조, 별도 기존/새 구도·Blender 방 B 실제 렌더와 입력을 확인했다. 기존 대사/행동 수·맥락 판단·말풍선 구조·저장/성장/경제는 유지했다.
+
+다음 한 작업: iPhone 파일 앱 → iCloud Drive → Arucon → Reviews의 `2026-10-14_arucon_REBOOT04_expression_v17_7256e98_review.mp4` 및 `_scenes.txt`로 사용자 제품 평가. **2:19 / 29.04MiB / native1170×2532 / 정상 속도**. 00:00/00:16/00:32 도도·장난·다정 OFF, 00:48/01:04/01:20 장난·다정·도도 ON, 01:36 기존 구도→새 구도→Blender 방, 01:54 실제 이동·접촉. 전체decode/fast-start/해시/비공유/업로드 완료. DELIVERY_SENT / MOBILE_NOT_VERIFIED. 최종 감정·성격·재미·아트·+12%·방·구도 USER_REVIEW_PENDING.
+
+검토 진입: 일반 방 설정→REBOOT-04 성격 검토판→우리 아이→합성 동일조건 비교. 말풍선 OFF/ON 준비는 기존 상황 메뉴를 연다. 같은 사건 claim을 지우지 말고 새 합성 개체/사건 사용 여부를 기록한다. 방·시점 비교에서 +12% 및 `구도 후보·얼굴과 넓은 바닥`, 방 B를 선택한다. 모델·수평 활동 폭 고정, 낮춘 카메라 후보. cold 후 기본 A/기존 시점/+12% OFF 확인. 마지막 앱은 기본 방/구도에서 대사 ON 자율생활로 두었다. 새 방 기본 채택은 하지 않았다.
+
+fresh498/498·linter/types·iOSRelease exit0·AndroidJS·CNG27STATIC·workflow42+직접1. 방 B 정상 이동·목적지 변경·body 접촉·수면/깨우기·동작 줄이기/원복, 같은 사건 억제, 시작735ms 후 Home취소/복귀 확인. cold는 비교 화면의 새 petId이므로 같은 개체 cold claim 검사로 과장하지 않는다. 기존74게임상태/5경제원장 모두 보존, 기존 기억1개체12→30 정상 경험 추가·사건제거0, 새 비교14→총88. 오류8목록 보존·원본DB백업 유지.
+
+PERF-01 OPEN: 준비30초/녹화OFF60초 A기존방/구도→B방/새구도 RAFp95 26.37/22.98ms, 제출49.53/49.27Hz. 조합/단일순서 proxy이며 성능 개선 원인 단정 금지. 무입력 창의 입력표본0, 별도 입력4표본은 부족. GPU/실기기/물리 입력·VoiceOver/long press/OS큰글자 NOT_RUN, 이모지 OPEN, STORAGE-01 원래 VFS원인 OPEN. 원본/실패/중간v16/최종v17은 `evidence/reboot-04-expression-v16-2026-10-14/` 보존. 16유형·성장형·상점·실건강·AI로 확대하지 않는다. SOL_DIRECT/SELF_REVIEW, subagent0, effective ROUTING_UNVERIFIED. feature 일반commit/push만 승인, main/merge/force/tag/배포/실건강/결제/보안 변경 금지.
+
+---
+
+## Historical — v15 인계 (이후 사용자 표현 REWORK 평가)
+
 # 재개 지점 — REBOOT-04 축하·읽기성 v15
 
 [현재 보고](REBOOT-04-REPORT.md) / [전체 지시](tasks/REBOOT-04-celebration-readability-followup.md). 앱 소스 **556725e**, 설치 **reboot-04-celebration-v15 Release**, 입력239개와 설치 JS `eddcd664…` / native `5c289d16…` 일치. 현재 HEAD/dirty/원격/설치 해시를 확인하고 더 새로운 변경을 보존한다. 같으면 재빌드·재설치·DB 초기화부터 하지 않는다. v11 보고317ca1e보다 최신인 REBOOT-05 소스8a95a38/인계376d18c에서 이어왔으며 그 작업을 보존했다.
